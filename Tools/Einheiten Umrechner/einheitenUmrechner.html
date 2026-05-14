@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Einheiten Umrechner</title>
+    <link rel="stylesheet" href="../allgemein.css">
+    <link rel="stylesheet" href="./einheitenUmrechner.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+        <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html"><img src="/3. MathematischeFunktionen/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div><input type="text" name="search" id="searchInput" placeholder="Suche..."></div>
+
+        <div>
+            <a href="" target="_self" class="navTextBorder">Login</a>
+            <a href="" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
+    </header>
+    <main>
+
+
+
+        <section class="einheitenBody">
+            <h1 class="zahlenHeader">Einheiten Umrechner</h1>
+
+            <div class="einheitenGruppenContainer">
+                <button data-category="btnLength" class="btnUnits">Length</button> <button data-category="btnMass" class="btnUnits">Mass</button>   <button data-category="btnTime" class="btnUnits">Time</button>
+            </div>
+
+            <div class="einheitsDiv">
+                <input type="text" id="inputEinheit" placeholder="Zahl eingeben..." class="zahlenInputfeld">
+
+                <select name="inputA" id="einheitA" class="selection">
+                    <option value=""> ...</option>
+                </select>
+
+                <i class="fas fa-long-arrow-alt-down"></i>
+
+                <select name="inputZ" id="einheitZ" class="selection">
+                    <option value=""> ...</option>
+                </select>
+
+                <div class="loesungsDiv"><p id="loesungOutput">Ergebnis</p></div>
+            </div>
+            
+            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+
+            <div class="zahlenAusgabestyle">
+                <div class="rechenwegDiv">
+                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                </div>
+                <p id="tipp"></p>
+            </div>
+        </section>
+
+
+
+
+    </main>
+    <footer>
+        <div class="footerNav">
+
+            <div class="platzhalter">Platzhalter</div>
+
+            <div class="linksFooterect">
+                <a href="">Datenschutz</a>
+
+                <a href="">Feedback</a>
+
+                <a href="">Impressum</a>
+            </div>
+        </div>
+    </footer>
+    <script src="./einheitenUmrechner.js"></script>
+</body>
+</html>

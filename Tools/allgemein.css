@@ -1,0 +1,140 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html{
+    font-size: 20px;
+}
+
+body{
+    margin: 0;
+    background-color: var(--backgroundBody);
+}
+
+
+/* FARBEN Styling*/
+
+:root{
+    --borderColor: rgb(118, 20, 209);
+
+    --backgroundNavbar: rgb(0, 0, 0);
+    --backgroundImpressum: rgb(0, 0, 0);
+    --borderNav: rgb(142, 57, 221);
+    --borderImpressum: rgb(142, 57, 221);
+
+    --backgroundBody:rgba(0, 0, 0, 0.918);
+
+    --underlineColor: rgb(73, 4, 94);
+
+    --textNormalColor:white;
+
+    --textLoginRegisterColor: white;
+    --backgroundLoginRegister: black;
+    --borderLoginRegisterColor: rgb(118, 57, 179);
+
+    --boxShadowing: rgba(255, 255, 255, 0.233);
+
+    --backgroundNormal:black;
+}
+
+
+
+
+/* Navbar */
+
+.navbar{
+    background-color: var(--backgroundNavbar);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+
+    padding: 1rem;
+
+    border: 4px solid var(--borderNav);
+    border-top: none;
+
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.navImage{
+    height: 40px;
+}
+
+#searchInput{
+    font-size: 0.8rem;
+
+    border: 2px solid var(--borderColor);
+    border-radius: 20px;
+
+    padding: 3px 1px 3px 4px;
+
+
+
+    outline: none;
+}
+
+#searchInput:focus{
+    border: 3px solid var(--borderColor);
+}
+
+
+.navTextBorder{
+    background-color: var(--backgroundLoginRegister);
+
+    border: 3px solid var(--borderLoginRegisterColor);
+    border-radius: 40px;
+
+    padding: 3px 9px;
+
+    color: var(--textLoginRegisterColor);
+
+    text-decoration: none;
+}
+
+
+
+
+
+
+
+
+/* Footer*/
+
+.footerNav{
+    background-color: var(--backgroundImpressum);
+
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+
+    margin-top: 6rem;
+
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+
+    border: 4px  solid var(--borderImpressum);
+    border-bottom: none;
+
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+}
+
+
+.platzhalter{
+    text-align: center;
+}
+
+.linksFooterect{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}

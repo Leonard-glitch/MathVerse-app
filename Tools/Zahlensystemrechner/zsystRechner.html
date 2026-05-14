@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zahlensystem Rechner</title>
+    <link rel="stylesheet" href="../allgemein.css">
+    <link rel="stylesheet" href="./zsystRechner.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+        <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html"><img src="/3. MathematischeFunktionen/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div><input type="text" name="search" id="searchInput" placeholder="Suche..."></div>
+
+        <div>
+            <a href="" target="_self" class="navTextBorder">Login</a>
+            <a href="" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
+    </header>
+    <main>
+
+
+
+        <section class="zahlenBody">
+            <h1 class="zahlenHeader">Zahlensystem Rechner</h1>
+
+            <div id="systemeContainer">
+
+                <select id="basea" class="selectBase">
+                <option value="2">2 (Dual)</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8 (Oktal)</option>
+                <option value="9">9</option>
+                <option value="10">10 (Dezimal)</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16 (Hexadezimal)</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                </select> 
+
+                <div class="SytemDiv"><input type="text" name="basea" id="zahl1Input" placeholder="Zahl1" class="zahlenInput"></div>
+
+                
+
+                <div class="rechenZeichenSelectDiv">
+                <select id="rechenZeichenMain" class="rechenZeichenSelect">
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="*">*</option>
+                <option value="/">/</option>
+         
+                </select> 
+                </div>
+
+                <div class="SytemDiv"><input type="text" name="basez" id="zahl2Input" placeholder="Zahl2" class="zahlenInput"></div>
+
+
+            </div>
+
+            <div>
+                <button id="btnAddInput" class="buttton" type="button">Add Input</button>
+                <button id="btnDeleteInput" class="buttton" type="button">Delete Input</button>
+            </div>
+
+
+            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
+
+            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+
+            <div class="zahlenAusgabestyle">
+                <div class="loesungsDiv"> <p class="loesungText">Lösung:</p><p id="loesungOutput"></p></div>
+                <div class="rechenwegDiv">
+                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                </div>
+                <p id="tipp"></p>
+            </div>
+        </section>
+
+
+
+
+    </main>
+    <footer>
+        <div class="footerNav">
+
+            <div class="platzhalter">Platzhalter</div>
+
+            <div class="linksFooterect">
+                <a href="">Datenschutz</a>
+
+                <a href="">Feedback</a>
+
+                <a href="">Impressum</a>
+            </div>
+        </div>
+    </footer>
+    <script src="./zsystRechner.js"></script>
+</body>
+</html>

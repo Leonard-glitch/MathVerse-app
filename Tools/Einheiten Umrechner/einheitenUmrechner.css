@@ -1,0 +1,281 @@
+body{
+    background-color: rgba(0, 0, 0, 0.856);
+}
+
+
+
+
+.zahlenHeader{
+    color: var(--textNormalColor);
+    color: rgb(255, 255, 255);
+    padding: 2rem;
+    font-size: 3rem;
+    text-align: center;
+    letter-spacing: 0.08rem;
+    font-weight: 1000;
+    text-decoration: underline var(--underlineColor);
+}
+
+
+/* Einheiten Body*/
+
+.einheitenBody{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+
+
+/* Einheiten Gruppen auswählen */
+
+.einheitenGruppenContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+.einheitenGruppenContainer button{
+    font-size: 1.0rem;
+    text-align: center;
+    margin-bottom: 1rem ;
+    padding: 0.1rem 0.5rem;
+
+    color: var(--textNormalColor);
+
+    background-color: var(--backgroundNormal);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    transition: box-shadow 0.1s ease-in;
+}
+
+.einheitenGruppenContainer button:hover{
+    box-shadow: 
+        0 5px 15px var(--boxShadowing),
+        0 10px 25px var(--boxShadowing);
+}
+
+.btnUnits.active {
+  background: #7a00ff;
+  color: white;
+  transform: scale(1.05);
+}
+
+
+/* Einheites Div*/
+
+.einheitsDiv{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/*Input Felder*/
+
+
+.zahlenInputfeld{
+    font-size: 1.0rem;
+    text-align: center;
+    padding: 0.1rem;
+    margin-top: 0;
+
+    background-color: var(--backgroundNormal);
+
+    color: var(--textNormalColor);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    transition: transform 0.1s ease-in;
+}
+
+.zahlenInputfeld:hover{
+    transform: scale(1.01);
+}
+
+.zahlenInputfeld:focus{
+    box-shadow: 
+        0 5px 20px var(--boxShadowing),
+        0 10px 25px var(--boxShadowing);
+}
+
+
+::placeholder{
+    color: var(--textNormalColor);
+    opacity: 0.5;
+}
+
+input {
+  background-color: black;
+  color: white;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: white;
+  -webkit-box-shadow: 0 0 0px 1000px black inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Einheiten auswählen*/
+
+.selection{
+    font-size: 1.0rem;
+    text-align: center;
+    margin: 0.5rem;
+    padding: 0.1rem 0.5rem;
+
+    color: var(--textNormalColor);
+
+    background-color: var(--backgroundNormal);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+}
+
+
+
+/* Icon */
+
+.fa-long-arrow-alt-down{
+    color: var(--textNormalColor);
+}
+
+
+
+/* Lösung Ausgabe*/
+
+.loesungsDiv{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    text-align: center;
+    padding: 0.2rem;
+    margin-top: 0.5rem;
+    
+    min-width: 12.5rem;
+
+    background-color: var(--backgroundNormal);
+
+    color: var(--textNormalColor);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+}
+
+
+
+
+
+/* Falsche Eingabe*/
+
+.falscheEingabestyle{
+    font-size: 1.7rem;
+    text-align: center;
+    margin:2rem 0 ;
+    padding: 0.1rem 0.5rem;
+
+    background-color: var(--backgroundNormal);
+
+    border: 4px solid red;
+    border-radius: 30px;
+
+    outline: none;
+
+    color: red;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    display: none;
+    transition: display 0.2s ease;
+}
+
+
+
+
+/* Ausgabe Rechenweg*/
+
+
+.zahlenAusgabestyle{
+    display: flex;
+    flex-direction: column;
+
+    min-width: 350px;
+
+    font-size: 1.7rem;
+    margin:1.5rem 0 ;
+    padding: 0.1rem 0.5rem;
+
+    background-color: var(--backgroundNormal);
+
+    color: var(--textNormalColor);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    transition: box-shadow 0.1s ease;
+}
+
+.zahlenAusgabestyle:hover{
+     box-shadow: 
+        0 5px 15px var(--boxShadowing),
+        0 10px 25px var(--boxShadowing);
+}
+
+.rechenwegDiv{
+    display: flex;
+    flex-direction: column;
+}
+
+.rechenwegDiv .rechenwegText{
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    text-decoration: none;
+}
+
+
+.rechenwegDiv #rechenwegOutput{
+    margin: 0;
+    padding-left: 0.5rem;
+    font-size: 1.0rem;
+}

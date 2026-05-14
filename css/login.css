@@ -1,0 +1,81 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+html{
+    font-size: 18px;
+}
+
+section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.headerOne{
+    text-align: center;
+    text-decoration: underline;
+    padding: 4rem;
+}
+
+.loginDiv{
+    border: 2px solid blue;
+    border-radius: 30px;
+    font-size: 1.4rem;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+.lintDiv{
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+label{
+    text-decoration: underline;
+}
+
+input{
+    font-size: 1rem;
+    padding: 0.2rem;
+    border: 2px solid rgb(0, 123, 255);
+    border-radius: 20px;
+}
+
+.button{
+    display: flex;
+    justify-content: center;
+}
+
+.button button{
+    font-size: 1.2rem;
+    border:2px solid blueviolet;
+    border-radius: 40px;
+    padding: 0.2rem 1rem;
+    background-color: rgb(154, 154, 209);
+    color: rgb(22, 221, 102);
+}
+
+
+
+
+.infosDiv{
+    border-top: 2px solid blue;
+    
+    padding: 0.5rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.infosLInk{
+    color: blue;
+}

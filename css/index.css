@@ -1,0 +1,324 @@
+html{
+    font-size: 20px;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+
+.navbar{
+    background-color: rgba(0, 0, 0, 0.541);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+
+    padding: 1rem;
+
+    border: 4px solid rgb(58, 9, 104);
+    border-top: none;
+
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.navImage{
+    height: 40px;
+}
+
+
+.navTextBorder{
+    background-color: black;
+
+    border: 3px solid rgb(138, 22, 255);
+    border-radius: 40px;
+
+    padding: 3px 9px;
+
+    color: white;
+
+    text-decoration: none;
+}
+
+
+
+/* 3 Body Divs*/
+
+
+.bodyDivsinSection{ /* Section*/
+    display: flex;
+    flex-direction: row;
+}
+
+.bodyDivContantLeft{ /* 1.BodyDiv*/
+    width: 15%;
+
+    border: 1px solid green;
+}
+
+.bodyDivContantMiddle{ /*2. BodyDiv*/
+    width: 70%;
+
+    padding-left: 20px;
+    padding-right: 20px;
+
+    background-color: rgba(0, 0, 255, 0.322);
+}
+
+.bodyDivContantRight{ /*3. BodyDiv*/
+    width: 15%;
+
+    border: 1px solid green;
+}
+
+
+
+
+
+/* SectionMiddle*/
+
+.headerOne{ /*HeaderOne*/
+    text-align: center;
+
+    padding: 1.5rem 0;
+    font-size: 4rem;
+    letter-spacing: 0.08rem;
+    font-weight: 1000;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+}
+
+.textUnderHeader1{ /*Text under Header*/
+    margin-top: 0;
+
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+
+}
+
+
+
+
+
+
+/* Favoriten*/
+
+.favoritenDiv{
+    margin-top: 6rem;
+
+    background-color: rgba(0, 0, 255, 0);
+}
+
+
+/*Card Allgemeines*/
+
+.cardTitleDiv{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    margin-bottom: 10px;
+}
+
+.favoritenHeader2{ /* New Ones Header*/
+    text-decoration: none;
+    padding-left: 5px;
+    margin: 0;
+}
+
+.star{
+    font-size: 22px;
+
+    color: gold;
+}
+
+.star:hover{
+    cursor: pointer;
+    text-shadow: 0px 0px 2px gold;
+}
+
+.star:active{
+    color: gold;
+}
+
+
+
+
+
+.cardsContainer{ /* Div in dem alle neuen Funktions sind*/
+    border: 2px solid rgb(255, 0, 0);
+    border-radius: 30px;
+
+    background-color: rgb(0, 255, 157);
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    padding: 1rem;
+}
+
+
+
+
+
+
+
+.card{ /* Zahlen Analyse Funktion*/
+    width: 10rem;
+
+    background-color: blueviolet;
+
+    aspect-ratio: 1 / 1;
+
+    border: 3px solid black;
+    border-radius: 2rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    font-size: 0.9rem;
+
+    color: black;
+    text-decoration: none;
+
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s ease;
+}
+
+.card:hover{
+    transform: translateY(-4px);
+}
+
+.cardTop{
+    position: relative;
+    margin-top: 10px;
+}
+
+.cardImg{ /* Image innerhalb des Div kontainers*/
+    width: 10em;
+    height: 8em;
+    border-radius: 1.5em;
+}
+
+.cardText{
+    margin-top: 0.5em;
+    text-align: center;
+}
+
+.info{
+    position: absolute;
+    top: 4%;
+    left: 6%;
+    font-size: 1.1em;
+}
+
+.favorite{
+    position: absolute;
+    top: 4%;
+    right: 6%;
+    font-size: 1em;
+
+    color: white;
+    text-shadow: 0px 0px 2px black;
+
+    transition:color 0.15s;
+}
+
+.favorite:hover{
+    text-shadow: 0px 0px 2px red;
+}
+
+.favorite.active{
+    color: red;
+    text-shadow: 0px 0px 2px red;
+}
+
+
+
+
+
+
+
+
+/* Restlichen FUNKTIONS*/
+
+.restFuncionsDiv{ 
+   background-color: rgba(0, 0, 255, 0);
+
+   margin-top: 5rem;
+}
+
+
+
+
+
+
+/* DROP DOWN Test
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: #ccc;
+}
+
+
+HTML: <div class="divider"><span><button>Drop Down</button></span></div>
+
+*/
+
+
+
+
+
+
+/* Footer*/
+
+.footerNav{
+    background-color: rgba(0, 0, 0, 0.616);
+
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+
+    margin-top: 6rem;
+
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+
+    border: 4px  solid rgb(58, 9, 104);
+    border-bottom: none;
+
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+}
+
+
+.platzhalter{
+    text-align: center;
+}
+
+.linksFooterect{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}

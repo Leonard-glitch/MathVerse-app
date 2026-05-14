@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="icon" type="image/x-icon" href="./pictures/favicon v1.png">
+    <title>MathVerse</title>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+        <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html"><img src="/3. MathematischeFunktionen/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div><input type="text" name="search" id="searchInput" placeholder="Suche..."></div>
+
+        <div>
+            <a href="" target="_self" class="navTextBorder">Login</a>
+            <a href="" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
+    </header>
+    <main>
+        <section class="bodyDivsinSection">
+            <aside class="bodyDivContantLeft"></aside>
+
+            <div class="bodyDivContantMiddle">
+                <h1 class="headerOne">MathVerse</h1>
+
+                <p class="textUnderHeader1">All your math tools in one place</p>
+
+
+                <div id="groupsContainer">
+
+                                    <!-- Favoriten -->
+                    <div class="restFuncionsDiv" data-id="favoritenGroupStar">
+                        <div class="cardTitleDiv">
+                            <i class="fa fa-star-o star"> </i> <h2 class="favoritenHeader2">Favoriten</h2>
+                        </div>
+                        <div class="cardsContainer" id="favoritenContainer">
+                            <!-- Favoriten werden dynamisch eingefügt -->
+
+
+                        </div>
+                    </div>
+
+                                    <!-- Algebra -->
+                    <div class="restFuncionsDiv" data-id="algebraGroupStar">
+                        <div class="cardTitleDiv">
+                            <i class="fa fa-star-o star"> </i> <h2 class="favoritenHeader2">Algebra</h2>
+                        </div>
+                        <div class="cardsContainer" id="algebraContainer">
+
+                            <a href="#" class="card" data-id="card1">
+                                <div class="cardTop">
+                                    <img src="./pictures/51R9beEdSfL.jpg" class="cardImg">
+                                    <i class="fa fa-info-circle info"></i>
+                                    <i class="fa fa-heart-o favorite"></i>
+                                </div>
+                                <p class="cardText">Zahlen Analyse</p>
+                            </a>
+                            
+                        </div>
+                    </div>
+
+                                    <!-- Zahlensysteme -->
+                    <div class="restFuncionsDiv" data-id="zahlensystemeGroupStar">
+                        <div class="cardTitleDiv">
+                            <i class="fa fa-star-o star"> </i> <h2 class="favoritenHeader2">Zahlensysteme</h2>
+                        </div>
+                        <div class="cardsContainer" id="zahlensystemeContainer">
+
+                            <a href="#" class="card" data-id="card2">
+                                <div class="cardTop">
+                                    <img src="./pictures/ZahlensystemeUmwandeln Temp1.jpg" class="cardImg">
+                                    <i class="fa fa-info-circle info"></i>
+                                    <i class="fa fa-heart-o favorite"></i>
+                                </div>
+                                <p class="cardText">Zahlensystem Umrechner</p>
+                            </a>
+
+                            <a href="#" class="card" data-id="card3">
+                                <div class="cardTop">
+                                    <img src="./pictures/beispiel-addition.png" class="cardImg">
+                                    <i class="fa fa-info-circle info"></i>
+                                    <i class="fa fa-heart-o favorite"></i>
+                                </div>
+                                <p class="cardText">Zahlensystem Rechner</p>
+                            </a>
+
+                        </div>
+                    </div>
+
+                                    <!-- All Tools -->
+                    <div class="restFuncionsDiv" data-id="allToolsGroupStar">
+                        <div class="cardTitleDiv">
+                            <i class="fa fa-star-o star"> </i> <h2 class="favoritenHeader2">All Tools</h2>
+                        </div>
+                        <div class="cardsContainer" id="allToolsContainer" data-alltools="true">
+                            <!-- Alle Karten noch einmal einfügen -->
+
+                            <a href="#" class="card" data-id="card1">
+                                <div class="cardTop">
+                                    <img src="./pictures/51R9beEdSfL.jpg" class="cardImg">
+                                    <i class="fa fa-info-circle info"></i>
+                                    <i class="fa fa-heart-o favorite"></i>
+                                </div>
+                                <p class="cardText">Zahlen Analyse</p>
+                            </a>
+
+                            <a href="#" class="card" data-id="card2">
+                                <div class="cardTop">
+                                    <img src="./pictures/ZahlensystemeUmwandeln Temp1.jpg" class="cardImg">
+                                    <i class="fa fa-info-circle info"></i>
+                                    <i class="fa fa-heart-o favorite"></i>
+                                </div>
+                                <p class="cardText">Zahlensystem Umrechner</p>
+                            </a>
+
+                            <a href="#" class="card" data-id="card3">
+                                <div class="cardTop">
+                                    <img src="./pictures/beispiel-addition.png" class="cardImg">
+                                    <i class="fa fa-info-circle info"></i>
+                                    <i class="fa fa-heart-o favorite"></i>
+                                </div>
+                                <p class="cardText">Zahlensystem Rechner</p>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="bodyDivContantRight"></aside>
+        </section>
+    </main>
+    <footer>
+        <div class="footerNav">
+
+            <div class="platzhalter">&copy;</div>
+
+            <div class="linksFooterect">
+                <a href="">Datenschutz</a>
+
+                <a href="">Feedback</a>
+
+                <a href="">Impressum</a>
+            </div>
+        </div>
+    </footer>
+    <script src="./javaScript/index.js"></script>
+</body>
+</html>

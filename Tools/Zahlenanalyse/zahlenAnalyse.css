@@ -1,0 +1,294 @@
+html{
+    font-size: 20px;
+}
+
+body{
+    margin: 0;
+    background-color: var(--backgroundBody);
+}
+
+
+/* FARBEN Styling*/
+
+:root{
+    --borderColor: rgb(118, 20, 209);
+
+    --backgroundNavbar: rgb(0, 0, 0);
+    --backgroundImpressum: rgb(0, 0, 0);
+    --borderNav: rgb(142, 57, 221);
+    --borderImpressum: rgb(142, 57, 221);
+
+    --backgroundBody:rgba(0, 0, 0, 0.918);
+
+    --underlineColor: rgb(73, 4, 94);
+
+    --textNormalColor:white;
+
+    --textLoginRegisterColor: white;
+    --backgroundLoginRegister: black;
+    --borderLoginRegisterColor: rgb(118, 57, 179);
+
+    --boxShadowing: rgba(255, 255, 255, 0.233);
+
+    --backgroundNormal:black;
+}
+
+
+
+
+/* Navbar */
+
+.navbar{
+    background-color: var(--backgroundNavbar);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+
+    padding: 1rem;
+
+    border: 4px solid var(--borderNav);
+    border-top: none;
+
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.navImage{
+    height: 40px;
+}
+
+.katalogText{
+    margin: 0;
+    padding: 0;
+    color: var(--textNormalColor);
+}
+
+
+.navTextBorder{
+    background-color: var(--backgroundLoginRegister);
+
+    border: 3px solid var(--borderLoginRegisterColor);
+    border-radius: 40px;
+
+    padding: 3px 9px;
+
+    color: var(--textLoginRegisterColor);
+
+    text-decoration: none;
+}
+
+
+
+
+/* Zahlen*/
+
+.zahlenBody{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.zahlneHeader{
+    color: var(--textNormalColor);
+    padding: 1.5rem 0;
+    font-size: 4rem;
+    letter-spacing: 0.08rem;
+    font-weight: 1000;
+    text-decoration: underline var(--underlineColor);
+}
+
+.zahlneInputfeld{
+    font-size: 1.7rem;
+    text-align: center;
+    padding: 0.1rem;
+
+    background-color: var(--backgroundNormal);
+
+    color: var(--textNormalColor);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    transition: transform 0.1s ease-in;
+}
+
+.zahlneInputfeld:hover{
+    transform: scale(1.01);
+}
+
+.zahlneInputfeld:focus{
+    box-shadow: 
+        0 5px 20px var(--boxShadowing),
+        0 10px 25px var(--boxShadowing);
+}
+
+
+::placeholder{
+    color: var(--textNormalColor);
+    opacity: 0.5;
+}
+
+input {
+  background-color: black;
+  color: white;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: white;
+  -webkit-box-shadow: 0 0 0px 1000px black inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+
+
+
+
+
+.zahlenButtoncss{
+    font-size: 1.7rem;
+    text-align: center;
+    margin:2rem 0 ;
+    padding: 0.1rem 0.5rem;
+
+    color: var(--textNormalColor);
+
+    background-color: var(--backgroundNormal);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    transition: box-shadow 0.1s ease-in;
+}
+
+.zahlenButtoncss:hover{
+    box-shadow: 
+        0 5px 15px var(--boxShadowing),
+        0 10px 25px var(--boxShadowing);
+}
+
+.zahlenButtoncss:active{
+    transform: translateY(3px);
+}
+
+/* Falsche Eingabe*/
+
+.falscheEingabestyle{
+    font-size: 1.7rem;
+    text-align: center;
+    margin:2rem 0 ;
+    padding: 0.1rem 0.5rem;
+
+    background-color: var(--backgroundNormal);
+
+    border: 4px solid red;
+    border-radius: 30px;
+
+    outline: none;
+
+    color: red;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    display: none;
+    transition: display 0.2s ease;
+}
+
+
+.zahlenAusgabestyle{
+    display: flex;
+    flex-direction: column;
+
+    font-size: 1.7rem;
+    margin:2rem 0 ;
+    padding: 0.1rem 0.5rem;
+
+    background-color: var(--backgroundNormal);
+
+    color: var(--textNormalColor);
+
+    border: 4px solid var(--borderColor);
+    border-radius: 30px;
+
+    outline: none;
+
+    box-shadow: 
+        0 5px 6px var(--boxShadowing),
+        0 10px 20px var(--boxShadowing);
+
+    transition: box-shadow 0.1s ease;
+}
+
+.zahlenAusgabestyle:hover{
+     box-shadow: 
+        0 5px 15px var(--boxShadowing),
+        0 10px 25px var(--boxShadowing);
+}
+
+.zahlenAusgabestyleZeilen{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.zahlenAusgabestyleZeilen p{
+    margin: 1.25rem;
+    text-decoration: none;
+}
+
+
+
+
+/* Footer*/
+
+.footerNav{
+    background-color: var(--backgroundImpressum);
+
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+
+    margin-top: 6rem;
+
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+
+    border: 4px  solid var(--borderImpressum);
+    border-bottom: none;
+
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+}
+
+
+.platzhalter{
+    text-align: center;
+}
+
+.linksFooterect{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
