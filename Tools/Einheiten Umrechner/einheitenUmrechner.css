@@ -1,18 +1,7 @@
-body {
-    background-color: rgba(0, 0, 0, 0.856);
-}
+/* ==========================================================================
+   SPEZIFISCHES DESIGN FÜR EINHEITEN-UMRECHNER (einheitenUmrechner.css)
+   ========================================================================== */
 
-.zahlenHeader {
-    color: rgb(255, 255, 255);
-    padding: 2rem;
-    font-size: 3rem;
-    text-align: center;
-    letter-spacing: 0.08rem;
-    font-weight: 1000;
-    text-decoration: underline var(--underlineColor);
-}
-
-/* Einheiten Body */
 .einheitenBody {
     display: flex;
     flex-direction: column;
@@ -20,58 +9,48 @@ body {
     padding: 0 1rem;
 }
 
-/* Einheiten Gruppen auswählen */
+/* Kategorie-Auswahl Buttons Container */
 .einheitenGruppenContainer {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
     flex-wrap: wrap;
+    background-color: var(--bg-input);
+    padding: 6px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
 }
 
-.einheitenGruppenContainer button {
-    font-size: 1.0rem;
-    text-align: center;
-    padding: 0.4rem 1.2rem;
-    color: var(--textNormalColor);
-    background-color: var(--backgroundNormal);
-    border: 4px solid var(--borderColor);
-    border-radius: 30px;
+/* Einzelne Kategorie-Buttons */
+.btnUnits {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.4rem 1.4rem;
+    color: var(--text-secondary);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-lg);
     outline: none;
     cursor: pointer;
-    box-shadow: 
-        0 5px 6px var(--boxShadowing),
-        0 10px 20px var(--boxShadowing);
-    transition: all 0.2s ease;
+    transition: all var(--transition-speed) ease;
 }
 
-/* Hover-Effekt gilt NUR für Buttons, die NICHT aktiv sind! */
-.einheitenGruppenContainer button:not(.active):hover {
-    box-shadow: 
-        0 5px 15px var(--boxShadowing),
-        0 10px 25px var(--boxShadowing);
-    transform: translateY(-2px);
-}
-
-/* Der aktive Button-Zustand */
-.btnUnits.active {
-    background: #7a00ff;
-    color: white;
-    border-color: #a347ff;
-    transform: scale(1.05);
-    cursor: default; /* Ändert den Mauszeiger, da man den aktiven Button nicht nochmal klicken muss */
+.btnUnits:not(.active):hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .btnUnits.active {
-    background: #7a00ff;
-    color: white;
-    border-color: #a347ff;
-    transform: scale(1.05);
+    background: var(--border-glow);
+    color: var(--text-primary);
+    box-shadow: 0 0 15px var(--glow-soft);
+    font-weight: 600;
 }
 
-/* Einheiten Div */
+/* Layout Box für Eingaben & Dropdowns */
 .einheitsDiv {
     display: flex;
     flex-direction: column;
@@ -81,163 +60,78 @@ body {
     max-width: 400px;
 }
 
-/* Input Felder & Selects */
-.zahlenInputfeld, .selection {
-    font-size: 1.1rem;
+/* Dropdown Menüs */
+.selection {
+    font-size: 1rem;
     text-align: center;
     padding: 0.6rem 1rem;
     width: 100%;
-    box-sizing: border-box;
-    background-color: black;
-    color: var(--textNormalColor);
-    border: 4px solid var(--borderColor);
-    border-radius: 30px;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
     outline: none;
-    box-shadow: 
-        0 5px 6px var(--boxShadowing),
-        0 10px 20px var(--boxShadowing);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-/* NUR das Inputfeld darf sich minimal vergrößern, da es alleine steht */
-.zahlenInputfeld:hover {
-    transform: scale(1.01);
-}
-
-/* Das Dropdown-Menü (Selection) bleibt beim Hovern von der Größe her stabil! */
-.selection:hover {
-    border-color: #a347ff;
+    box-shadow: var(--shadow-main);
     cursor: pointer;
-    box-shadow: 
-        0 0 10px rgba(163, 71, 255, 0.4),
-        0 5px 6px var(--boxShadowing);
+    transition: border-color var(--transition-speed);
 }
 
-/* Fokus-Zustand für beide (wenn man reinklickt) */
-.zahlenInputfeld:focus, .selection:focus {
-    border-color: #a347ff;
-    box-shadow: 
-        0 0 15px rgba(122, 0, 255, 0.6),
-        0 5px 20px var(--boxShadowing);
+.selection:hover, .selection:focus {
+    border-color: var(--border-glow);
 }
 
-/* Styling für die einzelnen Optionen im Dropdown-Menü */
 .selection option {
-    background-color: #111; /* Dunkler Hintergrund im aufgeklappten Zustand */
-    color: var(--textNormalColor);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
     padding: 0.5rem;
-    font-size: 1rem;
 }
 
-::placeholder {
-    color: var(--textNormalColor);
-    opacity: 0.5;
-}
-
-/* Autofill Fix */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-    -webkit-text-fill-color: white;
-    -webkit-box-shadow: 0 0 0px 1000px black inset;
-    transition: background-color 9999s ease-in-out 0s;
-}
-
-/* Icon zwischen den Selects */
+/* Pulsierender Tech-Pfeil */
 .fa-long-arrow-alt-down {
-    color: var(--textNormalColor);
-    font-size: 1.5rem;
-    margin: 0.2rem 0;
-    animation: pulse 2s infinite;
-}
-
-/* Lösung Ausgabe */
-.loesungsDiv {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 0.8rem 1rem;
-    width: 100%;
-    box-sizing: border-box;
-    background-color: var(--backgroundNormal);
-    color: #00ffcc; /* Schickes Live-Grün/Blau für das Ergebnis */
-    font-weight: bold;
+    color: var(--text-secondary);
     font-size: 1.3rem;
-    border: 4px solid var(--borderColor);
-    border-radius: 30px;
-    box-shadow: 
-        0 5px 6px var(--boxShadowing),
-        0 10px 20px var(--boxShadowing);
+    margin: 0.2rem 0;
+    animation: techPulse 2s infinite ease-in-out;
 }
 
-/* Falsche Eingabe (Weich einblendbar) */
-.falscheEingabestyle {
-    font-size: 1.2rem;
-    text-align: center;
-    margin: 1rem 0;
-    padding: 0.5rem 1.5rem;
-    background-color: var(--backgroundNormal);
-    border: 4px solid red;
-    border-radius: 30px;
-    color: red;
-    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
-    
-    /* Animation-Vorbereitung statt display: none */
-    display: none; 
-    opacity: 0;
-    transition: opacity 0.3s ease;
+@keyframes techPulse {
+    0% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.15); color: var(--border-glow); opacity: 1; filter: drop-shadow(0 0 4px var(--border-glow)); }
+    100% { transform: scale(1); opacity: 0.4; }
 }
 
-/* Ausgabe Rechenweg Box */
-.zahlenAusgabestyle {
-    display: flex;
-    flex-direction: column;
+/* Live Ergebnis Box */
+.einheitsDiv .loesungsDiv {
+    margin-top: 1rem;
     width: 100%;
-    max-width: 450px;
-    font-size: 1.1rem;
-    margin: 2rem 0;
-    padding: 1rem;
-    box-sizing: border-box;
-    background-color: var(--backgroundNormal);
-    color: var(--textNormalColor);
-    border: 4px solid var(--borderColor);
-    border-radius: 20px;
-    box-shadow: 
-        0 5px 6px var(--boxShadowing),
-        0 10px 20px var(--boxShadowing);
-    transition: box-shadow 0.2s ease;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.8rem;
+    text-align: center;
+    justify-content: center;
 }
 
-.zahlenAusgabestyle:hover {
-     box-shadow: 
-        0 5px 15px rgba(122, 0, 255, 0.4),
-        0 10px 25px var(--boxShadowing);
-}
-
-.rechenwegDiv {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.rechenwegDiv .rechenwegText {
-    font-size: 1.2rem;
+.einheitsDiv #loesungOutput {
+    font-size: 1.3rem;
     font-weight: bold;
-    color: #a347ff;
-    margin-bottom: 0.2rem;
+    color: var(--accent-live);
+    text-shadow: 0 0 10px var(--glow-live);
 }
 
-.rechenwegDiv #rechenwegOutput {
-    padding-left: 0.2rem;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: #ccc;
+/* ==========================================================================
+   RECHENWEG STYLING (Passend für deinen JS-Output)
+   ========================================================================== */
+#rechenwegOutput {
+    font-size: 1rem;
+    line-height: 1.8;              /* Sorgt für schönen Abstand beim <br> */
+    color: var(--text-secondary);
+    padding: 0.5rem 0;
 }
 
-/* Kleine Animation für den Pfeil */
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.7; }
+/* Formatiert das fettgedruckte Endergebnis in deiner Rechnung */
+#rechenwegOutput b {
+    color: var(--accent-live);
+    text-shadow: 0 0 8px var(--glow-live);
+    font-size: 1.1rem;
 }

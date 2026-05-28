@@ -1,143 +1,234 @@
-*{
+/* ==========================================================================
+   GLOBAL CONFIG & HIGH-TECH DARK THEME VARIABLES
+   ========================================================================== */
+:root {
+    /* Backgrounds */
+    --bg-body: #09090e;                 /* Tiefes High-Tech Dunkelblau/Schwarz */
+    --bg-surface: #111118;              /* Container & Karten Hintergrund */
+    --bg-input: #06060a;                /* Kontrastreiches Dunkel für Input-Felder */
+    --bg-navbar: rgba(9, 9, 14, 0.75);  /* Transparente Navbar für Blur-Effekt */
+    
+    /* Borders & Accents */
+    --border-color: #222232;            /* Subtile Standard-Strukturlinien */
+    --border-glow: #8a16ff;             /* Elektrisierendes Neon-Violett */
+    --accent-live: #00ffcc;             /* High-Tech Cyan für Ergebnisse/Erfolge */
+    --accent-error: #ff2a5f;            /* Aggressives Tech-Rot für Fehler */
+    
+    /* Text Colors */
+    --text-primary: #ffffff;            /* Haupttext */
+    --text-secondary: #8f8fbc;          /* Nebentext / Labels / Legenden */
+    --text-muted: #444460;              /* Platzhalter */
+
+    /* Shadows & Glows */
+    --shadow-main: 0 10px 30px rgba(0, 0, 0, 0.6);
+    --glow-soft: rgba(138, 22, 255, 0.25);
+    --glow-live: rgba(0, 255, 204, 0.2);
+    --glow-error: rgba(255, 42, 95, 0.35);
+
+    /* Layout Tokens */
+    --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --radius-lg: 32px;
+    --radius-md: 20px;
+    --radius-sm: 10px;
+    --transition-speed: 0.25s;
+}
+
+/* ==========================================================================
+   BASE RESET & RESET STYLES
+   ========================================================================== */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
-html{
+html {
     font-size: 20px;
+    font-family: var(--font-main);
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    scroll-behavior: smooth;
 }
 
-body{
-    margin: 0;
-    background-color: var(--backgroundBody);
+body {
+    background-color: var(--bg-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-
-/* FARBEN Styling*/
-
-:root{
-    --borderColor: rgb(118, 20, 209);
-
-    --backgroundNavbar: rgb(0, 0, 0);
-    --backgroundImpressum: rgb(0, 0, 0);
-    --borderNav: rgb(142, 57, 221);
-    --borderImpressum: rgb(142, 57, 221);
-
-    --backgroundBody:rgba(0, 0, 0, 0.918);
-
-    --underlineColor: rgb(73, 4, 94);
-
-    --textNormalColor:white;
-
-    --textLoginRegisterColor: white;
-    --backgroundLoginRegister: black;
-    --borderLoginRegisterColor: rgb(118, 57, 179);
-
-    --boxShadowing: rgba(255, 255, 255, 0.233);
-
-    --backgroundNormal:black;
+main {
+    flex: 1;
 }
 
-
-
-
-/* Navbar */
-
-.navbar{
-    background-color: var(--backgroundNavbar);
-
+/* ==========================================================================
+   GLOBAL NAVBAR
+   ========================================================================== */
+.navbar {
+    background-color: var(--bg-navbar);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
+    padding: 0.8rem 2rem;
 
-    padding: 0.2rem;
-
-    border: 4px solid var(--borderNav);
+    border: 2px solid var(--border-glow);
     border-top: none;
-
-    border-bottom-left-radius: 40px;
-    border-bottom-right-radius: 40px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+    box-shadow: 0 4px 25px var(--glow-soft);
+    
+    position: relative;
+    z-index: 100;
 }
 
-.navImage{
-    height: 50px;
-    padding: 0;
-    margin: 0;
-    border-radius: 30px;
+.navImage {
+    height: 45px;
+    border-radius: var(--radius-sm);
+    filter: drop-shadow(0 0 8px var(--glow-soft));
+    transition: var(--transition-speed);
 }
 
-#searchInput{
+.navImage:hover {
+    transform: scale(1.03);
+}
+
+#searchInput {
     font-size: 0.8rem;
-
-    border: 2px solid var(--borderColor);
-    border-radius: 20px;
-
-    padding: 3px 1px 3px 4px;
-
-
-
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
     outline: none;
+    width: 220px;
+    transition: var(--transition-speed) ease;
 }
 
-#searchInput:focus{
-    border: 3px solid var(--borderColor);
+#searchInput:focus {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 12px var(--glow-soft);
 }
 
-
-.navTextBorder{
-    background-color: var(--backgroundLoginRegister);
-
-    border: 3px solid var(--borderLoginRegisterColor);
-    border-radius: 40px;
-
-    padding: 3px 9px;
-
-    color: var(--textLoginRegisterColor);
-
+.navTextBorder {
+    background-color: var(--bg-input);
+    border: 2px solid var(--border-glow);
+    border-radius: var(--radius-lg);
+    padding: 5px 15px;
+    color: var(--text-primary);
     text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: var(--transition-speed);
 }
 
+.navTextBorder:hover {
+    background-color: var(--border-glow);
+    box-shadow: 0 0 15px var(--border-glow);
+    transform: translateY(-1px);
+}
 
-
-
-
-
-
-
-/* Footer*/
-
-.footerNav{
-    background-color: var(--backgroundImpressum);
-
+/* ==========================================================================
+   GLOBAL FOOTER
+   ========================================================================== */
+.footerNav {
+    background-color: var(--bg-surface);
+    border-top: 2px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 4rem;
-
+    gap: 3rem;
     margin-top: 6rem;
+    padding: 3rem 2rem 1.5rem 2rem;
 
-    padding-top: 4rem;
-    padding-bottom: 1rem;
-
-    border: 4px  solid var(--borderImpressum);
-    border-bottom: none;
-
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
 }
 
-
-.platzhalter{
+.platzhalter {
     text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
 }
 
-.linksFooterect{
+.linksFooterect {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 4rem;
+}
+
+.linksFooterect a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: var(--transition-speed);
+}
+
+.linksFooterect a:hover {
+    color: var(--accent-live);
+    text-shadow: 0 0 8px var(--accent-live);
+}
+
+/* Global Shared Headers */
+.zahlenHeader {
+    color: var(--text-primary);
+    padding: 2.5rem 1rem 1.5rem 1rem;
+    font-size: 2.8rem;
+    text-align: center;
+    letter-spacing: 0.1rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #ffffff, var(--text-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
+   GLOBAL INPUT FIELDS (Für alle Tools)
+   ========================================================================== */
+.zahlenInputfeld {
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 0.6rem 1.5rem;
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 380px;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    outline: none;
+    box-shadow: var(--shadow-main);
+    transition: all var(--transition-speed) ease;
+}
+
+/* Hover-Effekt: Feld hebt sich leicht an */
+.zahlenInputfeld:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-glow);
+}
+
+/* Fokus-Effekt: Feld leuchtet Tech-Violett auf */
+.zahlenInputfeld:focus {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 15px var(--glow-soft), var(--shadow-main);
+}
+
+/* Globaler Placeholder-Style */
+::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.35;
+}
+
+/* Autofill-Fix für Webkit-Browser (Chrome, Edge, Safari) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0px 1000px var(--bg-input) inset;
+    transition: background-color 9999s ease-in-out 0s;
 }
