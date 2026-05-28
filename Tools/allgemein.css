@@ -61,6 +61,8 @@ main {
     flex: 1;
 }
 
+
+
 /* ==========================================================================
    GLOBAL NAVBAR
    ========================================================================== */
@@ -231,4 +233,42 @@ input:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--text-primary);
     -webkit-box-shadow: 0 0 0px 1000px var(--bg-input) inset;
     transition: background-color 9999s ease-in-out 0s;
+}
+
+/* ==========================================================================
+   GLOBAL SCROLLBAR DESIGN (Für alle Tools)
+   ========================================================================== */
+
+/* 1. Standard-Browser (Chrome, Edge, Safari, Opera) */
+::-webkit-scrollbar {
+    width: 10px;               /* Breite der vertikalen Scrollbar */
+    height: 10px;              /* Höhe der horizontalen Scrollbar */
+}
+
+/* Der Hintergrund der Scrollbar-Schiene */
+::-webkit-scrollbar-track {
+    background: var(--bg-body); 
+    border-left: 1px solid var(--border-color);
+}
+
+/* Der bewegliche Griff (Scroll-Slider) */
+::-webkit-scrollbar-thumb {
+    background: rgba(138, 22, 255, 0.3); /* Transparentes Tech-Violett */
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--bg-body);    /* Erzeugt einen sauberen Abstand zum Rand */
+    transition: background var(--transition-speed) ease;
+}
+
+/* Hover-Effekt: Wenn man mit der Maus über die Scrollbar fährt */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-glow);      /* Volles Neon-Violett */
+    box-shadow: 0 0 10px var(--glow-soft);
+}
+
+/* 2. Firefox Unterstützung (Nutzt eine modernere, simplere Syntax) */
+@supports (scrollbar-color: auto) {
+    html {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(138, 22, 255, 0.3) var(--bg-body);
+    }
 }
