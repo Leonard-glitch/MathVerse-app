@@ -1,200 +1,369 @@
 .zahlenBody {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     padding: 0 1rem;
+
 }
+
+
 
 /* Systeme Anordnung */
+
 .systemeContainer {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 0.5rem;
+
 }
+
+
 
 .ausgansSytemDiv, .zielSytemDiv {
+
     margin: 0.2rem;
+
     display: flex;
+
     flex-direction: row;
+
     align-items: center;
+
 }
+
+
 
 .labelBasea, .labelBasez {
+
     background-color: var(--bg-surface);
+
     color: var(--text-secondary);
+
     font-size: 0.85rem;
+
     padding: 0.5rem 1rem;
+
     border: 1px solid var(--border-color);
+
     border-right: none;
+
     border-radius: var(--radius-md) 0 0 var(--radius-md);
+
     box-shadow: var(--shadow-main);
+
 }
+
+
 
 .selectBasea, .selectBasez {
+
     background-color: var(--bg-input);
+
     color: var(--text-primary);
+
     font-size: 0.85rem;
+
     padding: 0.45rem 1rem;
+
     border: 1px solid var(--border-color);
+
     border-radius: 0 var(--radius-md) var(--radius-md) 0;
+
     box-shadow: var(--shadow-main);
+
     outline: none;
+
     cursor: pointer;
+
     transition: var(--transition-speed);
+
 }
+
+
 
 .selectBasea:focus, .selectBasez:focus,
+
 .selectBasea:hover, .selectBasez:hover {
+
     border-color: var(--border-glow);
+
 }
+
+
 
 /* Eingabefeld */
+
 .zahlenInputfeld {
+
     font-size: 1.2rem;
+
     text-align: center;
+
     padding: 0.6rem 1.5rem;
+
     margin-top: 2rem;
+
     width: 100%;
+
     max-width: 380px;
+
     background-color: var(--bg-input);
+
     color: var(--text-primary);
+
     border: 2px solid var(--border-color);
+
     border-radius: var(--radius-lg);
+
     outline: none;
+
     box-shadow: var(--shadow-main);
+
     transition: all var(--transition-speed) ease;
+
 }
+
+
 
 .zahlenInputfeld:hover {
+
     transform: translateY(-2px);
+
     border-color: var(--border-glow);
+
 }
+
+
 
 .zahlenInputfeld:focus {
+
     border-color: var(--border-glow);
+
     box-shadow: 0 0 15px var(--glow-soft), var(--shadow-main);
+
 }
+
+
 
 ::placeholder {
+
     color: var(--text-secondary);
+
     opacity: 0.35;
+
 }
+
+
 
 /* Button */
+
 .zahlenButtoncss {
+
     font-size: 1.1rem;
+
     font-weight: 600;
+
     text-align: center;
+
     margin: 1.5rem 0;
+
     padding: 0.5rem 2rem;
+
     color: var(--text-primary);
+
     background-color: var(--bg-surface);
+
     border: 2px solid var(--border-glow);
+
     border-radius: var(--radius-lg);
+
     outline: none;
+
     cursor: pointer;
+
     box-shadow: var(--shadow-main);
+
     transition: all var(--transition-speed);
+
 }
+
+
 
 .zahlenButtoncss:hover {
+
     background-color: var(--border-glow);
+
     box-shadow: 0 0 20px var(--glow-soft), var(--shadow-main);
+
     transform: translateY(-2px);
+
 }
+
+
 
 .zahlenButtoncss:active {
+
     transform: translateY(1px);
+
 }
 
-/* Falsche Eingabe */
-.falscheEingabestyle {
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    margin: 1rem 0;
-    padding: 0.5rem 1.5rem;
-    background-color: rgba(255, 42, 95, 0.05);
-    border: 1px solid var(--accent-error);
-    border-radius: var(--radius-md);
-    color: var(--accent-error);
-    box-shadow: 0 0 15px var(--glow-error);
-    display: none;
-}
+
 
 /* Ausgabe & Rechenweg Box */
+
 .zahlenAusgabestyle {
+
     display: flex;
+
     flex-direction: column;
+
     width: 100%;
+
     max-width: 500px;
+
     margin: 1.5rem 0;
+
     padding: 1.5rem;
+
     background-color: var(--bg-surface);
+
     border: 1px solid var(--border-color);
+
     border-radius: var(--radius-md);
+
     box-shadow: var(--shadow-main);
+
     transition: border-color var(--transition-speed);
+
 }
+
+
 
 .zahlenAusgabestyle:hover {
+
     border-color: rgba(138, 22, 255, 0.4);
+
 }
+
+
 
 .loesungsDiv {
+
     display: flex;
+
     flex-direction: row;
+
     align-items: baseline;
+
     margin-bottom: 1.5rem;
+
     border-bottom: 1px solid var(--border-color);
+
     padding-bottom: 0.8rem;
+
 }
+
+
 
 .loesungText {
+
     font-size: 1.2rem;
+
     font-weight: bold;
+
     color: var(--text-secondary);
+
 }
+
+
 
 #loesungOutput {
+
     padding-left: 0.8rem;
+
     font-size: 1.4rem;
+
     font-weight: bold;
+
     color: var(--accent-live);
+
     text-shadow: 0 0 10px var(--glow-live);
+
 }
+
+
 
 .rechenwegDiv {
+
     display: none;
+
     flex-direction: column;
+
 }
+
+
 
 .rechenwegText {
+
     font-size: 1.1rem;
+
     font-weight: bold;
+
     color: var(--border-glow);
+
     margin-bottom: 0.5rem;
+
 }
+
+
 
 #rechenwegOutput {
+
     font-size: 0.9rem;
+
     color: var(--text-secondary);
+
     line-height: 1.6;
+
 }
+
+
 
 pre {
+
     margin: 8px 0;
+
     padding: 12px;
+
     background: var(--bg-input);
+
     border: 1px solid var(--border-color);
+
     border-radius: var(--radius-sm);
+
     font-family: 'Courier New', Courier, monospace;
+
     color: #e0e0ff;
+
     overflow-x: auto;
+
 }
 
+
+
 sub {
+
     font-size: 0.65rem;
+
     color: var(--text-secondary);
+
 }

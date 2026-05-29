@@ -174,7 +174,9 @@ input:checked + .slider:before {
     border-radius: var(--radius-md);
     padding: 0.8rem;
     text-align: center;
+    display: flex; /* Flex hinzugefügt für saubere Zentrierung */
     justify-content: center;
+    align-items: center;
 }
 
 .einheitsDiv #loesungOutput {
@@ -184,19 +186,65 @@ input:checked + .slider:before {
     text-shadow: 0 0 10px var(--glow-live);
 }
 
+
 /* ==========================================================================
-   RECHENWEG STYLING (Passend für deinen JS-Output)
+   STABILE & DYNAMISCHE RECHENWEG-BOX
    ========================================================================== */
-#rechenwegOutput {
-    font-size: 1rem;
-    line-height: 1.8;              /* Sorgt für schönen Abstand beim <br> */
-    color: var(--text-secondary);
-    padding: 0.5rem 0;
+
+/* Der Hauptcontainer bleibt absolut stabil in der Breite */
+.zahlenAusgabestyle {
+    display: none; 
+    flex-direction: column;
+    width: 100%;
+    max-width: 450px;          /* Ein kleines bisschen breiter als das Eingabefeld (400px) */
+    margin: 1.5rem 0;
+    padding: 1.2rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    transition: border-color var(--transition-speed);
 }
 
-/* Formatiert das fettgedruckte Endergebnis in deiner Rechnung */
-#rechenwegOutput b {
-    color: var(--accent-live);
-    text-shadow: 0 0 8px var(--glow-live);
+.zahlenAusgabestyle:hover {
+    border-color: rgba(138, 22, 255, 0.4);
+}
+
+/* Der Container für den Inhalt */
+.rechenwegDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.rechenwegText {
     font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--border-glow);
+    margin-bottom: 0.5rem;
+}
+
+#rechenwegOutput {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    width: 100%;
+}
+
+/* HIER IST JETZT DIE STABILE LOGIK FÜR DIE CODE-BOX */
+#rechenwegOutput pre {
+    margin: 8px 0;
+    padding: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: 'Courier New', Courier, monospace;
+    color: #e0e0ff;
+    
+    width: 100%;               /* Nutzt standardmäßig die 450px der Hauptbox */
+    white-space: pre;          /* Erzwingt, dass die Formel in ihrer Struktur bleibt */
+    
+    /* Scrollbalken-Verhalten */
+    overflow-x: auto;          /* Scrollbar ploppt NUR innerhalb dieses Feldes auf */
 }

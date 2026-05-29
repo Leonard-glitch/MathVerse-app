@@ -272,3 +272,20 @@ input:-webkit-autofill:focus {
         scrollbar-color: rgba(138, 22, 255, 0.3) var(--bg-body);
     }
 }
+
+/* ==========================================================================
+   GLOBAL ERROR MESSAGES (Zentralisiert für alle Tools)
+   ========================================================================== */
+.falscheEingabestyle {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 1rem 0;
+    padding: 0.5rem 1.5rem;
+    background-color: rgba(255, 42, 95, 0.05);
+    border: 1px solid var(--accent-error);
+    border-radius: var(--radius-md);
+    color: var(--accent-error);
+    box-shadow: 0 0 15px var(--glow-error);
+    display: none; /* Wird per JS gesteuert */
+}
