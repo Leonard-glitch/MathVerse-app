@@ -13,11 +13,13 @@ button_calc.forEach(button => {
 
     const outputContainer = tool.querySelector(".formulaErgebnis");
     const ergebnisOutput = tool.querySelector(".ergebnisText");
+    const rechenwegContainer = document.getElementById("rechenwegOutput");
 
     let ergebnis;
     let rechenweg;
     error.style.display = "none"; 
     outputContainer.style.display = "none";
+    rechenwegContainer.innerHTML = "";
 
     if (type === "share-of") {
       if (isNaN(p) || isNaN(G)) return showError("Falsche Eingabe");
@@ -46,7 +48,6 @@ button_calc.forEach(button => {
       if (outputContainer) outputContainer.style.display = "flex";
       if (ergebnisOutput) ergebnisOutput.innerHTML = ergebnis;
 
-      const rechenwegContainer = document.getElementById("rechenwegOutput");
       if (rechenwegContainer) rechenwegContainer.innerHTML = rechenweg;
     }
   });

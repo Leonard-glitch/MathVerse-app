@@ -1,53 +1,44 @@
-const zahlenInput=document.getElementById("zahlenInput");
-const buttonInput=document.getElementById("buttonZahlenInput");
+const zahlenInput = document.getElementById("zahlenInput");
+const buttonInput = document.getElementById("buttonZahlenInput");
 
-const errorMessages=document.getElementById("errorMessages");
+const errorMessages = document.getElementById("errorMessages");
+const errorBox = document.querySelector(".falscheEingabestyle");
 
-const ausgabeSumme=document.getElementById("ausgabeSumme");
-const ausgabeMax=document.getElementById("ausgabeMax");
-const ausgabeMin=document.getElementById("ausgabeMin");
-const ausgabeDurchschnitt=document.getElementById("ausgabeDurchschnitt");
+const ausgabeSumme = document.getElementById("ausgabeSumme");
+const ausgabeMax = document.getElementById("ausgabeMax");
+const ausgabeMin = document.getElementById("ausgabeMin");
+const ausgabeDurchschnitt = document.getElementById("ausgabeDurchschnitt");
 
-const errorBox=document.querySelector(".falscheEingabestyle");
+function zahlenAnalyse(arr) {
+    if (arr.length === 0) return null;
 
-function zahlenAnalyse(arr){
+    let sum = 0;
+    let max = arr[0];
+    let min = arr[0];
+    let average = 0;
 
-
-    if(arr.length === 0 || arr.some(num => isNaN(num))){
-    alert("Bitte gültige Zahlen eingeben!");
-    return;
-    }
-
-    let sum=0;
-    let max= arr[0];
-    let min= arr[0];
-    let average=0;
-
-    for(let i=0; i<arr.length; i++){
-
+    for (let i = 0; i < arr.length; i++) {
         sum += arr[i];
 
-        if(arr[i]>max){
-            max= arr[i];
+        if (arr[i] > max) {
+            max = arr[i];
         }
 
-        if(arr[i]< min){
-            min= arr[i];
+        if (arr[i] < min) {
+            min = arr[i];
         }
     }
 
-    average= sum/arr.length;
+    average = sum / arr.length;
 
-        return{
-            sum: sum,
-            max: max,
-            min: min,
-            average: average
-        };
-
+    return {
+        sum: sum,
+        max: max,
+        min: min,
+        // Runden auf 4 Nachkommastellen verhindert, dass lange Dezimalzahlen das UI zerreißen
+        average: Math.round(average * 10000) / 10000
+    };
 }
-
-
 
 function validateInput(inputString) {
     if (inputString.trim() === "") {
@@ -69,16 +60,18 @@ function validateInput(inputString) {
     return zahlenArray;
 }
 
-
-
-
 buttonInput.addEventListener("click", function() {
-
     const validationResult = validateInput(zahlenInput.value);
 
     if (typeof validationResult === "string") {
         errorBox.style.display = "block";
         errorMessages.textContent = validationResult;
+        
+        // Ergebnisse bei Fehler zurücksetzen
+        ausgabeSumme.textContent = "";
+        ausgabeMax.textContent = "";
+        ausgabeMin.textContent = "";
+        ausgabeDurchschnitt.textContent = "";
         return;
     }
 
@@ -86,26 +79,24 @@ buttonInput.addEventListener("click", function() {
 
     const result = zahlenAnalyse(validationResult);
 
-    ausgabeSumme.textContent = result.sum;
-    ausgabeMax.textContent = result.max;
-    ausgabeMin.textContent = result.min;
-    ausgabeDurchschnitt.textContent = result.average;
+    if (result) {
+        ausgabeSumme.textContent = result.sum;
+        ausgabeMax.textContent = result.max;
+        ausgabeMin.textContent = result.min;
+        ausgabeDurchschnitt.textContent = result.average;
+    }
 });
 
-zahlenInput.addEventListener("keydown", function(event){
-
-    if(event.key === "Enter"){
+zahlenInput.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
         buttonInput.click();
     }
-
 });
 
 zahlenInput.addEventListener("focus", function() {
     zahlenInput.select();
 });
 
-zahlenInput.addEventListener("input", function(){
-
+zahlenInput.addEventListener("input", function() {
     errorBox.style.display = "none";
-
 });
