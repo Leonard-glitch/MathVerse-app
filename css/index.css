@@ -369,3 +369,101 @@ body {
     color: var(--border-accent);
     text-shadow: 0 0 8px var(--border-accent);
 }
+
+/* ==========================================================================
+   DYNAMIC COLLAPSE SYSTEM (Fixed Bottom Center)
+   ========================================================================== */
+:root {
+    /* Zentrale Variable für die maximale Höhe im eingeklappten Zustand */
+    --container-max-height: 290px; 
+}
+
+/* Media Query für Mobilgeräte (ganz einfach hier anpassen) */
+@media (max-width: 768px) {
+    :root {
+        --container-max-height: 190px; 
+    }
+}
+
+/* Die Gruppe braucht relative Positionierung für den festen Button */
+.restFuncionsDiv {
+    position: relative;
+    margin-top: 4rem;
+}
+
+/* Limitierter Zustand für die Karten */
+.cardsContainer.collapsible {
+    max-height: var(--container-max-height);
+    overflow: hidden;
+    transition: max-height 0.35s ease-in-out;
+    position: relative;
+    /* Platz für den Button im eingeklappten Zustand */
+    padding-bottom: 3.5rem; 
+}
+
+/* Komplett geöffneter Zustand */
+.cardsContainer.expanded {
+    max-height: none !important;
+    /* Verhindert, dass die unterste Kartenreihe den Button überlappt */
+    padding-bottom: 4rem; 
+}
+
+/* Der Pfeil-Button: Fest positioniert unten in der Mitte der Gruppe.
+   Er bleibt IMMER an exakt dieser Stelle.
+*/
+.restFuncionsDiv .expand-btn {
+    display: none; /* Wird per JS aktiviert, wenn Höhe überschritten */
+    position: absolute;
+    bottom: -20px; /* Perfekt zentriert auf dem unteren Rahmen */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    width: 40px;
+    height: 40px;
+    background-color: var(--bg-surface-glow);
+    border: 2px solid var(--border-glow);
+    border-radius: 50%;
+    color: var(--text-primary);
+    box-shadow: 0 0 12px var(--glow-soft);
+    
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    z-index: 20;
+}
+
+.restFuncionsDiv .expand-btn:hover {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 18px var(--border-glow);
+    transform: translateX(-50%) scale(1.05); /* Wichtig: translateX beibehalten! */
+}
+
+/* Standard-Zustand (Eingeklappt): Pfeil zeigt nach unten */
+.restFuncionsDiv .expand-btn i {
+    transform: rotate(0deg);
+    transition: transform 0.25s ease;
+}
+
+/* Zustand (Ausgeklappt): Pfeil dreht sich um und zeigt nach oben */
+.restFuncionsDiv.is-expanded .expand-btn i {
+    transform: rotate(180deg);
+}
+
+/* Subtiler Verlauf am unteren Rand des Containers (NUR im eingeklappten Zustand) */
+.cardsContainer.collapsible::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(to top, var(--bg-surface) 30%, transparent);
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    opacity: 1;
+}
+
+.cardsContainer.expanded::after {
+    opacity: 0; /* Verblasst komplett beim Ausklappen */
+}

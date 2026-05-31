@@ -16,22 +16,36 @@ const tools = [
         id: "card1", 
         title: "Zahlen Analyse",
         image: "./pictures/51R9beEdSfL.jpg",
-        link: "#",
+        link: "./Tools/Zahlenanalyse/zahlenAnalyse.html",
         group: "algebra"
     },
     {
         id: "card2",
         title: "Zahlensystem Umrechner",
         image: "./pictures/ZahlensystemeUmwandeln Temp1.jpg",
-        link: "#",
+        link: "./Tools/Zahlensystemumrechner/zsystUmrechner.html",
         group: "zahlensysteme"
     },
     {
         id: "card3",
         title: "Zahlensystem Rechner",
         image: "./pictures/beispiel-addition.png",
-        link: "#",
+        link: "./Tools/Zahlensystemrechner/zsystRechner.html",
         group: "zahlensysteme"
+    },
+    {
+        id: "card4",
+        title: "Einheiten Umrechner",
+        image: "./pictures/hqdefault.jpg",
+        link: "./Tools/Einheiten Umrechner/einheitenUmrechner.html",
+        group: "einheiten",
+    },
+    {
+        id: "card5",
+        title: "Prozentrechnung",
+        image: "./pictures/Prozentrechnung_Thumbnail.png",
+        link: "./Tools/Prozentrechnung/prozentrechnung.html",
+        group: "arithmetik",
     }
 ];
 
@@ -71,6 +85,8 @@ function initMathVerse() {
 
     // 4. Live-Suche aktivieren
     initSearch();
+
+    applyCollapsibleLogic();
 }
 
 // ==========================================================================
@@ -223,6 +239,7 @@ function handleHeartClick(toolId) {
         containerOrders[container.id] = Array.from(container.querySelectorAll(".card")).map(c => c.dataset.id);
     });
     localStorage.setItem("containerOrders", JSON.stringify(containerOrders));
+applyCollapsibleLogic(); // <-- HIER HINZUFÜGEN
 }
 
 // ==========================================================================
@@ -359,5 +376,59 @@ function initSearch() {
                 groupDiv.style.display = "block";
             }
         });
+        applyCollapsibleLogic();
+    });
+}
+
+function applyCollapsibleLogic() {
+    document.querySelectorAll(".restFuncionsDiv").forEach(groupDiv => {
+        const container = groupDiv.querySelector(".cardsContainer");
+        if (!container) return;
+
+        // Alten Button entfernen, falls vorhanden
+        const existingBtn = groupDiv.querySelector(".expand-btn");
+        if (existingBtn) existingBtn.remove();
+        
+        // Klassen kurz zurücksetzen für eine exakte Messung
+        container.classList.remove("collapsible", "expanded");
+        groupDiv.classList.remove("is-expanded");
+
+        // Messmodus aktivieren
+        container.classList.add("collapsible");
+
+        // Wenn der Inhalt die erlaubte CSS-Max-Height überschreitet
+        if (container.scrollHeight > container.clientHeight) {
+            
+            // Button erstellen (Bleibt durch CSS fest unten in der Mitte)
+            const expandBtn = document.createElement("div");
+            expandBtn.className = "expand-btn";
+            expandBtn.innerHTML = '<i class="fa fa-chevron-down"></i>'; // Startet als Pfeil nach unten
+            expandBtn.style.display = "flex";
+
+            expandBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isExpanded = container.classList.contains("expanded");
+                
+                if (isExpanded) {
+                    // Zuklappen
+                    container.classList.remove("expanded");
+                    groupDiv.classList.remove("is-expanded");
+                    // Sanfter Scroll zurück zum Gruppen-Anfang, damit der User nicht die Orientierung verliert
+                    groupDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    // Aufklappen
+                    container.classList.add("expanded");
+                    groupDiv.classList.add("is-expanded");
+                }
+            });
+
+            // Button an das Gruppen-Div anhängen
+            groupDiv.appendChild(expandBtn);
+        } else {
+            // Passt der Inhalt komplett rein, entfernen wir die Begrenzung
+            container.classList.remove("collapsible");
+        }
     });
 }
