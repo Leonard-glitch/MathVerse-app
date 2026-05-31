@@ -1,13 +1,233 @@
+// ==========================================================================
+// 1. DATA CONFIGURATION (Zentrale Datenquelle)
+// ==========================================================================
+
+const groups = [
+    { id: "arithmetik", title: "Arithmetik" },
+    { id: "zahlensysteme", title: "Zahlensysteme" },
+    { id: "algebra", title: "Algebra" },
+    { id: "geometrie", title: "Geometrie" },
+    { id: "statistik", title: "Statistik" },
+    { id: "einheiten", title: "Einheiten" }
+];
+
+const tools = [
+    {
+        id: "card1", 
+        title: "Zahlen Analyse",
+        image: "./pictures/51R9beEdSfL.jpg",
+        link: "#",
+        group: "algebra"
+    },
+    {
+        id: "card2",
+        title: "Zahlensystem Umrechner",
+        image: "./pictures/ZahlensystemeUmwandeln Temp1.jpg",
+        link: "#",
+        group: "zahlensysteme"
+    },
+    {
+        id: "card3",
+        title: "Zahlensystem Rechner",
+        image: "./pictures/beispiel-addition.png",
+        link: "#",
+        group: "zahlensysteme"
+    }
+];
+
+// ==========================================================================
+// 2. STATE MANAGEMENT & INITIALIZATION
+// ==========================================================================
 
 let favoriten = JSON.parse(localStorage.getItem("favoriten")) || [];
-// Wir speichern die Reihenfolge der IDs pro Container
 let containerOrders = JSON.parse(localStorage.getItem("containerOrders")) || {};
+let pinnedGroups = JSON.parse(localStorage.getItem("pinnedGroups")) || [];
 
-const hearts = document.querySelectorAll(".favorite");
-const favoritesContainer = document.getElementById("favoritenContainer");
-const allToolsContainer = document.getElementById("allToolsContainer");
+const groupsContainer = document.getElementById("groupsContainer");
 
-// --- 1. INITIALISIERUNG BEIM LADEN ---
+// Applikations-Start
+initMathVerse();
+
+function initMathVerse() {
+    if (!groupsContainer) return;
+    groupsContainer.innerHTML = "";
+
+    // 1. Struktur-Kategorien im DOM aufbauen
+    createGroupDOM({ id: "favoriten", title: "Favoriten" }, "favoritenGroupStar");
+    groups.forEach(group => createGroupDOM(group, `${group.id}GroupStar`));
+    createGroupDOM({ id: "allTools", title: "All Tools" }, "allToolsGroupStar");
+
+    // Favoriten-Stern ist standardmäßig immer aktiv gepinnt
+    const favStar = document.querySelector('[data-id="favoritenGroupStar"] .star');
+    if (favStar) {
+        favStar.className = "fa fa-star star active";
+    }
+
+    // 2. Karten generieren und an ihre Startpositionen verteilen
+    buildAndDistributeCards();
+
+    // 3. Gruppen-Sterne Sortierung initial anwenden
+    sortGroupsByPins();
+
+    // 4. Live-Suche aktivieren
+    initSearch();
+}
+
+// ==========================================================================
+// 3. STRUCTURE GENERATION
+// ==========================================================================
+
+function createGroupDOM(group, groupDataId) {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "restFuncionsDiv";
+    groupDiv.dataset.id = groupDataId;
+    groupDiv.dataset.groupId = group.id; // Wichtig für native Sortierung bei Entpinnung
+
+    const cardTitleDiv = document.createElement("div");
+    cardTitleDiv.className = "cardTitleDiv";
+
+    const starIcon = document.createElement("i");
+    if (pinnedGroups.includes(groupDataId) || groupDataId === "favoritenGroupStar") {
+        starIcon.className = "fa fa-star star active";
+    } else {
+        starIcon.className = "fa fa-star-o star";
+    }
+    
+    starIcon.addEventListener("click", (e) => handleGroupStarClick(e, groupDataId));
+
+    const header = document.createElement("h2");
+    header.className = "favoritenHeader2";
+    header.textContent = group.title;
+
+    cardTitleDiv.appendChild(starIcon);
+    cardTitleDiv.appendChild(header);
+
+    const cardsContainer = document.createElement("div");
+    cardsContainer.className = "cardsContainer";
+    cardsContainer.id = `${group.id}Container`;
+    if (group.id === "allTools") cardsContainer.dataset.alltools = "true";
+
+    groupDiv.appendChild(cardTitleDiv);
+    groupDiv.appendChild(cardsContainer);
+    groupsContainer.appendChild(groupDiv);
+}
+
+// ==========================================================================
+// 4. CARD ENGINE & DOM MOVE LOGIC
+// ==========================================================================
+
+function createCardElement(tool, isAllToolsView = false) {
+    const card = document.createElement("a");
+    card.href = tool.link;
+    card.className = "card";
+    card.dataset.id = tool.id;
+    card.dataset.view = isAllToolsView ? "all" : "category";
+
+    const isFav = favoriten.includes(tool.id);
+    const heartClass = isFav ? "fa-heart active" : "fa-heart-o";
+
+    card.innerHTML = `
+        <div class="cardTop">
+            <img src="${tool.image}" class="cardImg" alt="${tool.title}">
+            <i class="fa fa-info-circle info"></i>
+            <i class="fa ${heartClass} favorite"></i>
+        </div>
+        <p class="cardText">${tool.title}</p>
+    `;
+
+    const heart = card.querySelector(".favorite");
+    heart.addEventListener("click", function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        handleHeartClick(tool.id);
+    });
+
+    return card;
+}
+
+function buildAndDistributeCards() {
+    const favContainer = document.getElementById("favoritenContainer");
+    const allToolsContainer = document.getElementById("allToolsContainer");
+
+    tools.forEach(tool => {
+        // 1. Erstelle die bewegliche Kategorie-Karte
+        const catCard = createCardElement(tool, false);
+        catCard.dataset.originalContainer = `${tool.group}Container`; // Problem 3 gelöst via dataset
+
+        // 2. Initialplatzierung prüfen (Favoriten-Array-Reihenfolge respektieren!)
+        if (favoriten.includes(tool.id)) {
+            if (favContainer) favContainer.appendChild(catCard);
+        } else {
+            const targetContainer = document.getElementById(`${tool.group}Container`);
+            if (targetContainer) targetContainer.appendChild(catCard);
+        }
+
+        // 3. Erstelle separate Instanz für "All Tools"
+        const allToolsCard = createCardElement(tool, true);
+        if (allToolsContainer) allToolsContainer.appendChild(allToolsCard);
+    });
+
+    // Alle Container initial sortieren anhand des Speichers
+    document.querySelectorAll(".cardsContainer").forEach(sortContainer);
+}
+
+function handleHeartClick(toolId) {
+    const wasActive = favoriten.includes(toolId);
+    const favContainer = document.getElementById("favoritenContainer");
+    
+    // Präziser Selektor verhindert das Auswählen der "All Tools"-Karte (Problem 4 gelöst)
+    const catCard = document.querySelector(`.card[data-id="${toolId}"][data-view="category"]`);
+
+    let affectedContainers = new Set();
+
+    if (!wasActive) {
+        // Zu Favoriten hinzufügen
+        favoriten.push(toolId);
+        if (catCard && favContainer) {
+            // Jede neu favorisierte Karte wird ans Ende geschoben, um die Array-Reihenfolge stabil zu halten
+            favContainer.appendChild(catCard); 
+            affectedContainers.add(favContainer);
+        }
+    } else {
+        // Aus Favoriten entfernen
+        favoriten = favoriten.filter(id => id !== toolId);
+        
+        if (catCard && catCard.dataset.originalContainer) {
+            const origContainer = document.getElementById(catCard.dataset.originalContainer);
+            if (origContainer) {
+                origContainer.appendChild(catCard);
+                affectedContainers.add(origContainer);
+            }
+        }
+    }
+
+    if (favContainer) affectedContainers.add(favContainer);
+    const allToolsContainer = document.getElementById("allToolsContainer");
+    if (allToolsContainer) affectedContainers.add(allToolsContainer);
+
+    // localStorage Update für Favoriten
+    localStorage.setItem("favoriten", JSON.stringify(favoriten));
+
+    // Herz-Synchronisation über alle Instanzen hinweg
+    document.querySelectorAll(`.card[data-id="${toolId}"] .favorite`).forEach(heart => {
+        if (!wasActive) {
+            heart.className = "fa fa-heart favorite active";
+        } else {
+            heart.className = "fa fa-heart-o favorite";
+        }
+    });
+
+    // Performance-Optimierung (Problem 6): Nur betroffene Container sortieren und genau 1x abspeichern
+    affectedContainers.forEach(container => {
+        sortContainer(container);
+        containerOrders[container.id] = Array.from(container.querySelectorAll(".card")).map(c => c.dataset.id);
+    });
+    localStorage.setItem("containerOrders", JSON.stringify(containerOrders));
+}
+
+// ==========================================================================
+// 5. SORTING & RECOVERY
+// ==========================================================================
 
 function sortContainer(container) {
     const containerId = container.id;
@@ -18,202 +238,126 @@ function sortContainer(container) {
         const idA = a.dataset.id;
         const idB = b.dataset.id;
 
-        // 1. Check den Favoriten-Status (Wichtig für All Tools)
-        const isFavA = favoriten.includes(idA);
-        const isFavB = favoriten.includes(idB);
+        // 1. Sonderlogik für den "All Tools" Container (Favoriten nach oben)
+        if (container.dataset.alltools === "true") {
+            const isFavA = favoriten.includes(idA);
+            const isFavB = favoriten.includes(idB);
+            if (isFavA && !isFavB) return -1;
+            if (!isFavA && isFavB) return 1;
+        }
 
-        // Wenn einer ein Favorit ist und der andere nicht, hat der Favorit Vorrang
-        if (isFavA && !isFavB) return -1;
-        if (!isFavA && isFavB) return 1;
+        // 2. Logik für den Favoriten-Container selbst (Chronologie des Hinzufügens wahren)
+        if (containerId === "favoritenContainer") {
+            return favoriten.indexOf(idA) - favoriten.indexOf(idB);
+        }
 
-        // 2. Wenn beide den gleichen Status haben (beide Fav oder beide nicht),
-        // dann nutze die gespeicherte Reihenfolge
+        // 3. Benutzerdefinierte Reihenfolge aus dem Speicher anwenden
         if (savedOrder) {
             const indexA = savedOrder.indexOf(idA);
             const indexB = savedOrder.indexOf(idB);
-            
-            // Falls IDs in der gespeicherten Order sind, sortiere danach
             if (indexA !== -1 && indexB !== -1) return indexA - indexB;
             if (indexA !== -1) return -1;
             if (indexB !== -1) return 1;
         }
 
-        // 3. Fallback: Falls gar nichts greift, sortiere nach der Position im favoriten-Array
-        if (isFavA && isFavB) {
-            return favoriten.indexOf(idA) - favoriten.indexOf(idB);
-        }
-
         return 0;
     });
     
-    // Karten neu im DOM anhängen
+    // DOM-Nodes in korrekter Reihenfolge neu anhängen
     cards.forEach(card => container.appendChild(card));
 }
 
-// Speichert die aktuelle Reihenfolge der IDs eines Containers
-function saveCurrentOrder(container) {
-    const containerId = container.id;
-    const cards = Array.from(container.querySelectorAll(".card"));
-    containerOrders[containerId] = cards.map(c => c.dataset.id);
-    localStorage.setItem("containerOrders", JSON.stringify(containerOrders));
+// ==========================================================================
+// 6. ORIGINAL GROUP PIN SYSTEM
+// ==========================================================================
+
+function handleGroupStarClick(event, groupId) {
+    event.preventDefault();
+    if (groupId === "favoritenGroupStar") return;
+
+    const star = event.currentTarget;
+    const wasActive = star.classList.contains("active");
+
+    if (!wasActive) {
+        star.className = "fa fa-star star active";
+        if (!pinnedGroups.includes(groupId)) {
+            pinnedGroups.push(groupId);
+        }
+    } else {
+        star.className = "fa fa-star-o star";
+        pinnedGroups = pinnedGroups.filter(id => id !== groupId);
+    }
+
+    localStorage.setItem("pinnedGroups", JSON.stringify(pinnedGroups));
+    sortGroupsByPins();
 }
 
-// Favoriten-Status initial setzen und Karten verschieben
-document.querySelectorAll(".card").forEach(card => {
-    const cardId = card.dataset.id;
-    const heart = card.querySelector(".favorite");
+function sortGroupsByPins() {
+    const allGroups = Array.from(groupsContainer.querySelectorAll(".restFuncionsDiv"));
     
-    if (favoriten.includes(cardId)) {
-        heart.classList.add("fa-heart", "active");
-        heart.classList.remove("fa-heart-o");
+    // Native Reihenfolge der IDs erstellen, um entpinnte Gruppen exakt einsortieren zu können
+    const nativeOrder = ["favoriten", ...groups.map(g => g.id), "allTools"];
 
-        const parent = card.parentElement;
-        if (parent !== favoritesContainer && parent !== allToolsContainer) {
-            if (!card.originalContainer) card.originalContainer = parent;
-            if (!favoritesContainer.querySelector(`.card[data-id="${cardId}"]`)) {
-                favoritesContainer.appendChild(card);
+    allGroups.sort((a, b) => {
+        const idA = a.dataset.id;
+        const idB = b.dataset.id;
+
+        if (idA === "favoritenGroupStar") return -1;
+        if (idB === "favoritenGroupStar") return 1;
+
+        const isPinnedA = pinnedGroups.includes(idA);
+        const isPinnedB = pinnedGroups.includes(idB);
+
+        if (isPinnedA && !isPinnedB) return -1;
+        if (!isPinnedA && isPinnedB) return 1;
+        
+        if (isPinnedA && isPinnedB) {
+            return pinnedGroups.indexOf(idA) - pinnedGroups.indexOf(idB);
+        }
+
+        // Problem 5 gelöst: Fallback für unangepinnte Gruppen auf die native Definitions-Reihenfolge
+        const grpA = a.dataset.groupId;
+        const grpB = b.dataset.groupId;
+        return nativeOrder.indexOf(grpA) - nativeOrder.indexOf(grpB);
+    });
+
+    allGroups.forEach(group => groupsContainer.appendChild(group));
+}
+
+// ==========================================================================
+// 7. SEARCH ENGINE
+// ==========================================================================
+
+function initSearch() {
+    const searchInput = document.getElementById("searchInput");
+    if (!searchInput) return;
+
+    searchInput.addEventListener("input", function() {
+        const query = this.value.toLowerCase().trim();
+
+        // 1. Einzelne Karten filtern
+        document.querySelectorAll(".card").forEach(card => {
+            const title = card.querySelector(".cardText").textContent.toLowerCase();
+            if (title.includes(query)) {
+                card.style.display = "flex";
+            } else {
+                card.style.display = "none";
             }
-        }
-    } else {
-        heart.classList.add("fa-heart-o");
-        heart.classList.remove("fa-heart", "active");
-    }
-});
-
-// Alle relevanten Container sortieren
-sortContainer(favoritesContainer);
-sortContainer(allToolsContainer);
-// Auch die Unterkategorien sortieren, damit dort die Reihenfolge bleibt
-document.querySelectorAll(".cardsContainer").forEach(sortContainer);
-
-
-// --- 2. CLICK-EVENT LOGIK ---
-hearts.forEach(heart => {
-    heart.addEventListener("click", function(event) {
-        event.preventDefault();
-        const card = heart.closest(".card");
-        const cardId = card.dataset.id;
-        const wasActive = heart.classList.contains("active");
-
-        const allInstances = document.querySelectorAll(`.card[data-id="${cardId}"]`);
-
-        if (!wasActive) {
-            if (!favoriten.includes(cardId)) favoriten.push(cardId);
-            
-            allInstances.forEach(c => {
-                const h = c.querySelector(".favorite");
-                h.classList.add("fa-heart", "active");
-                h.classList.remove("fa-heart-o");
-
-                const parent = c.parentElement;
-                if (parent !== favoritesContainer && parent !== allToolsContainer) {
-                    if (!c.originalContainer) c.originalContainer = parent;
-                    favoritesContainer.prepend(c); // Neue Favoriten nach oben
-                }
-            });
-        } else {
-            favoriten = favoriten.filter(id => id !== cardId);
-            
-            allInstances.forEach(c => {
-                const h = c.querySelector(".favorite");
-                h.classList.remove("fa-heart", "active");
-                h.classList.add("fa-heart-o");
-
-                if (favoritesContainer.contains(c) && c.originalContainer) {
-                    c.originalContainer.appendChild(c);
-                    saveCurrentOrder(c.originalContainer); // Reihenfolge in Ursprungskategorie merken
-                }
-            });
-        }
-
-        // Sortierung und Speicherung
-        sortContainer(favoritesContainer);
-        sortContainer(allToolsContainer);
+        });
         
-        saveCurrentOrder(favoritesContainer);
-        saveCurrentOrder(allToolsContainer);
-        
-        localStorage.setItem("favoriten", JSON.stringify(favoriten));
+        // 2. Gruppen-Sichtbarkeit regeln (Problem 2 gelöst)
+        document.querySelectorAll(".restFuncionsDiv").forEach(groupDiv => {
+            const container = groupDiv.querySelector(".cardsContainer");
+            const totalCardsInGroup = container ? container.querySelectorAll(".card").length : 0;
+            const visibleCardsInGroup = groupDiv.querySelectorAll('.card:not([style*="display: none"])').length;
+            
+            if (query !== "") {
+                // Während der Suche: Zeige Gruppe nur, wenn sie Treffer enthält
+                groupDiv.style.display = visibleCardsInGroup === 0 ? "none" : "block";
+            } else {
+                // Suche leer: Stelle Ursprungszustand wieder her (Leere Gruppen bleiben leer, aber sichtbar)
+                groupDiv.style.display = "block";
+            }
+        });
     });
-});
-
-/*Group Star Klickbar*/
-
-const stars=document.querySelectorAll(".star");
-
-const allGroups=document.getElementById("groupsContainer");
-
-
-const favoritenGroup = document.querySelector('[data-id="favoritenGroupStar"]');
-const favoritenStar = favoritenGroup.querySelector(".star");
-
-favoritenStar.classList.add("fa-star", "active");
-favoritenStar.classList.remove("fa-star-o");
-
-
-stars.forEach(function(star){
-
-    star.addEventListener("click", function(event2){
-
-
-        const group = star.closest("[data-id]");
-        const groupId = group.dataset.id;
-
-
-        const wasActive2 = star.classList.contains("active");
-
-        /* Stern aktivieren*/
-
-        if(!wasActive2){
-
-            const h = star;
-
-                h.classList.add("fa-star","active");
-                h.classList.remove("fa-star-o");
-
-                const activeGroups = allGroups.querySelectorAll(".restFuncionsDiv .star.active");
-
-                    if(activeGroups.length === 1){ // Nur die aktuelle Gruppe ist aktiv → kein anderer Sterb davor
-                        allGroups.prepend(group);
-                    } else if(activeGroups.length > 1){
-                        const lastActive = activeGroups[activeGroups.length - 2].closest(".restFuncionsDiv");
-                        lastActive.after(group);
-                    }
-        }
-
-        else{
-
-            const h = star;
-
-                h.classList.add("fa-star-o");
-                h.classList.remove("fa-star","active");
-               
-                const activeGroups = allGroups.querySelectorAll(".restFuncionsDiv .star.active");
-
-                    if(activeGroups.length === 0){
-                        allGroups.prepend(group);
-                    } else {
-                        const lastActive = activeGroups[activeGroups.length - 1].closest(".restFuncionsDiv");
-                        lastActive.after(group);
-                    }       
-        }
-    });
-});
-
-
-
-
-
-
-function toggleFavorit(cardId){
-
-    if(favoriten.includes(cardId)){
-        //entfernen
-        favoriten = favoriten.filter(id => id !== cardId);
-    } else {
-        //hinzufügen
-        favoriten.push(cardId);
-    }
-    //Änderung speichern
-    localStorage.setItem("favoriten", JSON.stringify(favoriten));
 }
