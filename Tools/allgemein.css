@@ -176,6 +176,20 @@ main {
     text-shadow: 0 0 8px var(--accent-live);
 }
 
+#openFeedbackBtn{
+    color: var(--text-secondary);
+    text-decoration: none;
+    background-color: var(--bg-surface);
+    border: none;
+    font-size: 0.8rem;
+    transition: var(--transition-speed);
+}
+
+#openFeedbackBtn:hover{
+    color: var(--accent-live);
+    text-shadow: 0 0 8px var(--accent-live);
+}
+
 /* Global Shared Headers */
 .zahlenHeader {
     color: var(--text-primary);
