@@ -1,0 +1,241 @@
+/* ==========================================================================
+   SPEZIFISCHES DESIGN FÜR BRUCHRECHNER (bruchrechner.css)
+   ========================================================================== */
+
+.bruchrechnerBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+/* CONTAINER FÜR DIE OPERATIONEN */
+.einheitenGruppenContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    background-color: var(--bg-input);
+    padding: 6px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.btnUnits {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    color: var(--text-secondary);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-lg);
+    outline: none;
+    cursor: pointer;
+    transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btnUnits:not(.active):hover {
+    color: var(--text-primary);
+    background-color: rgba(138, 22, 255, 0.08);
+}
+
+.btnUnits.active {
+    background: linear-gradient(135deg, var(--border-glow), #5900b3);
+    color: var(--text-primary);
+    box-shadow: 0 4px 15px rgba(138, 22, 255, 0.4);
+    font-weight: 600;
+    transform: scale(1.02);
+}
+
+/* ERZWIINGT RECHNER-ZEILE IMMER ALS ROW (NEBENEINANDER) */
+.bruchRechnerContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    width: 100%;
+    max-width: 950px;
+    margin-top: 2rem;
+}
+
+.bruchWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bruchEingabe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 85px;
+}
+
+.bruchStrich {
+    width: 100%;
+    height: 3px;
+    background-color: var(--text-secondary);
+    border-radius: 2px;
+}
+
+/* INPUT-ANPASSUNGEN */
+.bruchWrapper .zahlenInputfeld {
+    margin-top: 0 !important;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    border-radius: var(--radius-sm);
+    width: 100%;
+}
+
+#ganzzahl1, #ganzzahl2 {
+    width: 70px;
+}
+
+.mixed-field {
+    display: none;
+}
+
+/* ENTFERNT DIE RAUF-RUNTER-PFEILE (SPINNER) BEI NUMMERN-INPUTS */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield; /* Für Firefox */
+}
+
+.opSymbol {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-shadow: 0 0 8px var(--glow-soft);
+}
+
+.single-factor-field {
+    margin-top: 0 !important;
+    width: 85px !important;
+}
+
+.bruchRechnerContainer .loesungsDiv {
+    min-width: 140px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.8rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bruchRechnerContainer #loesungOutput {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--accent-live);
+    text-shadow: 0 0 10px var(--glow-live);
+}
+
+.resBruch {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    padding: 0 0.3rem;
+}
+.resBruchStrich {
+    width: 100%;
+    height: 2px;
+    background-color: var(--accent-live);
+    margin: 2px 0;
+}
+
+/* ==========================================================================
+   HIGH-TECH DESIGN FÜR DEN RECHENWEG (Optimierte Version)
+   ========================================================================== */
+#rechenwegOutput {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Mehr Luft zwischen den Hauptblöcken für bessere Struktur */
+    margin-top: 1rem;
+}
+
+/* Ein kompletter Rechenschritt-Block */
+.step-container {
+    background: rgba(255, 255, 255, 0.01); /* Minimaler Hintergrund für Tiefe */
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all var(--transition-speed) ease;
+}
+
+/* Schritt-Überschrift (z.B. "Schritt 1: Hauptnenner bestimmen") */
+.step-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--border-glow); /* Nutzt dein Neon-Lila für die Core-Struktur */
+    letter-spacing: 0.03rem;
+}
+
+/* Fließtext / Erklärung unter der Überschrift */
+.step-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary); /* Angenehmes, dezentes Grau/Blau statt hartem Weiß */
+    font-weight: 400;
+}
+
+/* Die dunkle Formel-Box (Monospace-Codebereich) */
+.step-formula-box {
+    background-color: #040407; /* Extrem tiefes Schwarz für maximalen Kontrast */
+    border: 1px solid rgba(138, 22, 255, 0.15); /* Subtiler lila Rand passend zum Thema */
+    border-radius: var(--radius-md); /* Weichere, modernere Ecken */
+    padding: 1.2rem;
+    font-family: 'Fira Code', 'Courier New', Courier, monospace; /* Fira Code als Premium-Fallback */
+    font-size: 0.95rem;
+    color: var(--text-primary); /* Klares, helles Weiß für die eigentliche Mathe-Formel */
+    line-height: 1.6;
+    white-space: pre-wrap;
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.02rem;
+}
+
+/* Das "Lösung: ..." Highlight am Ende eines Schritts */
+.step-sub-solution {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding-left: 0.2rem;
+}
+
+/* Spezielles Finish für das finale Endergebnis im Rechenweg */
+.step-container.final-step {
+    border: 1px solid rgba(0, 255, 204, 0.15); /* Zartes Cyan-Highlight um den ganzen Block */
+    background: rgba(0, 255, 204, 0.01);
+}
+
+.step-container.final-step .step-title {
+    color: var(--accent-live); /* Cyan-Schriftzug */
+}
+
+.step-container.final-step .step-formula-box {
+    border-color: rgba(0, 255, 204, 0.25); /* Cyan-Rahmen für die finale Formel-Box */
+}
+
+.step-container.final-step .step-sub-solution {
+    color: var(--accent-live); /* Macht das finale Ergebnis farblich prominent */
+    font-weight: 600;
+    text-shadow: 0 0 10px var(--glow-live);
+}
+

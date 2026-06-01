@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Bruchrechner</title>
+    <link rel="stylesheet" href="/MathVerse-app/css/feedback.css">
+    <link rel="stylesheet" href="../allgemein.css">
+    <link rel="stylesheet" href="./bruchRechner.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html"><img src="/MathVerse-app/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+            <div><input type="text" name="search" id="searchInput" placeholder="Suche..."></div>
+            <div>
+                <a href="" target="_self" class="navTextBorder">Login</a>
+                <a href="" target="_self" class="navTextBorder">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="bruchrechnerBody">
+            <h1 class="zahlenHeader">Bruchrechner</h1>
+
+            <div class="einheitenGruppenContainer">
+                <button data-operation="add" class="btnUnits active">Addieren</button>
+                <button data-operation="sub" class="btnUnits">Subtrahieren</button>
+                <button data-operation="mul" class="btnUnits">Multiplizieren</button>
+                <button data-operation="div" class="btnUnits">Dividieren</button>
+                <button data-operation="kuerzen" class="btnUnits">Kürzen</button>
+                <button data-operation="erweitern" class="btnUnits">Erweitern</button>
+            </div>
+
+            <div class="advancedMode">
+                <span class="advancedText">Gemischte Zahlen</span>
+                <label class="switch"><input type="checkbox" id="mixedToggle"><span class="slider round"></span></label>
+            </div>
+
+            <div class="bruchRechnerContainer">
+                <div class="bruchWrapper" id="wrapperBruch1">
+                    <input type="number" id="ganzzahl1" placeholder="Ganzzahl" class="zahlenInputfeld mixed-field">
+                    <div class="bruchEingabe">
+                        <input type="number" id="zaehler1" placeholder="Zähler" class="zahlenInputfeld">
+                        <div class="bruchStrich"></div>
+                        <input type="number" id="nenner1" placeholder="Nenner" class="zahlenInputfeld">
+                    </div>
+                </div>
+
+                <div id="operationZeichen" class="opSymbol">+</div>
+
+                <div class="bruchWrapper" id="wrapperBruch2">
+                    <input type="number" id="erwFaktor" placeholder="Faktor" class="zahlenInputfeld single-factor-field" style="display: none;">
+                    
+                    <div class="bruchEingabe" id="bruch2Eingabe">
+                        <input type="number" id="ganzzahl2" placeholder="Ganzzahl" class="zahlenInputfeld mixed-field">
+                        <input type="number" id="zaehler2" placeholder="Zähler" class="zahlenInputfeld">
+                        <div class="bruchStrich"></div>
+                        <input type="number" id="nenner2" placeholder="Nenner" class="zahlenInputfeld">
+                    </div>
+                </div>
+
+                <div class="opSymbol">=</div>
+
+                <div class="loesungsDiv">
+                    <p id="loesungOutput">Ergebnis</p>
+                </div>
+            </div>
+            
+            <p id="errorMessages" class="falscheEingabestyle"></p>
+
+            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+                <div class="rechenwegDiv">
+                    <p class="rechenwegText">Rechenweg:</p> 
+                    <div id="rechenwegOutput"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footerNav">
+            <div class="platzhalter">Platzhalter</div>
+            <div class="linksFooterect">
+                <a href="">Datenschutz</a>
+                <button id="openFeedbackBtn">Feedback senden</button>
+                <a href="">Impressum</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./bruchRechner.js"></script>
+    <script src="/MathVerse-app/javaScript/feedback.js"></script>
+</body>
+</html>
