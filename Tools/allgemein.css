@@ -3,25 +3,34 @@
    ========================================================================== */
 :root {
     /* Backgrounds */
-    --bg-body: #09090e;                 /* Tiefes High-Tech Dunkelblau/Schwarz */
-    --bg-surface: #111118;              /* Container & Karten Hintergrund */
-    --bg-input: #06060a;                /* Kontrastreiches Dunkel für Input-Felder */
-    --bg-navbar: rgba(9, 9, 14, 0.75);  /* Transparente Navbar für Blur-Effekt */
-    
+    --bg-body: #09090e;                  /* Tiefes High-Tech Dunkelblau/Schwarz */
+    --bg-surface: #111118;               /* Container & Karten Hintergrund */
+    --bg-surface-glow: #1a1a26;          /* Hover-Zustände für Karten & Buttons */
+    --bg-input: #06060a;                 /* Kontrastreiches Dunkel für Input-Felder */
+    --bg-navbar: rgba(9, 9, 14, 0.75);   /* Transparente Navbar für Blur-Effekt */
+
     /* Borders & Accents */
-    --border-color: #222232;            /* Subtile Standard-Strukturlinien */
-    --border-glow: #8a16ff;             /* Elektrisierendes Neon-Violett */
-    --accent-live: #00ffcc;             /* High-Tech Cyan für Ergebnisse/Erfolge */
-    --accent-error: #ff2a5f;            /* Aggressives Tech-Rot für Fehler */
-    
+    --border-color: #222232;             /* Subtile Standard-Strukturlinien */
+    --border-glow: #8a16ff;              /* Elektrisierendes Neon-Violett */
+    --border-accent: #00ffcc;            /* Alias für accent-live (Cyan-Akzent) */
+    --accent-color: #8a16ff;             /* Hauptakzent Violett (Alias für border-glow) */
+    --accent-hover: #a142ff;             /* Helleres Violett für Hover-Zustände */
+    --accent-live: #00ffcc;              /* High-Tech Cyan für Ergebnisse/Erfolge */
+    --accent-error: #ff2a5f;             /* Aggressives Tech-Rot für Fehler */
+
+    /* Interactive States */
+    --favorite-active: #ff2a5f;          /* Herz-Favorit Farbe */
+    --star-active: #ffb700;              /* Stern-Pin Gold-Farbe */
+
     /* Text Colors */
-    --text-primary: #ffffff;            /* Haupttext */
-    --text-secondary: #8f8fbc;          /* Nebentext / Labels / Legenden */
-    --text-muted: #444460;              /* Platzhalter */
+    --text-primary: #ffffff;             /* Haupttext */
+    --text-secondary: #8f8fbc;           /* Nebentext / Labels / Legenden */
+    --text-muted: #444460;               /* Platzhalter */
 
     /* Shadows & Glows */
     --shadow-main: 0 10px 30px rgba(0, 0, 0, 0.6);
     --glow-soft: rgba(138, 22, 255, 0.25);
+    --glow-hard: rgba(0, 255, 204, 0.3);
     --glow-live: rgba(0, 255, 204, 0.2);
     --glow-error: rgba(255, 42, 95, 0.35);
 
@@ -31,10 +40,11 @@
     --radius-md: 20px;
     --radius-sm: 10px;
     --transition-speed: 0.25s;
+    --transition-fast: 0.2s ease;
 }
 
 /* ==========================================================================
-   BASE RESET & RESET STYLES
+   BASE RESET & BASE STYLES
    ========================================================================== */
 * {
     margin: 0;
@@ -61,8 +71,6 @@ main {
     flex: 1;
 }
 
-
-
 /* ==========================================================================
    GLOBAL NAVBAR
    ========================================================================== */
@@ -70,7 +78,7 @@ main {
     background-color: var(--bg-navbar);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    
+
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -83,7 +91,7 @@ main {
     border-bottom-left-radius: var(--radius-lg);
     border-bottom-right-radius: var(--radius-lg);
     box-shadow: 0 4px 25px var(--glow-soft);
-    
+
     position: relative;
     z-index: 100;
 }
@@ -145,10 +153,9 @@ main {
     gap: 3rem;
     margin-top: 6rem;
     padding: 3rem 2rem 1.5rem 2rem;
-
     border-top-left-radius: var(--radius-lg);
     border-top-right-radius: var(--radius-lg);
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .platzhalter {
@@ -176,16 +183,17 @@ main {
     text-shadow: 0 0 8px var(--accent-live);
 }
 
-#openFeedbackBtn{
+#openFeedbackBtn {
     color: var(--text-secondary);
     text-decoration: none;
     background-color: var(--bg-surface);
     border: none;
     font-size: 0.8rem;
     transition: var(--transition-speed);
+    cursor: pointer;
 }
 
-#openFeedbackBtn:hover{
+#openFeedbackBtn:hover {
     color: var(--accent-live);
     text-shadow: 0 0 8px var(--accent-live);
 }
@@ -204,7 +212,7 @@ main {
 }
 
 /* ==========================================================================
-   GLOBAL INPUT FIELDS (Für alle Tools)
+   GLOBAL INPUT FIELDS
    ========================================================================== */
 .zahlenInputfeld {
     font-size: 1.2rem;
@@ -222,25 +230,22 @@ main {
     transition: all var(--transition-speed) ease;
 }
 
-/* Hover-Effekt: Feld hebt sich leicht an */
 .zahlenInputfeld:hover {
     transform: translateY(-2px);
     border-color: var(--border-glow);
 }
 
-/* Fokus-Effekt: Feld leuchtet Tech-Violett auf */
 .zahlenInputfeld:focus {
     border-color: var(--border-glow);
     box-shadow: 0 0 15px var(--glow-soft), var(--shadow-main);
 }
 
-/* Globaler Placeholder-Style */
 ::placeholder {
     color: var(--text-secondary);
     opacity: 0.35;
 }
 
-/* Autofill-Fix für Webkit-Browser (Chrome, Edge, Safari) */
+/* Autofill-Fix für Webkit-Browser */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
@@ -250,36 +255,30 @@ input:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   GLOBAL SCROLLBAR DESIGN (Für alle Tools)
+   GLOBAL SCROLLBAR DESIGN
    ========================================================================== */
-
-/* 1. Standard-Browser (Chrome, Edge, Safari, Opera) */
 ::-webkit-scrollbar {
-    width: 10px;               /* Breite der vertikalen Scrollbar */
-    height: 10px;              /* Höhe der horizontalen Scrollbar */
+    width: 10px;
+    height: 10px;
 }
 
-/* Der Hintergrund der Scrollbar-Schiene */
 ::-webkit-scrollbar-track {
-    background: var(--bg-body); 
+    background: var(--bg-body);
     border-left: 1px solid var(--border-color);
 }
 
-/* Der bewegliche Griff (Scroll-Slider) */
 ::-webkit-scrollbar-thumb {
-    background: rgba(138, 22, 255, 0.3); /* Transparentes Tech-Violett */
+    background: rgba(138, 22, 255, 0.3);
     border-radius: var(--radius-sm);
-    border: 2px solid var(--bg-body);    /* Erzeugt einen sauberen Abstand zum Rand */
+    border: 2px solid var(--bg-body);
     transition: background var(--transition-speed) ease;
 }
 
-/* Hover-Effekt: Wenn man mit der Maus über die Scrollbar fährt */
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--border-glow);      /* Volles Neon-Violett */
+    background: var(--border-glow);
     box-shadow: 0 0 10px var(--glow-soft);
 }
 
-/* 2. Firefox Unterstützung (Nutzt eine modernere, simplere Syntax) */
 @supports (scrollbar-color: auto) {
     html {
         scrollbar-width: thin;
@@ -288,7 +287,7 @@ input:-webkit-autofill:focus {
 }
 
 /* ==========================================================================
-   GLOBAL ERROR MESSAGES (Zentralisiert für alle Tools)
+   GLOBAL ERROR MESSAGES
    ========================================================================== */
 .falscheEingabestyle {
     font-size: 1rem;
@@ -301,5 +300,5 @@ input:-webkit-autofill:focus {
     border-radius: var(--radius-md);
     color: var(--accent-error);
     box-shadow: 0 0 15px var(--glow-error);
-    display: none; /* Wird per JS gesteuert */
+    display: none;
 }

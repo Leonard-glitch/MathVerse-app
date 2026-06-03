@@ -1,122 +1,32 @@
 /* ==========================================================================
-   CONFIG / THEME VARIABLES (Hier kannst du später andere Themes definieren)
+   INDEX.CSS – HOMEPAGE-SPEZIFISCHE STYLES
+   Basis-Theme kommt aus allgemein.css (wird zuerst geladen).
+   Hier nur: Homepage-Overrides + Komponenten der Startseite.
    ========================================================================== */
+
+/* Radius & Layout-Overrides für die Homepage */
 :root {
-    /* Backgrounds */
-    --bg-main: #0a0a0f;                 /* Tiefes High-Tech Dunkelblau/Schwarz */
-    --bg-surface: #12121a;              /* Karten & Container Hintergrund */
-    --bg-surface-glow: #1a1a26;         /* Hover-Zustände */
-    --bg-navbar: rgba(10, 10, 15, 0.75); /* Transparente Navbar mit Blur */
-    
-    /* Borders & Lines */
-    --border-color: #262636;            /* Subtile Standard-Rahmen */
-    --border-glow: #8a16ff;             /* High-Tech Neon-Violett */
-    --border-accent: #00ff9d;           /* High-Tech Neon-Grün/Cyan (Ersetzt das pure Rot/Grün) */
-
-    /* Text Colors */
-    --text-primary: #ffffff;            /* Haupttext */
-    --text-secondary: #8f8fbc;          /* Nebentext / Beschreibungen */
-    --text-muted: #52527a;              /* Platzhalter / Deaktiviert */
-
-    /* Interactive / UI Elements */
-    --accent-color: #8a16ff;            /* Hauptakzent (Violett) */
-    --accent-hover: #a142ff;
-    --favorite-active: #ff2a5f;         /* Moderneres, kräftiges Rot für Herzen */
-    --star-active: #ffb700;             /* Sattes Gold für Sterne */
-    
-    /* Shadows & Glow Effects */
-    --glow-soft: rgba(138, 22, 255, 0.2);
-    --glow-hard: rgba(0, 255, 157, 0.3);
-    --shadow-main: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-
-    /* Fonts & Layout */
-    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --radius-lg: 24px;
     --radius-md: 16px;
-    --radius-sm: 8px;
-    --transition-fast: 0.2s ease;
+    --container-max-height: 290px;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --container-max-height: 190px;
+    }
 }
 
 /* ==========================================================================
-   BASE STYLES
+   NAVBAR OVERRIDE (Homepage hat etwas kleineres navImage)
    ========================================================================== */
-html {
-    font-size: 20px;
-    font-family: var(--font-main);
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-main);
-}
-
-/* ==========================================================================
-   NAVIGATION BAR
-   ========================================================================== */
-.navbar {
-    background-color: var(--bg-navbar);
-    backdrop-filter: blur(12px); /* Moderner Glassmorphismus-Effekt */
-    -webkit-backdrop-filter: blur(12px);
-    
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-
-    padding: 0.8rem 2rem;
-
-    border: 2px solid var(--border-glow);
-    border-top: none;
-
-    border-bottom-left-radius: var(--radius-lg);
-    border-bottom-right-radius: var(--radius-lg);
-    box-shadow: 0 4px 20px var(--glow-soft);
-    
-    position: relative;
-    z-index: 100;
-}
-
 .navImage {
     height: 40px;
     filter: drop-shadow(0 0 8px var(--glow-soft));
 }
 
 #searchInput {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 0.4rem 1rem;
-    color: var(--text-primary);
-    font-size: 0.8rem;
-    outline: none;
-    transition: var(--transition-fast);
     width: 250px;
-}
-
-#searchInput:focus {
-    border-color: var(--border-glow);
-    box-shadow: 0 0 10px var(--glow-soft);
-}
-
-.navTextBorder {
-    background-color: transparent;
-    border: 2px solid var(--border-glow);
-    border-radius: var(--radius-lg);
-    padding: 6px 16px;
-    color: var(--text-primary);
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: var(--transition-fast);
-}
-
-.navTextBorder:hover {
-    background-color: var(--accent-color);
-    box-shadow: 0 0 15px var(--border-glow);
 }
 
 /* ==========================================================================
@@ -128,16 +38,14 @@ body {
     min-height: 80vh;
 }
 
-.bodyDivContantLeft, 
+.bodyDivContantLeft,
 .bodyDivContantRight {
     width: 15%;
-    border: none; /* Grüne Testränder entfernt für Cleanen Tech-Look */
 }
 
 .bodyDivContantMiddle {
     width: 70%;
     padding: 0 20px;
-    background-color: transparent; /* Entfernt das alte Test-Blau */
 }
 
 /* ==========================================================================
@@ -154,7 +62,7 @@ body {
     background: linear-gradient(45deg, #ffffff, var(--text-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 10px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
 }
 
 .textUnderHeader1 {
@@ -169,8 +77,8 @@ body {
 /* ==========================================================================
    CARDS CONTAINER & GROUPS
    ========================================================================== */
-.restFuncionsDiv { 
-    background-color: transparent;
+.restFuncionsDiv {
+    position: relative;
     margin-top: 4rem;
 }
 
@@ -205,16 +113,15 @@ body {
 
 .star.active {
     color: var(--star-active);
-    filter: drop-shadow(0 0 5px rgba(255,183,0,0.5));
+    filter: drop-shadow(0 0 5px rgba(255, 183, 0, 0.5));
 }
 
-/* The Grid Grid-Container */
-.cardsContainer { 
+/* Cards Grid Container */
+.cardsContainer {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    background-color: var(--bg-surface); /* Matt-dunkler Tech-Hintergrund statt grellem Grün */
+    background-color: var(--bg-surface);
     box-shadow: var(--shadow-main);
-
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -223,7 +130,6 @@ body {
     transition: border-color var(--transition-fast);
 }
 
-/* Highlight-Effekt wenn Favoriten drin sind oder aktiv genutzt werden */
 .cardsContainer:hover {
     border-color: rgba(250, 250, 250, 0.05);
 }
@@ -231,13 +137,12 @@ body {
 /* ==========================================================================
    THE INTERACTIVE CARDS
    ========================================================================== */
-.card { 
+.card {
     width: 10rem;
-    background-color: #181826; /* Leicht helleres Elementen-Dunkel */
+    background-color: #181826;
     aspect-ratio: 1 / 1;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -247,7 +152,7 @@ body {
     cursor: pointer;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -265,7 +170,7 @@ body {
     justify-content: center;
 }
 
-.cardImg { 
+.cardImg {
     width: 100%;
     height: 6.8em;
     object-fit: cover;
@@ -327,97 +232,42 @@ body {
 }
 
 /* ==========================================================================
-   FOOTER SECTION
+   FOOTER OVERRIDE (Homepage hat anderen Abstand)
    ========================================================================== */
 .footerNav {
-    background-color: var(--bg-surface);
-    border-top: 2px solid var(--border-color);
-    
-    display: flex;
-    flex-direction: column;
     gap: 2rem;
-
     margin-top: 8rem;
     padding-top: 2.5rem;
     padding-bottom: 1.5rem;
-
-    border-top-left-radius: var(--radius-lg);
-    border-top-right-radius: var(--radius-lg);
-}
-
-.platzhalter {
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.linksFooterect {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 3rem;
-}
-
-.linksFooterect a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.8rem;
-    transition: var(--transition-fast);
-}
-
-.linksFooterect a:hover {
-    color: var(--border-accent);
-    text-shadow: 0 0 8px var(--border-accent);
 }
 
 /* ==========================================================================
    DYNAMIC COLLAPSE SYSTEM (Fixed Bottom Center)
    ========================================================================== */
-:root {
-    /* Zentrale Variable für die maximale Höhe im eingeklappten Zustand */
-    --container-max-height: 290px; 
-}
 
-/* Media Query für Mobilgeräte (ganz einfach hier anpassen) */
-@media (max-width: 768px) {
-    :root {
-        --container-max-height: 190px; 
-    }
-}
-
-/* Die Gruppe braucht relative Positionierung für den festen Button */
-.restFuncionsDiv {
-    position: relative;
-    margin-top: 4rem;
-}
-
-/* Limitierter Zustand für die Karten */
+/* Limitierter Zustand */
 .cardsContainer.collapsible {
     max-height: var(--container-max-height);
     overflow: hidden;
     transition: max-height 0.35s ease-in-out;
     position: relative;
-    /* Platz für den Button im eingeklappten Zustand */
-    padding-bottom: 3.5rem; 
+    padding-bottom: 3.5rem;
 }
 
 /* Komplett geöffneter Zustand */
 .cardsContainer.expanded {
     max-height: none !important;
-    /* Verhindert, dass die unterste Kartenreihe den Button überlappt */
-    padding-bottom: 4rem; 
+    padding-bottom: 4rem;
 }
 
-/* Der Pfeil-Button: Fest positioniert unten in der Mitte der Gruppe.
-   Er bleibt IMMER an exakt dieser Stelle.
-*/
+/* Der Pfeil-Button */
 .restFuncionsDiv .expand-btn {
-    display: none; /* Wird per JS aktiviert, wenn Höhe überschritten */
+    display: none;
     position: absolute;
-    bottom: -20px; /* Perfekt zentriert auf dem unteren Rahmen */
+    bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
-    
+
     width: 40px;
     height: 40px;
     background-color: var(--bg-surface-glow);
@@ -425,7 +275,7 @@ body {
     border-radius: 50%;
     color: var(--text-primary);
     box-shadow: 0 0 12px var(--glow-soft);
-    
+
     justify-content: center;
     align-items: center;
     cursor: pointer;
@@ -436,21 +286,19 @@ body {
 .restFuncionsDiv .expand-btn:hover {
     background-color: var(--accent-color);
     box-shadow: 0 0 18px var(--border-glow);
-    transform: translateX(-50%) scale(1.05); /* Wichtig: translateX beibehalten! */
+    transform: translateX(-50%) scale(1.05);
 }
 
-/* Standard-Zustand (Eingeklappt): Pfeil zeigt nach unten */
 .restFuncionsDiv .expand-btn i {
     transform: rotate(0deg);
     transition: transform 0.25s ease;
 }
 
-/* Zustand (Ausgeklappt): Pfeil dreht sich um und zeigt nach oben */
 .restFuncionsDiv.is-expanded .expand-btn i {
     transform: rotate(180deg);
 }
 
-/* Subtiler Verlauf am unteren Rand des Containers (NUR im eingeklappten Zustand) */
+/* Verlauf am unteren Rand (nur im eingeklappten Zustand) */
 .cardsContainer.collapsible::after {
     content: '';
     position: absolute;
@@ -465,5 +313,5 @@ body {
 }
 
 .cardsContainer.expanded::after {
-    opacity: 0; /* Verblasst komplett beim Ausklappen */
+    opacity: 0;
 }

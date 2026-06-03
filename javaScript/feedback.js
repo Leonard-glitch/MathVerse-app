@@ -1,70 +1,105 @@
 /* ==========================================================================
-   HIGH-TECH FEEDBACK MODAL LOGIC
+   FEEDBACK MODAL – Auto-Inject & Logic
+   Einbinden: <script src="/MathVerse-app/javaScript/feedback.js"></script>
+   Voraussetzung pro Seite:
+     - <link rel="stylesheet" href="/MathVerse-app/css/feedback.css">
+     - <button id="openFeedbackBtn"> irgendwo im Footer
    ========================================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Elemente aus dem DOM holen
-  const modal = document.getElementById("feedbackModal");
-  const openBtn = document.getElementById("openFeedbackBtn");
-  const closeBtn = document.querySelector(".close-btn");
-  const form = document.getElementById("feedbackForm");
-  const formContainer = document.getElementById("feedbackFormContainer");
-  const successMessage = document.getElementById("successMessage");
+(function () {
 
-  // Sicherheitsabfrage: Nur ausführen, wenn die Elemente auf der Seite existieren
-  if (!modal || !openBtn) return;
+  // 1. Modal-HTML dynamisch in den Body injizieren
+  const modalHTML = `
+    <div id="feedbackModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
 
-  // 1. Fenster öffnen bei Klick auf den Feedback-Button
-  openBtn.addEventListener("click", (event) => {
-    event.preventDefault();
-    modal.style.display = "block";
-  });
+        <div id="feedbackFormContainer">
+          <h2 class="feedback-header">Feedback senden</h2>
+          <form id="feedbackForm">
+            <label for="feedbackCategory" class="feedback-label">Kategorie</label>
+            <select id="feedbackCategory" class="feedback-select" required>
+              <option value="" disabled selected hidden>Wähle eine Kategorie...</option>
+              <option value="Design">Design / UI</option>
+              <option value="Tool fehlt">Neues Mathe-Tool vorschlagen</option>
+              <option value="Bug">Fehler / Bug melden</option>
+              <option value="Sonstiges">Sonstiges</option>
+            </select>
 
-  // 2. Fenster schließen bei Klick auf das "X"
-  if (closeBtn) {
+            <label for="feedbackText" class="feedback-label">Deine Nachricht</label>
+            <textarea id="feedbackText" class="feedback-textarea" rows="4" required placeholder="Schreibe hier dein Feedback..."></textarea>
+
+            <button type="submit" class="feedback-submit-btn">Absenden</button>
+          </form>
+        </div>
+
+        <div id="feedbackSuccessMessage" class="success-container" style="display: none;">
+          <div class="success-icon">&#10004;</div>
+          <h3 class="success-header">Übertragen!</h3>
+          <p class="success-text">Vielen Dank, dein Feedback hilft uns die Mathe-Tools noch besser zu machen.</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+  // 2. Logik initialisieren sobald DOM bereit ist
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal         = document.getElementById("feedbackModal");
+    const openBtn       = document.getElementById("openFeedbackBtn");
+    const closeBtn      = modal.querySelector(".close-btn");
+    const form          = document.getElementById("feedbackForm");
+    const formContainer = document.getElementById("feedbackFormContainer");
+    const successMsg    = document.getElementById("feedbackSuccessMessage");
+
+    // Kein Feedback-Button auf dieser Seite → nichts tun
+    if (!openBtn) return;
+
+    // Modal öffnen
+    openBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      modal.style.display = "block";
+    });
+
+    // Modal schließen (X)
     closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
     });
-  }
 
-  // 3. Fenster schließen, wenn man außerhalb des Modal-Contents klickt
-  window.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      modal.style.display = "none";
-    }
-  });
+    // Modal schließen (Klick außerhalb)
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
 
-  // 4. Formular-Absendung verarbeiten
-  form.addEventListener("submit", (event) => {
-    event.preventDefault(); // Verhindert das Neuladen der Seite
-    
-    // Werte auslesen
-    const kategorie = document.getElementById("feedbackCategory").value;
-    const nachricht = document.getElementById("feedbackText").value;
-    const aktuellesTool = window.location.pathname; 
-    
-    // Daten-Ausgabe in der Konsole (Bereit für dein Backend/API-Fetch)
-    console.log("--- NEUES FEEDBACK EMPFANGEN ---");
-    console.log("Kategorie:", kategorie);
-    console.log("Nachricht:", nachricht);
-    console.log("Tool-Seite:", aktuellesTool);
-    
-    // UI-Wechsel: Formular ausblenden, leuchtenden Erfolgsscreen einblenden
-    formContainer.style.display = "none";
-    successMessage.style.display = "flex";
-    
-    // Nach 2.5 Sekunden schließt sich das Fenster automatisch
-    setTimeout(() => {
-      modal.style.display = "none";
-      
-      // Sobald das Fenster unsichtbar ist, setzen wir die Inhalte im Hintergrund 
-      // unbemerkt zurück, damit das Formular beim nächsten Öffnen wieder bereitsteht.
+    // Formular absenden
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const kategorie = document.getElementById("feedbackCategory").value;
+      const nachricht = document.getElementById("feedbackText").value;
+      const seite     = window.location.pathname;
+
+      // Hier später Backend-Fetch einfügen
+      console.log("--- NEUES FEEDBACK ---");
+      console.log("Kategorie:", kategorie);
+      console.log("Nachricht:", nachricht);
+      console.log("Seite:",     seite);
+
+      // Erfolgs-Screen anzeigen
+      formContainer.style.display = "none";
+      successMsg.style.display    = "flex";
+
+      // Modal nach 2.5s automatisch schließen und zurücksetzen
       setTimeout(() => {
-        form.reset();
-        formContainer.style.display = "block";
-        successMessage.style.display = "none";
-      }, 300); // Wartet, bis die Schließ-Animation vorbei ist
-      
-    }, 2500);
+        modal.style.display = "none";
+        setTimeout(() => {
+          form.reset();
+          formContainer.style.display = "block";
+          successMsg.style.display    = "none";
+        }, 300);
+      }, 2500);
+    });
   });
-});
+
+})();
