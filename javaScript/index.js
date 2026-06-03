@@ -385,6 +385,9 @@ function applyCollapsibleLogic() {
         const container = groupDiv.querySelector(".cardsContainer");
         if (!container) return;
 
+        // 1. ZUSTAND MERKEN: Schauen, ob diese Gruppe vor dem Klick offen war
+        const wasExpanded = container.classList.contains("expanded") || groupDiv.classList.contains("is-expanded");
+
         // Alten Button entfernen, falls vorhanden
         const existingBtn = groupDiv.querySelector(".expand-btn");
         if (existingBtn) existingBtn.remove();
@@ -415,7 +418,7 @@ function applyCollapsibleLogic() {
                     // Zuklappen
                     container.classList.remove("expanded");
                     groupDiv.classList.remove("is-expanded");
-                    // Sanfter Scroll zurück zum Gruppen-Anfang, damit der User nicht die Orientierung verliert
+                    // Sanfter Scroll zurück zum Gruppen-Anfang
                     groupDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 } else {
                     // Aufklappen
@@ -426,6 +429,13 @@ function applyCollapsibleLogic() {
 
             // Button an das Gruppen-Div anhängen
             groupDiv.appendChild(expandBtn);
+
+            // 2. ZUSTAND WIEDERHERSTELLEN: Wenn sie offen war, Klassen sofort wieder draufwerfen
+            if (wasExpanded) {
+                container.classList.add("expanded");
+                groupDiv.classList.add("is-expanded");
+            }
+
         } else {
             // Passt der Inhalt komplett rein, entfernen wir die Begrenzung
             container.classList.remove("collapsible");
