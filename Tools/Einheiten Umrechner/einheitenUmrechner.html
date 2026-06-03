@@ -14,7 +14,11 @@
         <nav class="navbar">
         <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html"><img src="/MathVerse-app/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
-        <div><input type="text" name="search" id="searchInput" placeholder="Suche..."></div>
+        <div>
+            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+            <div id="searchResults"></div>
+        </div>
 
         <div>
             <a href="" target="_self" class="navTextBorder">Login</a>
@@ -85,5 +89,6 @@
     </footer>
     <script src="./einheitenUmrechner.js"></script>
     <script src="/MathVerse-app/javaScript/feedback.js"></script>
+    <script type="module" src="/MathVerse-app-main/javaScript/search.js"></script>
 </body>
 </html>

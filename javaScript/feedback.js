@@ -36,7 +36,7 @@
         <div id="feedbackSuccessMessage" class="success-container" style="display: none;">
           <div class="success-icon">&#10004;</div>
           <h3 class="success-header">Übertragen!</h3>
-          <p class="success-text">Vielen Dank, dein Feedback hilft uns die Mathe-Tools noch besser zu machen.</p>
+          <p class="success-text">Vielen Dank, Ihr Feedback hilft uns MathVerse noch besser zu machen.</p>
         </div>
       </div>
     </div>

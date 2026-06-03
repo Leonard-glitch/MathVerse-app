@@ -8,7 +8,7 @@
 :root {
     --radius-lg: 24px;
     --radius-md: 16px;
-    --container-max-height: 290px;
+    --container-max-height: 330px;  /*Hier die maximale Höhe des Containers festlegen. / Wann der Pfeil angezeigt wird */
 }
 
 @media (max-width: 768px) {
