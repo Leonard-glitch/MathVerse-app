@@ -13,15 +13,19 @@
 <body>
     <header>
         <nav class="navbar">
-            <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html">
-                <img src="/3. MathematischeFunktionen/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage">
-            </a>
-            <div><input type="text" name="search" id="searchInput" placeholder="Suchen..."></div>
-            <div>
-                <a href="" target="_self" class="navTextBorder">Login</a>
-                <a href="" target="_self" class="navTextBorder">Register</a>
-            </div>
-        </nav>
+        <a href="index.html"><img src="./pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div>
+            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+            <div id="searchResults"></div>
+        </div>
+
+        <div>
+            <a href="" target="_self" class="navTextBorder">Login</a>
+            <a href="" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
     </header>
     <main>
         <section class="bodyDivsinSection">
@@ -49,5 +53,6 @@
     </footer>
     <script src="./javaScript/index.js"></script>
     <script src="./javaScript/feedback.js"></script>
+    <script type="module" src="./javaScript/search.js"></script>
 </body>
 </html>

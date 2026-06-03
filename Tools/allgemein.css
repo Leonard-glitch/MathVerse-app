@@ -84,7 +84,7 @@ main {
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
-    padding: 0.8rem 2rem;
+    padding: 0.5rem 2rem;
 
     border: 2px solid var(--border-glow);
     border-top: none;
@@ -395,7 +395,7 @@ input:-webkit-autofill:focus {
 
     color: var(--accent-live);
 
-    border: 1px solid rgba(138, 22, 255, 0.4);
+    border: 1px solid rgba(156, 97, 8, 0.555);
 
     border-radius: 999px;
 
