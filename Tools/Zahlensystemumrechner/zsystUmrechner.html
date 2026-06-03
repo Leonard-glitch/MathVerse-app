@@ -4,17 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zahlensystem Umrechner</title>
-    <link rel="icon" type="image/x-icon" href="/MathVerse-app/MathVerse-app-main/3. MathematischeFunktionen/pictures/favicon v1.png">
-    <link rel="stylesheet" href="/MathVerse-app/css/feedback.css">
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="./zsystUmrechner.css">
     <link rel="stylesheet" href="../allgemein.css">
 </head>
 <body>
     <header>
         <nav class="navbar">
-        <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html"><img src="/3. MathematischeFunktionen/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+        <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
-        <div><input type="text" name="search" id="searchInput" placeholder="Suche..."></div>
+        <div>
+            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+            <div id="searchResults"></div>
+        </div>
 
         <div>
             <a href="" target="_self" class="navTextBorder">Login</a>
@@ -119,6 +123,7 @@
         </div>
     </footer>
     <script src="./zsystUmrechner.js"></script>
-    <script src="/MathVerse-app/javaScript/feedback.js"></script>
+    <script src="../../javaScript/feedback.js"></script>
+    <script type="module" src="../../javaScript/search.js"></script>
 </body>
 </html>
