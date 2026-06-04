@@ -44,7 +44,7 @@ const tools = [
         id: "card5",
         title: "Prozentrechnung",
         image: "./pictures/Prozentrechnung_Thumbnail.png",
-        link: "./Tools/Prozentrechnung/prozentrechnung.html",
+        link: "./Tools/Prozentrechner/prozentrechner.html",
         group: "arithmetik",
     }
 ];
