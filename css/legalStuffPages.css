@@ -1,0 +1,90 @@
+/* ==========================================================================
+   STYLING FÜR RECHTSTEXTE (IMPRESSUM & DATENSCHUTZ)
+   ========================================================================== */
+
+.legalContainer {
+    max-width: 950px;         /* Etwas breiter für bessere Lesbarkeit im Fließtext */
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    width: 100%;
+}
+
+.legalCard {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 2.5rem;          /* Mehr Innenabstand für einen cleanereren Look */
+    box-shadow: var(--shadow-main);
+    transition: border-color var(--transition-speed);
+    
+    /* TEXT-AUSRICHTUNG FÜR DIE GANZE KARTE */
+    text-align: left;         /* 'left' für klassischen linksbündigen Text. 
+                                 Nutze 'justify' für Blocksatz, falls gewünscht */
+}
+
+.legalCard:hover {
+    border-color: rgba(138, 22, 255, 0.4);
+}
+
+/* HAUPT-ÜBERSCHRIFTEN (z.B. "1. Datenschutz auf einen Blick") */
+.legalCard h2 {
+    color: var(--accent-live);
+    font-size: 1.4rem;        /* Schriftgröße der großen Abschnitte */
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+    font-weight: 700;
+    text-shadow: 0 0 10px var(--glow-live);
+    letter-spacing: 0.5px;    /* Leicht erhöhter Zeichenabstand */
+}
+
+/* UNTER-ÜBERSCHRIFTEN (z.B. "Cookies & Lokaler Speicher") */
+.legalCard h3 {
+    color: var(--text-primary);
+    font-size: 1.1rem;        /* Schriftgröße der Unterpunkte */
+    margin-top: 1.4rem;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+}
+
+/* DER NORMALE FLIESS-TEXT */
+.legalCard p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;        /* Erhöht von 0.85rem auf 0.9rem für bessere Lesbarkeit */
+    line-height: 1.7;         /* Zeilenabstand (1.7 ist sehr angenehm bei dunklen Designs) */
+    margin-bottom: 1.2rem;    /* Abstand zwischen den Absätzen */
+}
+
+/* ZUSPITZUNG FÜR ZWECKMÄSSIGE LISTEN */
+.legalCard ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.legalCard li {
+    color: var(--text-secondary);
+    font-size: 0.9rem;        /* Gleiche Größe wie der normale Fließtext */
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.legalDivider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    margin: 2.5rem 0;
+}
+
+/* Optimierung für mobile Geräte */
+@media (max-width: 768px) {
+    .legalCard {
+        padding: 1.5rem;
+    }
+    
+    .legalCard h2 {
+        font-size: 1.2rem;
+    }
+    
+    .legalCard p, .legalCard li {
+        font-size: 0.85rem;   /* Auf Mobilgeräten minimal kleiner, damit es kompakt bleibt */
+    }
+}

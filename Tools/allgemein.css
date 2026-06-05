@@ -491,3 +491,29 @@ body {
 .tool-page-heart.is-active {
     border-color: rgba(255, 42, 95, 0.4);
 }
+
+
+/* ==========================================================================
+   FOOTER SOCIAL LINKS
+   ========================================================================== */
+.footerSocial {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-bottom: -0.5rem; /* Gleicht den Abstand zu den Text-Links an */
+}
+
+.footerSocial a {
+    color: var(--text-secondary);
+    font-size: 1.4rem; /* Angenehme Icon-Größe */
+    transition: var(--transition-fast);
+    text-decoration: none;
+}
+
+/* Hover-Effekt passend zu deinem MathVerse-Design */
+.footerSocial a:hover {
+    color: var(--accent-live);
+    transform: translateY(-3px);
+    filter: drop-shadow(0 0 8px var(--accent-live));
+}
