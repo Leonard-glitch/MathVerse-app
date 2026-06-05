@@ -1,81 +1,159 @@
-*{
-    padding: 0;
-    margin: 0;
-}
 
-html{
-    font-size: 18px;
-}
 
-section{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.headerOne{
-    text-align: center;
-    text-decoration: underline;
-    padding: 4rem;
-}
-
-.loginDiv{
-    border: 2px solid blue;
-    border-radius: 30px;
-    font-size: 1.4rem;
-}
-
-form{
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-}
-
-.lintDiv{
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-label{
-    text-decoration: underline;
-}
-
-input{
-    font-size: 1rem;
-    padding: 0.2rem;
-    border: 2px solid rgb(0, 123, 255);
-    border-radius: 20px;
-}
-
-.button{
+section {
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 75vh;
+    padding: 2rem 1rem;
 }
 
-.button button{
-    font-size: 1.2rem;
-    border:2px solid blueviolet;
-    border-radius: 40px;
-    padding: 0.2rem 1rem;
-    background-color: rgb(154, 154, 209);
-    color: rgb(22, 221, 102);
-}
-
-
-
-
-.infosDiv{
-    border-top: 2px solid blue;
-    
-    padding: 0.5rem;
-
+.loginContainer {
+    width: 100%;
+    max-width: 440px;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    background-color: var(--bg-body);
 }
 
-.infosLInk{
-    color: blue;
+.loginTitle {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Input Gruppe für den Floating-Label Effekt */
+.inputGroup {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Minimalistisches Eingabefeld */
+.xInput {
+    width: 100%;
+    padding: 1.25rem 0.75rem 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color var(--transition-speed);
+}
+
+/* Ändere diesen Block in deinem CSS so ab: */
+.xInput:focus {
+    /* Violett wird nur angewendet, wenn das Feld nicht bereits als valide (grün) markiert ist */
+    border-color: var(--border-glow);
+}
+
+/* Das animierte Label */
+.floatingLabel {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.9rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    pointer-events: none;
+    transition: all 0.15s ease;
+}
+
+/* Label-Animation wenn fokussiert oder ausgefüllt */
+.xInput:focus ~ .floatingLabel,
+.xInput:not(:placeholder-shown) ~ .floatingLabel {
+    top: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--border-glow);
+}
+
+/* Fetter, vollflächiger Button */
+.xLoginBtn {
+    background-color: var(--text-primary);
+    color: var(--bg-body);
+    border: none;
+    border-radius: 9999px;
+    padding: 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: opacity var(--transition-fast);
+}
+
+.xLoginBtn:hover {
+    opacity: 0.9;
+}
+
+/* Wechsel zur Login-Seite am Ende */
+.signupPrompt {
+    margin-top: 2.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.signupLink {
+    color: var(--border-glow);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signupLink:hover {
+    text-decoration: underline;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+/* Die Checkbox reagiert jetzt nur noch auf direkte Klicks */
+.checkboxGroup input[type="checkbox"] {
+    accent-color: var(--border-glow); /* Dein Tech-Violett */
+    width: 16px; /* Etwas größer, damit man sie trotz des gezielten Klicks gut trifft */
+    height: 16px;
+    margin-top: 3px;
+    cursor: pointer;
+}
+
+.checkboxText {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    user-select: none; /* Verhindert, dass der Text aus Versehen markiert wird */
+}
+
+.checkboxText a {
+    color: var(--border-glow);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.checkboxText a:hover {
+    text-decoration: underline;
+}
+
+/* Roter Stern für das Pflichtfeld */
+.accent-error {
+    color: var(--accent-error);
+}
+
+/* Spezifische Anpassung für Fehler direkt an den Eingabefeldern */
+.field-error {
+    font-size: 0.75rem;     /* Etwas kompakter, da es direkt am Feld klebt */
+    text-align: left;       /* Linksbündig passend zum X-Design */
+    margin: -0.5rem 0 0.5rem 0; /* Verringert den Abstand zum oberen Input-Feld */
+    padding: 0.4rem 1rem;   /* Etwas schlanker */
+    width: 100%;
 }

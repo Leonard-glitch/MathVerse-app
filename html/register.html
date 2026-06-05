@@ -1,35 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Tools/allgemein.css">
     <link rel="stylesheet" href="../css/register.css">
     <title>Register</title>
 </head>
 <body>
-    <section>
-        <h1 class="headerOne">Register</h1>
-        <div class="loginDiv">
-            <form action="">
-                <div class="lintDiv">
-                    <label for="userName">User Name</label>
-                    <input type="userName" id="userName" name="userName" required>
+
+    <main>
+        <section>
+            <div class="loginContainer">
+                <h1 class="loginTitle">Registrieren</h1>
+
+                <form action="/register" method="POST" class="loginForm" novalidate>
+                    
+                    <div class="inputGroup">
+                        <input type="text" id="userName" name="userName" class="xInput" placeholder=" " required>
+                        <label for="userName" class="floatingLabel">Benutzername</label>
+                    </div>
+                    
+                    <div id="usernameError" class="falscheEingabestyle field-error"></div>
+
+                    <div class="inputGroup">
+                        <input type="email" id="email" name="email" class="xInput" placeholder=" " required>
+                        <label for="email" class="floatingLabel">E-Mail-Adresse</label>
+                    </div>
+
+                    <div class="inputGroup">
+                        <input type="password" id="password" name="password" class="xInput" placeholder=" " required>
+                        <label for="password" class="floatingLabel">Passwort</label>
+                    </div>
+
+                    <div class="inputGroup">
+                        <input type="password" id="passwordConf" name="passwordConf" class="xInput" placeholder=" " required>
+                        <label for="passwordConf" class="floatingLabel">Passwort bestätigen</label>
+                    </div>
+
+                    <div id="formError" class="falscheEingabestyle field-error"></div>
+
+                    <div class="checkboxGroup">
+                        <input type="checkbox" id="privacyAccept" name="privacyAccept" required>
+                        <span class="checkboxText">
+                            Ich habe die <a href="./datenSchutz.html" target="_blank">Datenschutzerklärung</a> gelesen und akzeptiere sie. <span class="accent-error">*</span>
+                        </span>
+                    </div>
+
+                    <button type="submit" class="xLoginBtn">Registrieren</button>
+                </form>
+
+                <div class="signupPrompt">
+                    Du hast bereits ein Konto? <a href="./login.html" class="signupLink">Anmelden</a>
                 </div>
-                <div class="lintDiv">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <div class="lintDiv">
-                    <label for="passwordConf">Confirm Password</label>
-                    <input type="password" id="passwordConf" name="passwordConf" required>
-                </div>
-                <p id="messages"></p>
-                <div class="button"><button type="submit">Register</button></div>
-            </form>
-            <div class="infosDiv">
-                <p class="infosText">Already have an Accound? <a href="./login.html" class="infosLInk">Login</a></p>
             </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footerNav">
+            <div class="footerSocial">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+            </div>
+
+            <div class="linksFooterect">
+                <a href="./html/datenSchutz.html">Datenschutz</a>
+                <button id="openFeedbackBtn">Feedback senden</button>
+                <a href="./html/impressum.html">Impressum</a>
+            </div>
+            
+            <div class="platzhalter">&copy; MathVerse</div>
         </div>
-    </section>
+    </footer>
+    <script src="../javaScript/register.js"></script>
 </body>
 </html>

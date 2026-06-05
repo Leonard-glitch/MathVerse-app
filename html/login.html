@@ -1,32 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Tools/allgemein.css">
     <link rel="stylesheet" href="../css/login.css">
     <title>Login</title>
 </head>
 <body>
-    <section>
-        <h1 class="headerOne">Login</h1>
-        <div class="loginDiv">
-            <form action="">
-                <div class="lintDiv">
-                    <label for="userName">User Name</label>
-                    <input type="userName" id="userName" name="userName" required>
+    <main>
+        <section>
+            <div class="loginContainer">
+                <h1 class="loginTitle">Login</h1>
+
+                <form action="/login" method="POST" class="loginForm" novalidate>
+                    
+                    <div class="inputGroup">
+                        <input type="text" id="username" name="username" class="xInput" placeholder=" " required>
+                        <label for="username" class="floatingLabel">Benutzername oder E-Mail</label>
+                        <small class="input-hint">Du kannst dich wahlweise mit deinem Benutzernamen oder deiner E-Mail-Adresse anmelden.</small>
+                    </div>
+                    <div id="usernameError" class="falscheEingabestyle field-error" style="display: none;"></div>
+
+                    <div class="inputGroup">
+                        <input type="password" id="password" name="password" class="xInput" placeholder=" " required>
+                        <label for="password" class="floatingLabel">Passwort</label>
+                        
+                        <div class="forgotPasswordWrapper">
+                            <a href="./forgot-password.html" class="forgotPasswordLink">Passwort vergessen?</a>
+                        </div>
+                    </div>
+                    <div id="formError" class="falscheEingabestyle field-error" style="display: none;"></div>
+
+                    <button type="submit" class="xLoginBtn">Anmelden</button>
+                </form>
+
+                <div class="signupPrompt">
+                    Du hast noch kein Konto? <a href="./register.html" class="signupLink">Registrieren</a>
                 </div>
-                <div class="lintDiv">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <p id="messages"></p>
-                <div class="button"><button type="submit">Login</button></div>
-            </form>
-            <div class="infosDiv">
-                <p class="infosText">Don't have a Account yet? <a href="./register.html" class="infosLInk">Register</a></p>
-                <p><a href="" class="infosLInk">Forgot Password?</a></p>
             </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footerNav">
+            <div class="footerSocial">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+            </div>
+
+            <div class="linksFooterect">
+                <a href="./datenSchutz.html">Datenschutz</a>
+                <button id="openFeedbackBtn">Feedback senden</button>
+                <a href="./impressum.html">Impressum</a>
+            </div>
+            
+            <div class="platzhalter">&copy; MathVerse</div>
         </div>
-    </section>
+    </footer>
+    <script src="../javaScript/login.js"></script>
 </body>
 </html>

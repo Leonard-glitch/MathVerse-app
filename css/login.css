@@ -1,81 +1,151 @@
-*{
-    padding: 0;
-    margin: 0;
-}
+/* ==========================================================================
+   NEW MODERN LOGIN PAGE (X-Inspired Style)
+   ========================================================================== */
 
-html{
-    font-size: 18px;
-}
-
-section{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.headerOne{
-    text-align: center;
-    text-decoration: underline;
-    padding: 4rem;
-}
-
-.loginDiv{
-    border: 2px solid blue;
-    border-radius: 30px;
-    font-size: 1.4rem;
-}
-
-form{
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-}
-
-.lintDiv{
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-label{
-    text-decoration: underline;
-}
-
-input{
-    font-size: 1rem;
-    padding: 0.2rem;
-    border: 2px solid rgb(0, 123, 255);
-    border-radius: 20px;
-}
-
-.button{
+section {
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 2rem 1rem;
 }
 
-.button button{
-    font-size: 1.2rem;
-    border:2px solid blueviolet;
-    border-radius: 40px;
-    padding: 0.2rem 1rem;
-    background-color: rgb(154, 154, 209);
-    color: rgb(22, 221, 102);
-}
-
-
-
-
-.infosDiv{
-    border-top: 2px solid blue;
-    
-    padding: 0.5rem;
-
+/* Zentraler Container wie das X-Login-Modal */
+.loginContainer {
+    width: 100%;
+    max-width: 440px;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    background-color: var(--bg-body); /* Flaches Design statt dicker Box */
 }
 
-.infosLInk{
-    color: blue;
+.loginTitle {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Input Gruppe für den Floating-Label Effekt */
+.inputGroup {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Das Eingabefeld im X-Stil */
+.xInput {
+    width: 100%;
+    padding: 1.25rem 0.75rem 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 4px; /* X nutzt sehr subtile Radien bei Inputs */
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color var(--transition-speed);
+}
+
+.xInput:focus {
+    border-color: var(--border-glow); /* Violettes Leuchten beim Fokussieren */
+}
+
+/* Das animierte Label */
+.floatingLabel {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.9rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    pointer-events: none;
+    transition: all 0.15s ease;
+}
+
+/* Magie: Wenn das Feld fokussiert ist oder Text enthält, wandert das Label nach oben */
+.xInput:focus ~ .floatingLabel,
+.xInput:not(:placeholder-shown) ~ .floatingLabel {
+    top: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--border-glow);
+}
+
+/* Hilfetext unter dem Username */
+.input-hint {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    margin-top: 0.25rem;
+    padding: 0 0.2rem;
+}
+
+/* Passwort vergessen Bereich */
+.forgotPasswordWrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 0.35rem;
+}
+
+.forgotPasswordLink {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.forgotPasswordLink:hover {
+    color: var(--accent-live);
+    text-decoration: underline;
+}
+
+/* Der fette, cleane Button im X-Stil */
+.xLoginBtn {
+    background-color: var(--text-primary); /* Invertiert für maximale Aufmerksamkeit */
+    color: var(--bg-body);
+    border: none;
+    border-radius: 9999px; /* Komplett rund wie bei X */
+    padding: 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: opacity var(--transition-fast);
+}
+
+.xLoginBtn:hover {
+    opacity: 0.9;
+}
+
+/* Registrierungs-Aufforderung am Verlassen des Formulars */
+.signupPrompt {
+    margin-top: 2.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.signupLink {
+    color: var(--border-glow);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signupLink:hover {
+    text-decoration: underline;
+}
+
+/* Spezifische Anpassung für Fehler direkt an den Eingabefeldern */
+.field-error {
+    font-size: 0.75rem;
+    text-align: left;
+    margin: 0.25rem 0 0.5rem 0;
+    padding: 0.4rem 0.75rem;
+    width: 100%;
+    color: var(--accent-error); /* Nutzt deine globale Fehlerfarbe */
 }
