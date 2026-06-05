@@ -412,3 +412,82 @@ input:-webkit-autofill:focus {
     white-space: nowrap;
 }
 
+
+/* ==========================================================================
+   TOOL-PAGE HEART BUTTON (Floating Favorite Icon auf Tool-Seiten)
+   Wird von toolFavorite.js dynamisch in den Body injiziert.
+   ========================================================================== */
+
+
+body {
+    position: relative; /* Wichtig für die absolute Positionierung des Herz-Buttons */
+}
+
+.tool-page-heart {
+    position: absolute;
+    top: 5rem;          /* Komfortabler Abstand unter der Navbar */
+    right: 1.5rem;
+    z-index: 500;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    width: 52px;
+    padding: 0.55rem 0.4rem 0.4rem;
+
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+
+    box-shadow: var(--shadow-main);
+    transition:
+        border-color var(--transition-speed),
+        box-shadow   var(--transition-speed),
+        transform    var(--transition-speed);
+}
+
+.tool-page-heart:hover {
+    border-color: var(--favorite-active);
+    box-shadow: 0 0 20px rgba(255, 42, 95, 0.25), var(--shadow-main);
+    transform: translateY(-2px);
+}
+
+.tool-page-heart:active {
+    transform: scale(0.94);
+}
+
+/* SVG Herz-Icon */
+.tool-page-heart .heart-svg {
+    width: 22px;
+    height: 22px;
+    color: var(--text-muted);
+    transition: color var(--transition-speed), fill var(--transition-speed);
+}
+
+/* Kleines Label darunter */
+.tool-page-heart .heart-tooltip-label {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    transition: color var(--transition-speed);
+    white-space: nowrap;
+}
+
+/* Aktiver (favorisierter) Zustand */
+.tool-page-heart.is-active .heart-svg {
+    color: var(--favorite-active);
+    fill: var(--favorite-active);
+    filter: drop-shadow(0 0 6px rgba(255, 42, 95, 0.55));
+}
+
+.tool-page-heart.is-active .heart-tooltip-label {
+    color: var(--favorite-active);
+}
+
+.tool-page-heart.is-active {
+    border-color: rgba(255, 42, 95, 0.4);
+}

@@ -315,3 +315,96 @@
 .cardsContainer.expanded::after {
     opacity: 0;
 }
+
+
+/* ==========================================================================
+   INFO TOOLTIP – Singleton, position:fixed, an <body> gehängt
+   Kein overflow-clipping durch Eltern-Container möglich.
+   ========================================================================== */
+
+.info-tooltip {
+    position: fixed;
+    width: 220px;
+    z-index: 9000;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.info-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Inhalt-Box */
+.info-tooltip-text {
+    display: block;
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-sm);
+    box-shadow:
+        0 0 18px var(--glow-soft),
+        0 8px 24px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+/* ── Pfeil UNTEN (Tooltip über dem Icon) ───────────────────────────── */
+.info-tooltip.tooltip-above .info-tooltip-text::before,
+.info-tooltip.tooltip-above .info-tooltip-text::after {
+    content: '';
+    position: absolute;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+}
+/* Außen-Dreieck (Border-Farbe) */
+.info-tooltip.tooltip-above .info-tooltip-text::before {
+    bottom: -8px;
+    border-left:  8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top:   8px solid var(--border-glow);
+}
+/* Innen-Dreieck (Hintergrundfarbe) */
+.info-tooltip.tooltip-above .info-tooltip-text::after {
+    bottom: -6px;
+    border-left:  7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top:   6px solid var(--bg-surface);
+}
+
+/* ── Pfeil OBEN (Tooltip unter dem Icon) ───────────────────────────── */
+.info-tooltip.tooltip-below .info-tooltip-text::before,
+.info-tooltip.tooltip-below .info-tooltip-text::after {
+    content: '';
+    position: absolute;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+}
+.info-tooltip.tooltip-below .info-tooltip-text::before {
+    top: -8px;
+    border-left:   8px solid transparent;
+    border-right:  8px solid transparent;
+    border-bottom: 8px solid var(--border-glow);
+}
+.info-tooltip.tooltip-below .info-tooltip-text::after {
+    top: -6px;
+    border-left:   7px solid transparent;
+    border-right:  7px solid transparent;
+    border-bottom: 6px solid var(--bg-surface);
+}
+
+/* Info-Icon interaktiv */
+.info:hover {
+    color: var(--border-glow) !important;
+    filter: drop-shadow(0 0 5px var(--glow-soft));
+    cursor: pointer;
+}

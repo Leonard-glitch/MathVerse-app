@@ -3,35 +3,38 @@
 // ==========================================================================
 
 const groups = [
-    { id: "arithmetik", title: "Arithmetik" },
+    { id: "arithmetik",    title: "Arithmetik" },
     { id: "zahlensysteme", title: "Zahlensysteme" },
-    { id: "algebra", title: "Algebra" },
-    { id: "geometrie", title: "Geometrie" },
-    { id: "statistik", title: "Statistik" },
-    { id: "einheiten", title: "Einheiten" }
+    { id: "algebra",       title: "Algebra" },
+    { id: "geometrie",     title: "Geometrie" },
+    { id: "statistik",     title: "Statistik" },
+    { id: "einheiten",     title: "Einheiten" }
 ];
 
 const tools = [
     {
-        id: "card1", 
+        id: "card1",
         title: "Zahlen Analyse",
         image: "./pictures/51R9beEdSfL.jpg",
         link: "./Tools/Zahlenanalyse/zahlenAnalyse.html",
-        group: "algebra"
+        group: "algebra",
+        info: "Analysiert eine kommagetrennte Zahlenliste und gibt Summe, Maximum, Minimum und Durchschnitt aus."
     },
     {
         id: "card2",
         title: "Zahlensystem Umrechner",
         image: "./pictures/ZahlensystemeUmwandeln Temp1.jpg",
         link: "./Tools/Zahlensystemumrechner/zsystUmrechner.html",
-        group: "zahlensysteme"
+        group: "zahlensysteme",
+        info: "Rechnet Zahlen zwischen Zahlensystemen (Basis 2–20) um – inklusive Nachkommastellen und vollem Rechenweg."
     },
     {
         id: "card3",
         title: "Zahlensystem Rechner",
         image: "./pictures/beispiel-addition.png",
         link: "./Tools/Zahlensystemrechner/zsystRechner.html",
-        group: "zahlensysteme"
+        group: "zahlensysteme",
+        info: "Führt Grundrechenarten (+, −, ×, ÷) direkt in einem beliebigen Zahlensystem durch und zeigt den schriftlichen Rechenweg."
     },
     {
         id: "card4",
@@ -39,6 +42,7 @@ const tools = [
         image: "./pictures/hqdefault.jpg",
         link: "./Tools/Einheiten Umrechner/einheitenUmrechner.html",
         group: "einheiten",
+        info: "Konvertiert Längen, Massen und Zeiteinheiten – mit Advanced Mode für imperiale und astronomische Einheiten."
     },
     {
         id: "card5",
@@ -46,6 +50,7 @@ const tools = [
         image: "./pictures/Prozentrechnung_Thumbnail.png",
         link: "./Tools/Prozentrechner/prozentrechner.html",
         group: "arithmetik",
+        info: "Berechnet Anteil, Prozentsatz und Grundwert – drei Formeln auf einen Blick, mit sofortigem Rechenweg."
     }
 ];
 
@@ -53,9 +58,9 @@ const tools = [
 // 2. STATE MANAGEMENT & INITIALIZATION
 // ==========================================================================
 
-let favoriten = JSON.parse(localStorage.getItem("favoriten")) || [];
+let favoriten       = JSON.parse(localStorage.getItem("favoriten"))       || [];
 let containerOrders = JSON.parse(localStorage.getItem("containerOrders")) || {};
-let pinnedGroups = JSON.parse(localStorage.getItem("pinnedGroups")) || [];
+let pinnedGroups    = JSON.parse(localStorage.getItem("pinnedGroups"))    || [];
 
 const groupsContainer = document.getElementById("groupsContainer");
 
@@ -66,26 +71,16 @@ function initMathVerse() {
     if (!groupsContainer) return;
     groupsContainer.innerHTML = "";
 
-    // 1. Struktur-Kategorien im DOM aufbauen
     createGroupDOM({ id: "favoriten", title: "Favoriten" }, "favoritenGroupStar");
     groups.forEach(group => createGroupDOM(group, `${group.id}GroupStar`));
     createGroupDOM({ id: "allTools", title: "All Tools" }, "allToolsGroupStar");
 
-    // Favoriten-Stern ist standardmäßig immer aktiv gepinnt
     const favStar = document.querySelector('[data-id="favoritenGroupStar"] .star');
-    if (favStar) {
-        favStar.className = "fa fa-star star active";
-    }
+    if (favStar) favStar.className = "fa fa-star star active";
 
-    // 2. Karten generieren und an ihre Startpositionen verteilen
     buildAndDistributeCards();
-
-    // 3. Gruppen-Sterne Sortierung initial anwenden
     sortGroupsByPins();
-
-    // 4. Live-Suche aktivieren
     initSearch();
-
     applyCollapsibleLogic();
 }
 
@@ -97,7 +92,7 @@ function createGroupDOM(group, groupDataId) {
     const groupDiv = document.createElement("div");
     groupDiv.className = "restFuncionsDiv";
     groupDiv.dataset.id = groupDataId;
-    groupDiv.dataset.groupId = group.id; // Wichtig für native Sortierung bei Entpinnung
+    groupDiv.dataset.groupId = group.id;
 
     const cardTitleDiv = document.createElement("div");
     cardTitleDiv.className = "cardTitleDiv";
@@ -108,7 +103,6 @@ function createGroupDOM(group, groupDataId) {
     } else {
         starIcon.className = "fa fa-star-o star";
     }
-    
     starIcon.addEventListener("click", (e) => handleGroupStarClick(e, groupDataId));
 
     const header = document.createElement("h2");
@@ -151,26 +145,55 @@ function createCardElement(tool, isAllToolsView = false) {
         <p class="cardText">${tool.title}</p>
     `;
 
+    // ── Herz-Klick ──────────────────────────────────────────────────────────
     const heart = card.querySelector(".favorite");
-    heart.addEventListener("click", function(event) {
+    heart.addEventListener("click", function (event) {
         event.preventDefault();
         event.stopPropagation();
         handleHeartClick(tool.id);
     });
 
+    // ── Info-Tooltip ─────────────────────────────────────────────────────────
+    const infoIcon = card.querySelector(".info");
+    if (infoIcon && tool.info) {
+        let hoverTimer = null;
+
+        infoIcon.addEventListener("mouseenter", () => {
+            hoverTimer = setTimeout(() => showGlobalTooltip(infoIcon, tool.info), 2000);
+        });
+
+        infoIcon.addEventListener("mouseleave", () => {
+            clearTimeout(hoverTimer);
+            hoverTimer = null;
+            if (!infoIcon._pinned) hideGlobalTooltip();
+        });
+
+        infoIcon.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            clearTimeout(hoverTimer);
+            hoverTimer = null;
+            if (infoIcon._pinned) {
+                infoIcon._pinned = false;
+                hideGlobalTooltip();
+            } else {
+                infoIcon._pinned = true;
+                showGlobalTooltip(infoIcon, tool.info);
+            }
+        });
+    }
+
     return card;
 }
 
 function buildAndDistributeCards() {
-    const favContainer = document.getElementById("favoritenContainer");
+    const favContainer      = document.getElementById("favoritenContainer");
     const allToolsContainer = document.getElementById("allToolsContainer");
 
     tools.forEach(tool => {
-        // 1. Erstelle die bewegliche Kategorie-Karte
         const catCard = createCardElement(tool, false);
-        catCard.dataset.originalContainer = `${tool.group}Container`; // Problem 3 gelöst via dataset
+        catCard.dataset.originalContainer = `${tool.group}Container`;
 
-        // 2. Initialplatzierung prüfen (Favoriten-Array-Reihenfolge respektieren!)
         if (favoriten.includes(tool.id)) {
             if (favContainer) favContainer.appendChild(catCard);
         } else {
@@ -178,36 +201,27 @@ function buildAndDistributeCards() {
             if (targetContainer) targetContainer.appendChild(catCard);
         }
 
-        // 3. Erstelle separate Instanz für "All Tools"
         const allToolsCard = createCardElement(tool, true);
         if (allToolsContainer) allToolsContainer.appendChild(allToolsCard);
     });
 
-    // Alle Container initial sortieren anhand des Speichers
     document.querySelectorAll(".cardsContainer").forEach(sortContainer);
 }
 
 function handleHeartClick(toolId) {
-    const wasActive = favoriten.includes(toolId);
-    const favContainer = document.getElementById("favoritenContainer");
-    
-    // Präziser Selektor verhindert das Auswählen der "All Tools"-Karte (Problem 4 gelöst)
-    const catCard = document.querySelector(`.card[data-id="${toolId}"][data-view="category"]`);
-
-    let affectedContainers = new Set();
+    const wasActive         = favoriten.includes(toolId);
+    const favContainer      = document.getElementById("favoritenContainer");
+    const catCard           = document.querySelector(`.card[data-id="${toolId}"][data-view="category"]`);
+    let affectedContainers  = new Set();
 
     if (!wasActive) {
-        // Zu Favoriten hinzufügen
         favoriten.push(toolId);
         if (catCard && favContainer) {
-            // Jede neu favorisierte Karte wird ans Ende geschoben, um die Array-Reihenfolge stabil zu halten
-            favContainer.appendChild(catCard); 
+            favContainer.appendChild(catCard);
             affectedContainers.add(favContainer);
         }
     } else {
-        // Aus Favoriten entfernen
         favoriten = favoriten.filter(id => id !== toolId);
-        
         if (catCard && catCard.dataset.originalContainer) {
             const origContainer = document.getElementById(catCard.dataset.originalContainer);
             if (origContainer) {
@@ -221,25 +235,26 @@ function handleHeartClick(toolId) {
     const allToolsContainer = document.getElementById("allToolsContainer");
     if (allToolsContainer) affectedContainers.add(allToolsContainer);
 
-    // localStorage Update für Favoriten
     localStorage.setItem("favoriten", JSON.stringify(favoriten));
 
-    // Herz-Synchronisation über alle Instanzen hinweg
-    document.querySelectorAll(`.card[data-id="${toolId}"] .favorite`).forEach(heart => {
-        if (!wasActive) {
-            heart.className = "fa fa-heart favorite active";
-        } else {
-            heart.className = "fa fa-heart-o favorite";
-        }
-    });
+    // Herz-Icons synchronisieren
+    syncHeartIcons(toolId, !wasActive);
 
-    // Performance-Optimierung (Problem 6): Nur betroffene Container sortieren und genau 1x abspeichern
     affectedContainers.forEach(container => {
         sortContainer(container);
-        containerOrders[container.id] = Array.from(container.querySelectorAll(".card")).map(c => c.dataset.id);
+        containerOrders[container.id] = Array.from(
+            container.querySelectorAll(".card")
+        ).map(c => c.dataset.id);
     });
     localStorage.setItem("containerOrders", JSON.stringify(containerOrders));
-applyCollapsibleLogic(); // <-- HIER HINZUFÜGEN
+    applyCollapsibleLogic();
+}
+
+// Herz-Icons für eine Tool-ID auf den gegebenen Zustand setzen
+function syncHeartIcons(toolId, isActive) {
+    document.querySelectorAll(`.card[data-id="${toolId}"] .favorite`).forEach(heart => {
+        heart.className = `fa ${isActive ? "fa-heart active" : "fa-heart-o"} favorite`;
+    });
 }
 
 // ==========================================================================
@@ -248,14 +263,13 @@ applyCollapsibleLogic(); // <-- HIER HINZUFÜGEN
 
 function sortContainer(container) {
     const containerId = container.id;
-    const cards = Array.from(container.querySelectorAll(".card"));
-    const savedOrder = containerOrders[containerId];
+    const cards       = Array.from(container.querySelectorAll(".card"));
+    const savedOrder  = containerOrders[containerId];
 
     cards.sort((a, b) => {
         const idA = a.dataset.id;
         const idB = b.dataset.id;
 
-        // 1. Sonderlogik für den "All Tools" Container (Favoriten nach oben)
         if (container.dataset.alltools === "true") {
             const isFavA = favoriten.includes(idA);
             const isFavB = favoriten.includes(idB);
@@ -263,12 +277,10 @@ function sortContainer(container) {
             if (!isFavA && isFavB) return 1;
         }
 
-        // 2. Logik für den Favoriten-Container selbst (Chronologie des Hinzufügens wahren)
         if (containerId === "favoritenContainer") {
             return favoriten.indexOf(idA) - favoriten.indexOf(idB);
         }
 
-        // 3. Benutzerdefinierte Reihenfolge aus dem Speicher anwenden
         if (savedOrder) {
             const indexA = savedOrder.indexOf(idA);
             const indexB = savedOrder.indexOf(idB);
@@ -279,27 +291,24 @@ function sortContainer(container) {
 
         return 0;
     });
-    
-    // DOM-Nodes in korrekter Reihenfolge neu anhängen
+
     cards.forEach(card => container.appendChild(card));
 }
 
 // ==========================================================================
-// 6. ORIGINAL GROUP PIN SYSTEM
+// 6. GROUP PIN SYSTEM
 // ==========================================================================
 
 function handleGroupStarClick(event, groupId) {
     event.preventDefault();
     if (groupId === "favoritenGroupStar") return;
 
-    const star = event.currentTarget;
+    const star    = event.currentTarget;
     const wasActive = star.classList.contains("active");
 
     if (!wasActive) {
         star.className = "fa fa-star star active";
-        if (!pinnedGroups.includes(groupId)) {
-            pinnedGroups.push(groupId);
-        }
+        if (!pinnedGroups.includes(groupId)) pinnedGroups.push(groupId);
     } else {
         star.className = "fa fa-star-o star";
         pinnedGroups = pinnedGroups.filter(id => id !== groupId);
@@ -310,9 +319,7 @@ function handleGroupStarClick(event, groupId) {
 }
 
 function sortGroupsByPins() {
-    const allGroups = Array.from(groupsContainer.querySelectorAll(".restFuncionsDiv"));
-    
-    // Native Reihenfolge der IDs erstellen, um entpinnte Gruppen exakt einsortieren zu können
+    const allGroups   = Array.from(groupsContainer.querySelectorAll(".restFuncionsDiv"));
     const nativeOrder = ["favoriten", ...groups.map(g => g.id), "allTools"];
 
     allGroups.sort((a, b) => {
@@ -327,12 +334,11 @@ function sortGroupsByPins() {
 
         if (isPinnedA && !isPinnedB) return -1;
         if (!isPinnedA && isPinnedB) return 1;
-        
+
         if (isPinnedA && isPinnedB) {
             return pinnedGroups.indexOf(idA) - pinnedGroups.indexOf(idB);
         }
 
-        // Problem 5 gelöst: Fallback für unangepinnte Gruppen auf die native Definitions-Reihenfolge
         const grpA = a.dataset.groupId;
         const grpB = b.dataset.groupId;
         return nativeOrder.indexOf(grpA) - nativeOrder.indexOf(grpB);
@@ -349,96 +355,175 @@ function initSearch() {
     const searchInput = document.getElementById("searchInput");
     if (!searchInput) return;
 
-    searchInput.addEventListener("input", function() {
+    searchInput.addEventListener("input", function () {
         const query = this.value.toLowerCase().trim();
 
-        // 1. Einzelne Karten filtern
         document.querySelectorAll(".card").forEach(card => {
             const title = card.querySelector(".cardText").textContent.toLowerCase();
-            if (title.includes(query)) {
-                card.style.display = "flex";
-            } else {
-                card.style.display = "none";
-            }
+            card.style.display = title.includes(query) ? "flex" : "none";
         });
-        
-        // 2. Gruppen-Sichtbarkeit regeln (Problem 2 gelöst)
+
         document.querySelectorAll(".restFuncionsDiv").forEach(groupDiv => {
-            const container = groupDiv.querySelector(".cardsContainer");
-            const totalCardsInGroup = container ? container.querySelectorAll(".card").length : 0;
-            const visibleCardsInGroup = groupDiv.querySelectorAll('.card:not([style*="display: none"])').length;
-            
-            if (query !== "") {
-                // Während der Suche: Zeige Gruppe nur, wenn sie Treffer enthält
-                groupDiv.style.display = visibleCardsInGroup === 0 ? "none" : "block";
-            } else {
-                // Suche leer: Stelle Ursprungszustand wieder her (Leere Gruppen bleiben leer, aber sichtbar)
-                groupDiv.style.display = "block";
-            }
+            const visibleCards = groupDiv.querySelectorAll('.card:not([style*="display: none"])').length;
+            groupDiv.style.display = (query !== "" && visibleCards === 0) ? "none" : "block";
         });
+
         applyCollapsibleLogic();
     });
 }
+
+// ==========================================================================
+// 8. COLLAPSIBLE LOGIC
+// ==========================================================================
 
 function applyCollapsibleLogic() {
     document.querySelectorAll(".restFuncionsDiv").forEach(groupDiv => {
         const container = groupDiv.querySelector(".cardsContainer");
         if (!container) return;
 
-        // 1. ZUSTAND MERKEN: Schauen, ob diese Gruppe vor dem Klick offen war
-        const wasExpanded = container.classList.contains("expanded") || groupDiv.classList.contains("is-expanded");
+        const wasExpanded = container.classList.contains("expanded") ||
+                            groupDiv.classList.contains("is-expanded");
 
-        // Alten Button entfernen, falls vorhanden
         const existingBtn = groupDiv.querySelector(".expand-btn");
         if (existingBtn) existingBtn.remove();
-        
-        // Klassen kurz zurücksetzen für eine exakte Messung
+
         container.classList.remove("collapsible", "expanded");
         groupDiv.classList.remove("is-expanded");
-
-        // Messmodus aktivieren
         container.classList.add("collapsible");
 
-        // Wenn der Inhalt die erlaubte CSS-Max-Height überschreitet
         if (container.scrollHeight > container.clientHeight) {
-            
-            // Button erstellen (Bleibt durch CSS fest unten in der Mitte)
             const expandBtn = document.createElement("div");
             expandBtn.className = "expand-btn";
-            expandBtn.innerHTML = '<i class="fa fa-chevron-down"></i>'; // Startet als Pfeil nach unten
+            expandBtn.innerHTML = '<i class="fa fa-chevron-down"></i>';
             expandBtn.style.display = "flex";
 
             expandBtn.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
                 const isExpanded = container.classList.contains("expanded");
-                
                 if (isExpanded) {
-                    // Zuklappen
                     container.classList.remove("expanded");
                     groupDiv.classList.remove("is-expanded");
-                    // Sanfter Scroll zurück zum Gruppen-Anfang
-                    groupDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    groupDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
                 } else {
-                    // Aufklappen
                     container.classList.add("expanded");
                     groupDiv.classList.add("is-expanded");
                 }
             });
 
-            // Button an das Gruppen-Div anhängen
             groupDiv.appendChild(expandBtn);
 
-            // 2. ZUSTAND WIEDERHERSTELLEN: Wenn sie offen war, Klassen sofort wieder draufwerfen
             if (wasExpanded) {
                 container.classList.add("expanded");
                 groupDiv.classList.add("is-expanded");
             }
-
         } else {
-            // Passt der Inhalt komplett rein, entfernen wir die Begrenzung
             container.classList.remove("collapsible");
         }
     });
 }
+
+// ==========================================================================
+// 9. GLOBAL TOOLTIP SINGLETON
+//    Wird an <body> gehängt (position: fixed) → kein overflow-clipping möglich
+// ==========================================================================
+
+let _globalTooltip  = null;
+let _activeInfoIcon = null;
+
+function getGlobalTooltip() {
+    if (!_globalTooltip) {
+        _globalTooltip = document.createElement("div");
+        _globalTooltip.className = "info-tooltip";
+        _globalTooltip.innerHTML = `<span class="info-tooltip-text"></span>`;
+        document.body.appendChild(_globalTooltip);
+
+        // Klick irgendwo außerhalb schließt den Tooltip
+        document.addEventListener("click", (e) => {
+            if (!e.target.classList.contains("info")) {
+                if (_activeInfoIcon) _activeInfoIcon._pinned = false;
+                hideGlobalTooltip();
+            }
+        });
+    }
+    return _globalTooltip;
+}
+
+function showGlobalTooltip(infoIcon, text) {
+    const tooltip = getGlobalTooltip();
+
+    // Vorheriges Icon entpinnen
+    if (_activeInfoIcon && _activeInfoIcon !== infoIcon) {
+        _activeInfoIcon._pinned = false;
+    }
+    _activeInfoIcon = infoIcon;
+
+    // Text setzen bevor Positionierung (damit offsetHeight stimmt)
+    tooltip.querySelector(".info-tooltip-text").textContent = text;
+    tooltip.classList.remove("visible"); // kurz unsichtbar für saubere Messung
+
+    positionGlobalTooltip(tooltip, infoIcon);
+    tooltip.classList.add("visible");
+}
+
+function hideGlobalTooltip() {
+    if (_globalTooltip) {
+        _globalTooltip.classList.remove("visible", "tooltip-above", "tooltip-below");
+    }
+    _activeInfoIcon = null;
+}
+
+function positionGlobalTooltip(tooltip, infoIcon) {
+    const TT_WIDTH = 220;
+    const MARGIN   = 10;
+    const ARROW_OFFSET = 10; // Abstand Icon ↔s Tooltip-Kante
+
+    const rect = infoIcon.getBoundingClientRect();
+
+    tooltip.style.width    = TT_WIDTH + "px";
+    tooltip.style.position = "fixed";
+
+    // Höhe messen (Element ist im DOM, nur opacity:0)
+    const ttHeight = tooltip.offsetHeight || 80;
+
+    let top, arrowClass;
+
+    // Genug Platz oben? → darüber, sonst darunter
+    if (rect.top >= ttHeight + ARROW_OFFSET + MARGIN) {
+        top        = rect.top - ttHeight - ARROW_OFFSET;
+        arrowClass = "tooltip-above";
+    } else {
+        top        = rect.bottom + ARROW_OFFSET;
+        arrowClass = "tooltip-below";
+    }
+
+    // Horizontal: Icon-Mitte als Ankerpunkt, am Viewport-Rand abklemmen
+    let left = rect.left + rect.width / 2 - TT_WIDTH / 2;
+    left = Math.max(MARGIN, Math.min(left, window.innerWidth - TT_WIDTH - MARGIN));
+
+    // Pfeil-Position relativ zum Tooltip-Rand berechnen
+    const arrowLeft = rect.left + rect.width / 2 - left;
+    const arrowLeftClamped = Math.max(16, Math.min(arrowLeft, TT_WIDTH - 16));
+
+    tooltip.style.top  = top  + "px";
+    tooltip.style.left = left + "px";
+    tooltip.style.setProperty("--arrow-left", arrowLeftClamped + "px");
+    tooltip.classList.remove("tooltip-above", "tooltip-below");
+    tooltip.classList.add(arrowClass);
+}
+
+// ==========================================================================
+// 10. CROSS-TAB SYNC
+//     Wenn die Tool-Seite in einem anderen Tab den Favoriten-State ändert,
+//     werden die Herz-Icons auf der Homepage sofort aktualisiert.
+// ==========================================================================
+
+window.addEventListener("storage", (e) => {
+    if (e.key !== "favoriten") return;
+    favoriten = JSON.parse(e.newValue || "[]");
+
+    // Alle Herz-Icons neu rendern
+    tools.forEach(tool => {
+        syncHeartIcons(tool.id, favoriten.includes(tool.id));
+    });
+});
