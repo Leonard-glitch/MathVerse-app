@@ -3,40 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../css/feedback.css">
     <link rel="stylesheet" href="../Tools/allgemein.css">
     <link rel="stylesheet" href="../css/login.css">
-    <title>Login</title>
+    <title>Login – MathVerse</title>
 </head>
 <body>
+    <header>
+        <nav class="navbar">
+            <a href="../index.html">
+                <img src="../pictures/WebsiteLogoImageLongImageV2.png" alt="MathVerse" class="navImage">
+            </a>
+            <div class="searchContainer">
+                <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+                <div id="searchResults"></div>
+            </div>
+            <div>
+                <a href="./login.html" class="navTextBorder">Login</a>
+                <a href="./register.html" class="navTextBorder">Register</a>
+            </div>
+        </nav>
+    </header>
+
     <main>
         <section>
             <div class="loginContainer">
-                <h1 class="loginTitle">Login</h1>
+                <h1 class="loginTitle">Anmelden</h1>
 
                 <form action="/login" method="POST" class="loginForm" novalidate>
-                    
-                    <div class="inputGroup">
-                        <input type="text" id="username" name="username" class="xInput" placeholder=" " required>
-                        <label for="username" class="floatingLabel">Benutzername oder E-Mail</label>
-                        <small class="input-hint">Du kannst dich wahlweise mit deinem Benutzernamen oder deiner E-Mail-Adresse anmelden.</small>
-                    </div>
-                    <div id="usernameError" class="falscheEingabestyle field-error" style="display: none;"></div>
 
+                    <!-- Benutzername / E-Mail -->
                     <div class="inputGroup">
-                        <input type="password" id="password" name="password" class="xInput" placeholder=" " required>
+                        <input type="text" id="username" name="username"
+                               class="xInput" placeholder=" "
+                               required autocomplete="username">
+                        <label for="username" class="floatingLabel">Benutzername oder E-Mail</label>
+                        <small class="input-hint">Du kannst dich mit Benutzername oder E-Mail anmelden.</small>
+                    </div>
+                    <div id="usernameError" class="falscheEingabestyle field-error" style="display:none;"></div>
+
+                    <!-- Passwort -->
+                    <div class="inputGroup">
+                        <input type="password" id="password" name="password"
+                               class="xInput" placeholder=" "
+                               required autocomplete="current-password">
                         <label for="password" class="floatingLabel">Passwort</label>
-                        
+                        <button type="button" class="passwordToggle" id="togglePassword"
+                                tabindex="-1" aria-label="Passwort anzeigen">
+                            <i class="fa fa-eye"></i>
+                        </button>
                         <div class="forgotPasswordWrapper">
                             <a href="./forgot-password.html" class="forgotPasswordLink">Passwort vergessen?</a>
                         </div>
                     </div>
-                    <div id="formError" class="falscheEingabestyle field-error" style="display: none;"></div>
+                    <div id="formError" class="falscheEingabestyle field-error" style="display:none;"></div>
 
                     <button type="submit" class="xLoginBtn">Anmelden</button>
                 </form>
 
                 <div class="signupPrompt">
-                    Du hast noch kein Konto? <a href="./register.html" class="signupLink">Registrieren</a>
+                    Noch kein Konto? <a href="./register.html" class="signupLink">Registrieren</a>
                 </div>
             </div>
         </section>
@@ -45,21 +73,22 @@
     <footer>
         <div class="footerNav">
             <div class="footerSocial">
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://twitter.com"  target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+                <a href="https://youtube.com"   target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com"    target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
             </div>
-
             <div class="linksFooterect">
                 <a href="./datenSchutz.html">Datenschutz</a>
                 <button id="openFeedbackBtn">Feedback senden</button>
                 <a href="./impressum.html">Impressum</a>
             </div>
-            
-            <div class="platzhalter">&copy; MathVerse</div>
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
         </div>
     </footer>
+
     <script src="../javaScript/login.js"></script>
+    <script src="../javaScript/feedback.js"></script>
+    <script type="module" src="../javaScript/search.js"></script>
 </body>
 </html>

@@ -1,4 +1,6 @@
-
+/* ==========================================================================
+   REGISTER PAGE – X-Inspired Style
+   ========================================================================== */
 
 section {
     display: flex;
@@ -31,33 +33,67 @@ section {
     gap: 1.5rem;
 }
 
-/* Input Gruppe für den Floating-Label Effekt */
+/* ==========================================================================
+   INPUT GROUP (Floating Label Pattern)
+   ========================================================================== */
+
 .inputGroup {
     position: relative;
     display: flex;
     flex-direction: column;
 }
 
-/* Minimalistisches Eingabefeld */
 .xInput {
     width: 100%;
-    padding: 1.25rem 0.75rem 0.5rem 0.75rem;
+    padding: 1.25rem 2.5rem 0.5rem 0.75rem; /* rechts Platz für Toggle */
     font-size: 0.9rem;
     background-color: transparent;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     color: var(--text-primary);
     outline: none;
-    transition: border-color var(--transition-speed);
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
 }
 
-/* Ändere diesen Block in deinem CSS so ab: */
 .xInput:focus {
-    /* Violett wird nur angewendet, wenn das Feld nicht bereits als valide (grün) markiert ist */
     border-color: var(--border-glow);
+    box-shadow: 0 0 0 3px rgba(138, 22, 255, 0.1);
 }
 
-/* Das animierte Label */
+/* ── State-Klassen ── */
+
+.xInput.is-valid {
+    border-color: var(--accent-live);
+}
+.xInput.is-valid:focus {
+    border-color: var(--accent-live);
+    box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.12);
+}
+
+.xInput.is-error {
+    border-color: var(--accent-error);
+}
+.xInput.is-error:focus {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 0 3px rgba(138, 22, 255, 0.1);
+}
+
+/* Shake-Animation bei Fehler */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-3px); }
+    80%       { transform: translateX(3px); }
+}
+.xInput.shake {
+    animation: shake 0.35s ease;
+}
+
+/* ==========================================================================
+   FLOATING LABEL
+   ========================================================================== */
+
 .floatingLabel {
     position: absolute;
     left: 0.75rem;
@@ -65,10 +101,9 @@ section {
     color: var(--text-secondary);
     font-size: 0.9rem;
     pointer-events: none;
-    transition: all 0.15s ease;
+    transition: top 0.15s ease, font-size 0.15s ease, color 0.15s ease;
 }
 
-/* Label-Animation wenn fokussiert oder ausgefüllt */
 .xInput:focus ~ .floatingLabel,
 .xInput:not(:placeholder-shown) ~ .floatingLabel {
     top: 0.25rem;
@@ -76,25 +111,169 @@ section {
     color: var(--border-glow);
 }
 
-/* Fetter, vollflächiger Button */
+.xInput.is-valid:focus ~ .floatingLabel,
+.xInput.is-valid:not(:placeholder-shown) ~ .floatingLabel {
+    color: var(--accent-live);
+}
+
+.xInput.is-error:not(:focus) ~ .floatingLabel {
+    color: var(--accent-error);
+}
+
+/* ==========================================================================
+   PASSWORT TOGGLE BUTTON
+   ========================================================================== */
+
+.passwordToggle {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.85rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.2rem;
+    line-height: 1;
+    transition: color var(--transition-fast);
+    z-index: 1;
+}
+
+.passwordToggle:hover {
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   PASSWORT-STÄRKE INDIKATOR
+   ========================================================================== */
+
+.strengthWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: -0.75rem; /* Direkt unter dem Passwort-Feld */
+}
+
+.strengthBar {
+    flex: 1;
+    height: 4px;
+    background-color: var(--border-color);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.strengthFill {
+    height: 100%;
+    width: 0%;
+    border-radius: 99px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strengthLabel {
+    font-size: 0.65rem;
+    font-weight: 600;
+    min-width: 50px;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+}
+
+/* Strength-Stufen */
+.strengthWrapper[data-strength="1"] .strengthFill { width: 25%; background-color: var(--accent-error); }
+.strengthWrapper[data-strength="1"] .strengthLabel { color: var(--accent-error); }
+
+.strengthWrapper[data-strength="2"] .strengthFill { width: 50%; background-color: #ff9100; }
+.strengthWrapper[data-strength="2"] .strengthLabel { color: #ff9100; }
+
+.strengthWrapper[data-strength="3"] .strengthFill { width: 75%; background-color: #ffcc00; }
+.strengthWrapper[data-strength="3"] .strengthLabel { color: #ffcc00; }
+
+.strengthWrapper[data-strength="4"] .strengthFill { width: 100%; background-color: var(--accent-live); }
+.strengthWrapper[data-strength="4"] .strengthLabel { color: var(--accent-live); }
+
+/* ==========================================================================
+   FEHLER-NACHRICHTEN
+   ========================================================================== */
+
+.field-error {
+    font-size: 0.75rem;
+    text-align: left;
+    margin: -0.5rem 0 0.25rem 0;
+    padding: 0.4rem 0.75rem;
+    width: 100%;
+    border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   CHECKBOX (Datenschutz)
+   ========================================================================== */
+
+.checkboxGroup {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: -0.25rem;
+}
+
+.checkboxGroup input[type="checkbox"] {
+    accent-color: var(--border-glow);
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.checkboxText {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    user-select: none;
+}
+
+.checkboxText a {
+    color: var(--border-glow);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.checkboxText a:hover {
+    text-decoration: underline;
+}
+
+.accent-error {
+    color: var(--accent-error);
+}
+
+/* ==========================================================================
+   SUBMIT BUTTON
+   ========================================================================== */
+
 .xLoginBtn {
     background-color: var(--text-primary);
     color: var(--bg-body);
     border: none;
     border-radius: 9999px;
-    padding: 0.65rem;
-    font-size: 0.85rem;
+    padding: 0.7rem;
+    font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
-    margin-top: 1rem;
-    transition: opacity var(--transition-fast);
+    margin-top: 0.5rem;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .xLoginBtn:hover {
-    opacity: 0.9;
+    opacity: 0.88;
+    transform: translateY(-1px);
 }
 
-/* Wechsel zur Login-Seite am Ende */
+.xLoginBtn:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   LINK ZUR LOGIN-SEITE
+   ========================================================================== */
+
 .signupPrompt {
     margin-top: 2.5rem;
     font-size: 0.85rem;
@@ -111,49 +290,14 @@ section {
     text-decoration: underline;
 }
 
-.checkboxGroup {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.4rem;
-    margin-top: 0.5rem;
-}
+/* ==========================================================================
+   AUTOFILL FIX
+   ========================================================================== */
 
-/* Die Checkbox reagiert jetzt nur noch auf direkte Klicks */
-.checkboxGroup input[type="checkbox"] {
-    accent-color: var(--border-glow); /* Dein Tech-Violett */
-    width: 16px; /* Etwas größer, damit man sie trotz des gezielten Klicks gut trifft */
-    height: 16px;
-    margin-top: 3px;
-    cursor: pointer;
-}
-
-.checkboxText {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-    user-select: none; /* Verhindert, dass der Text aus Versehen markiert wird */
-}
-
-.checkboxText a {
-    color: var(--border-glow);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.checkboxText a:hover {
-    text-decoration: underline;
-}
-
-/* Roter Stern für das Pflichtfeld */
-.accent-error {
-    color: var(--accent-error);
-}
-
-/* Spezifische Anpassung für Fehler direkt an den Eingabefeldern */
-.field-error {
-    font-size: 0.75rem;     /* Etwas kompakter, da es direkt am Feld klebt */
-    text-align: left;       /* Linksbündig passend zum X-Design */
-    margin: -0.5rem 0 0.5rem 0; /* Verringert den Abstand zum oberen Input-Feld */
-    padding: 0.4rem 1rem;   /* Etwas schlanker */
-    width: 100%;
+.xInput:-webkit-autofill,
+.xInput:-webkit-autofill:hover,
+.xInput:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0px 1000px #09090e inset;
+    transition: background-color 9999s ease-in-out 0s;
 }

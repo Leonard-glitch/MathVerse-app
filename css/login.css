@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NEW MODERN LOGIN PAGE (X-Inspired Style)
+   LOGIN PAGE – X-Inspired Style
    ========================================================================== */
 
 section {
@@ -10,14 +10,13 @@ section {
     padding: 2rem 1rem;
 }
 
-/* Zentraler Container wie das X-Login-Modal */
 .loginContainer {
     width: 100%;
     max-width: 440px;
     padding: 2rem;
     display: flex;
     flex-direction: column;
-    background-color: var(--bg-body); /* Flaches Design statt dicker Box */
+    background-color: var(--bg-body);
 }
 
 .loginTitle {
@@ -34,31 +33,71 @@ section {
     gap: 1.5rem;
 }
 
-/* Input Gruppe für den Floating-Label Effekt */
+/* ==========================================================================
+   INPUT GROUP (Floating Label Pattern)
+   ========================================================================== */
+
 .inputGroup {
     position: relative;
     display: flex;
     flex-direction: column;
 }
 
-/* Das Eingabefeld im X-Stil */
+/* Basis-Input */
 .xInput {
     width: 100%;
-    padding: 1.25rem 0.75rem 0.5rem 0.75rem;
+    padding: 1.25rem 2.5rem 0.5rem 0.75rem; /* rechts Platz für Toggle-Button */
     font-size: 0.9rem;
     background-color: transparent;
     border: 1px solid var(--border-color);
-    border-radius: 4px; /* X nutzt sehr subtile Radien bei Inputs */
+    border-radius: 4px;
     color: var(--text-primary);
     outline: none;
-    transition: border-color var(--transition-speed);
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
 }
 
 .xInput:focus {
-    border-color: var(--border-glow); /* Violettes Leuchten beim Fokussieren */
+    border-color: var(--border-glow);
+    box-shadow: 0 0 0 3px rgba(138, 22, 255, 0.1);
 }
 
-/* Das animierte Label */
+/* ── State-Klassen (ersetzen fehleranfällige inline-style-Vergleiche) ── */
+
+/* Grüner Rand: Feld ist valide */
+.xInput.is-valid {
+    border-color: var(--accent-live);
+}
+.xInput.is-valid:focus {
+    border-color: var(--accent-live);
+    box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.12);
+}
+
+/* Roter Rand: Feld hat Fehler */
+.xInput.is-error {
+    border-color: var(--accent-error);
+}
+/* Im Fokus: Zeigt violett an, dass der User gerade korrigiert */
+.xInput.is-error:focus {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 0 3px rgba(138, 22, 255, 0.1);
+}
+
+/* Shake-Animation bei Fehler beim Absenden */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-3px); }
+    80%       { transform: translateX(3px); }
+}
+.xInput.shake {
+    animation: shake 0.35s ease;
+}
+
+/* ==========================================================================
+   FLOATING LABEL
+   ========================================================================== */
+
 .floatingLabel {
     position: absolute;
     left: 0.75rem;
@@ -66,31 +105,61 @@ section {
     color: var(--text-secondary);
     font-size: 0.9rem;
     pointer-events: none;
-    transition: all 0.15s ease;
+    transition: top 0.15s ease, font-size 0.15s ease, color 0.15s ease;
 }
 
-/* Magie: Wenn das Feld fokussiert ist oder Text enthält, wandert das Label nach oben */
+/* Label wandert nach oben, wenn Feld fokussiert oder ausgefüllt */
 .xInput:focus ~ .floatingLabel,
 .xInput:not(:placeholder-shown) ~ .floatingLabel {
     top: 0.25rem;
     font-size: 0.7rem;
     color: var(--border-glow);
 }
+/* Grüne Label-Farbe wenn valide */
+.xInput.is-valid:focus ~ .floatingLabel,
+.xInput.is-valid:not(:placeholder-shown) ~ .floatingLabel {
+    color: var(--accent-live);
+}
 
-/* Hilfetext unter dem Username */
+/* ==========================================================================
+   PASSWORT TOGGLE BUTTON (Auge-Icon)
+   ========================================================================== */
+
+.passwordToggle {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.85rem;  /* Vertikal zentriert im Input */
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.2rem;
+    line-height: 1;
+    transition: color var(--transition-fast);
+    z-index: 1;
+}
+
+.passwordToggle:hover {
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   HINTS & EXTRAS
+   ========================================================================== */
+
 .input-hint {
     font-size: 0.65rem;
     color: var(--text-secondary);
     opacity: 0.7;
-    margin-top: 0.25rem;
+    margin-top: 0.3rem;
     padding: 0 0.2rem;
 }
 
-/* Passwort vergessen Bereich */
 .forgotPasswordWrapper {
     display: flex;
     justify-content: flex-start;
-    margin-top: 0.35rem;
+    margin-top: 0.4rem;
 }
 
 .forgotPasswordLink {
@@ -105,25 +174,49 @@ section {
     text-decoration: underline;
 }
 
-/* Der fette, cleane Button im X-Stil */
+/* ==========================================================================
+   SUBMIT BUTTON
+   ========================================================================== */
+
 .xLoginBtn {
-    background-color: var(--text-primary); /* Invertiert für maximale Aufmerksamkeit */
+    background-color: var(--text-primary);
     color: var(--bg-body);
     border: none;
-    border-radius: 9999px; /* Komplett rund wie bei X */
-    padding: 0.65rem;
-    font-size: 0.85rem;
+    border-radius: 9999px;
+    padding: 0.7rem;
+    font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
-    margin-top: 1rem;
-    transition: opacity var(--transition-fast);
+    margin-top: 0.5rem;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 .xLoginBtn:hover {
-    opacity: 0.9;
+    opacity: 0.88;
+    transform: translateY(-1px);
 }
 
-/* Registrierungs-Aufforderung am Verlassen des Formulars */
+.xLoginBtn:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   FEHLER-NACHRICHTEN (field-error überschreibt globale .falscheEingabestyle)
+   ========================================================================== */
+
+.field-error {
+    font-size: 0.75rem;
+    text-align: left;
+    margin: -0.5rem 0 0.25rem 0;
+    padding: 0.4rem 0.75rem;
+    width: 100%;
+    border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   LINK ZUR REGISTRIERUNG
+   ========================================================================== */
+
 .signupPrompt {
     margin-top: 2.5rem;
     font-size: 0.85rem;
@@ -140,12 +233,14 @@ section {
     text-decoration: underline;
 }
 
-/* Spezifische Anpassung für Fehler direkt an den Eingabefeldern */
-.field-error {
-    font-size: 0.75rem;
-    text-align: left;
-    margin: 0.25rem 0 0.5rem 0;
-    padding: 0.4rem 0.75rem;
-    width: 100%;
-    color: var(--accent-error); /* Nutzt deine globale Fehlerfarbe */
+/* ==========================================================================
+   AUTOFILL FIX (überschreibt gelb/weiß des Browsers)
+   ========================================================================== */
+
+.xInput:-webkit-autofill,
+.xInput:-webkit-autofill:hover,
+.xInput:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-primary);
+    -webkit-box-shadow: 0 0 0px 1000px #09090e inset;
+    transition: background-color 9999s ease-in-out 0s;
 }

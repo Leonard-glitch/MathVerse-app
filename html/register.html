@@ -3,11 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../css/feedback.css">
     <link rel="stylesheet" href="../Tools/allgemein.css">
     <link rel="stylesheet" href="../css/register.css">
-    <title>Register</title>
+    <title>Registrieren – MathVerse</title>
 </head>
 <body>
+    <header>
+        <nav class="navbar">
+            <a href="../index.html">
+                <img src="../pictures/WebsiteLogoImageLongImageV2.png" alt="MathVerse" class="navImage">
+            </a>
+            <div class="searchContainer">
+                <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+                <div id="searchResults"></div>
+            </div>
+            <div>
+                <a href="./login.html" class="navTextBorder">Login</a>
+                <a href="./register.html" class="navTextBorder">Register</a>
+            </div>
+        </nav>
+    </header>
 
     <main>
         <section>
@@ -15,43 +33,74 @@
                 <h1 class="loginTitle">Registrieren</h1>
 
                 <form action="/register" method="POST" class="loginForm" novalidate>
-                    
+
+                    <!-- Benutzername -->
                     <div class="inputGroup">
-                        <input type="text" id="userName" name="userName" class="xInput" placeholder=" " required>
+                        <input type="text" id="userName" name="userName"
+                               class="xInput" placeholder=" "
+                               required autocomplete="username">
                         <label for="userName" class="floatingLabel">Benutzername</label>
                     </div>
-                    
-                    <div id="usernameError" class="falscheEingabestyle field-error"></div>
+                    <div id="usernameError" class="falscheEingabestyle field-error" style="display:none;"></div>
 
+                    <!-- E-Mail -->
                     <div class="inputGroup">
-                        <input type="email" id="email" name="email" class="xInput" placeholder=" " required>
+                        <input type="email" id="email" name="email"
+                               class="xInput" placeholder=" "
+                               required autocomplete="email">
                         <label for="email" class="floatingLabel">E-Mail-Adresse</label>
                     </div>
+                    <div id="emailError" class="falscheEingabestyle field-error" style="display:none;"></div>
 
+                    <!-- Passwort -->
                     <div class="inputGroup">
-                        <input type="password" id="password" name="password" class="xInput" placeholder=" " required>
+                        <input type="password" id="password" name="password"
+                               class="xInput" placeholder=" "
+                               required autocomplete="new-password">
                         <label for="password" class="floatingLabel">Passwort</label>
+                        <button type="button" class="passwordToggle" id="togglePassword"
+                                tabindex="-1" aria-label="Passwort anzeigen">
+                            <i class="fa fa-eye"></i>
+                        </button>
                     </div>
 
+                    <!-- Passwort bestätigen -->
                     <div class="inputGroup">
-                        <input type="password" id="passwordConf" name="passwordConf" class="xInput" placeholder=" " required>
+                        <input type="password" id="passwordConf" name="passwordConf"
+                               class="xInput" placeholder=" "
+                               required autocomplete="new-password">
                         <label for="passwordConf" class="floatingLabel">Passwort bestätigen</label>
+                        <button type="button" class="passwordToggle" id="togglePasswordConf"
+                                tabindex="-1" aria-label="Passwort-Bestätigung anzeigen">
+                            <i class="fa fa-eye"></i>
+                        </button>
                     </div>
+                    <div id="formError" class="falscheEingabestyle field-error" style="display:none;"></div>
 
-                    <div id="formError" class="falscheEingabestyle field-error"></div>
-
+                    <!-- Datenschutz-Checkbox -->
                     <div class="checkboxGroup">
                         <input type="checkbox" id="privacyAccept" name="privacyAccept" required>
                         <span class="checkboxText">
-                            Ich habe die <a href="./datenSchutz.html" target="_blank">Datenschutzerklärung</a> gelesen und akzeptiere sie. <span class="accent-error">*</span>
+                            Ich habe die
+                            <a href="./datenSchutz.html" target="_blank">Datenschutzerklärung</a>
+                            gelesen und akzeptiere sie.
+                            <span class="accent-error">*</span>
                         </span>
+                    </div>
+
+                    <!-- Passwort-Stärke Indikator -->
+                    <div class="strengthWrapper" id="strengthWrapper" style="display:none;">
+                        <div class="strengthBar">
+                            <div class="strengthFill" id="strengthFill"></div>
+                        </div>
+                        <span class="strengthLabel" id="strengthLabel"></span>
                     </div>
 
                     <button type="submit" class="xLoginBtn">Registrieren</button>
                 </form>
 
                 <div class="signupPrompt">
-                    Du hast bereits ein Konto? <a href="./login.html" class="signupLink">Anmelden</a>
+                    Bereits ein Konto? <a href="./login.html" class="signupLink">Anmelden</a>
                 </div>
             </div>
         </section>
@@ -60,21 +109,22 @@
     <footer>
         <div class="footerNav">
             <div class="footerSocial">
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://twitter.com"  target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+                <a href="https://youtube.com"   target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com"    target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
             </div>
-
             <div class="linksFooterect">
-                <a href="./html/datenSchutz.html">Datenschutz</a>
+                <a href="./datenSchutz.html">Datenschutz</a>
                 <button id="openFeedbackBtn">Feedback senden</button>
-                <a href="./html/impressum.html">Impressum</a>
+                <a href="./impressum.html">Impressum</a>
             </div>
-            
-            <div class="platzhalter">&copy; MathVerse</div>
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
         </div>
     </footer>
+
     <script src="../javaScript/register.js"></script>
+    <script src="../javaScript/feedback.js"></script>
+    <script type="module" src="../javaScript/search.js"></script>
 </body>
 </html>

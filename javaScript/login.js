@@ -1,91 +1,132 @@
-document.querySelector('.loginForm').addEventListener('submit', function(event) {
-    const usernameError = document.getElementById('usernameError');
-    const formError = document.getElementById('formError');
-    
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
+/**
+ * login.js – MathVerse Login-Validierung
+ *
+ * Wichtig: Zustandsverwaltung via CSS-Klassen (.is-valid / .is-error),
+ * NICHT via this.style.borderColor === 'var(--…)' – das funktioniert im
+ * Browser nicht zuverlässig, weil CSS-Variablen in inline Styles zu
+ * computed values aufgelöst werden.
+ */
 
-    // Reset vor der Prüfung
-    usernameError.style.display = 'none';
-    usernameError.textContent = '';
-    formError.style.display = 'none';
-    formError.textContent = '';
-    
-    [usernameInput, passwordInput].forEach(input => {
-        input.style.borderColor = 'var(--border-color)';
-    });
+const form           = document.querySelector('.loginForm');
+const usernameInput  = document.getElementById('username');
+const passwordInput  = document.getElementById('password');
+const usernameError  = document.getElementById('usernameError');
+const formError      = document.getElementById('formError');
+const toggleBtn      = document.getElementById('togglePassword');
 
-    let isValid = true;
+// ===========================================================================
+// STATE HELPERS
+// ===========================================================================
 
-    // 1. Prüfen ob Username/E-Mail ausgefüllt ist
+function setValid(input, errEl) {
+    input.classList.remove('is-error', 'shake');
+    input.classList.add('is-valid');
+    if (errEl) hideMsg(errEl);
+}
+
+function setError(input, errEl, msg) {
+    input.classList.remove('is-valid');
+    input.classList.add('is-error');
+    // Shake-Animation triggern
+    input.classList.remove('shake');
+    void input.offsetWidth; // reflow → Animation neu starten
+    input.classList.add('shake');
+    if (errEl && msg) showMsg(errEl, msg);
+}
+
+function setNeutral(input) {
+    input.classList.remove('is-valid', 'is-error', 'shake');
+}
+
+function showMsg(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+function hideMsg(el) {
+    if (el) el.style.display = 'none';
+}
+
+// ===========================================================================
+// BLUR VALIDATION (grün wenn ok, neutral wenn leer)
+// ===========================================================================
+
+usernameInput.addEventListener('blur', () => {
+    if (usernameInput.value.trim()) {
+        setValid(usernameInput, usernameError);
+    } else {
+        setNeutral(usernameInput);
+    }
+});
+
+passwordInput.addEventListener('blur', () => {
+    if (passwordInput.value) {
+        setValid(passwordInput, formError);
+    } else {
+        setNeutral(passwordInput);
+    }
+});
+
+// ===========================================================================
+// INPUT (Tipp-Events) – Fehlermarker beim Tippen entfernen
+// ===========================================================================
+
+usernameInput.addEventListener('input', () => {
+    if (usernameInput.classList.contains('is-error')) {
+        usernameInput.classList.remove('is-error', 'shake');
+        hideMsg(usernameError);
+    }
+});
+
+passwordInput.addEventListener('input', () => {
+    if (passwordInput.classList.contains('is-error')) {
+        passwordInput.classList.remove('is-error', 'shake');
+        hideMsg(formError);
+    }
+});
+
+// ===========================================================================
+// SUBMIT VALIDATION
+// ===========================================================================
+
+form.addEventListener('submit', (e) => {
+    // Alle alten Meldungen zurücksetzen
+    hideMsg(usernameError);
+    hideMsg(formError);
+
+    let valid = true;
+
+    // Benutzername / E-Mail
     if (!usernameInput.value.trim()) {
-        isValid = false;
-        usernameInput.style.borderColor = 'var(--accent-error)';
-        usernameError.textContent = 'Bitte gib deinen Benutzernamen oder deine E-Mail-Adresse ein.';
-        usernameError.style.display = 'block';
+        setError(usernameInput, usernameError, 'Bitte gib deinen Benutzernamen oder deine E-Mail-Adresse ein.');
+        valid = false;
+    } else {
+        setValid(usernameInput, usernameError);
     }
 
-    // 2. Prüfen ob Passwort ausgefüllt ist
+    // Passwort
     if (!passwordInput.value) {
-        isValid = false;
-        passwordInput.style.borderColor = 'var(--accent-error)';
-        formError.textContent = 'Bitte gib dein Passwort ein.';
-        formError.style.display = 'block';
+        setError(passwordInput, formError, 'Bitte gib dein Passwort ein.');
+        valid = false;
+    } else {
+        setValid(passwordInput, formError);
     }
 
-    if (!isValid) {
-        event.preventDefault();
+    if (!valid) {
+        e.preventDefault();
     }
 });
 
-// ==========================================================================
-// LIVE-VALIDIERUNG (Beim Verlassen des Feldes -> Grün-Logik)
-// ==========================================================================
+// ===========================================================================
+// PASSWORT TOGGLE (Auge-Icon)
+// ===========================================================================
 
-// Username / E-Mail
-document.getElementById('username').addEventListener('blur', function() {
-    const usernameError = document.getElementById('usernameError');
-    if (!this.value.trim()) {
-        this.style.borderColor = 'var(--border-color)';
-        return;
-    }
-    
-    // Einfache Live-Validierung: Wenn Text drin steht, ist es für den Client erstmal valide (Grün)
-    this.style.borderColor = 'var(--accent-live)';
-    usernameError.style.display = 'none';
-});
-
-// Passwort
-document.getElementById('password').addEventListener('blur', function() {
-    const formError = document.getElementById('formError');
-    if (!this.value) {
-        this.style.borderColor = 'var(--border-color)';
-        return;
-    }
-
-    // Für das Login reicht es, wenn überhaupt etwas eingegeben wurde
-    this.style.borderColor = 'var(--accent-live)';
-    formError.style.display = 'none';
-});
-
-// ==========================================================================
-// ZURÜCKSETZEN BEIM TIPPEN (Kein Flackern von Grün auf Violett)
-// ==========================================================================
-['username', 'password'].forEach(id => {
-    document.getElementById(id).addEventListener('input', function() {
-        const usernameError = document.getElementById('usernameError');
-        const formError = document.getElementById('formError');
-
-        // Nur auf Violett setzen, wenn das Feld aktuell einen Fehler (Rot) anzeigt
-        if (this.style.borderColor === 'var(--accent-error)') {
-            this.style.borderColor = 'var(--border-glow)';
-        }
-
-        // Fehlertexte beim Tippen ausblenden
-        if (id === 'username') {
-            usernameError.style.display = 'none';
-        } else {
-            formError.style.display = 'none';
-        }
+if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+        const isHidden = passwordInput.type === 'password';
+        passwordInput.type = isHidden ? 'text' : 'password';
+        const icon = toggleBtn.querySelector('i');
+        icon.className = isHidden ? 'fa fa-eye-slash' : 'fa fa-eye';
+        toggleBtn.setAttribute('aria-label', isHidden ? 'Passwort verbergen' : 'Passwort anzeigen');
     });
-});
+}
