@@ -1,0 +1,32 @@
+
+//Change from Login/Register to User Area if user is logged in
+
+const navUserArea=document.getElementById("navUserArea");
+
+function changeNavUserArea(){
+    const userAccount = document.createElement("a");
+    userAccount.href = "../../html/userArea.html";
+    userAccount.target = "_self";
+    userAccount.classList.add("userAccount");
+    const displayName =
+    userName.length > 10
+        ? userName.substring(0, 10) + "..."
+        : userName;
+
+    userAccount.innerHTML = `
+        <span class="userName">${displayName}</span>
+        <i class="fa fa-cog settings-icon"></i>
+    `;
+
+    // 1. Container leeren
+    navUserArea.innerHTML = "";
+    
+    // 2. Das echte Element-Objekt hinzufügen
+    navUserArea.appendChild(userAccount);
+}
+
+const userName= "Leolegend6260";
+
+if(userName){
+    changeNavUserArea();
+}
