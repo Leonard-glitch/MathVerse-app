@@ -1,4 +1,8 @@
 
+localStorage.setItem('currentUserName', 'Leolegend6260')
+
+const userName= localStorage.getItem('currentUserName');
+
 //Change from Login/Register to User Area if user is logged in
 
 const navUserArea=document.getElementById("navUserArea");
@@ -25,8 +29,6 @@ function changeNavUserArea(){
     navUserArea.appendChild(userAccount);
 }
 
-const userName= "Leolegend6260";
-
 if(userName){
-    changeNavUserArea();
+    changeNavUserArea(); 
 }
