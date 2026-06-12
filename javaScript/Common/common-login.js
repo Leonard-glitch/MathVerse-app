@@ -9,7 +9,7 @@ const navUserArea=document.getElementById("navUserArea");
 
 function changeNavUserArea(){
     const userAccount = document.createElement("a");
-    userAccount.href = "../../html/userArea.html";
+    userAccount.href = "/MathVerse-app/html/userArea.html";
     userAccount.target = "_self";
     userAccount.classList.add("userAccount");
     const displayName =

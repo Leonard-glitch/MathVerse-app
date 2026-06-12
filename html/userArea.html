@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../Tools/allgemein.css">
+    <link rel="stylesheet" href="../css/userArea.css">
+    <title>Einstellungen – MathVerse</title>
+</head>
+<body>
+
+    <div class="settingsLayout">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="settingsSidebar">
+
+            <!-- Back button -->
+            <div class="sidebarTop">
+                <a href="../index.html" class="backBtn">
+                    <i class="fa fa-arrow-left"></i>
+                    <span>Zurück zu MathVerse</span>
+                </a>
+            </div>
+
+            <!-- Nav groups -->
+            <nav class="sidebarNav">
+
+                <div class="navGroup">
+                    <span class="navGroupTitle">Mein Konto</span>
+                    <button class="navItem active" data-panel="account">
+                        <i class="fa fa-user-circle navItemIcon"></i>
+                        Konto
+                    </button>
+                    <button class="navItem" data-panel="security">
+                        <i class="fa fa-lock navItemIcon"></i>
+                        Sicherheit
+                    </button>
+                </div>
+
+                <div class="navDivider"></div>
+
+                <div class="navGroup">
+                    <span class="navGroupTitle">App</span>
+                    <button class="navItem" data-panel="appearance">
+                        <i class="fa fa-paint-brush navItemIcon"></i>
+                        Erscheinungsbild
+                    </button>
+                    <button class="navItem" data-panel="favorites">
+                        <i class="fa fa-heart navItemIcon"></i>
+                        Meine Favoriten
+                    </button>
+                </div>
+
+                <div class="navDivider"></div>
+
+                <div class="navGroup">
+                    <button class="navItem navItem--danger" id="logoutNavBtn">
+                        <i class="fa fa-sign-out navItemIcon"></i>
+                        Abmelden
+                    </button>
+                    <button class="navItem navItem--danger" data-panel="delete">
+                        <i class="fa fa-trash navItemIcon"></i>
+                        Konto löschen
+                    </button>
+                </div>
+
+            </nav>
+
+            <!-- Sidebar user card (Discord-style bottom info) -->
+            <div class="sidebarUserCard">
+                <div class="sidebarAvatar" id="sidebarAvatarEl">L</div>
+                <div class="sidebarUserInfo">
+                    <div class="sidebarUsername" id="sidebarUsernameEl">Leolegend6260</div>
+                    <div class="sidebarUserStatus"><span class="statusDot"></span><span id="sidebarEmailEl">···</span></div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- RIGHT CONTENT AREA -->
+        <main class="settingsContent">
+
+            <!-- ─────────────────────────────────────
+                 PANEL: Mein Konto
+                 ───────────────────────────────────── -->
+            <section class="settingsPanel active" id="panel-account">
+
+                <div class="panelHeader">
+                    <h1 class="panelTitle">Mein Konto</h1>
+                </div>
+
+                <!-- Profile Banner + Avatar -->
+                <div class="profileBanner">
+                    <div class="bannerGradient" id="bannerEl"></div>
+                    <div class="profileAvatarLarge" id="profileAvatarEl">L</div>
+                </div>
+
+                <!-- Username / Display Card -->
+                <div class="settingsCard profileNameCard">
+                    <div class="profileNameRow">
+                        <div class="profileDisplayName" id="displayNameEl">Leolegend6260</div>
+                    </div>
+                </div>
+
+                <!-- Account Info Card -->
+                <div class="settingsCard">
+                    <div class="cardHeader">
+                        <h2 class="cardTitle">Kontoinformationen</h2>
+                        <button class="editCardBtn" id="editAccountBtn">
+                            <i class="fa fa-pencil"></i> Bearbeiten
+                        </button>
+                    </div>
+
+                    <!-- View mode -->
+                    <div id="accountViewMode">
+                        <div class="infoRow">
+                            <div class="infoLabel">Benutzername</div>
+                            <div class="infoValue" id="view-username">Leolegend6260</div>
+                        </div>
+                        <div class="infoRow">
+                            <div class="infoLabel">E-Mail-Adresse</div>
+                            <div class="infoValue" id="view-email">–</div>
+                        </div>
+                        <div class="infoRow">
+                            <div class="infoLabel">Mitglied seit</div>
+                            <div class="infoValue">Juni 2026</div>
+                        </div>
+                    </div>
+
+                    <!-- Edit mode -->
+                    <div id="accountEditMode" class="hidden">
+                        <p class="editModeHint">Gib dein aktuelles Passwort ein, um Änderungen zu bestätigen.</p>
+
+                        <div class="formGroup">
+                            <label class="formLabel">Benutzername</label>
+                            <input type="text" id="input-username" class="settingsInput" value="Leolegend6260">
+                        </div>
+                        <div class="formGroup">
+                            <label class="formLabel">E-Mail-Adresse</label>
+                            <input type="email" id="input-email" class="settingsInput" placeholder="Neue E-Mail...">
+                        </div>
+                        <div class="formGroup">
+                            <label class="formLabel">Aktuelles Passwort <span class="required">*</span></label>
+                            <div class="passwordWrapper">
+                                <input type="password" id="input-current-pw" class="settingsInput" placeholder="Aktuelles Passwort">
+                                <button type="button" class="pwToggle" data-target="input-current-pw"><i class="fa fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="editActions">
+                            <button class="cancelEditBtn" id="cancelAccountBtn">Abbrechen</button>
+                            <button class="saveChangesBtn" id="saveAccountBtn">Änderungen speichern</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success toast placeholder -->
+                <div class="toastMessage hidden" id="accountToast">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Gespeichert!</span>
+                </div>
+
+            </section>
+
+            <!-- ─────────────────────────────────────
+                 PANEL: Sicherheit
+                 ───────────────────────────────────── -->
+            <section class="settingsPanel" id="panel-security">
+
+                <div class="panelHeader">
+                    <h1 class="panelTitle">Sicherheit</h1>
+                </div>
+
+                <!-- Password Change -->
+                <div class="settingsCard">
+                    <h2 class="cardTitle">Passwort ändern</h2>
+
+                    <div class="formGroup">
+                        <label class="formLabel">Aktuelles Passwort</label>
+                        <div class="passwordWrapper">
+                            <input type="password" id="sec-current-pw" class="settingsInput" placeholder="••••••••">
+                            <button type="button" class="pwToggle" data-target="sec-current-pw"><i class="fa fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="formGroup">
+                        <label class="formLabel">Neues Passwort</label>
+                        <div class="passwordWrapper">
+                            <input type="password" id="sec-new-pw" class="settingsInput" placeholder="••••••••">
+                            <button type="button" class="pwToggle" data-target="sec-new-pw"><i class="fa fa-eye"></i></button>
+                        </div>
+                        <!-- Strength bar -->
+                        <div class="strengthBar" id="sec-strengthBar">
+                            <div class="strengthFill" id="sec-strengthFill"></div>
+                        </div>
+                        <div class="strengthLabel" id="sec-strengthLabel"></div>
+                    </div>
+
+                    <div class="formGroup">
+                        <label class="formLabel">Neues Passwort bestätigen</label>
+                        <div class="passwordWrapper">
+                            <input type="password" id="sec-confirm-pw" class="settingsInput" placeholder="••••••••">
+                            <button type="button" class="pwToggle" data-target="sec-confirm-pw"><i class="fa fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="formError hidden" id="sec-error"></div>
+
+                    <div class="editActions editActions--left">
+                        <button class="saveChangesBtn" id="savePwBtn">Passwort aktualisieren</button>
+                    </div>
+                </div>
+
+                <!-- 2FA teaser -->
+                <div class="settingsCard settingsCard--dimmed">
+                    <div class="teaserRow">
+                        <div>
+                            <h2 class="cardTitle">Zwei-Faktor-Authentifizierung</h2>
+                            <p class="cardSubtitle">Schütze dein Konto mit einer zusätzlichen Sicherheitsstufe.</p>
+                        </div>
+                        <span class="comingSoonBadge">Bald verfügbar</span>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ─────────────────────────────────────
+                 PANEL: Erscheinungsbild
+                 ───────────────────────────────────── -->
+            <section class="settingsPanel" id="panel-appearance">
+
+                <div class="panelHeader">
+                    <h1 class="panelTitle">Erscheinungsbild</h1>
+                    <p class="panelSubtitle">Passe MathVerse an deinen Stil an. Änderungen werden sofort übernommen.</p>
+                </div>
+
+                <!-- Color Theme -->
+                <div class="settingsCard">
+                    <h2 class="cardTitle">Akzentfarbe</h2>
+                    <p class="cardSubtitle">Wähle die Hauptfarbe für Rahmen, Buttons und Glüheffekte.</p>
+
+                    <div class="colorGrid" id="colorGrid">
+                        <button class="colorSwatch active" data-theme="violet"
+                            style="--swatch: #8a16ff;"
+                            title="Neon Violett (Standard)">
+                            <div class="swatchCircle"></div>
+                            <span class="swatchLabel">Violett</span>
+                            <i class="fa fa-check swatchCheck"></i>
+                        </button>
+                        <button class="colorSwatch" data-theme="cyan"
+                            style="--swatch: #00ffcc;"
+                            title="Cyber Cyan">
+                            <div class="swatchCircle"></div>
+                            <span class="swatchLabel">Cyan</span>
+                            <i class="fa fa-check swatchCheck"></i>
+                        </button>
+                        <button class="colorSwatch" data-theme="blue"
+                            style="--swatch: #1e90ff;"
+                            title="Electric Blue">
+                            <div class="swatchCircle"></div>
+                            <span class="swatchLabel">Blau</span>
+                            <i class="fa fa-check swatchCheck"></i>
+                        </button>
+                        <button class="colorSwatch" data-theme="pink"
+                            style="--swatch: #ff2d78;"
+                            title="Neon Pink">
+                            <div class="swatchCircle"></div>
+                            <span class="swatchLabel">Pink</span>
+                            <i class="fa fa-check swatchCheck"></i>
+                        </button>
+                        <button class="colorSwatch" data-theme="orange"
+                            style="--swatch: #ff6a00;"
+                            title="Solar Orange">
+                            <div class="swatchCircle"></div>
+                            <span class="swatchLabel">Orange</span>
+                            <i class="fa fa-check swatchCheck"></i>
+                        </button>
+                        <button class="colorSwatch" data-theme="gold"
+                            style="--swatch: #f5c518;"
+                            title="Gold">
+                            <div class="swatchCircle"></div>
+                            <span class="swatchLabel">Gold</span>
+                            <i class="fa fa-check swatchCheck"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Font Size -->
+                <div class="settingsCard">
+                    <h2 class="cardTitle">Schriftgröße</h2>
+                    <p class="cardSubtitle">Basis-Schriftgröße der gesamten App.</p>
+
+                    <div class="sliderRow">
+                        <span class="sliderMin">A</span>
+                        <input type="range" id="fontSizeSlider" class="settingsSlider"
+                               min="14" max="24" step="1" value="20">
+                        <span class="sliderMax">A</span>
+                    </div>
+                    <div class="sliderValueDisplay"><span id="fontSizeDisplay">20</span>px</div>
+                </div>
+
+                <!-- Preview -->
+                <div class="settingsCard settingsCard--preview">
+                    <h2 class="cardTitle">Vorschau</h2>
+                    <div class="appearancePreview">
+                        <div class="previewNavbar">
+                            <div class="previewLogo">MathVerse</div>
+                            <div class="previewBtn">Tool öffnen</div>
+                        </div>
+                        <div class="previewContent">
+                            <div class="previewCard">
+                                <div class="previewCardTitle">Bruchrechner</div>
+                                <div class="previewCardSub">Addieren · Subtrahieren · Kürzen</div>
+                            </div>
+                            <div class="previewCard previewCard--active">
+                                <div class="previewCardTitle">Zahlensystem Umrechner</div>
+                                <div class="previewCardSub">Basis 2–20 · mit Rechenweg</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="editActions editActions--left">
+                    <button class="saveChangesBtn" id="saveAppearanceBtn">Design speichern</button>
+                    <button class="cancelEditBtn" id="resetAppearanceBtn">Zurücksetzen</button>
+                </div>
+
+                <div class="toastMessage hidden" id="appearanceToast">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Design gespeichert!</span>
+                </div>
+
+            </section>
+
+            <!-- ─────────────────────────────────────
+                 PANEL: Favoriten
+                 ───────────────────────────────────── -->
+            <section class="settingsPanel" id="panel-favorites">
+
+                <div class="panelHeader">
+                    <h1 class="panelTitle">Meine Favoriten</h1>
+                    <p class="panelSubtitle">Tools, die du mit dem Herz-Icon markiert hast.</p>
+                </div>
+
+                <div class="favoritesGrid" id="favoritesGrid">
+                    <!-- Dynamisch befüllt via JS -->
+                </div>
+
+                <div class="emptyState hidden" id="favEmptyState">
+                    <i class="fa fa-heart emptyIcon"></i>
+                    <p class="emptyTitle">Noch keine Favoriten</p>
+                    <p class="emptyText">Markiere Tools auf der Startseite mit dem Herz-Icon, um sie hier zu sehen.</p>
+                    <a href="../index.html" class="saveChangesBtn" style="display:inline-block; margin-top:1rem;">
+                        Zur Startseite
+                    </a>
+                </div>
+
+            </section>
+
+            <!-- ─────────────────────────────────────
+                 PANEL: Konto löschen
+                 ───────────────────────────────────── -->
+            <section class="settingsPanel" id="panel-delete">
+
+                <div class="panelHeader">
+                    <h1 class="panelTitle">Konto löschen</h1>
+                </div>
+
+                <div class="settingsCard settingsCard--danger">
+                    <div class="dangerIcon"><i class="fa fa-exclamation-triangle"></i></div>
+                    <h2 class="cardTitle" style="color: var(--accent-error);">Achtung – diese Aktion ist unwiderruflich</h2>
+                    <p class="cardSubtitle" style="margin-top: 0.5rem;">
+                        Wenn du dein Konto löschst, werden alle deine Daten, Favoriten und Einstellungen
+                        dauerhaft entfernt. Eine Wiederherstellung ist nicht möglich.
+                    </p>
+
+                    <div class="formGroup" style="margin-top: 1.5rem;">
+                        <label class="formLabel">Tippe <strong style="color:var(--accent-error);">LÖSCHEN</strong> zur Bestätigung</label>
+                        <input type="text" id="deleteConfirmInput" class="settingsInput settingsInput--danger"
+                               placeholder="LÖSCHEN">
+                    </div>
+
+                    <div class="editActions editActions--left" style="margin-top: 1rem;">
+                        <button class="deleteFinalBtn" id="deleteAccountBtn" disabled>
+                            <i class="fa fa-trash"></i> Konto dauerhaft löschen
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- =====================================================================
+         LOGOUT CONFIRMATION MODAL
+         ===================================================================== -->
+    <div class="modalOverlay hidden" id="logoutModal">
+        <div class="modalBox">
+            <h2 class="modalTitle">Abmelden?</h2>
+            <p class="modalText">Du wirst aus deinem MathVerse-Konto abgemeldet.</p>
+            <div class="modalActions">
+                <button class="cancelEditBtn" id="logoutCancelBtn">Abbrechen</button>
+                <button class="saveChangesBtn" id="logoutConfirmBtn">Abmelden</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../javaScript/userArea.js"></script>
+</body>
+</html>
