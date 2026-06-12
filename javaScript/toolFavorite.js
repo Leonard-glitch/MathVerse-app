@@ -1,23 +1,22 @@
 /**
- * toolFavorite.js
- * Injiziert einen schwebenden Heart-Button auf Tool-Seiten.
- * Synchronisiert Favoriten mit der Homepage via localStorage ("favoriten"-Key).
- * Einbinden: <script src="../../javaScript/toolFavorite.js"></script>
+ * toolFavorite.js – Floating Heart Button auf Tool-Seiten
+ *
+ * Ist jetzt ein ES-Modul: Holt die Tool-ID dynamisch aus toolsCollection.js
+ * anhand des aktuellen Dateinamens → keine hardcodierten Mappings mehr.
+ *
+ * HTML: <script type="module" src="../../javaScript/toolFavorite.js"></script>
  */
-(function () {
 
-    // ── Filename → Tool-ID (muss mit index.js übereinstimmen) ──────────────
-    const PAGE_TO_ID = {
-        'zahlenAnalyse.html':      'card1',
-        'zsystUmrechner.html':     'card2',
-        'zsystRechner.html':       'card3',
-        'einheitenUmrechner.html': 'card4',
-        'prozentrechner.html':     'card5'
-    };
+import { tools } from './toolsCollection.js';
 
-    const filename = window.location.pathname.split('/').pop();
-    const toolId   = PAGE_TO_ID[filename];
-    if (!toolId) return;   // Unbekannte Seite → nichts tun
+// ── Tool anhand des aktuellen Dateinamens finden ────────────────────────────
+const filename = window.location.pathname.split('/').pop();
+const toolData = tools.find(t => t.filename === filename);
+
+// Unbekannte Seite → nichts tun
+if (toolData) init(toolData.id);
+
+function init(toolId) {
 
     // ── localStorage-Helfer ─────────────────────────────────────────────────
     function getFavoriten() {
@@ -29,7 +28,7 @@
         localStorage.setItem('favoriten', JSON.stringify(arr));
     }
 
-    // ── Heart-Button bauen (SVG, kein FontAwesome nötig) ───────────────────
+    // ── Heart-Button bauen ──────────────────────────────────────────────────
     const btn = document.createElement('button');
     btn.className = 'tool-page-heart';
     btn.setAttribute('aria-label', 'Zu Favoriten hinzufügen');
@@ -49,29 +48,23 @@
     function render() {
         const isFav = getFavoriten().includes(toolId);
         btn.classList.toggle('is-active', isFav);
-        btn.setAttribute('aria-label',
-            isFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen');
-        btn.querySelector('.heart-tooltip-label').textContent =
-            isFav ? 'Favorit' : 'Favorit?';
+        btn.setAttribute('aria-label', isFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen');
+        btn.querySelector('.heart-tooltip-label').textContent = isFav ? 'Favorit' : 'Favorit?';
     }
 
     // ── Toggle bei Klick ────────────────────────────────────────────────────
     btn.addEventListener('click', () => {
-        let favs = getFavoriten();
+        let favs  = getFavoriten();
         const isFav = favs.includes(toolId);
-        favs = isFav
-            ? favs.filter(id => id !== toolId)
-            : [...favs, toolId];
+        favs = isFav ? favs.filter(id => id !== toolId) : [...favs, toolId];
         setFavoriten(favs);
         render();
     });
 
-    // ── Cross-Tab-Sync (z.B. Homepage in Tab 2 ändert State) ───────────────
+    // ── Cross-Tab-Sync ──────────────────────────────────────────────────────
     window.addEventListener('storage', (e) => {
         if (e.key === 'favoriten') render();
     });
 
-    // ── Initial ─────────────────────────────────────────────────────────────
     render();
-
-})();
+}

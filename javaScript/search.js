@@ -1,15 +1,16 @@
+// search.js – keine inhaltlichen Änderungen nötig.
+// toolsCollection.js exportiert weiterhin title, tags und url → alles kompatibel.
+
 import { tools } from "./toolsCollection.js";
 
-const searchInput = document.getElementById("searchInput");
+const searchInput   = document.getElementById("searchInput");
 const searchResults = document.getElementById("searchResults");
 
 if (searchInput && searchResults) {
 
     searchInput.addEventListener("input", () => {
 
-        const query = searchInput.value
-            .trim()
-            .toLowerCase();
+        const query = searchInput.value.trim().toLowerCase();
 
         if (query.length === 0) {
             searchResults.style.display = "none";
@@ -18,15 +19,8 @@ if (searchInput && searchResults) {
         }
 
         const matches = tools.filter(tool => {
-
-            const titleMatch =
-                tool.title.toLowerCase().includes(query);
-
-            const tagMatch =
-                tool.tags.some(tag =>
-                    tag.toLowerCase().includes(query)
-                );
-
+            const titleMatch = tool.title.toLowerCase().includes(query);
+            const tagMatch   = tool.tags.some(tag => tag.toLowerCase().includes(query));
             return titleMatch || tagMatch;
         });
 
@@ -34,10 +28,7 @@ if (searchInput && searchResults) {
     });
 
     document.addEventListener("click", e => {
-
-        if (!searchResults.contains(e.target)
-            && e.target !== searchInput) {
-
+        if (!searchResults.contains(e.target) && e.target !== searchInput) {
             searchResults.style.display = "none";
         }
     });
@@ -46,13 +37,7 @@ if (searchInput && searchResults) {
 function renderResults(results) {
 
     if (results.length === 0) {
-
-        searchResults.innerHTML = `
-            <div class="searchResult">
-                Keine Ergebnisse gefunden
-            </div>
-        `;
-
+        searchResults.innerHTML = `<div class="searchResult">Keine Ergebnisse gefunden</div>`;
         searchResults.style.display = "block";
         return;
     }
@@ -60,22 +45,20 @@ function renderResults(results) {
     searchResults.innerHTML = "";
 
     results.forEach(tool => {
-
         const result = document.createElement("a");
-
-        result.href = tool.url;
-
+        result.href  = tool.url;           // ← aus toolsCollection.url
         result.classList.add("searchResult");
 
         result.innerHTML = `
-            <div class="searchResultTitle">
-                ${tool.title}
-            </div>
-
-            <div class="searchResultTags">
-                ${tool.tags.map(tag => `#${tag}`).join(" ")}
-            </div>
+            <div class="searchResultTitle">${tool.title}</div>
+            <div class="searchResultTags">${tool.tags.map(tag => `#${tag}`).join(" ")}</div>
         `;
+
+        // Optional: Icon neben dem Titel (tool.image.small)
+        // const icon = document.createElement("img");
+        // icon.src = tool.image.small;
+        // icon.className = "searchResultIcon";
+        // result.prepend(icon);
 
         searchResults.appendChild(result);
     });

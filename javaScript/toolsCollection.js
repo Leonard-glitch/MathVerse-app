@@ -1,46 +1,99 @@
+// ==========================================================================
+// MATHVERSE – ZENTRALE TOOL-DATENQUELLE
+// Alle anderen Dateien importieren von hier.
+// Neue Tools: NUR HIER eintragen, der Rest passiert automatisch.
+// ==========================================================================
+
+export const groups = [
+    { id: "arithmetik",    title: "Arithmetik" },
+    { id: "zahlensysteme", title: "Zahlensysteme" },
+    { id: "algebra",       title: "Algebra" },
+    { id: "geometrie",     title: "Geometrie" },
+    { id: "statistik",     title: "Statistik" },
+    { id: "einheiten",     title: "Einheiten" }
+];
+
 export const tools = [
     {
-        id: "zahlen-analyse",
-        title: "Zahlen Analyse",
-        category: "algebra",
-        image: "/pictures/51R9beEdSfL.jpg",
-        url: "/MathVerse-app/Tools/Zahlenanalyse/zahlenAnalyse.html",
-        tags: ["zahlen", "analyse", "algebra", "mathematik"]
+        id:       "card1",                          // Favoriten-Key in localStorage
+        title:    "Zahlen Analyse",
+        group:    "algebra",                        // Muss einer group.id entsprechen
+        filename: "zahlenAnalyse.html",             // Dateiname der Tool-Seite (für toolFavorite.js)
+        url:      "/MathVerse-app/Tools/Zahlenanalyse/zahlenAnalyse.html",
+        tags:     ["zahlen", "analyse", "algebra", "mathematik"],
+        info:     "Analysiert eine kommagetrennte Zahlenliste und gibt Summe, Maximum, Minimum und Durchschnitt aus.",
+        image: {
+            big:   "/MathVerse-app/pictures/51R9beEdSfL.jpg",            // Homepage-Cards
+            small: "/MathVerse-app/pictures/icons/zahlenAnalyse-icon.png" // UserArea, Suchvorschläge usw.
+        }
     },
-
     {
-        id: "zahlensystem-umrechner",
-        title: "Zahlensystem Umrechner",
-        category: "zahlensysteme",
-        image: "/pictures/ZahlensystemeUmwandeln Temp1.jpg",
-        url: "/MathVerse-app/Tools/Zahlensystemumrechner/zsystUmrechner.html", // Pfad an MathVerse-app angepasst
-        tags: ["zahlensystem", "umrechner", "dual", "binär", "hex", "oktal", "dezimal"]
+        id:       "card2",
+        title:    "Zahlensystem Umrechner",
+        group:    "zahlensysteme",
+        filename: "zsystUmrechner.html",
+        url:      "/MathVerse-app/Tools/Zahlensystemumrechner/zsystUmrechner.html",
+        tags:     ["zahlensystem", "umrechner", "dual", "binär", "hex", "oktal", "dezimal"],
+        info:     "Rechnet Zahlen zwischen Zahlensystemen (Basis 2–20) um – inklusive Nachkommastellen und vollem Rechenweg.",
+        image: {
+            big:   "/MathVerse-app/pictures/ZahlensystemeUmwandeln Temp1.jpg",
+            small: "/MathVerse-app/pictures/icons/zsystUmrechner-icon.png"
+        }
     },
-
     {
-        id: "zahlensystem-rechner",
-        title: "Zahlensystem Rechner",
-        category: "zahlensysteme",
-        image: "/pictures/beispiel-addition.png",
-        url: "/MathVerse-app/Tools/Zahlensystemrechner/zsystRechner.html", // Pfad an MathVerse-app angepasst
-        tags: ["zahlensystem", "rechner", "addition", "subtraktion", "multiplikation", "division", "dual"]
+        id:       "card3",
+        title:    "Zahlensystem Rechner",
+        group:    "zahlensysteme",
+        filename: "zsystRechner.html",
+        url:      "/MathVerse-app/Tools/Zahlensystemrechner/zsystRechner.html",
+        tags:     ["zahlensystem", "rechner", "addition", "subtraktion", "multiplikation", "division", "dual"],
+        info:     "Führt Grundrechenarten (+, −, ×, ÷) direkt in einem beliebigen Zahlensystem durch und zeigt den schriftlichen Rechenweg.",
+        image: {
+            big:   "/MathVerse-app/pictures/beispiel-addition.png",
+            small: "/MathVerse-app/pictures/icons/zsystRechner-icon.png"
+        }
     },
-
     {
-        id: "einheiten-umrechner",
-        title: "Einheiten Umrechner",
-        category: "einheiten",
-        image: "/pictures/einheiten.jpg",
-        url: "/MathVerse-app/Tools/Einheiten Umrechner/einheitenUmrechner.html", // Pfad an MathVerse-app angepasst
-        tags: ["umrechner", "einheiten", "länge", "gewicht", "temperatur", "zeit"]
+        id:       "card4",
+        title:    "Einheiten Umrechner",
+        group:    "einheiten",
+        filename: "einheitenUmrechner.html",
+        url:      "/MathVerse-app/Tools/Einheiten Umrechner/einheitenUmrechner.html",
+        tags:     ["umrechner", "einheiten", "länge", "gewicht", "temperatur", "zeit"],
+        info:     "Konvertiert Längen, Massen und Zeiteinheiten – mit Advanced Mode für imperiale und astronomische Einheiten.",
+        image: {
+            big:   "/MathVerse-app/pictures/hqdefault.jpg",
+            small: "/MathVerse-app/pictures/icons/einheitenUmrechner-icon.png"
+        }
     },
-
     {
-        id: "prozent-rechner",
-        title: "Prozent Rechner",
-        category: "arithmetik",
-        image: "/pictures/prozent.jpg",
-        url: "/MathVerse-app/Tools/Prozentrechner/prozentRechner.html", // Pfad an MathVerse-app angepasst
-        tags: ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner"]
+        id:       "card5",
+        title:    "Prozentrechnung",
+        group:    "arithmetik",
+        filename: "prozentrechner.html",
+        url:      "/MathVerse-app/Tools/Prozentrechner/prozentrechner.html",
+        tags:     ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner"],
+        info:     "Berechnet Anteil, Prozentsatz und Grundwert – drei Formeln auf einen Blick, mit sofortigem Rechenweg.",
+        image: {
+            big:   "/MathVerse-app/pictures/Prozentrechnung_Thumbnail.png",
+            small: "/MathVerse-app/pictures/icons/prozentrechner-icon.png"
+        }
     }
+
+    // -----------------------------------------------------------------------
+    // Neues Tool hinzufügen? Schema:
+    // {
+    //     id:       "card6",
+    //     title:    "Tool Titel",
+    //     group:    "eine-der-gruppen-ids",
+    //     filename: "meinTool.html",
+    //     url:      "/MathVerse-app/Tools/MeinTool/meinTool.html",
+    //     tags:     ["tag1", "tag2"],
+    //     info:     "Kurzbeschreibung für den Tooltip.",
+    //     image: {
+    //         big:   "/MathVerse-app/pictures/meinTool-big.jpg",
+    //         small: "/MathVerse-app/pictures/icons/meinTool-icon.png"
+    //     }
+    // }
+    // -----------------------------------------------------------------------
 ];

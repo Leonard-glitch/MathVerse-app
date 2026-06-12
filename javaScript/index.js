@@ -1,61 +1,11 @@
 // ==========================================================================
-// 1. DATA CONFIGURATION (Zentrale Datenquelle)
+// INDEX.JS – Homepage Logic
+// Tool-Daten kommen aus toolsCollection.js – hier nichts mehr eintragen!
 // ==========================================================================
-
-const groups = [
-    { id: "arithmetik",    title: "Arithmetik" },
-    { id: "zahlensysteme", title: "Zahlensysteme" },
-    { id: "algebra",       title: "Algebra" },
-    { id: "geometrie",     title: "Geometrie" },
-    { id: "statistik",     title: "Statistik" },
-    { id: "einheiten",     title: "Einheiten" }
-];
-
-const tools = [
-    {
-        id: "card1",
-        title: "Zahlen Analyse",
-        image: "./pictures/51R9beEdSfL.jpg",
-        link: "./Tools/Zahlenanalyse/zahlenAnalyse.html",
-        group: "algebra",
-        info: "Analysiert eine kommagetrennte Zahlenliste und gibt Summe, Maximum, Minimum und Durchschnitt aus."
-    },
-    {
-        id: "card2",
-        title: "Zahlensystem Umrechner",
-        image: "./pictures/ZahlensystemeUmwandeln Temp1.jpg",
-        link: "./Tools/Zahlensystemumrechner/zsystUmrechner.html",
-        group: "zahlensysteme",
-        info: "Rechnet Zahlen zwischen Zahlensystemen (Basis 2–20) um – inklusive Nachkommastellen und vollem Rechenweg."
-    },
-    {
-        id: "card3",
-        title: "Zahlensystem Rechner",
-        image: "./pictures/beispiel-addition.png",
-        link: "./Tools/Zahlensystemrechner/zsystRechner.html",
-        group: "zahlensysteme",
-        info: "Führt Grundrechenarten (+, −, ×, ÷) direkt in einem beliebigen Zahlensystem durch und zeigt den schriftlichen Rechenweg."
-    },
-    {
-        id: "card4",
-        title: "Einheiten Umrechner",
-        image: "./pictures/hqdefault.jpg",
-        link: "./Tools/Einheiten Umrechner/einheitenUmrechner.html",
-        group: "einheiten",
-        info: "Konvertiert Längen, Massen und Zeiteinheiten – mit Advanced Mode für imperiale und astronomische Einheiten."
-    },
-    {
-        id: "card5",
-        title: "Prozentrechnung",
-        image: "./pictures/Prozentrechnung_Thumbnail.png",
-        link: "./Tools/Prozentrechner/prozentrechner.html",
-        group: "arithmetik",
-        info: "Berechnet Anteil, Prozentsatz und Grundwert – drei Formeln auf einen Blick, mit sofortigem Rechenweg."
-    }
-];
+import { tools, groups } from './toolsCollection.js';
 
 // ==========================================================================
-// 2. STATE MANAGEMENT & INITIALIZATION
+// 1. STATE MANAGEMENT & INITIALIZATION
 // ==========================================================================
 
 let favoriten       = JSON.parse(localStorage.getItem("favoriten"))       || [];
@@ -85,7 +35,7 @@ function initMathVerse() {
 }
 
 // ==========================================================================
-// 3. STRUCTURE GENERATION
+// 2. STRUCTURE GENERATION
 // ==========================================================================
 
 function createGroupDOM(group, groupDataId) {
@@ -123,12 +73,13 @@ function createGroupDOM(group, groupDataId) {
 }
 
 // ==========================================================================
-// 4. CARD ENGINE & DOM MOVE LOGIC
+// 3. CARD ENGINE
+// Einziger Ort, der das Card-HTML generiert – image.big und url aus toolsCollection
 // ==========================================================================
 
 function createCardElement(tool, isAllToolsView = false) {
     const card = document.createElement("a");
-    card.href = tool.link;
+    card.href = tool.url;                   // ← kommt aus toolsCollection.url
     card.className = "card";
     card.dataset.id = tool.id;
     card.dataset.view = isAllToolsView ? "all" : "category";
@@ -138,7 +89,7 @@ function createCardElement(tool, isAllToolsView = false) {
 
     card.innerHTML = `
         <div class="cardTop">
-            <img src="${tool.image}" class="cardImg" alt="${tool.title}">
+            <img src="${tool.image.big}" class="cardImg" alt="${tool.title}">
             <i class="fa fa-info-circle info"></i>
             <i class="fa ${heartClass} favorite"></i>
         </div>
@@ -208,6 +159,10 @@ function buildAndDistributeCards() {
     document.querySelectorAll(".cardsContainer").forEach(sortContainer);
 }
 
+// ==========================================================================
+// 4. HEART / FAVORITE LOGIC
+// ==========================================================================
+
 function handleHeartClick(toolId) {
     const wasActive         = favoriten.includes(toolId);
     const favContainer      = document.getElementById("favoritenContainer");
@@ -237,7 +192,6 @@ function handleHeartClick(toolId) {
 
     localStorage.setItem("favoriten", JSON.stringify(favoriten));
 
-    // Herz-Icons synchronisieren
     syncHeartIcons(toolId, !wasActive);
 
     affectedContainers.forEach(container => {
@@ -250,7 +204,6 @@ function handleHeartClick(toolId) {
     applyCollapsibleLogic();
 }
 
-// Herz-Icons für eine Tool-ID auf den gegebenen Zustand setzen
 function syncHeartIcons(toolId, isActive) {
     document.querySelectorAll(`.card[data-id="${toolId}"] .favorite`).forEach(heart => {
         heart.className = `fa ${isActive ? "fa-heart active" : "fa-heart-o"} favorite`;
@@ -258,7 +211,7 @@ function syncHeartIcons(toolId, isActive) {
 }
 
 // ==========================================================================
-// 5. SORTING & RECOVERY
+// 5. SORTING
 // ==========================================================================
 
 function sortContainer(container) {
@@ -303,7 +256,7 @@ function handleGroupStarClick(event, groupId) {
     event.preventDefault();
     if (groupId === "favoritenGroupStar") return;
 
-    const star    = event.currentTarget;
+    const star      = event.currentTarget;
     const wasActive = star.classList.contains("active");
 
     if (!wasActive) {
@@ -348,7 +301,7 @@ function sortGroupsByPins() {
 }
 
 // ==========================================================================
-// 7. SEARCH ENGINE
+// 7. SEARCH
 // ==========================================================================
 
 function initSearch() {
@@ -425,7 +378,6 @@ function applyCollapsibleLogic() {
 
 // ==========================================================================
 // 9. GLOBAL TOOLTIP SINGLETON
-//    Wird an <body> gehängt (position: fixed) → kein overflow-clipping möglich
 // ==========================================================================
 
 let _globalTooltip  = null;
@@ -438,7 +390,6 @@ function getGlobalTooltip() {
         _globalTooltip.innerHTML = `<span class="info-tooltip-text"></span>`;
         document.body.appendChild(_globalTooltip);
 
-        // Klick irgendwo außerhalb schließt den Tooltip
         document.addEventListener("click", (e) => {
             if (!e.target.classList.contains("info")) {
                 if (_activeInfoIcon) _activeInfoIcon._pinned = false;
@@ -452,15 +403,13 @@ function getGlobalTooltip() {
 function showGlobalTooltip(infoIcon, text) {
     const tooltip = getGlobalTooltip();
 
-    // Vorheriges Icon entpinnen
     if (_activeInfoIcon && _activeInfoIcon !== infoIcon) {
         _activeInfoIcon._pinned = false;
     }
     _activeInfoIcon = infoIcon;
 
-    // Text setzen bevor Positionierung (damit offsetHeight stimmt)
     tooltip.querySelector(".info-tooltip-text").textContent = text;
-    tooltip.classList.remove("visible"); // kurz unsichtbar für saubere Messung
+    tooltip.classList.remove("visible");
 
     positionGlobalTooltip(tooltip, infoIcon);
     tooltip.classList.add("visible");
@@ -474,21 +423,18 @@ function hideGlobalTooltip() {
 }
 
 function positionGlobalTooltip(tooltip, infoIcon) {
-    const TT_WIDTH = 220;
-    const MARGIN   = 10;
-    const ARROW_OFFSET = 10; // Abstand Icon ↔s Tooltip-Kante
+    const TT_WIDTH     = 220;
+    const MARGIN       = 10;
+    const ARROW_OFFSET = 10;
 
-    const rect = infoIcon.getBoundingClientRect();
-
+    const rect     = infoIcon.getBoundingClientRect();
     tooltip.style.width    = TT_WIDTH + "px";
     tooltip.style.position = "fixed";
 
-    // Höhe messen (Element ist im DOM, nur opacity:0)
     const ttHeight = tooltip.offsetHeight || 80;
 
     let top, arrowClass;
 
-    // Genug Platz oben? → darüber, sonst darunter
     if (rect.top >= ttHeight + ARROW_OFFSET + MARGIN) {
         top        = rect.top - ttHeight - ARROW_OFFSET;
         arrowClass = "tooltip-above";
@@ -497,12 +443,10 @@ function positionGlobalTooltip(tooltip, infoIcon) {
         arrowClass = "tooltip-below";
     }
 
-    // Horizontal: Icon-Mitte als Ankerpunkt, am Viewport-Rand abklemmen
     let left = rect.left + rect.width / 2 - TT_WIDTH / 2;
     left = Math.max(MARGIN, Math.min(left, window.innerWidth - TT_WIDTH - MARGIN));
 
-    // Pfeil-Position relativ zum Tooltip-Rand berechnen
-    const arrowLeft = rect.left + rect.width / 2 - left;
+    const arrowLeft        = rect.left + rect.width / 2 - left;
     const arrowLeftClamped = Math.max(16, Math.min(arrowLeft, TT_WIDTH - 16));
 
     tooltip.style.top  = top  + "px";
@@ -514,15 +458,11 @@ function positionGlobalTooltip(tooltip, infoIcon) {
 
 // ==========================================================================
 // 10. CROSS-TAB SYNC
-//     Wenn die Tool-Seite in einem anderen Tab den Favoriten-State ändert,
-//     werden die Herz-Icons auf der Homepage sofort aktualisiert.
 // ==========================================================================
 
 window.addEventListener("storage", (e) => {
     if (e.key !== "favoriten") return;
     favoriten = JSON.parse(e.newValue || "[]");
-
-    // Alle Herz-Icons neu rendern
     tools.forEach(tool => {
         syncHeartIcons(tool.id, favoriten.includes(tool.id));
     });
