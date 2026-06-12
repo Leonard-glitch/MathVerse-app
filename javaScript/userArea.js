@@ -55,7 +55,7 @@ const THEMES = {
         '--glow-hard':     'rgba(245, 197, 24, 0.4)',
         '--border-accent': '#f5c518',
     },
-};
+}; 
 
 // Tool meta-data for the Favourites panel (mirrors index.js tools array)
 const TOOL_META = {
@@ -453,9 +453,13 @@ function initLogoutModal() {
     confirmBtn.addEventListener('click', () => {
         // Real logout logic goes here
         localStorage.removeItem('mv-username');
-        window.location.href = '../html/login.html';
+        window.location.href = '../index.html';
     });
 }
+
+logoutNavBtn.addEventListener('click', () => {
+  initLogoutModal();  
+})
 
 // ── Password toggle helper ────────────────────────────────────────────────────
 
