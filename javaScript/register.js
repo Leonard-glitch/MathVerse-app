@@ -272,6 +272,9 @@ privacyCheckbox.addEventListener('change', () => {
 // ===========================================================================
 
 form.addEventListener('submit', (e) => {
+    // Verhindert das Abschicken an das (noch) nicht vorhandene Backend
+    e.preventDefault();
+
     // Alle Fehlermeldungen zurücksetzen
     hideMsg(usernameError);
     hideMsg(emailError);
@@ -348,13 +351,35 @@ form.addEventListener('submit', (e) => {
         valid = false;
     }
 
+    // AUSWERTUNG
     if (!valid) {
-        e.preventDefault();
-        // Scroll zum ersten Fehler-Feld
+        // Scroll zum ersten Fehler-Feld, falls etwas nicht passt
         if (firstErrorInput) {
             firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
             firstErrorInput.focus();
         }
+    } else {
+        // WENN ALLES PASST: User lokal registrieren und direkt einloggen
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Wichtig: 'username' exakt so benennen wie im Login-Skript und Nav-Skript!
+        const user = {
+            username: uname,
+            email: emailInput.value.trim(),
+            favoriten: [],
+            pinnedGroupes: [],
+            containerOrders: {},
+            theme: "purple",
+            fontsize: "20",
+            isPro: false
+        };  //Später wird advanced Mode aktiv? dann von LocalStorage nach Datenbank übertragen
+
+        localStorage.setItem("currentUser", JSON.stringify(user));
+                
+        console.log('Registrierung erfolgreich! User eingeloggt.');
+
+        // Weiterleitung zur Startseite
+        window.location.href = '../index.html';
     }
 });
 

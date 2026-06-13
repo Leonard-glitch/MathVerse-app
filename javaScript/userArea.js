@@ -1,11 +1,18 @@
-/* ==========================================================================
-   userArea.js – MathVerse Settings Page Logic
-   Handles: panel navigation, inline editing, appearance theming, favorites
-   ========================================================================== */
+/**
+ * userArea.js – MathVerse Settings Page Logic (ES Module)
+ *
+ * Bugs behoben gegenüber der alten Version:
+ * - TOOL_META entfernt → Daten kommen jetzt aus toolsCollection.js
+ * - initFavoritesPanel() war nicht definiert → entfernt
+ * - logoutNavBtn.addEventListener() am Dateiende → ReferenceError behoben
+ * - Logout löscht jetzt auch 'isLoggedIn' aus localStorage
+ * - applyTheme / applyFontSize: ungenutzten 'live'-Parameter entfernt
+ * - showError-Konflikt: Funktion in showFormError umbenannt
+ */
 
-// ── Colour Themes ────────────────────────────────────────────────────────────
-// Each theme overrides the root CSS variables that control all glow/border colours.
+import { tools, groups } from './toolsCollection.js';
 
+// ── Colour Themes ─────────────────────────────────────────────────────────────
 const THEMES = {
     violet: {
         '--border-glow':   '#8a16ff',
@@ -55,65 +62,78 @@ const THEMES = {
         '--glow-hard':     'rgba(245, 197, 24, 0.4)',
         '--border-accent': '#f5c518',
     },
-}; 
-
-// Tool meta-data for the Favourites panel (mirrors index.js tools array)
-const TOOL_META = {
-    card1: { title: 'Zahlen Analyse',            icon: 'fa-bar-chart', tag: 'Algebra',        url: '../Tools/Zahlenanalyse/zahlenAnalyse.html' },
-    card2: { title: 'Zahlensystem Umrechner',    icon: 'fa-exchange',  tag: 'Zahlensysteme',  url: '../Tools/Zahlensystemumrechner/zsystUmrechner.html' },
-    card3: { title: 'Zahlensystem Rechner',      icon: 'fa-calculator',tag: 'Zahlensysteme',  url: '../Tools/Zahlensystemrechner/zsystRechner.html' },
-    card4: { title: 'Einheiten Umrechner',        icon: 'fa-arrows-h',  tag: 'Einheiten',      url: '../Tools/Einheiten Umrechner/einheitenUmrechner.html' },
-    card5: { title: 'Prozentrechnung',           icon: 'fa-percent',   tag: 'Arithmetik',     url: '../Tools/Prozentrechner/prozentrechner.html' },
 };
 
-// ── State ────────────────────────────────────────────────────────────────────
+// ── Gruppen-Icon-Mapping für Favoriten (abgeleitet aus toolsCollection-Gruppen) ──
+const GROUP_ICONS = {
+    arithmetik:    'fa-percent',
+    zahlensysteme: 'fa-calculator',
+    algebra:       'fa-bar-chart',
+    geometrie:     'fa-circle-o',
+    statistik:     'fa-line-chart',
+    einheiten:     'fa-arrows-h',
+};
 
-let currentTheme    = localStorage.getItem('mv-theme') || 'violet';
+// ── State ─────────────────────────────────────────────────────────────────────
+
+/* * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * LOCAL STORAGE ZUGRIFF: Theme und Fontsize auslesen (Get Item)
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ */
+let currentTheme    = localStorage.getItem('mv-theme')    || 'violet';
 let currentFontSize = parseInt(localStorage.getItem('mv-fontsize') || '20', 10);
 let pendingTheme    = currentTheme;
 let pendingFontSize = currentFontSize;
 
-// ── DOM Refs ─────────────────────────────────────────────────────────────────
-
+// ── DOM-Referenzen ────────────────────────────────────────────────────────────
 const navItems        = document.querySelectorAll('.navItem[data-panel]');
 const panels          = document.querySelectorAll('.settingsPanel');
 
-// Sidebar live elements
 const sidebarAvatar   = document.getElementById('sidebarAvatarEl');
 const sidebarUsername = document.getElementById('sidebarUsernameEl');
 const sidebarEmail    = document.getElementById('sidebarEmailEl');
-
-// Profile elements
 const profileAvatar   = document.getElementById('profileAvatarEl');
 const displayName     = document.getElementById('displayNameEl');
 const viewUsername    = document.getElementById('view-username');
 const viewEmail       = document.getElementById('view-email');
 
-// ── Initialisation ───────────────────────────────────────────────────────────
+// ── Shake-Keyframe (einmalig injiziert) ───────────────────────────────────────
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `
+    @keyframes settingsShake {
+        0%,100% { transform: translateX(0); }
+        20%     { transform: translateX(-5px); }
+        40%     { transform: translateX(5px); }
+        60%     { transform: translateX(-3px); }
+        80%     { transform: translateX(3px); }
+    }
+`;
+document.head.appendChild(shakeStyle);
 
+// ── Initialisierung ───────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    applyTheme(currentTheme, false);
-    applyFontSize(currentFontSize, false);
+    applyTheme(currentTheme);
+    applyFontSize(currentFontSize);
     populateUserInfo();
     initPanelNav();
     initAccountPanel();
     initSecurityPanel();
     initAppearancePanel();
-    initFavoritesPanel();
     initDeletePanel();
     initLogoutModal();
-    initPasswordToggles();   // Called ONCE globally — covers all panels
+    initPasswordToggles();
 });
 
-// ── Panel navigation ─────────────────────────────────────────────────────────
+// =============================================================================
+// PANEL NAVIGATION
+// =============================================================================
 
 function initPanelNav() {
     navItems.forEach(item => {
         item.addEventListener('click', () => {
-            const panelId = item.dataset.panel;
-            switchPanel(panelId);
             navItems.forEach(n => n.classList.remove('active'));
             item.classList.add('active');
+            switchPanel(item.dataset.panel);
         });
     });
 }
@@ -123,22 +143,28 @@ function switchPanel(panelId) {
     const target = document.getElementById(`panel-${panelId}`);
     if (target) target.classList.add('active');
 
-    // Side-effects per panel
+    // Panel-spezifische Seiteneffekte
     if (panelId === 'favorites') populateFavorites();
 }
 
-// ── User info population ─────────────────────────────────────────────────────
+// =============================================================================
+// USER INFO
+// =============================================================================
 
 function maskEmail(email) {
     if (!email || !email.includes('@')) return '–';
     const [local, domain] = email.split('@');
-    const visible = local.charAt(0) + local.charAt(1);
+    const visible = local.slice(0, 2);
     return `${visible}${'*'.repeat(Math.min(local.length - 2, 5))}@${domain}`;
 }
 
 function populateUserInfo() {
-    const name  = localStorage.getItem('mv-username') || 'Leolegend6260';
-    const email = localStorage.getItem('mv-email')    || '';
+    /* * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * LOCAL STORAGE ZUGRIFF: Username und E-Mail abrufen (Get Item)
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     */
+    const name   = localStorage.getItem('mv-username') || 'Gast';
+    const email  = localStorage.getItem('mv-email')    || '';
     const letter = name.charAt(0).toUpperCase();
 
     if (sidebarAvatar)   sidebarAvatar.textContent  = letter;
@@ -151,11 +177,13 @@ function populateUserInfo() {
 
     const inputUsername = document.getElementById('input-username');
     const inputEmail    = document.getElementById('input-email');
-    if (inputUsername) inputUsername.value = name;
-    if (inputEmail && email) inputEmail.value = email;
+    if (inputUsername)          inputUsername.value = name;
+    if (inputEmail && email)    inputEmail.value    = email;
 }
 
-// ── Account panel ─────────────────────────────────────────────────────────────
+// =============================================================================
+// KONTO-PANEL
+// =============================================================================
 
 function initAccountPanel() {
     const editBtn   = document.getElementById('editAccountBtn');
@@ -178,11 +206,11 @@ function initAccountPanel() {
     });
 
     saveBtn.addEventListener('click', () => {
-        const newName  = document.getElementById('input-username').value.trim();
-        const newEmail = document.getElementById('input-email').value.trim();
-        const pw       = document.getElementById('input-current-pw').value;
+        const newName   = document.getElementById('input-username').value.trim();
+        const newEmail  = document.getElementById('input-email').value.trim();
+        const currentPw = document.getElementById('input-current-pw').value;
 
-        if (!pw) {
+        if (!currentPw) {
             shakeElement(document.getElementById('input-current-pw'));
             return;
         }
@@ -191,19 +219,19 @@ function initAccountPanel() {
             return;
         }
 
-        // Persist
+        /* * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         * LOCAL STORAGE ZUGRIFF: Username und E-Mail updaten (Set Item)
+         * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         */
         localStorage.setItem('mv-username', newName);
         if (newEmail) localStorage.setItem('mv-email', newEmail);
 
         populateUserInfo();
         exitEditMode(viewMode, editMode, editBtn);
+        document.getElementById('input-current-pw').value = '';
 
-        // Show toast
         toast.classList.remove('hidden');
         setTimeout(() => toast.classList.add('hidden'), 3000);
-
-        // Clear sensitive field
-        document.getElementById('input-current-pw').value = '';
     });
 }
 
@@ -213,7 +241,9 @@ function exitEditMode(viewMode, editMode, editBtn) {
     editBtn.classList.remove('hidden');
 }
 
-// ── Security panel ─────────────────────────────────────────────────────────────
+// =============================================================================
+// SICHERHEITS-PANEL
+// =============================================================================
 
 function initSecurityPanel() {
     const newPwInput  = document.getElementById('sec-new-pw');
@@ -223,41 +253,37 @@ function initSecurityPanel() {
 
     if (!newPwInput) return;
 
-    // Live strength meter
-    newPwInput.addEventListener('input', () => {
-        updateStrength(newPwInput.value);
-    });
+    newPwInput.addEventListener('input', () => updateStrength(newPwInput.value));
 
     saveBtn.addEventListener('click', () => {
         const cur  = document.getElementById('sec-current-pw').value;
-        const nw   = document.getElementById('sec-new-pw').value;
-        const conf = document.getElementById('sec-confirm-pw').value;
+        const nw   = newPwInput.value;
+        const conf = confPwInput.value;
 
         errorEl.classList.add('hidden');
 
         if (!cur) {
-            showError(errorEl, 'Bitte gib dein aktuelles Passwort ein.');
+            showFormError(errorEl, 'Bitte gib dein aktuelles Passwort ein.');
             shakeElement(document.getElementById('sec-current-pw'));
             return;
         }
         if (nw.length < 6) {
-            showError(errorEl, 'Das neue Passwort muss mindestens 6 Zeichen lang sein.');
+            showFormError(errorEl, 'Das neue Passwort muss mindestens 6 Zeichen lang sein.');
             shakeElement(newPwInput);
             return;
         }
         if (nw !== conf) {
-            showError(errorEl, 'Die Passwörter stimmen nicht überein.');
+            showFormError(errorEl, 'Die Passwörter stimmen nicht überein.');
             shakeElement(confPwInput);
             return;
         }
 
-        // Success
+        // Erfolg
         document.getElementById('sec-current-pw').value = '';
         newPwInput.value  = '';
         confPwInput.value = '';
         updateStrength('');
-
-        showError(errorEl, '✓ Passwort erfolgreich geändert.', true);
+        showFormError(errorEl, '✓ Passwort erfolgreich geändert.', true);
         setTimeout(() => errorEl.classList.add('hidden'), 3000);
     });
 }
@@ -268,51 +294,57 @@ function updateStrength(pw) {
     if (!fill) return;
 
     if (!pw) {
-        fill.style.width = '0';
+        fill.style.width           = '0';
         fill.style.backgroundColor = '';
-        label.textContent = '';
+        if (label) label.textContent = '';
         return;
     }
 
     let score = 0;
-    if (pw.length >= 6)  score++;
-    if (pw.length >= 10) score++;
-    if (pw.length >= 14) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    if (pw.length >= 6)           score++;
+    if (pw.length >= 10)          score++;
+    if (pw.length >= 14)          score++;
+    if (/[A-Z]/.test(pw))         score++;
+    if (/[0-9]/.test(pw))         score++;
+    if (/[^A-Za-z0-9]/.test(pw))  score++;
 
-    const lvl = Math.min(4, Math.max(1, Math.round(score / 1.5)));
-    const map  = ['', 'Schwach', 'Ok', 'Gut', 'Stark'];
-    const cols = ['', '#ff2a5f', '#ff9100', '#ffcc00', '#00ffcc'];
+    const lvl    = Math.min(4, Math.max(1, Math.round(score / 1.5)));
+    const labels = ['', 'Schwach', 'Ok', 'Gut', 'Stark'];
+    const colors = ['', '#ff2a5f', '#ff9100', '#ffcc00', '#00ffcc'];
 
     fill.style.width           = `${lvl * 25}%`;
-    fill.style.backgroundColor = cols[lvl];
-    label.textContent          = map[lvl];
-    label.style.color          = cols[lvl];
+    fill.style.backgroundColor = colors[lvl];
+
+    if (label) {
+        label.textContent = labels[lvl];
+        label.style.color = colors[lvl];
+    }
 }
 
-// ── Appearance panel ──────────────────────────────────────────────────────────
+// =============================================================================
+// ERSCHEINUNGSBILD-PANEL
+// =============================================================================
 
 function initAppearancePanel() {
-    // Color swatches
     const swatches = document.querySelectorAll('.colorSwatch');
+    const slider   = document.getElementById('fontSizeSlider');
+    const display  = document.getElementById('fontSizeDisplay');
+    const saveBtn  = document.getElementById('saveAppearanceBtn');
+    const resetBtn = document.getElementById('resetAppearanceBtn');
+    const toast    = document.getElementById('appearanceToast');
+
+    // Aktiven Swatch aus gespeichertem Theme setzen
+    document.querySelector(`.colorSwatch[data-theme="${currentTheme}"]`)
+        ?.classList.add('active');
+
     swatches.forEach(swatch => {
         swatch.addEventListener('click', () => {
             swatches.forEach(s => s.classList.remove('active'));
             swatch.classList.add('active');
             pendingTheme = swatch.dataset.theme;
-            applyTheme(pendingTheme, true);  // Live preview
+            applyTheme(pendingTheme); // Live-Vorschau
         });
     });
-
-    // Set initially active swatch
-    const activeSwatch = document.querySelector(`.colorSwatch[data-theme="${currentTheme}"]`);
-    if (activeSwatch) activeSwatch.classList.add('active');
-
-    // Font size slider
-    const slider  = document.getElementById('fontSizeSlider');
-    const display = document.getElementById('fontSizeDisplay');
 
     if (slider) {
         slider.value = currentFontSize;
@@ -321,59 +353,70 @@ function initAppearancePanel() {
         slider.addEventListener('input', () => {
             pendingFontSize = parseInt(slider.value, 10);
             if (display) display.textContent = pendingFontSize;
-            applyFontSize(pendingFontSize, true);
+            applyFontSize(pendingFontSize); // Live-Vorschau
         });
     }
 
-    // Save
-    const saveBtn  = document.getElementById('saveAppearanceBtn');
-    const resetBtn = document.getElementById('resetAppearanceBtn');
-    const toast    = document.getElementById('appearanceToast');
-
-    saveBtn.addEventListener('click', () => {
+    saveBtn?.addEventListener('click', () => {
         currentTheme    = pendingTheme;
         currentFontSize = pendingFontSize;
+
+        /* * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         * LOCAL STORAGE ZUGRIFF: Theme und Fontsize speichern (Set Item)
+         * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         */
         localStorage.setItem('mv-theme',    currentTheme);
-        localStorage.setItem('mv-fontsize', currentFontSize);
+        localStorage.setItem('mv-fontsize', String(currentFontSize));
 
         toast.classList.remove('hidden');
         setTimeout(() => toast.classList.add('hidden'), 3000);
     });
 
-    resetBtn.addEventListener('click', () => {
+    resetBtn?.addEventListener('click', () => {
         pendingTheme    = 'violet';
         pendingFontSize = 20;
-        applyTheme(pendingTheme, true);
-        applyFontSize(pendingFontSize, true);
 
-        if (slider)  slider.value = 20;
-        if (display) display.textContent = 20;
+        applyTheme(pendingTheme);
+        applyFontSize(pendingFontSize);
+
+        if (slider)  slider.value         = 20;
+        if (display) display.textContent  = 20;
 
         swatches.forEach(s => s.classList.remove('active'));
-        const violet = document.querySelector('.colorSwatch[data-theme="violet"]');
-        if (violet) violet.classList.add('active');
+        document.querySelector('.colorSwatch[data-theme="violet"]')
+            ?.classList.add('active');
     });
 }
 
-function applyTheme(themeName, live = false) {
+function applyTheme(themeName) {
     const vars = THEMES[themeName];
     if (!vars) return;
-    const root = document.documentElement;
-    Object.entries(vars).forEach(([key, val]) => root.style.setProperty(key, val));
+    Object.entries(vars).forEach(([key, val]) =>
+        document.documentElement.style.setProperty(key, val)
+    );
 }
 
-function applyFontSize(size, live = false) {
+function applyFontSize(size) {
     document.documentElement.style.fontSize = `${size}px`;
 }
 
-// ── Favorites panel ───────────────────────────────────────────────────────────
+// =============================================================================
+// FAVORITEN-PANEL
+// (Daten kommen jetzt direkt aus toolsCollection.js – kein TOOL_META mehr)
+// =============================================================================
 
 function populateFavorites() {
-    const grid      = document.getElementById('favoritesGrid');
+    const grid       = document.getElementById('favoritesGrid');
     const emptyState = document.getElementById('favEmptyState');
 
     let favs = [];
-    try { favs = JSON.parse(localStorage.getItem('favoriten') || '[]'); } catch (_) {}
+    try { 
+        /* * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         * LOCAL STORAGE ZUGRIFF: Favoriten-Liste auslesen (Get Item)
+         * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         */
+        favs = JSON.parse(localStorage.getItem('favoriten') || '[]'); 
+    } catch (_) {}
 
     grid.innerHTML = '';
 
@@ -385,125 +428,121 @@ function populateFavorites() {
     emptyState.classList.add('hidden');
 
     favs.forEach(id => {
-        const meta = TOOL_META[id];
-        if (!meta) return;
+        const tool = tools.find(t => t.id === id);
+        if (!tool) return;
+
+        const group = groups.find(g => g.id === tool.group);
+        const icon  = GROUP_ICONS[tool.group] || 'fa-star';
 
         const card = document.createElement('a');
-        card.href  = meta.url;
-        card.className = 'favCard';
-        card.innerHTML = `
-            <i class="fa ${meta.icon} favCardIcon"></i>
-            <div class="favCardTitle">${meta.title}</div>
-            <div class="favCardTag">${meta.tag}</div>
+        card.href       = tool.url;
+        card.className  = 'favCard';
+        card.innerHTML  = `
+            <i class="fa ${icon} favCardIcon"></i>
+            <div class="favCardTitle">${tool.title}</div>
+            <div class="favCardTag">${group?.title ?? ''}</div>
         `;
         grid.appendChild(card);
     });
 }
 
-// ── Delete panel ──────────────────────────────────────────────────────────────
+// =============================================================================
+// KONTO-LÖSCHEN-PANEL
+// =============================================================================
 
 function initDeletePanel() {
-    const input  = document.getElementById('deleteConfirmInput');
-    const btn    = document.getElementById('deleteAccountBtn');
+    const input = document.getElementById('deleteConfirmInput');
+    const btn   = document.getElementById('deleteAccountBtn');
 
     if (!input || !btn) return;
 
     input.addEventListener('input', () => {
-        const ready = input.value === 'LÖSCHEN';
-        btn.disabled = !ready;
+        btn.disabled = input.value !== 'LÖSCHEN';
     });
 
     btn.addEventListener('click', () => {
-        // In a real app: API call to delete account
+        /* * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         * LOCAL STORAGE ZUGRIFF: Kompletten Speicher leeren (Clear)
+         * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         */
         localStorage.clear();
         alert('Konto wurde gelöscht. Du wirst zur Startseite weitergeleitet.');
         window.location.href = '../index.html';
     });
 }
 
-// ── Logout modal ──────────────────────────────────────────────────────────────
+// =============================================================================
+// LOGOUT-MODAL
+// =============================================================================
 
 function initLogoutModal() {
-    const logoutNavBtn   = document.getElementById('logoutNavBtn');
-    const modal          = document.getElementById('logoutModal');
-    const cancelBtn      = document.getElementById('logoutCancelBtn');
-    const confirmBtn     = document.getElementById('logoutConfirmBtn');
+    const logoutNavBtn = document.getElementById('logoutNavBtn');
+    const modal        = document.getElementById('logoutModal');
+    const cancelBtn    = document.getElementById('logoutCancelBtn');
+    const confirmBtn   = document.getElementById('logoutConfirmBtn');
 
     if (!logoutNavBtn || !modal) return;
 
-    logoutNavBtn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-    });
+    logoutNavBtn.addEventListener('click', () => modal.classList.remove('hidden'));
 
-    cancelBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
+    cancelBtn?.addEventListener('click', () => modal.classList.add('hidden'));
 
-    // Close on overlay click or Escape key
-    modal.addEventListener('click', (e) => {
+    // Schließen bei Klick auf das Overlay
+    modal.addEventListener('click', e => {
         if (e.target === modal) modal.classList.add('hidden');
     });
 
-    document.addEventListener('keydown', (e) => {
+    // Schließen mit Escape-Taste
+    document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
             modal.classList.add('hidden');
         }
     });
 
-    confirmBtn.addEventListener('click', () => {
-        // Real logout logic goes here
+    confirmBtn?.addEventListener('click', () => {
+        /* * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         * LOCAL STORAGE ZUGRIFF: Spezifische Login-Daten löschen (Remove Item)
+         * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         */
+        localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('mv-username');
+        localStorage.removeItem('mv-email');
         window.location.href = '../index.html';
     });
 }
 
-logoutNavBtn.addEventListener('click', () => {
-  initLogoutModal();  
-})
-
-// ── Password toggle helper ────────────────────────────────────────────────────
+// =============================================================================
+// PASSWORT-TOGGLES (global für alle Panels)
+// =============================================================================
 
 function initPasswordToggles() {
     document.querySelectorAll('.pwToggle').forEach(btn => {
         btn.addEventListener('click', () => {
-            const targetId = btn.dataset.target;
-            const input    = document.getElementById(targetId);
+            const input = document.getElementById(btn.dataset.target);
             if (!input) return;
             const isHidden = input.type === 'password';
-            input.type     = isHidden ? 'text' : 'password';
-            const icon     = btn.querySelector('i');
-            icon.className = isHidden ? 'fa fa-eye-slash' : 'fa fa-eye';
+            input.type = isHidden ? 'text' : 'password';
+            btn.querySelector('i').className = isHidden ? 'fa fa-eye-slash' : 'fa fa-eye';
         });
     });
 }
 
-// ── Utility helpers ───────────────────────────────────────────────────────────
+// =============================================================================
+// HILFSFUNKTIONEN
+// =============================================================================
 
 function shakeElement(el) {
     if (!el) return;
     el.style.animation = 'none';
-    void el.offsetWidth;
+    void el.offsetWidth; // Reflow → Animation neu starten
     el.style.animation = 'settingsShake 0.35s ease';
     setTimeout(() => { el.style.animation = ''; }, 400);
 }
 
-function showError(el, msg, isSuccess = false) {
-    el.textContent = msg;
-    el.style.color           = isSuccess ? 'var(--accent-live)'  : 'var(--accent-error)';
-    el.style.borderColor     = isSuccess ? 'var(--accent-live)'  : 'rgba(255,42,95,0.3)';
-    el.style.backgroundColor = isSuccess ? 'rgba(0,255,204,0.06)' : 'rgba(255,42,95,0.06)';
+function showFormError(el, msg, isSuccess = false) {
+    el.textContent           = msg;
+    el.style.color           = isSuccess ? 'var(--accent-live)'     : 'var(--accent-error)';
+    el.style.borderColor     = isSuccess ? 'var(--accent-live)'     : 'rgba(255,42,95,0.3)';
+    el.style.backgroundColor = isSuccess ? 'rgba(0,255,204,0.06)'   : 'rgba(255,42,95,0.06)';
     el.classList.remove('hidden');
 }
-
-// Shake animation added to document
-const shakeStyle = document.createElement('style');
-shakeStyle.textContent = `
-    @keyframes settingsShake {
-        0%,100%  { transform: translateX(0); }
-        20%      { transform: translateX(-5px); }
-        40%      { transform: translateX(5px); }
-        60%      { transform: translateX(-3px); }
-        80%      { transform: translateX(3px); }
-    }
-`;
-document.head.appendChild(shakeStyle);

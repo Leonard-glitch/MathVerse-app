@@ -1,16 +1,36 @@
-// ==========================================================================
-// INDEX.JS – Homepage Logic
-// Tool-Daten kommen aus toolsCollection.js – hier nichts mehr eintragen!
-// ==========================================================================
+
+function isUserLoggedIn() {
+    // Prüft, ob das Flag gesetzt ist UND ob ein gültiger User existiert
+    return localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('currentUser') !== null;
+}
+function saveUserData() {
+    if (isUserLoggedIn()) {
+        let currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+        // Daten im Objekt aktualisieren
+        currentUser.favoriten = favoriten;
+        currentUser.containerOrders = containerOrders;
+        currentUser.pinnedGroupes = pinnedGroups; // Gleicher Typo wie im Register-Skript ("pinnedGroupes")
+        // Zurück in den LocalStorage schreiben
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    } else {
+        // Fallback für nicht eingeloggte User (falls die überhaupt speichern dürfen)
+        localStorage.setItem("favoriten", JSON.stringify(favoriten));
+        localStorage.setItem("containerOrders", JSON.stringify(containerOrders));
+        localStorage.setItem("pinnedGroups", JSON.stringify(pinnedGroups));
+    }
+}
+
+   localStorage.removeItem(""); //NUR ZUM TESTEN, BITTE ENTFERNEN! Setzt den Login-Status zurück
+
+
 import { tools, groups } from './toolsCollection.js';
 
-// ==========================================================================
-// 1. STATE MANAGEMENT & INITIALIZATION
-// ==========================================================================
+// 1. Hol dir den aktuellen User, falls vorhanden
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-let favoriten       = JSON.parse(localStorage.getItem("favoriten"))       || [];
-let containerOrders = JSON.parse(localStorage.getItem("containerOrders")) || {};
-let pinnedGroups    = JSON.parse(localStorage.getItem("pinnedGroups"))    || [];
+let favoriten       = isUserLoggedIn() ? (currentUser.favoriten || [])       : (JSON.parse(localStorage.getItem("favoriten")) || []);
+let containerOrders = isUserLoggedIn() ? (currentUser.containerOrders || {}) : (JSON.parse(localStorage.getItem("containerOrders")) || {});
+let pinnedGroups    = isUserLoggedIn() ? (currentUser.pinnedGroupes || [])   : (JSON.parse(localStorage.getItem("pinnedGroups")) || []);
 
 const groupsContainer = document.getElementById("groupsContainer");
 
@@ -99,6 +119,16 @@ function createCardElement(tool, isAllToolsView = false) {
     // ── Herz-Klick ──────────────────────────────────────────────────────────
     const heart = card.querySelector(".favorite");
     heart.addEventListener("click", function (event) {
+        // 1. Checken, ob der User NICHT eingeloggt ist
+    if (!isUserLoggedIn()) {
+        // Verhindert das Standardverhalten, falls nötig
+        event.preventDefault(); 
+        // Nutzer warnen / anreizen sich einzuloggen
+        alert('Du musst eingeloggt sein, um Favoriten zu speichern!');
+        // Optional: Direkt zum Login weiterleiten
+        // window.location.href = 'login.html'; 
+        return; // bricht die Funktion hier ab! Die Logik darunter wird NICHT ausgeführt.
+    }
         event.preventDefault();
         event.stopPropagation();
         handleHeartClick(tool.id);
@@ -190,7 +220,6 @@ function handleHeartClick(toolId) {
     const allToolsContainer = document.getElementById("allToolsContainer");
     if (allToolsContainer) affectedContainers.add(allToolsContainer);
 
-    localStorage.setItem("favoriten", JSON.stringify(favoriten));
 
     syncHeartIcons(toolId, !wasActive);
 
@@ -200,8 +229,8 @@ function handleHeartClick(toolId) {
             container.querySelectorAll(".card")
         ).map(c => c.dataset.id);
     });
-    localStorage.setItem("containerOrders", JSON.stringify(containerOrders));
     applyCollapsibleLogic();
+    saveUserData();
 }
 
 function syncHeartIcons(toolId, isActive) {
@@ -253,6 +282,16 @@ function sortContainer(container) {
 // ==========================================================================
 
 function handleGroupStarClick(event, groupId) {
+        // 1. Checken, ob der User NICHT eingeloggt ist
+    if (!isUserLoggedIn()) {
+        // Verhindert das Standardverhalten, falls nötig
+        event.preventDefault(); 
+        // Nutzer warnen / anreizen sich einzuloggen
+        alert('Du musst eingeloggt sein, um Gruppen zu bearbeiten!');
+        // Optional: Direkt zum Login weiterleiten
+        // window.location.href = 'login.html'; 
+        return; // bricht die Funktion hier ab! Die Logik darunter wird NICHT ausgeführt.
+    }
     event.preventDefault();
     if (groupId === "favoritenGroupStar") return;
 
@@ -267,7 +306,7 @@ function handleGroupStarClick(event, groupId) {
         pinnedGroups = pinnedGroups.filter(id => id !== groupId);
     }
 
-    localStorage.setItem("pinnedGroups", JSON.stringify(pinnedGroups));
+    saveUserData();
     sortGroupsByPins();
 }
 

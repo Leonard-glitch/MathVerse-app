@@ -156,7 +156,7 @@
                     </div>
                 </div>
 
-                <!-- Success toast placeholder -->
+                <!-- Success toast -->
                 <div class="toastMessage hidden" id="accountToast">
                     <i class="fa fa-check-circle"></i>
                     <span>Gespeichert!</span>
@@ -191,7 +191,6 @@
                             <input type="password" id="sec-new-pw" class="settingsInput" placeholder="••••••••">
                             <button type="button" class="pwToggle" data-target="sec-new-pw"><i class="fa fa-eye"></i></button>
                         </div>
-                        <!-- Strength bar -->
                         <div class="strengthBar" id="sec-strengthBar">
                             <div class="strengthFill" id="sec-strengthFill"></div>
                         </div>
@@ -213,7 +212,7 @@
                     </div>
                 </div>
 
-                <!-- 2FA teaser -->
+                <!-- 2FA Teaser -->
                 <div class="settingsCard settingsCard--dimmed">
                     <div class="teaserRow">
                         <div>
@@ -243,43 +242,37 @@
 
                     <div class="colorGrid" id="colorGrid">
                         <button class="colorSwatch active" data-theme="violet"
-                            style="--swatch: #8a16ff;"
-                            title="Neon Violett (Standard)">
+                            style="--swatch: #8a16ff;" title="Neon Violett (Standard)">
                             <div class="swatchCircle"></div>
                             <span class="swatchLabel">Violett</span>
                             <i class="fa fa-check swatchCheck"></i>
                         </button>
                         <button class="colorSwatch" data-theme="cyan"
-                            style="--swatch: #00ffcc;"
-                            title="Cyber Cyan">
+                            style="--swatch: #00ffcc;" title="Cyber Cyan">
                             <div class="swatchCircle"></div>
                             <span class="swatchLabel">Cyan</span>
                             <i class="fa fa-check swatchCheck"></i>
                         </button>
                         <button class="colorSwatch" data-theme="blue"
-                            style="--swatch: #1e90ff;"
-                            title="Electric Blue">
+                            style="--swatch: #1e90ff;" title="Electric Blue">
                             <div class="swatchCircle"></div>
                             <span class="swatchLabel">Blau</span>
                             <i class="fa fa-check swatchCheck"></i>
                         </button>
                         <button class="colorSwatch" data-theme="pink"
-                            style="--swatch: #ff2d78;"
-                            title="Neon Pink">
+                            style="--swatch: #ff2d78;" title="Neon Pink">
                             <div class="swatchCircle"></div>
                             <span class="swatchLabel">Pink</span>
                             <i class="fa fa-check swatchCheck"></i>
                         </button>
                         <button class="colorSwatch" data-theme="orange"
-                            style="--swatch: #ff6a00;"
-                            title="Solar Orange">
+                            style="--swatch: #ff6a00;" title="Solar Orange">
                             <div class="swatchCircle"></div>
                             <span class="swatchLabel">Orange</span>
                             <i class="fa fa-check swatchCheck"></i>
                         </button>
                         <button class="colorSwatch" data-theme="gold"
-                            style="--swatch: #f5c518;"
-                            title="Gold">
+                            style="--swatch: #f5c518;" title="Gold">
                             <div class="swatchCircle"></div>
                             <span class="swatchLabel">Gold</span>
                             <i class="fa fa-check swatchCheck"></i>
@@ -345,7 +338,7 @@
                 </div>
 
                 <div class="favoritesGrid" id="favoritesGrid">
-                    <!-- Dynamisch befüllt via JS -->
+                    <!-- Dynamisch befüllt via JS aus toolsCollection.js -->
                 </div>
 
                 <div class="emptyState hidden" id="favEmptyState">
@@ -408,6 +401,7 @@
         </div>
     </div>
 
-    <script src="../javaScript/userArea.js"></script>
+    <!-- userArea.js als ES-Modul laden (ermöglicht import aus toolsCollection.js) -->
+    <script type="module" src="../javaScript/userArea.js"></script>
 </body>
 </html>

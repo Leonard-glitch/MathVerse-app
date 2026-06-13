@@ -1,8 +1,10 @@
-
-let userName=null;
+let currentUser;
+let userName;
 if (localStorage.getItem('isLoggedIn') === 'true') {
-    
-    userName = localStorage.getItem('mv-username');
+    console.log("User is logged in");
+   currentUser =
+    JSON.parse(localStorage.getItem("currentUser"));
+    userName=currentUser.username;
 }
 
 //Change from Login/Register to User Area if user is logged in
