@@ -94,16 +94,13 @@ passwordInput.addEventListener('input', () => {
 // ===========================================================================
 
 form.addEventListener('submit', (e) => {
-    // Verhindert das Neuladen/Abschicken der Seite an den (noch) nicht existierenden Server
     e.preventDefault();
 
-    // Alle alten Meldungen zurücksetzen
     hideMsg(usernameError);
     hideMsg(formError);
 
     let valid = true;
 
-    // Benutzername / E-Mail Validierung
     if (!usernameInput.value.trim()) {
         setError(usernameInput, usernameError, 'Bitte gib deinen Benutzernamen oder deine E-Mail-Adresse ein.');
         valid = false;
@@ -111,7 +108,6 @@ form.addEventListener('submit', (e) => {
         setValid(usernameInput, usernameError);
     }
 
-    // Passwort Validierung
     if (!passwordInput.value) {
         setError(passwordInput, formError, 'Bitte gib dein Passwort ein.');
         valid = false;
@@ -119,17 +115,35 @@ form.addEventListener('submit', (e) => {
         setValid(passwordInput, formError);
     }
 
-    // WENN ALLES PASST:
     if (valid) {
-        // 1. Daten im LocalStorage speichern
+        const uname = usernameInput.value.trim();
+
+        // Gibt es auf diesem Gerät schon einen passenden currentUser
+        // (z.B. von einer früheren Registrierung)? Dann diesen wieder
+        // einloggen, damit Favoriten/Theme/etc. erhalten bleiben.
+        const existing = window.MV.getCurrentUser();
+        const matches  = existing && (
+            existing.username?.toLowerCase() === uname.toLowerCase() ||
+            existing.email?.toLowerCase()    === uname.toLowerCase()
+        );
+
+        if (!matches) {
+            window.MV.saveCurrentUser({
+                username: uname,
+                email: existing?.email || '',
+                favoriten: [],
+                pinnedGroups: [],
+                containerOrders: {},
+                theme: 'violet',
+                fontsize: 20,
+                isPro: false
+            });
+        }
+
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('mv-username', usernameInput.value.trim()); // Optional: Benutzernamen für später merken
 
-        console.log('Login erfolgreich! Daten im LocalStorage gespeichert.');
-
-        // 2. Weiterleitung zur Startseite (Szenario 1 / Standard)
-        // Passe den Pfad an, falls deine index.html woanders liegt
-        window.location.href = '../index.html'; 
+        console.log('Login erfolgreich!');
+        window.location.href = '../index.html';
     }
 });
 

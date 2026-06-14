@@ -1,43 +1,307 @@
-let currentUser;
-let userName;
-if (localStorage.getItem('isLoggedIn') === 'true') {
-    console.log("User is logged in");
-   currentUser =
-    JSON.parse(localStorage.getItem("currentUser"));
-    userName=currentUser.username;
-}
+/**
+ * common-login.js – MathVerse zentrale User-Daten- & Login-Logik
+ *
+ * Stellt window.MV bereit – die EINZIGE Stelle, an der mit
+ * localStorage("currentUser" / "isLoggedIn") gearbeitet wird.
+ * Wird als normales <script> geladen (kein type="module"), damit
+ * auch Module (index.js, userArea.js, toolFavorite.js, ...) per
+ * window.MV darauf zugreifen können.
+ */
 
-//Change from Login/Register to User Area if user is logged in
+localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen!
+(function () {
 
-const navUserArea=document.getElementById("navUserArea");
+    // ==========================================================================
+    // THEMES – zentral, damit überall (Navbar, Tools, UserArea) anwendbar
+    // ==========================================================================
+    const THEMES = {
+        violet: { '--border-glow': '#8a16ff', '--accent-color': '#8a16ff', '--accent-hover': '#a142ff', '--glow-soft': 'rgba(138, 22, 255, 0.25)', '--glow-hard': 'rgba(138, 22, 255, 0.4)', '--border-accent': '#8a16ff' },
+        cyan:   { '--border-glow': '#00e5b5', '--accent-color': '#00e5b5', '--accent-hover': '#00ffcc', '--glow-soft': 'rgba(0, 229, 181, 0.25)', '--glow-hard': 'rgba(0, 229, 181, 0.4)', '--border-accent': '#00e5b5' },
+        blue:   { '--border-glow': '#1e90ff', '--accent-color': '#1e90ff', '--accent-hover': '#4dabff', '--glow-soft': 'rgba(30, 144, 255, 0.25)', '--glow-hard': 'rgba(30, 144, 255, 0.4)', '--border-accent': '#1e90ff' },
+        pink:   { '--border-glow': '#ff2d78', '--accent-color': '#ff2d78', '--accent-hover': '#ff5e97', '--glow-soft': 'rgba(255, 45, 120, 0.25)', '--glow-hard': 'rgba(255, 45, 120, 0.4)', '--border-accent': '#ff2d78' },
+        orange: { '--border-glow': '#ff6a00', '--accent-color': '#ff6a00', '--accent-hover': '#ff8c33', '--glow-soft': 'rgba(255, 106, 0, 0.25)', '--glow-hard': 'rgba(255, 106, 0, 0.4)', '--border-accent': '#ff6a00' },
+        gold:   { '--border-glow': '#f5c518', '--accent-color': '#f5c518', '--accent-hover': '#f7d04e', '--glow-soft': 'rgba(245, 197, 24, 0.25)', '--glow-hard': 'rgba(245, 197, 24, 0.4)', '--border-accent': '#f5c518' },
+    };
 
-function changeNavUserArea(){
+    // Schema für currentUser – einzige Quelle der Wahrheit
+    const DEFAULT_USER = () => ({
+        username: 'Gast',
+        email: '',
+        favoriten: [],
+        pinnedGroups: [],
+        containerOrders: {},
+        theme: 'violet',
+        fontsize: 20,
+        isPro: false
+    });
 
-    const safeName = userName;
+    // ==========================================================================
+    // CORE STORAGE HELPERS
+    // ==========================================================================
+    function isLoggedIn() {
+        return localStorage.getItem('isLoggedIn') === 'true' && !!localStorage.getItem('currentUser');
+    }
 
-    const userAccount = document.createElement("a");
-    userAccount.href = "/MathVerse-app/html/userArea.html";
-    userAccount.target = "_self";
-    userAccount.classList.add("userAccount");
-    
-    // Namenskürzung (Nutzt jetzt den safeName)
-    const displayName = safeName.length > 10
-        ? safeName.substring(0, 10) + "..."
-        : safeName;
+    function getCurrentUser() {
+        try {
+            const u = JSON.parse(localStorage.getItem('currentUser'));
+            return u ? { ...DEFAULT_USER(), ...u } : null;
+        } catch {
+            return null;
+        }
+    }
 
-    userAccount.innerHTML = `
-        <span class="userName">${displayName}</span>
-        <i class="fa fa-cog settings-icon"></i>
-    `;
+    function saveCurrentUser(user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+    }
 
-    // 1. Container leeren
-    navUserArea.innerHTML = "";
-    
-    // 2. Das echte Element-Objekt hinzufügen
-    navUserArea.appendChild(userAccount);
-}
+    function updateCurrentUser(patch) {
+        const user = getCurrentUser() || DEFAULT_USER();
+        const updated = { ...user, ...patch };
+        saveCurrentUser(updated);
+        return updated;
+    }
 
-// 3. Nur ausführen, wenn der User eingeloggt ist UND wir das Navigations-Element auf der Seite finden
-if (localStorage.getItem('isLoggedIn') === 'true' && navUserArea) {
-    changeNavUserArea(); 
-}
+    function logout() {
+        // currentUser bleibt erhalten -> beim nächsten Login sind
+        // Favoriten/Theme/etc. wieder da. Nur der Login-Status fällt weg.
+        localStorage.removeItem('isLoggedIn');
+    }
+
+    // ==========================================================================
+    // FAVORITEN / GRUPPEN-PINS / CONTAINER-REIHENFOLGE
+    // -> nur verfügbar, wenn eingeloggt (siehe Punkt 1 der Anfrage)
+    // ==========================================================================
+    function getFavorites() {
+        const u = getCurrentUser();
+        return (isLoggedIn() && u) ? (u.favoriten || []) : [];
+    }
+    function setFavorites(arr) {
+        if (!isLoggedIn()) return;
+        updateCurrentUser({ favoriten: arr });
+    }
+    function toggleFavorite(id) {
+        if (!isLoggedIn()) return false;
+        const favs = getFavorites();
+        const isFav = favs.includes(id);
+        const updated = isFav ? favs.filter(f => f !== id) : [...favs, id];
+        setFavorites(updated);
+        return !isFav;
+    }
+
+    function getPinnedGroups() {
+        const u = getCurrentUser();
+        return (isLoggedIn() && u) ? (u.pinnedGroups || []) : [];
+    }
+    function setPinnedGroups(arr) {
+        if (!isLoggedIn()) return;
+        updateCurrentUser({ pinnedGroups: arr });
+    }
+
+    function getContainerOrders() {
+        const u = getCurrentUser();
+        return (isLoggedIn() && u) ? (u.containerOrders || {}) : {};
+    }
+    function setContainerOrders(obj) {
+        if (!isLoggedIn()) return;
+        updateCurrentUser({ containerOrders: obj });
+    }
+
+    // ==========================================================================
+    // THEME & SCHRIFTGRÖSSE
+    // Eingeloggt -> Teil von currentUser. Nicht eingeloggt -> lokale
+    // Geräte-Einstellung (eigener Key), damit es trotzdem funktioniert.
+    // ==========================================================================
+    function getTheme() {
+        const u = getCurrentUser();
+        if (isLoggedIn() && u && u.theme) return u.theme;
+        return localStorage.getItem('mv-theme') || 'violet';
+    }
+    function setTheme(theme) {
+        if (isLoggedIn()) {
+            updateCurrentUser({ theme });
+        } else {
+            localStorage.setItem('mv-theme', theme);
+        }
+    }
+    function getFontSize() {
+        const u = getCurrentUser();
+        if (isLoggedIn() && u && u.fontsize) return parseInt(u.fontsize, 10);
+        return parseInt(localStorage.getItem('mv-fontsize') || '20', 10);
+    }
+    function setFontSize(size) {
+        if (isLoggedIn()) {
+            updateCurrentUser({ fontsize: size });
+        } else {
+            localStorage.setItem('mv-fontsize', String(size));
+        }
+    }
+    function applyTheme(themeName) {
+        const vars = THEMES[themeName] || THEMES.violet;
+        Object.entries(vars).forEach(([key, val]) =>
+            document.documentElement.style.setProperty(key, val)
+        );
+    }
+    function applyFontSize(size) {
+        document.documentElement.style.fontSize = `${size}px`;
+    }
+
+    // ==========================================================================
+    // PASSWORT-STÄRKE (zentral – wird von register.js & userArea.js genutzt)
+    //
+    // Wichtig: Lange, vom Browser/Passwortmanager generierte Passwörter
+    // (z.B. 16 Zeichen, Groß/Klein/Zahlen, aber OFT OHNE Sonderzeichen)
+    // sollen trotzdem als "Stark" gelten -> Länge wird stärker gewichtet
+    // und mit Math.ceil statt Math.round gerundet.
+    // ==========================================================================
+    function getPasswordStrength(pw) {
+        if (!pw) return 0;
+        let score = 0;
+        if (pw.length >= 8)  score++;
+        if (pw.length >= 12) score++;
+        if (pw.length >= 16) score++;
+        if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        return Math.min(4, Math.max(1, Math.ceil(score / 1.5)));
+    }
+
+    // ==========================================================================
+    // LOGIN-PROMPT MODAL (ersetzt die alert()-Aufrufe)
+    // ==========================================================================
+    let modalReady = false;
+
+    function injectModal() {
+        if (modalReady) return;
+        modalReady = true;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .mv-modalOverlay {
+                position: fixed; inset: 0;
+                background: rgba(9, 9, 14, 0.85);
+                backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+                display: flex; align-items: center; justify-content: center;
+                z-index: 9999; animation: mvFadeIn 0.15s ease;
+            }
+            .mv-modalBox {
+                background: var(--bg-surface);
+                border: 1px solid var(--border-glow);
+                border-radius: var(--radius-md);
+                padding: 2rem; max-width: 380px; width: 90%;
+                box-shadow: 0 0 40px var(--glow-soft), var(--shadow-main);
+                animation: mvScaleIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                text-align: center;
+            }
+            .mv-modalTitle { font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.6rem; }
+            .mv-modalText { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.5; }
+            .mv-modalActions { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; }
+            .mv-modalActions a, .mv-modalActions button {
+                font-family: var(--font-main);
+                border-radius: var(--radius-sm);
+                padding: 0.55rem 1.2rem;
+                font-size: 0.78rem; font-weight: 700;
+                cursor: pointer; text-decoration: none;
+                transition: all var(--transition-fast);
+                border: 1px solid var(--border-color);
+            }
+            .mv-modalBtnPrimary { background-color: var(--border-glow); color: #fff; border: none; }
+            .mv-modalBtnPrimary:hover { background-color: var(--accent-hover); box-shadow: 0 0 20px var(--glow-soft); }
+            .mv-modalBtnSecondary { background: transparent; color: var(--text-secondary); }
+            .mv-modalBtnSecondary:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+            @keyframes mvFadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes mvScaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        `;
+        document.head.appendChild(style);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'mv-modalOverlay';
+        overlay.id = 'mvLoginPromptModal';
+        overlay.style.display = 'none';
+        overlay.innerHTML = `
+            <div class="mv-modalBox">
+                <h2 class="mv-modalTitle">Anmeldung erforderlich</h2>
+                <p class="mv-modalText" id="mvLoginPromptText">Melde dich an, um diese Funktion zu nutzen.</p>
+                <div class="mv-modalActions">
+                    <button class="mv-modalBtnSecondary" id="mvLoginPromptCancel">Abbrechen</button>
+                    <a class="mv-modalBtnPrimary" href="/MathVerse-app/html/login.html">Anmelden</a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', e => { if (e.target === overlay) hideLoginPrompt(); });
+        overlay.querySelector('#mvLoginPromptCancel').addEventListener('click', hideLoginPrompt);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') hideLoginPrompt();
+        });
+    }
+
+    function hideLoginPrompt() {
+        const overlay = document.getElementById('mvLoginPromptModal');
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    function showLoginPrompt(message) {
+        injectModal();
+        const overlay = document.getElementById('mvLoginPromptModal');
+        const text = document.getElementById('mvLoginPromptText');
+        if (message) text.textContent = message;
+        overlay.style.display = 'flex';
+    }
+
+    // ==========================================================================
+    // PUBLIC API
+    // ==========================================================================
+    window.MV = {
+        THEMES,
+        isLoggedIn,
+        getCurrentUser,
+        saveCurrentUser,
+        updateCurrentUser,
+        logout,
+        getFavorites, setFavorites, toggleFavorite,
+        getPinnedGroups, setPinnedGroups,
+        getContainerOrders, setContainerOrders,
+        getTheme, setTheme, getFontSize, setFontSize,
+        applyTheme, applyFontSize,
+        getPasswordStrength,
+        showLoginPrompt, hideLoginPrompt,
+        getUsername: () => (getCurrentUser()?.username) || 'Gast',
+        getEmail: () => (getCurrentUser()?.email) || ''
+    };
+
+    // ==========================================================================
+    // THEME & FONTSIZE GLOBAL ANWENDEN (auf jeder Seite, sofort)
+    // ==========================================================================
+    applyTheme(getTheme());
+    applyFontSize(getFontSize());
+
+    // ==========================================================================
+    // NAVBAR: Login/Register -> Useraccount-Link, wenn eingeloggt
+    // ==========================================================================
+    const navUserArea = document.getElementById('navUserArea');
+
+    function changeNavUserArea() {
+        if (!navUserArea) return;
+        const name = window.MV.getUsername();
+        const displayName = name.length > 10 ? name.substring(0, 10) + '...' : name;
+
+        const userAccount = document.createElement('a');
+        userAccount.href = '/MathVerse-app/html/userArea.html';
+        userAccount.target = '_self';
+        userAccount.classList.add('userAccount');
+        userAccount.innerHTML = `
+            <span class="userName">${displayName}</span>
+            <i class="fa fa-cog settings-icon"></i>
+        `;
+
+        navUserArea.innerHTML = '';
+        navUserArea.appendChild(userAccount);
+    }
+
+    if (isLoggedIn() && navUserArea) {
+        changeNavUserArea();
+    }
+
+})();

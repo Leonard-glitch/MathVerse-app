@@ -1,36 +1,4 @@
-
-function isUserLoggedIn() {
-    // Prüft, ob das Flag gesetzt ist UND ob ein gültiger User existiert
-    return localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('currentUser') !== null;
-}
-function saveUserData() {
-    if (isUserLoggedIn()) {
-        let currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
-        // Daten im Objekt aktualisieren
-        currentUser.favoriten = favoriten;
-        currentUser.containerOrders = containerOrders;
-        currentUser.pinnedGroupes = pinnedGroups; // Gleicher Typo wie im Register-Skript ("pinnedGroupes")
-        // Zurück in den LocalStorage schreiben
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
-    } else {
-        // Fallback für nicht eingeloggte User (falls die überhaupt speichern dürfen)
-        localStorage.setItem("favoriten", JSON.stringify(favoriten));
-        localStorage.setItem("containerOrders", JSON.stringify(containerOrders));
-        localStorage.setItem("pinnedGroups", JSON.stringify(pinnedGroups));
-    }
-}
-
-   localStorage.removeItem(""); //NUR ZUM TESTEN, BITTE ENTFERNEN! Setzt den Login-Status zurück
-
-
 import { tools, groups } from './toolsCollection.js';
-
-// 1. Hol dir den aktuellen User, falls vorhanden
-let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-let favoriten       = isUserLoggedIn() ? (currentUser.favoriten || [])       : (JSON.parse(localStorage.getItem("favoriten")) || []);
-let containerOrders = isUserLoggedIn() ? (currentUser.containerOrders || {}) : (JSON.parse(localStorage.getItem("containerOrders")) || {});
-let pinnedGroups    = isUserLoggedIn() ? (currentUser.pinnedGroupes || [])   : (JSON.parse(localStorage.getItem("pinnedGroups")) || []);
 
 const groupsContainer = document.getElementById("groupsContainer");
 
@@ -68,6 +36,7 @@ function createGroupDOM(group, groupDataId) {
     cardTitleDiv.className = "cardTitleDiv";
 
     const starIcon = document.createElement("i");
+    const pinnedGroups = window.MV.getPinnedGroups();
     if (pinnedGroups.includes(groupDataId) || groupDataId === "favoritenGroupStar") {
         starIcon.className = "fa fa-star star active";
     } else {
@@ -94,17 +63,16 @@ function createGroupDOM(group, groupDataId) {
 
 // ==========================================================================
 // 3. CARD ENGINE
-// Einziger Ort, der das Card-HTML generiert – image.big und url aus toolsCollection
 // ==========================================================================
 
 function createCardElement(tool, isAllToolsView = false) {
     const card = document.createElement("a");
-    card.href = tool.url;                   // ← kommt aus toolsCollection.url
+    card.href = tool.url;
     card.className = "card";
     card.dataset.id = tool.id;
     card.dataset.view = isAllToolsView ? "all" : "category";
 
-    const isFav = favoriten.includes(tool.id);
+    const isFav = window.MV.getFavorites().includes(tool.id);
     const heartClass = isFav ? "fa-heart active" : "fa-heart-o";
 
     card.innerHTML = `
@@ -119,18 +87,14 @@ function createCardElement(tool, isAllToolsView = false) {
     // ── Herz-Klick ──────────────────────────────────────────────────────────
     const heart = card.querySelector(".favorite");
     heart.addEventListener("click", function (event) {
-        // 1. Checken, ob der User NICHT eingeloggt ist
-    if (!isUserLoggedIn()) {
-        // Verhindert das Standardverhalten, falls nötig
-        event.preventDefault(); 
-        // Nutzer warnen / anreizen sich einzuloggen
-        alert('Du musst eingeloggt sein, um Favoriten zu speichern!');
-        // Optional: Direkt zum Login weiterleiten
-        // window.location.href = 'login.html'; 
-        return; // bricht die Funktion hier ab! Die Logik darunter wird NICHT ausgeführt.
-    }
         event.preventDefault();
         event.stopPropagation();
+
+        if (!window.MV.isLoggedIn()) {
+            window.MV.showLoginPrompt("Melde dich an, um Tools als Favorit zu speichern.");
+            return;
+        }
+
         handleHeartClick(tool.id);
     });
 
@@ -170,6 +134,7 @@ function createCardElement(tool, isAllToolsView = false) {
 function buildAndDistributeCards() {
     const favContainer      = document.getElementById("favoritenContainer");
     const allToolsContainer = document.getElementById("allToolsContainer");
+    const favoriten         = window.MV.getFavorites();
 
     tools.forEach(tool => {
         const catCard = createCardElement(tool, false);
@@ -194,19 +159,17 @@ function buildAndDistributeCards() {
 // ==========================================================================
 
 function handleHeartClick(toolId) {
-    const wasActive         = favoriten.includes(toolId);
-    const favContainer      = document.getElementById("favoritenContainer");
-    const catCard           = document.querySelector(`.card[data-id="${toolId}"][data-view="category"]`);
-    let affectedContainers  = new Set();
+    const isNowFav     = window.MV.toggleFavorite(toolId);
+    const favContainer = document.getElementById("favoritenContainer");
+    const catCard      = document.querySelector(`.card[data-id="${toolId}"][data-view="category"]`);
+    let affectedContainers = new Set();
 
-    if (!wasActive) {
-        favoriten.push(toolId);
+    if (isNowFav) {
         if (catCard && favContainer) {
             favContainer.appendChild(catCard);
             affectedContainers.add(favContainer);
         }
     } else {
-        favoriten = favoriten.filter(id => id !== toolId);
         if (catCard && catCard.dataset.originalContainer) {
             const origContainer = document.getElementById(catCard.dataset.originalContainer);
             if (origContainer) {
@@ -220,17 +183,18 @@ function handleHeartClick(toolId) {
     const allToolsContainer = document.getElementById("allToolsContainer");
     if (allToolsContainer) affectedContainers.add(allToolsContainer);
 
+    syncHeartIcons(toolId, isNowFav);
 
-    syncHeartIcons(toolId, !wasActive);
-
+    const containerOrders = window.MV.getContainerOrders();
     affectedContainers.forEach(container => {
         sortContainer(container);
         containerOrders[container.id] = Array.from(
             container.querySelectorAll(".card")
         ).map(c => c.dataset.id);
     });
+    window.MV.setContainerOrders(containerOrders);
+
     applyCollapsibleLogic();
-    saveUserData();
 }
 
 function syncHeartIcons(toolId, isActive) {
@@ -245,8 +209,9 @@ function syncHeartIcons(toolId, isActive) {
 
 function sortContainer(container) {
     const containerId = container.id;
+    const favoriten   = window.MV.getFavorites();
+    const savedOrder  = window.MV.getContainerOrders()[containerId];
     const cards       = Array.from(container.querySelectorAll(".card"));
-    const savedOrder  = containerOrders[containerId];
 
     cards.sort((a, b) => {
         const idA = a.dataset.id;
@@ -282,21 +247,18 @@ function sortContainer(container) {
 // ==========================================================================
 
 function handleGroupStarClick(event, groupId) {
-        // 1. Checken, ob der User NICHT eingeloggt ist
-    if (!isUserLoggedIn()) {
-        // Verhindert das Standardverhalten, falls nötig
-        event.preventDefault(); 
-        // Nutzer warnen / anreizen sich einzuloggen
-        alert('Du musst eingeloggt sein, um Gruppen zu bearbeiten!');
-        // Optional: Direkt zum Login weiterleiten
-        // window.location.href = 'login.html'; 
-        return; // bricht die Funktion hier ab! Die Logik darunter wird NICHT ausgeführt.
-    }
     event.preventDefault();
+
+    if (!window.MV.isLoggedIn()) {
+        window.MV.showLoginPrompt("Melde dich an, um Gruppen anzupinnen.");
+        return;
+    }
+
     if (groupId === "favoritenGroupStar") return;
 
     const star      = event.currentTarget;
     const wasActive = star.classList.contains("active");
+    let pinnedGroups = window.MV.getPinnedGroups();
 
     if (!wasActive) {
         star.className = "fa fa-star star active";
@@ -306,13 +268,14 @@ function handleGroupStarClick(event, groupId) {
         pinnedGroups = pinnedGroups.filter(id => id !== groupId);
     }
 
-    saveUserData();
+    window.MV.setPinnedGroups(pinnedGroups);
     sortGroupsByPins();
 }
 
 function sortGroupsByPins() {
-    const allGroups   = Array.from(groupsContainer.querySelectorAll(".restFuncionsDiv"));
-    const nativeOrder = ["favoriten", ...groups.map(g => g.id), "allTools"];
+    const allGroups    = Array.from(groupsContainer.querySelectorAll(".restFuncionsDiv"));
+    const nativeOrder  = ["favoriten", ...groups.map(g => g.id), "allTools"];
+    const pinnedGroups = window.MV.getPinnedGroups();
 
     allGroups.sort((a, b) => {
         const idA = a.dataset.id;
@@ -500,9 +463,14 @@ function positionGlobalTooltip(tooltip, infoIcon) {
 // ==========================================================================
 
 window.addEventListener("storage", (e) => {
-    if (e.key !== "favoriten") return;
-    favoriten = JSON.parse(e.newValue || "[]");
+    if (e.key !== "currentUser" && e.key !== "isLoggedIn") return;
+
+    const favoriten = window.MV.getFavorites();
     tools.forEach(tool => {
         syncHeartIcons(tool.id, favoriten.includes(tool.id));
     });
+
+    // Bei Logout/Login in einem anderen Tab gleich neu aufbauen,
+    // da Favoriten/Pins komplett anders aussehen können.
+    initMathVerse();
 });

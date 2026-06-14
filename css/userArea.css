@@ -256,6 +256,13 @@ body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
+
+@keyframes settingsAutoFillStart { from {} to {} }
+
+.settingsInput:-webkit-autofill {
+    animation-name: settingsAutoFillStart;
+    animation-duration: 0.001s;
+}
 /* ── Panel header ────────────────────────────────────────────────────────── */
 
 .panelHeader {

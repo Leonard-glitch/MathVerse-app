@@ -154,25 +154,6 @@ function validatePasswordConf(silent = false) {
 // PASSWORT-STÄRKE INDIKATOR
 // ===========================================================================
 
-const STRENGTH_LEVELS = [
-    { min: 0,  label: '',        strength: 0 },
-    { min: 1,  label: 'Schwach', strength: 1 },
-    { min: 6,  label: 'Ok',      strength: 2 },
-    { min: 10, label: 'Gut',     strength: 3 },
-    { min: 14, label: 'Stark',   strength: 4 },
-];
-
-function getStrength(pw) {
-    if (!pw) return 0;
-    let score = 0;
-    if (pw.length >= 6)  score++;
-    if (pw.length >= 10) score++;
-    if (pw.length >= 14) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    return Math.min(4, Math.max(1, Math.round(score / 1.5)));
-}
 
 function updateStrengthBar(pw) {
     if (!strengthWrapper) return;
@@ -183,7 +164,7 @@ function updateStrengthBar(pw) {
     }
 
     strengthWrapper.style.display = 'flex';
-    const lvl = getStrength(pw);
+    const lvl = window.MV.getPasswordStrength(pw);
     strengthWrapper.dataset.strength = lvl;
 
     const labels = ['', 'Schwach', 'Ok', 'Gut', 'Stark'];
@@ -241,6 +222,23 @@ passwordInput.addEventListener('input', () => {
             hideMsg(formError);
         } else {
             passwordConfInput.classList.remove('is-valid');
+        }
+    }
+});
+
+// Erkennt, wenn der Browser/Passwortmanager (z.B. "Starkes Passwort
+// vorschlagen") das Feld automatisch befüllt – dafür triggert :-webkit-autofill
+// in register.css eine CSS-Animation, die wir hier abfangen.
+passwordInput.addEventListener('animationstart', (e) => {
+    if (e.animationName === 'onAutoFillStart') {
+        updateStrengthBar(passwordInput.value);
+        if (passwordConfInput.value) {
+            // Bestätigungsfeld ggf. mit-validieren, falls auch befüllt
+            if (passwordInput.value === passwordConfInput.value) {
+                setValid(passwordInput);
+                setValid(passwordConfInput);
+                hideMsg(formError);
+            }
         }
     }
 });
@@ -360,22 +358,18 @@ form.addEventListener('submit', (e) => {
         }
     } else {
         // WENN ALLES PASST: User lokal registrieren und direkt einloggen
-        localStorage.setItem('isLoggedIn', 'true');
-        
-        // Wichtig: 'username' exakt so benennen wie im Login-Skript und Nav-Skript!
-        const user = {
+        window.MV.saveCurrentUser({
             username: uname,
             email: emailInput.value.trim(),
             favoriten: [],
-            pinnedGroupes: [],
+            pinnedGroups: [],
             containerOrders: {},
-            theme: "purple",
-            fontsize: "20",
+            theme: 'violet',
+            fontsize: 20,
             isPro: false
-        };  //Später wird advanced Mode aktiv? dann von LocalStorage nach Datenbank übertragen
+        });
+        localStorage.setItem('isLoggedIn', 'true');
 
-        localStorage.setItem("currentUser", JSON.stringify(user));
-                
         console.log('Registrierung erfolgreich! User eingeloggt.');
 
         // Weiterleitung zur Startseite

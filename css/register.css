@@ -301,3 +301,13 @@ section {
     -webkit-box-shadow: 0 0 0px 1000px #09090e inset;
     transition: background-color 9999s ease-in-out 0s;
 }
+
+/* ==========================================================================
+   AUTOFILL-DETECTION (für Passwort-Stärke-Anzeige bei vorgeschlagenen PWs)
+   ========================================================================== */
+@keyframes onAutoFillStart { from {} to {} }
+
+.xInput:-webkit-autofill {
+    animation-name: onAutoFillStart;
+    animation-duration: 0.001s;
+}
