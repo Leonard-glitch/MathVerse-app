@@ -257,12 +257,6 @@ unitsButtons.forEach(button => {
     });
 });
 
-// Advanced Mode Switch Event Listener mit LocalStorage Anbindung
-advancedCheckbox.addEventListener("change", () => {
-    localStorage.setItem("advancedModeActive", advancedCheckbox.checked);
-    updateDropdowns();
-    calculate();
-});
 
 inputEinheit.addEventListener("input", calculate);
 einheitA.addEventListener("change", calculate);
@@ -270,15 +264,11 @@ einheitZ.addEventListener("change", calculate);
 
 // Initialisierung beim Laden der Seite
 document.addEventListener("DOMContentLoaded", () => {
-    // Advanced Mode Zustand aus dem LocalStorage holen
-    const savedAdvancedState = localStorage.getItem("advancedModeActive");
-    if (savedAdvancedState === "true") {
-        advancedCheckbox.checked = true;
-    } else {
-        advancedCheckbox.checked = false;
-    }
+    window.MV.bindAdvancedToggle(advancedCheckbox, "einheitenUmrechner", () => {
+        updateDropdowns();
+        calculate();
+    });
 
-    // Ersten Button (Length) triggern, um die Anwendung zu starten
     const firstButton = document.querySelector('[data-category="btnLength"]');
     if (firstButton) firstButton.click();
 });

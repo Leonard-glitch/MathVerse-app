@@ -8,15 +8,6 @@
 
 import { tools, groups } from './toolsCollection.js';
 
-// ── Gruppen-Icon-Mapping für Favoriten ──────────────────────────────────────
-const GROUP_ICONS = {
-    arithmetik:    'fa-percent',
-    zahlensysteme: 'fa-calculator',
-    algebra:       'fa-bar-chart',
-    geometrie:     'fa-circle-o',
-    statistik:     'fa-line-chart',
-    einheiten:     'fa-arrows-h',
-};
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/; // ganz oben in der Datei ergänzen
 
@@ -355,22 +346,22 @@ function populateFavorites() {
     emptyState.classList.add('hidden');
 
     favs.forEach(id => {
-        const tool = tools.find(t => t.id === id);
-        if (!tool) return;
+    const tool = tools.find(t => t.id === id);
+    if (!tool) return;
 
-        const group = groups.find(g => g.id === tool.group);
-        const icon  = GROUP_ICONS[tool.group] || 'fa-star';
+    const group = groups.find(g => g.id === tool.group);
+    const icon  = group?.icon || 'fa-star';   // <- statt GROUP_ICONS[tool.group]
 
-        const card = document.createElement('a');
-        card.href       = tool.url;
-        card.className  = 'favCard';
-        card.innerHTML  = `
-            <i class="fa ${icon} favCardIcon"></i>
-            <div class="favCardTitle">${tool.title}</div>
-            <div class="favCardTag">${group?.title ?? ''}</div>
-        `;
-        grid.appendChild(card);
-    });
+    const card = document.createElement('a');
+    card.href       = tool.url;
+    card.className  = 'favCard';
+    card.innerHTML  = `
+        <i class="fa ${icon} favCardIcon"></i>
+        <div class="favCardTitle">${tool.title}</div>
+        <div class="favCardTag">${group?.title ?? ''}</div>
+    `;
+    grid.appendChild(card);
+});
 }
 
 // =============================================================================

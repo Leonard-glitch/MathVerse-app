@@ -31,10 +31,11 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     favoriten: [],
     pinnedGroups: [],
     containerOrders: {},
+    advancedModes: {},
     theme: 'violet',
     fontsize: 20,
     isPro: false
-    });
+});
 
     // ==========================================================================
     // CORE STORAGE HELPERS
@@ -217,6 +218,63 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         updateCurrentUser({ containerOrders: obj });
     }
 
+
+    // ==========================================================================
+    // ADVANCED MODES – pro Tool ein eigener Eintrag, NUR eingeloggt nutzbar
+    // (gleiche Logik wie Favoriten)
+    // ==========================================================================
+    function getAdvancedModes() {
+        const u = getCurrentUser();
+        return (isLoggedIn() && u) ? (u.advancedModes || {}) : {};
+    }
+    function setAdvancedModes(obj) {
+        if (!isLoggedIn()) return;
+        updateCurrentUser({ advancedModes: obj });
+    }
+    function getAdvancedMode(key) {
+        return !!getAdvancedModes()[key];
+    }
+    function toggleAdvancedMode(key) {
+        if (!isLoggedIn()) return false;
+        const modes = getAdvancedModes();
+        const newVal = !modes[key];
+        setAdvancedModes({ ...modes, [key]: newVal });
+        return newVal;
+    }
+
+    // Bindet eine Advanced-Mode-Checkbox an Login-Status + eigenen Speicherplatz.
+    // key      = eindeutiger Bezeichner DIESES Tools/Switches, z.B. "einheitenUmrechner"
+    // onChange = wird nach jeder Statusänderung (auch beim Initial-Load) aufgerufen
+    function bindAdvancedToggle(checkbox, key, onChange) {
+        if (!checkbox) return;
+        const wrapper = checkbox.closest('.advancedMode') || checkbox.parentElement;
+
+        function applyState() {
+            const loggedIn = isLoggedIn();
+            checkbox.checked = loggedIn ? getAdvancedMode(key) : false;
+            if (wrapper) wrapper.classList.toggle('locked', !loggedIn);
+            if (typeof onChange === 'function') onChange(checkbox.checked);
+        }
+
+        checkbox.addEventListener('change', () => {
+            if (!isLoggedIn()) {
+                checkbox.checked = false;
+                showLoginPrompt('Melde dich an, um den Advanced Mode zu nutzen.');
+                if (typeof onChange === 'function') onChange(false);
+                return;
+            }
+            toggleAdvancedMode(key);
+            if (typeof onChange === 'function') onChange(checkbox.checked);
+        });
+
+        applyState();
+
+        // Cross-Tab-Sync (Login/Logout in anderem Tab)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'currentUser' || e.key === 'isLoggedIn') applyState();
+        });
+    }
+
     // ==========================================================================
     // THEME & SCHRIFTGRÖSSE
     // Eingeloggt -> Teil von currentUser. Nicht eingeloggt -> lokale
@@ -380,11 +438,12 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         showLoginPrompt, hideLoginPrompt,
         getUsername: () => (getCurrentUser()?.username) || 'Gast',
         getEmail: () => (getCurrentUser()?.email) || '',
-        // "Datenbank"-Simulation
         getAllUsers, saveAllUsers,
         findUserByUsername, findUserByEmail, findUserByUsernameOrEmail,
         isUsernameTaken, isEmailTaken,
-        registerUser, loginUser, deleteCurrentAccount
+        registerUser, loginUser, deleteCurrentAccount,
+        getAdvancedModes, setAdvancedModes, getAdvancedMode, toggleAdvancedMode,
+        bindAdvancedToggle
     };
 
     // ==========================================================================

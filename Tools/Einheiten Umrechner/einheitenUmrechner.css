@@ -115,6 +115,14 @@ input:checked + .slider:before {
 .slider.round { border-radius: 34px; }
 .slider.round:before { border-radius: 50%; }
 
+.advancedMode.locked {
+    opacity: 0.5;
+}
+
+.advancedMode.locked .switch {
+    cursor: not-allowed;
+}
+
 /* Layout Box für Eingaben & Dropdowns */
 .einheitsDiv {
     display: flex;

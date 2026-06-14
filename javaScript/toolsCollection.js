@@ -5,12 +5,12 @@
 // ==========================================================================
 
 export const groups = [
-    { id: "arithmetik",    title: "Arithmetik" },
-    { id: "zahlensysteme", title: "Zahlensysteme" },
-    { id: "algebra",       title: "Algebra" },
-    { id: "geometrie",     title: "Geometrie" },
-    { id: "statistik",     title: "Statistik" },
-    { id: "einheiten",     title: "Einheiten" }
+    { id: "arithmetik",    title: "Arithmetik",    icon: "fa-percent" },
+    { id: "zahlensysteme", title: "Zahlensysteme", icon: "fa-calculator" },
+    { id: "algebra",       title: "Algebra",       icon: "fa-bar-chart" },
+    { id: "geometrie",     title: "Geometrie",     icon: "fa-circle-o" },
+    { id: "statistik",     title: "Statistik",     icon: "fa-line-chart" },
+    { id: "einheiten",     title: "Einheiten",     icon: "fa-arrows-h" }
 ];
 
 export const tools = [
