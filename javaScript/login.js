@@ -14,6 +14,8 @@ const usernameError  = document.getElementById('usernameError');
 const formError      = document.getElementById('formError');
 const toggleBtn      = document.getElementById('togglePassword');
 
+window.MV.redirectIfLoggedIn("../index.html")
+
 // ===========================================================================
 // STATE HELPERS
 // ===========================================================================

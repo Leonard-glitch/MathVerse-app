@@ -39,6 +39,11 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     // ==========================================================================
     // CORE STORAGE HELPERS
     // ==========================================================================
+
+    function redirectIfLoggedIn(path) {
+    if (isLoggedIn()) window.location.href = path;
+    }
+
     function isLoggedIn() {
         return localStorage.getItem('isLoggedIn') === 'true' && !!localStorage.getItem('currentUser');
     }
@@ -77,7 +82,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     // currentUser wird beim nächsten Login wieder aus allUsers geladen.
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isLoggedIn');
-}
+    }
 
 
     // ==========================================================================
@@ -360,6 +365,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     // ==========================================================================
     window.MV = {
         THEMES,
+        redirectIfLoggedIn,
         isLoggedIn,
         getCurrentUser,
         saveCurrentUser,
