@@ -117,30 +117,15 @@ form.addEventListener('submit', (e) => {
 
     if (valid) {
         const uname = usernameInput.value.trim();
+        const result = window.MV.loginUser(uname, passwordInput.value);
 
-        // Gibt es auf diesem Gerät schon einen passenden currentUser
-        // (z.B. von einer früheren Registrierung)? Dann diesen wieder
-        // einloggen, damit Favoriten/Theme/etc. erhalten bleiben.
-        const existing = window.MV.getCurrentUser();
-        const matches  = existing && (
-            existing.username?.toLowerCase() === uname.toLowerCase() ||
-            existing.email?.toLowerCase()    === uname.toLowerCase()
-        );
-
-        if (!matches) {
-            window.MV.saveCurrentUser({
-                username: uname,
-                email: existing?.email || '',
-                favoriten: [],
-                pinnedGroups: [],
-                containerOrders: {},
-                theme: 'violet',
-                fontsize: 20,
-                isPro: false
-            });
+        if (!result.success) {
+            // Aus Sicherheitsgründen eine generische Fehlermeldung,
+            // egal ob User nicht existiert oder Passwort falsch ist.
+            setError(usernameInput, null);
+            setError(passwordInput, formError, 'Benutzername/E-Mail oder Passwort ist falsch.');
+            return;
         }
-
-        localStorage.setItem('isLoggedIn', 'true');
 
         console.log('Login erfolgreich!');
         window.location.href = '../index.html';

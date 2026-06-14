@@ -25,14 +25,15 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
 
     // Schema für currentUser – einzige Quelle der Wahrheit
     const DEFAULT_USER = () => ({
-        username: 'Gast',
-        email: '',
-        favoriten: [],
-        pinnedGroups: [],
-        containerOrders: {},
-        theme: 'violet',
-        fontsize: 20,
-        isPro: false
+    username: 'Gast',
+    email: '',
+    password: '',
+    favoriten: [],
+    pinnedGroups: [],
+    containerOrders: {},
+    theme: 'violet',
+    fontsize: 20,
+    isPro: false
     });
 
     // ==========================================================================
@@ -59,12 +60,116 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         const user = getCurrentUser() || DEFAULT_USER();
         const updated = { ...user, ...patch };
         saveCurrentUser(updated);
+
+        // Änderungen auch in der "Datenbank" (allUsers) spiegeln
+        const users = getAllUsers();
+        const idx = users.findIndex(u => u.username.toLowerCase() === user.username.toLowerCase());
+        if (idx !== -1) {
+            users[idx] = { ...users[idx], ...patch };
+            saveAllUsers(users);
+        }
+
         return updated;
     }
 
     function logout() {
-        // currentUser bleibt erhalten -> beim nächsten Login sind
-        // Favoriten/Theme/etc. wieder da. Nur der Login-Status fällt weg.
+    // allUsers bleibt unberührt – Account & Daten existieren weiterhin.
+    // currentUser wird beim nächsten Login wieder aus allUsers geladen.
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isLoggedIn');
+}
+
+
+    // ==========================================================================
+    // "DATENBANK"-SIMULATION: allUsers (alle registrierten Accounts)
+    // -> currentUser bleibt der "eingeloggte" Account, allUsers ist die
+    //    komplette User-Tabelle. Spätere echte DB kann hier 1:1 andocken.
+    // ==========================================================================
+    const ALL_USERS_KEY = 'allUsers';
+
+    function getAllUsers() {
+        try {
+            const users = JSON.parse(localStorage.getItem(ALL_USERS_KEY));
+            return Array.isArray(users) ? users : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function saveAllUsers(users) {
+        localStorage.setItem(ALL_USERS_KEY, JSON.stringify(users));
+    }
+
+    function findUserByUsername(username) {
+        if (!username) return undefined;
+        return getAllUsers().find(u => u.username.toLowerCase() === username.toLowerCase());
+    }
+
+    function findUserByEmail(email) {
+        if (!email) return undefined;
+        return getAllUsers().find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+    }
+
+    function findUserByUsernameOrEmail(identifier) {
+        if (!identifier) return undefined;
+        const id = identifier.toLowerCase();
+        return getAllUsers().find(u =>
+            u.username.toLowerCase() === id || (u.email && u.email.toLowerCase() === id)
+        );
+    }
+
+    // excludeUsername: erlaubt einem User, seinen EIGENEN Namen/seine
+    // EIGENE Mail beim Bearbeiten zu "behalten", ohne dass er sich
+    // selbst als "vergeben" meldet.
+    function isUsernameTaken(username, excludeUsername = null) {
+        if (!username) return false;
+        return getAllUsers().some(u =>
+            u.username.toLowerCase() === username.toLowerCase() &&
+            (!excludeUsername || u.username.toLowerCase() !== excludeUsername.toLowerCase())
+        );
+    }
+
+    function isEmailTaken(email, excludeUsername = null) {
+        if (!email) return false;
+        return getAllUsers().some(u =>
+            u.email && u.email.toLowerCase() === email.toLowerCase() &&
+            (!excludeUsername || u.username.toLowerCase() !== excludeUsername.toLowerCase())
+        );
+    }
+
+    // Registriert einen neuen User in "allUsers" und loggt ihn direkt ein
+    function registerUser(userData) {
+        const newUser = { ...DEFAULT_USER(), ...userData };
+        const users = getAllUsers();
+        users.push(newUser);
+        saveAllUsers(users);
+
+        saveCurrentUser(newUser);
+        localStorage.setItem('isLoggedIn', 'true');
+        return newUser;
+    }
+
+    // Prüft Zugangsdaten gegen "allUsers" und loggt bei Erfolg ein
+    function loginUser(identifier, password) {
+        const user = findUserByUsernameOrEmail(identifier);
+        if (!user) return { success: false, reason: 'notfound' };
+        if ((user.password || '') !== password) return { success: false, reason: 'wrongpassword' };
+
+        saveCurrentUser(user);
+        localStorage.setItem('isLoggedIn', 'true');
+        return { success: true, user };
+    }
+
+    // Löscht den aktuell eingeloggten Account vollständig aus "allUsers"
+    function deleteCurrentAccount() {
+        const user = getCurrentUser();
+        if (user) {
+            const users = getAllUsers().filter(
+                u => u.username.toLowerCase() !== user.username.toLowerCase()
+            );
+            saveAllUsers(users);
+        }
+        localStorage.removeItem('currentUser');
         localStorage.removeItem('isLoggedIn');
     }
 
@@ -268,7 +373,12 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         getPasswordStrength,
         showLoginPrompt, hideLoginPrompt,
         getUsername: () => (getCurrentUser()?.username) || 'Gast',
-        getEmail: () => (getCurrentUser()?.email) || ''
+        getEmail: () => (getCurrentUser()?.email) || '',
+        // "Datenbank"-Simulation
+        getAllUsers, saveAllUsers,
+        findUserByUsername, findUserByEmail, findUserByUsernameOrEmail,
+        isUsernameTaken, isEmailTaken,
+        registerUser, loginUser, deleteCurrentAccount
     };
 
     // ==========================================================================

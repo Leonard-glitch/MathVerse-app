@@ -24,7 +24,7 @@ const strengthLabel    = document.getElementById('strengthLabel');
 // Konfiguration
 const TAKEN_NAMES    = ['admin', 'test', 'max_mustermann', 'mathverse', 'moderator'];
 const MIN_PW_LENGTH  = 6;
-const MIN_UN_LENGTH  = 3;
+const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/;
 
 // ===========================================================================
 // STATE HELPERS
@@ -52,11 +52,23 @@ function showMsg(el, msg) {
     if (!el) return;
     el.textContent = msg;
     el.style.display = 'block';
+    el.style.color = '';
+    el.style.borderColor = '';
+    el.style.backgroundColor = '';
 }
 
 function hideMsg(el) {
     if (!el) return;
     el.style.display = 'none';
+}
+
+function showSuccessMsg(el, msg) {
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.style.color = 'var(--accent-live)';
+    el.style.borderColor = 'var(--accent-live)';
+    el.style.backgroundColor = 'rgba(0, 255, 204, 0.06)';
 }
 
 // ===========================================================================
@@ -75,19 +87,21 @@ function validateUsername(silent = false) {
         if (!silent) hideMsg(usernameError);
         return false;
     }
-    if (val.length < MIN_UN_LENGTH) {
+
+    if (!USERNAME_REGEX.test(val)) {
         setError(usernameInput);
-        if (!silent) showMsg(usernameError, `Benutzername muss mindestens ${MIN_UN_LENGTH} Zeichen lang sein.`);
+        if (!silent) showMsg(usernameError, 'Nur Buchstaben, Zahlen, _, - und . erlaubt (3–20 Zeichen).');
         return false;
     }
-    if (TAKEN_NAMES.includes(val.toLowerCase())) {
+
+    if (TAKEN_NAMES.includes(val.toLowerCase()) || window.MV.isUsernameTaken(val)) {
         setError(usernameInput);
         if (!silent) showMsg(usernameError, `„${val}" ist bereits vergeben.`);
         return false;
     }
 
     setValid(usernameInput);
-    if (!silent) hideMsg(usernameError);
+    if (!silent) showSuccessMsg(usernameError, `„${val}" ist verfügbar.`);
     return true;
 }
 
@@ -102,6 +116,11 @@ function validateEmail(silent = false) {
     if (!emailInput.checkValidity()) {
         setError(emailInput);
         if (!silent) showMsg(emailError, 'Bitte gib eine gültige E-Mail-Adresse ein.');
+        return false;
+    }
+    if (window.MV.isEmailTaken(val)) {
+        setError(emailInput);
+        if (!silent) showMsg(emailError, 'Für diese E-Mail-Adresse existiert bereits ein Konto.');
         return false;
     }
 
@@ -189,10 +208,8 @@ passwordConfInput.addEventListener('blur', () => validatePasswordConf());
 // ===========================================================================
 
 usernameInput.addEventListener('input', () => {
-    if (usernameInput.classList.contains('is-error')) {
-        usernameInput.classList.remove('is-error', 'shake');
-        hideMsg(usernameError);
-    }
+    usernameInput.classList.remove('shake');
+    validateUsername(); // läuft live bei jedem Tastendruck, zeigt dauerhaft Status
 });
 
 emailInput.addEventListener('input', () => {
@@ -288,12 +305,12 @@ form.addEventListener('submit', (e) => {
         showMsg(usernameError, 'Bitte gib einen Benutzernamen ein.');
         valid = false;
         firstErrorInput = firstErrorInput || usernameInput;
-    } else if (uname.length < MIN_UN_LENGTH) {
+    } else if (!USERNAME_REGEX.test(uname)) {
         setError(usernameInput);
-        showMsg(usernameError, `Mindestens ${MIN_UN_LENGTH} Zeichen erforderlich.`);
+        showMsg(usernameError, 'Nur Buchstaben, Zahlen, _, - und . erlaubt (3–20 Zeichen).');
         valid = false;
         firstErrorInput = firstErrorInput || usernameInput;
-    } else if (TAKEN_NAMES.includes(uname.toLowerCase())) {
+    } else if (TAKEN_NAMES.includes(uname.toLowerCase()) || window.MV.isUsernameTaken(uname)) {
         setError(usernameInput);
         showMsg(usernameError, `„${uname}" ist bereits vergeben.`);
         valid = false;
@@ -306,6 +323,11 @@ form.addEventListener('submit', (e) => {
     if (!emailInput.value.trim() || !emailInput.checkValidity()) {
         setError(emailInput);
         showMsg(emailError, 'Bitte gib eine gültige E-Mail-Adresse ein.');
+        valid = false;
+        firstErrorInput = firstErrorInput || emailInput;
+    } else if (window.MV.isEmailTaken(emailInput.value.trim())) {
+        setError(emailInput);
+        showMsg(emailError, 'Für diese E-Mail-Adresse existiert bereits ein Konto.');
         valid = false;
         firstErrorInput = firstErrorInput || emailInput;
     } else {
@@ -357,10 +379,11 @@ form.addEventListener('submit', (e) => {
             firstErrorInput.focus();
         }
     } else {
-        // WENN ALLES PASST: User lokal registrieren und direkt einloggen
-        window.MV.saveCurrentUser({
+        // WENN ALLES PASST: User in "allUsers" registrieren und einloggen
+        window.MV.registerUser({
             username: uname,
             email: emailInput.value.trim(),
+            password: passwordInput.value,
             favoriten: [],
             pinnedGroups: [],
             containerOrders: {},
@@ -368,7 +391,6 @@ form.addEventListener('submit', (e) => {
             fontsize: 20,
             isPro: false
         });
-        localStorage.setItem('isLoggedIn', 'true');
 
         console.log('Registrierung erfolgreich! User eingeloggt.');
 

@@ -18,6 +18,8 @@ const GROUP_ICONS = {
     einheiten:     'fa-arrows-h',
 };
 
+const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/; // ganz oben in der Datei ergänzen
+
 // ── State ─────────────────────────────────────────────────────────────────────
 let pendingTheme    = window.MV.getTheme();
 let pendingFontSize = window.MV.getFontSize();
@@ -150,19 +152,28 @@ function initAccountPanel() {
         const newName   = document.getElementById('input-username').value.trim();
         const newEmail  = document.getElementById('input-email').value.trim();
         const currentPw = document.getElementById('input-current-pw').value;
+        const user      = window.MV.getCurrentUser();
 
-        if (!currentPw) {
+        if (!currentPw || currentPw !== (user.password || '')) {
             shakeElement(document.getElementById('input-current-pw'));
             return;
         }
-        if (!newName || newName.length < 3) {
+       if (!newName || !USERNAME_REGEX.test(newName)) {
+        shakeElement(document.getElementById('input-username'));
+        return;
+    }
+        if (window.MV.isUsernameTaken(newName, user.username)) {
             shakeElement(document.getElementById('input-username'));
+            return;
+        }
+        if (newEmail && window.MV.isEmailTaken(newEmail, user.username)) {
+            shakeElement(document.getElementById('input-email'));
             return;
         }
 
         window.MV.updateCurrentUser({
             username: newName,
-            email: newEmail || window.MV.getCurrentUser().email
+            email: newEmail || user.email
         });
 
         populateUserInfo();
@@ -205,11 +216,12 @@ function initSecurityPanel() {
         const cur  = document.getElementById('sec-current-pw').value;
         const nw   = newPwInput.value;
         const conf = confPwInput.value;
+        const user = window.MV.getCurrentUser();
 
         errorEl.classList.add('hidden');
 
-        if (!cur) {
-            showFormError(errorEl, 'Bitte gib dein aktuelles Passwort ein.');
+        if (!cur || cur !== (user.password || '')) {
+            showFormError(errorEl, 'Das aktuelle Passwort ist falsch.');
             shakeElement(document.getElementById('sec-current-pw'));
             return;
         }
@@ -223,6 +235,8 @@ function initSecurityPanel() {
             shakeElement(confPwInput);
             return;
         }
+
+        window.MV.updateCurrentUser({ password: nw });
 
         document.getElementById('sec-current-pw').value = '';
         newPwInput.value  = '';
@@ -373,9 +387,8 @@ function initDeletePanel() {
         btn.disabled = input.value !== 'LÖSCHEN';
     });
 
-    btn.addEventListener('click', () => {
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isLoggedIn');
+   btn.addEventListener('click', () => {
+        window.MV.deleteCurrentAccount();
         alert('Konto wurde gelöscht. Du wirst zur Startseite weitergeleitet.');
         window.location.href = '../index.html';
     });
