@@ -24,6 +24,10 @@ Advanced Mode:
 -Frequenz(vielleicht)
 -Kraftstoffverbrauch(vielleicht)
 
++ Infos(Einheiten ausgeschrieben) wenn länger Hover
++ Textumbruch nach = wenn nötig
++ wenn eine Untereinheit bei einer anderen Einheit auch exestiert wie dm, dm² soll diese auch bei den anderen wenn nötig/möglich ist sein.
+
 
 
 Prozent Rechner:
