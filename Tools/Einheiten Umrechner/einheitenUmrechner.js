@@ -15,10 +15,11 @@ const unitsConfig = {
             ft: 0.3048,
             yd: 0.9144,
             mi: 1609.344,
-            NM: 1852,
+            nmi: 1852,
             ly: 9460730472580800
         }
     },
+
     mass: {
         basics: {
             mg: 0.001,
@@ -40,6 +41,7 @@ const unitsConfig = {
             ct: 0.2
         }
     },
+
     time: {
         basics: {
             s: 1,
@@ -58,6 +60,7 @@ const unitsConfig = {
             cen: 3153600000
         }
     },
+
     area: {
         basics: {
             "mm²": 0.000001,
@@ -93,7 +96,36 @@ const unitsConfig = {
             "mach": 340.3,         // Mach 1 (Standardatmosphäre, ~15°C)
             "c": 299792458         // Lichtgeschwindigkeit
         }
+    },
+
+    volume: {
+    basics: {
+        "mm³": 0.000001,
+        "ml": 0.001,
+        "cm³": 0.001,
+        "cl": 0.01,
+        "dl": 0.1,
+        "l": 1,
+        "dm³": 1,
+        "hl": 100,
+        "m³": 1000,
+        "dam³": 1000000,      // Kubikdekameter
+        "hm³": 1000000000,    // Kubikhaktometer
+        "km³": 1000000000000  // Kubikkilometer
+    },
+    advanced: {
+        "µl": 0.000001,
+        "nl": 0.000000001,
+        "in³": 0.016387064,
+        "fl oz (UK)": 0.0284130625,
+        "fl oz (US)": 0.0295735295625,
+        "pt (US)": 0.473176473,
+        "pt (UK)": 0.56826125,
+        "gal (US)": 3.785411784,
+        "gal (UK)": 4.54609,
+        "ft³": 28.316846592
     }
+}
 };
 
 // DOM Elemente abgreifen
@@ -110,10 +142,11 @@ let currentCategory = "length";
 
 // Liste aller imperialen, US-amerikanischen und astronomischen Einheiten
 const imperialUnits = [
-    "in", "ft", "yd", "mi", "NM", "ly",        // Länge
-    "gr", "oz", "lb", "st", "ct",              // Masse
-    "in²", "ft²", "yd²", "ac", "mi²",          // Fläche
-    "in/s", "ft/s", "mph", "kn", "mach", "c"   // Geschwindigkeit
+    "in", "ft", "yd", "mi", "nmi", "ly",
+    "gr", "oz", "lb", "st", "ct",
+    "in²", "ft²", "yd²", "ac", "mi²",
+    "in/s", "ft/s", "mph", "kn", "mach", "c",
+    "in³", "ft³", "fl oz (UK)", "fl oz (US)", "pt (US)", "pt (UK)", "gal (US)", "gal (UK)"
 ];
 
 // Standard-Zuordnungen beim harten Wechsel der Hauptkategorie
@@ -122,8 +155,25 @@ const imperialUnits = [
             mass:   { from: "kg",   to: "g" },
             time:   { from: "h",    to: "min" },
             area:   { from: "m²",   to: "cm²" },
-            speed:  { from: "km/h", to: "m/s" }
+            speed:  { from: "km/h", to: "m/s" },
+            volume: { from: "l", to: "ml" }
         };
+
+// Kategorien, die nur im Advanced Mode als Buttons sichtbar sind
+const advancedCategoryNames = ["volume"]; // wird mit jeder neuen Advanced-Kategorie ergänzt
+
+function updateAdvancedCategoryVisibility(isAdvanced) {
+    document.querySelectorAll(".advancedCategory").forEach(btn => {
+        btn.classList.toggle("visible", isAdvanced);
+    });
+
+    // Wenn Advanced Mode ausgeschaltet wird, während eine Advanced-Kategorie aktiv ist:
+    // zurück zur Standard-Kategorie (Länge) wechseln
+    if (!isAdvanced && advancedCategoryNames.includes(currentCategory)) {
+        const lengthButton = document.querySelector('[data-category="btnLength"]');
+        if (lengthButton) lengthButton.click();
+    }
+}
 // Hilfsfunktion: Holt die aktivierten Einheiten und sortiert sie sauber nach System und Größe
 function getActiveUnits() {
     const category = unitsConfig[currentCategory];
@@ -328,7 +378,8 @@ einheitZ.addEventListener("change", calculate);
 
 // Initialisierung beim Laden der Seite
 document.addEventListener("DOMContentLoaded", () => {
-    window.MV.bindAdvancedToggle(advancedCheckbox, "einheitenUmrechner", () => {
+    window.MV.bindAdvancedToggle(advancedCheckbox, "einheitenUmrechner", (isChecked) => {
+        updateAdvancedCategoryVisibility(isChecked);
         updateDropdowns();
         calculate();
     });

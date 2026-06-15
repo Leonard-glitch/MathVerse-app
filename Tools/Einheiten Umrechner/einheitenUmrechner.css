@@ -51,77 +51,7 @@
 }
 
 
-/* ADVANCED MODE SWITCH */
 
-.advancedMode{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.advancedText{
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-}
-
-/* Der äußere Rahmen des Schalters */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 55px;
-  height: 30px;
-}
-
-/* Macht die echte, hässliche HTML-Checkbox unsichtbar */
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* Der Hintergrund des Schiebers (grau im Zustand "AUS") */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: var(--text-muted);
-  transition: .4s;
-}
-
-/* Der kleine weiße Button/Kreis, der sich bewegt */
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 23px;
-  width: 23px;
-  left: 4px;
-  bottom: 4px;
-  background-color: var(--accent-live);
-  transition: .4s;
-}
-
-/* Hintergrund wird blau, wenn die Checkbox aktiv ("AN") ist */
-input:checked + .slider {
-  background-color: var(--border-glow);
-}
-
-/* Bewegt den weißen Button nach rechts, wenn "AN" */
-input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-/* OPTIONAL: Macht den Schalter rund. Wenn du ihn eckig willst, lösch das einfach */
-.slider.round { border-radius: 34px; }
-.slider.round:before { border-radius: 50%; }
-
-.advancedMode.locked {
-    opacity: 0.5;
-}
-
-.advancedMode.locked .switch {
-    cursor: not-allowed;
-}
 
 /* Layout Box für Eingaben & Dropdowns */
 .einheitsDiv {
