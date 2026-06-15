@@ -57,6 +57,42 @@ const unitsConfig = {
             dec: 315360000,
             cen: 3153600000
         }
+    },
+    area: {
+        basics: {
+            "mm²": 0.000001,
+            "cm²": 0.0001,
+            "dm²": 0.01,
+            "m²": 1,
+            "a": 100,          // Ar
+            "ha": 10000,       // Hektar
+            "km²": 1000000
+        },
+        advanced: {
+            "in²": 0.00064516,
+            "ft²": 0.09290304,
+            "yd²": 0.83612736,
+            "ac": 4046.8564224, // Acre
+            "mi²": 2589988.110336
+        }
+    },
+
+    speed: {
+        basics: {
+            "mm/s": 0.001,
+            "cm/s": 0.01,
+            "m/s": 1,
+            "km/h": 0.27777777778,
+            "km/s": 1000
+        },
+        advanced: {
+            "in/s": 0.0254,
+            "ft/s": 0.3048,
+            "mph": 0.44704,
+            "kn": 0.51444444444,   // Knoten
+            "mach": 340.3,         // Mach 1 (Standardatmosphäre, ~15°C)
+            "c": 299792458         // Lichtgeschwindigkeit
+        }
     }
 };
 
@@ -73,8 +109,21 @@ const advancedCheckbox = document.querySelector(".advancedMode input[type='check
 let currentCategory = "length"; 
 
 // Liste aller imperialen, US-amerikanischen und astronomischen Einheiten
-const imperialUnits = ["in", "ft", "yd", "mi", "NM", "ly", "gr", "oz", "lb", "st", "ct"];
+const imperialUnits = [
+    "in", "ft", "yd", "mi", "NM", "ly",        // Länge
+    "gr", "oz", "lb", "st", "ct",              // Masse
+    "in²", "ft²", "yd²", "ac", "mi²",          // Fläche
+    "in/s", "ft/s", "mph", "kn", "mach", "c"   // Geschwindigkeit
+];
 
+// Standard-Zuordnungen beim harten Wechsel der Hauptkategorie
+        const categoryDefaults = {
+            length: { from: "m",    to: "cm" },
+            mass:   { from: "kg",   to: "g" },
+            time:   { from: "h",    to: "min" },
+            area:   { from: "m²",   to: "cm²" },
+            speed:  { from: "km/h", to: "m/s" }
+        };
 // Hilfsfunktion: Holt die aktivierten Einheiten und sortiert sie sauber nach System und Größe
 function getActiveUnits() {
     const category = unitsConfig[currentCategory];
@@ -184,24 +233,26 @@ function calculate() {
     ausgabeContainer.style.display = "flex"; 
 
     if (unitFrom === unitTo) {
-        rechenwegOutput.innerHTML = `<pre>Identische Einheiten: Keine Berechnung notwendig.</pre>`;
+    rechenwegOutput.innerHTML = `<pre>Identische Einheiten: Keine Berechnung notwendig.</pre>`;
     } else {
-        // --- LESBARE DEZIMALZAHL-LOGIK (Reine Multiplikation bleibt) ---
-        let printFactor;
-        
-        // Wenn der Faktor extrem winzig (< 0.000001) oder gigantisch ist, 
-        // nutzen wir als Notfall-Layoutschutz die Exponenten-Schreibweise.
-        // Dazwischen (wie bei 0.0001) erzwingen wir die normale Dezimalzahl.
-        if (directFactor !== 0 && (directFactor < 0.000001 || directFactor > 10000000)) {
-            printFactor = directFactor.toExponential(6);
-        } else {
-            // toFixed(10) wirft das '1e-4' raus, parseFloat entfernt unnötige Nullen am Ende
-            printFactor = parseFloat(directFactor.toFixed(10)).toString();
+    // Faktor für die ANZEIGE bestimmen: manchmal ist der Kehrwert "schöner"
+    // (z.B. ÷ 3.6 statt × 0.2777777778 bei km/h -> m/s)
+    let displayOperator = "×";
+    let displayFactor = directFactor;
+
+    if (directFactor >= 0.0001 && directFactor < 1) {
+        const inverse = 1 / directFactor;
+        if (countDecimals(inverse) <= 4 && countDecimals(inverse) < countDecimals(directFactor)) {
+            displayOperator = "÷";
+            displayFactor = inverse;
         }
-        
-        rechenwegOutput.innerHTML = `
-            <pre>Formel:    Wert × ${printFactor}\nRechnung:  ${parsedValue} ${unitFrom} × ${printFactor} = <b>${formattedResult} ${unitTo}</b></pre>
-        `;
+    }
+
+    const printFactor = formatFactor(displayFactor);
+
+    rechenwegOutput.innerHTML = `
+        <pre>Formel:    Wert ${displayOperator} ${printFactor}\nRechnung:  ${parsedValue} ${unitFrom} ${displayOperator} ${printFactor} = <b>${formattedResult} ${unitTo}</b></pre>
+    `;
     }
 }
 
@@ -241,21 +292,34 @@ unitsButtons.forEach(button => {
 
         updateDropdowns();
 
-        // Standard-Zuordnungen beim harten Wechsel der Hauptkategorie
-        if (currentCategory === "length") {
-            einheitA.value = "m";
-            einheitZ.value = "cm";
-        } else if (currentCategory === "mass") {
-            einheitA.value = "kg";
-            einheitZ.value = "g";
-        } else if (currentCategory === "time") {
-            einheitA.value = "h";
-            einheitZ.value = "min";
+        const defaults = categoryDefaults[currentCategory];
+        if (defaults) {
+            einheitA.value = defaults.from;
+            einheitZ.value = defaults.to;
         }
+
 
         calculate();
     });
 });
+
+// Rundet auf 10 Nachkommastellen (killt Floating-Point-Reste wie 3.5999999999997)
+// und zählt, wie viele "echte" Nachkommastellen übrig bleiben.
+function countDecimals(num) {
+    const rounded = Math.round(num * 1e10) / 1e10;
+    const str = rounded.toString();
+    if (str.includes("e")) return Infinity; // Exponentialschreibweise -> nicht "schön"
+    const parts = str.split(".");
+    return parts[1] ? parts[1].length : 0;
+}
+
+// Formatiert einen Faktor für die Anzeige im Rechenweg
+function formatFactor(num) {
+    if (num !== 0 && (Math.abs(num) < 0.000001 || Math.abs(num) > 10000000)) {
+        return num.toExponential(6);
+    }
+    return parseFloat(num.toFixed(10)).toString();
+}
 
 
 inputEinheit.addEventListener("input", calculate);

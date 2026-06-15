@@ -60,7 +60,7 @@ export const tools = [
         filename: "einheitenUmrechner.html",
         url:      "/MathVerse-app/Tools/Einheiten Umrechner/einheitenUmrechner.html",
         tags:     ["umrechner", "einheiten", "länge", "gewicht", "temperatur", "zeit"],
-        info:     "Konvertiert Längen, Massen und Zeiteinheiten – mit Advanced Mode für imperiale und astronomische Einheiten.",
+        info:     "Vielseitiger Umrechner für verschiedenste Maßeinheiten – inklusive Advanced Mode für internationale und spezialisierte Messsysteme.",
         image: {
             big:   "/MathVerse-app/pictures/hqdefault.jpg",
             small: "/MathVerse-app/pictures/icons/einheitenUmrechner-icon.png"

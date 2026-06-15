@@ -41,3 +41,11 @@ Advanced Mode:
 -Erhöhung/Vermindung um ...%
 -Mehrwertsteuer
 -Rabattrechner (Skonto)
+
+
+
+Dreisatz Rechner
+
+https://www.finanz-tools.de/dreisatz-rechner
+
+basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit Button(oder submit button wie bei allen tools). Rechenweg style wie Zahlensystem Umrechner
