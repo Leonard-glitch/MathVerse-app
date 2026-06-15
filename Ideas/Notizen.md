@@ -3,6 +3,7 @@ TOOLS:
 
 Einheiten Umrechner:
 
+(https://www.convertworld.com/de/ + google Umrechner)
 No Advanced Mode + Extencion:
 
 -Länge
@@ -22,3 +23,21 @@ Advanced Mode:
 -Flächenwinkel
 -Frequenz(vielleicht)
 -Kraftstoffverbrauch(vielleicht)
+
+
+
+Prozent Rechner:
+
+(https://www.blitzrechner.de/prozent/)
+No Advanced Mode + Extencion:
+
+-Grundwert
+-Prozent
+-Prozentsatz
+
+Advanced Mode:
+
+-Prozentuale Veränderung
+-Erhöhung/Vermindung um ...%
+-Mehrwertsteuer
+-Rabattrechner (Skonto)
