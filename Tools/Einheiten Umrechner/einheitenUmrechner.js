@@ -99,33 +99,140 @@ const unitsConfig = {
     },
 
     volume: {
-    basics: {
-        "mm³": 0.000001,
-        "ml": 0.001,
-        "cm³": 0.001,
-        "cl": 0.01,
-        "dl": 0.1,
-        "l": 1,
-        "dm³": 1,
-        "hl": 100,
-        "m³": 1000,
-        "dam³": 1000000,      // Kubikdekameter
-        "hm³": 1000000000,    // Kubikhaktometer
-        "km³": 1000000000000  // Kubikkilometer
+        basics: {
+            "mm³": 0.000001,
+            "ml": 0.001,
+            "cm³": 0.001,
+            "cl": 0.01,
+            "dl": 0.1,
+            "l": 1,
+            "dm³": 1,
+            "hl": 100,
+            "m³": 1000,
+            "dam³": 1000000,      // Kubikdekameter
+            "hm³": 1000000000,    // Kubikhaktometer
+            "km³": 1000000000000  // Kubikkilometer
+        },
+        advanced: {
+            "µl": 0.000001,
+            "nl": 0.000000001,
+            "in³": 0.016387064,
+            "fl oz (UK)": 0.0284130625,
+            "fl oz (US)": 0.0295735295625,
+            "pt (US)": 0.473176473,
+            "pt (UK)": 0.56826125,
+            "gal (US)": 3.785411784,
+            "gal (UK)": 4.54609,
+            "ft³": 28.316846592
+        }
     },
-    advanced: {
-        "µl": 0.000001,
-        "nl": 0.000000001,
-        "in³": 0.016387064,
-        "fl oz (UK)": 0.0284130625,
-        "fl oz (US)": 0.0295735295625,
-        "pt (US)": 0.473176473,
-        "pt (UK)": 0.56826125,
-        "gal (US)": 3.785411784,
-        "gal (UK)": 4.54609,
-        "ft³": 28.316846592
+    pressure: {
+        basics: { 
+            Pa: 1, 
+            hPa: 100, 
+            kPa: 1000, 
+            MPa: 1000000, 
+            bar: 100000 
+        },
+        advanced: { 
+            mbar: 100, 
+            atm: 101325, 
+            mmHg: 133.322, 
+            psi: 6894.757293168, 
+            inHg: 3386.389 
+        }
+    },
+
+    energy: {
+        basics: { 
+            J: 1, 
+            kJ: 1000, 
+            MJ: 1000000, 
+            Wh: 3600, 
+            kWh: 3600000 
+        },
+        advanced: { 
+            MWh: 3600000000, 
+            cal: 4.184, 
+            kcal: 4184, 
+            eV: 1.602176634e-19, 
+            BTU: 1055.05585262 
+        }
+    },
+
+    frequency: {
+        basics: { 
+            Hz: 1, 
+            kHz: 1000, 
+            MHz: 1000000, 
+            GHz: 1000000000 
+        },
+        advanced: { 
+            THz: 1000000000000, 
+            rpm: 0.0166666667 
+        }
+    },
+
+    decimalprefixes: {
+        basics: { 
+            m: 0.001, 
+            c: 0.01, 
+            d: 0.1, 
+            Einheit: 1, 
+            da: 10, 
+            h: 100, 
+            k: 1000, 
+            M: 1000000, 
+            G: 1000000000 
+        },
+        advanced: { 
+            y: 1e-24, 
+            z: 1e-21, 
+            a: 1e-18, 
+            f: 1e-15, 
+            p: 1e-12, 
+            n: 1e-9, 
+            µ: 1e-6, 
+            T: 1e12, 
+            P: 1e15, 
+            E: 1e18, 
+            Z: 1e21, 
+            Y: 1e24 
+        }
+    },
+
+    angle: {
+        basics: { 
+            "°": 1, 
+            rad: 57.29577951308232, 
+            gon: 0.9 
+        },
+        advanced: { 
+            "′": 0.0166666667, 
+            "″": 0.0002777778, 
+            Umdrehung: 360 
+        }
+    },
+
+    datasize: {
+        basics: { 
+            Bit: 0.125, 
+            Byte: 1,
+            KB: 1000, 
+            KiB: 1024, 
+            MB: 1000000, 
+            MiB: 1048576 
+        },
+        advanced: { 
+            GB: 1000000000, 
+            GiB: 1073741824, 
+            TB: 1000000000000, 
+            TiB: 1099511627776, 
+            PB: 1000000000000000, 
+            PiB: 1125899906842624 
+        }
     }
-}
+
 };
 
 // DOM Elemente abgreifen
@@ -142,25 +249,35 @@ let currentCategory = "length";
 
 // Liste aller imperialen, US-amerikanischen und astronomischen Einheiten
 const imperialUnits = [
-    "in", "ft", "yd", "mi", "nmi", "ly",
+    "in", "ft", "yd", "mi", "NM", "ly",
     "gr", "oz", "lb", "st", "ct",
     "in²", "ft²", "yd²", "ac", "mi²",
     "in/s", "ft/s", "mph", "kn", "mach", "c",
-    "in³", "ft³", "fl oz (UK)", "fl oz (US)", "pt (US)", "pt (UK)", "gal (US)", "gal (UK)"
+    "in³", "ft³", "fl oz (UK)", "fl oz (US)", "pt (US)", "pt (UK)", "gal (US)", "gal (UK)",
+    "psi", "inHg", "BTU"
 ];
 
 // Standard-Zuordnungen beim harten Wechsel der Hauptkategorie
-        const categoryDefaults = {
-            length: { from: "m",    to: "cm" },
-            mass:   { from: "kg",   to: "g" },
-            time:   { from: "h",    to: "min" },
-            area:   { from: "m²",   to: "cm²" },
-            speed:  { from: "km/h", to: "m/s" },
-            volume: { from: "l", to: "ml" }
-        };
+const categoryDefaults = {
+    length: { from: "m",    to: "cm" },
+    mass:   { from: "kg",   to: "g" },
+    time:   { from: "h",    to: "min" },
+    area:   { from: "m²",   to: "cm²" },
+    speed:  { from: "km/h", to: "m/s" },
+    volume: { from: "l",    to: "ml" },
+    pressure: { from: "bar", to: "psi" },
+    energy: { from: "kcal", to: "kJ" },
+    frequency: { from: "Hz", to: "kHz" },
+    decimalprefixes: { from: "k", to: "M" },
+    angle: { from: "°", to: "rad" },
+    datasize: { from: "MB", to: "GB" }
+};
 
 // Kategorien, die nur im Advanced Mode als Buttons sichtbar sind
-const advancedCategoryNames = ["volume"]; // wird mit jeder neuen Advanced-Kategorie ergänzt
+const advancedCategoryNames = [
+    "volume", "pressure", "energy", "frequency",
+    "decimalprefixes", "angle", "datasize"
+]; // wird mit jeder neuen Advanced-Kategorie ergänzt
 
 function updateAdvancedCategoryVisibility(isAdvanced) {
     document.querySelectorAll(".advancedCategory").forEach(btn => {
