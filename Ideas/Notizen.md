@@ -25,7 +25,7 @@ Advanced Mode:
 -Kraftstoffverbrauch(vielleicht)
 
 + Infos(Einheiten ausgeschrieben) wenn länger Hover
-+ Textumbruch nach = wenn nötig
++ Textumbruch nach = wenn nötig(im Rechenweg)
 + wenn eine Untereinheit bei einer anderen Einheit auch exestiert wie dm, dm² soll diese auch bei den anderen wenn nötig/möglich ist sein.
 
 
@@ -45,6 +45,9 @@ Advanced Mode:
 -Erhöhung/Vermindung um ...%
 -Mehrwertsteuer
 -Rabattrechner (Skonto)
+
++ Es wird ein eigener Local Storage Button hinzugefügt. Dieser wird in AdavancedModes gespeichert gleich wie bei Einheiten Umrechner
+(sowiso ähnliche Logiken wie in Einheiten Umrechner)
 
 
 

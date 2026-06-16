@@ -257,6 +257,7 @@ input:-webkit-autofill:focus {
 /* ==========================================================================
    GLOBAL SCROLLBAR DESIGN
    ========================================================================== */
+
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -268,21 +269,28 @@ input:-webkit-autofill:focus {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(138, 22, 255, 0.3);
+    background: var(--glow-soft);
+
     border-radius: var(--radius-sm);
     border: 2px solid var(--bg-body);
-    transition: background var(--transition-speed) ease;
+
+    transition:
+        background var(--transition-speed),
+        box-shadow var(--transition-speed);
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--border-glow);
-    box-shadow: 0 0 10px var(--glow-soft);
+
+    box-shadow:
+        0 0 10px var(--glow-soft),
+        0 0 20px var(--glow-hard);
 }
 
 @supports (scrollbar-color: auto) {
     html {
         scrollbar-width: thin;
-        scrollbar-color: rgba(138, 22, 255, 0.3) var(--bg-body);
+        scrollbar-color: var(--border-glow) var(--bg-body);
     }
 }
 

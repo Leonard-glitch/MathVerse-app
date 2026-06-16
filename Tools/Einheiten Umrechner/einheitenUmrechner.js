@@ -110,7 +110,7 @@ const unitsConfig = {
             "hl": 100,
             "m³": 1000,
             "dam³": 1000000,      // Kubikdekameter
-            "hm³": 1000000000,    // Kubikhaktometer
+            "hm³": 1000000000,    // Kubikhektometer
             "km³": 1000000000000  // Kubikkilometer
         },
         advanced: {
@@ -126,113 +126,50 @@ const unitsConfig = {
             "ft³": 28.316846592
         }
     },
+
     pressure: {
-        basics: { 
-            Pa: 1, 
-            hPa: 100, 
-            kPa: 1000, 
-            MPa: 1000000, 
-            bar: 100000 
-        },
-        advanced: { 
-            mbar: 100, 
-            atm: 101325, 
-            mmHg: 133.322, 
-            psi: 6894.757293168, 
-            inHg: 3386.389 
-        }
+        basics: { Pa: 1, hPa: 100, kPa: 1000, MPa: 1000000, bar: 100000 },
+        advanced: { mbar: 100, atm: 101325, mmHg: 133.322, psi: 6894.757293168, inHg: 3386.389 }
     },
 
     energy: {
-        basics: { 
-            J: 1, 
-            kJ: 1000, 
-            MJ: 1000000, 
-            Wh: 3600, 
-            kWh: 3600000 
-        },
-        advanced: { 
-            MWh: 3600000000, 
-            cal: 4.184, 
-            kcal: 4184, 
-            eV: 1.602176634e-19, 
-            BTU: 1055.05585262 
-        }
+        basics: { J: 1, kJ: 1000, MJ: 1000000, Wh: 3600, kWh: 3600000 },
+        advanced: { MWh: 3600000000, cal: 4.184, kcal: 4184, eV: 1.602176634e-19, BTU: 1055.05585262 }
     },
 
     frequency: {
-        basics: { 
-            Hz: 1, 
-            kHz: 1000, 
-            MHz: 1000000, 
-            GHz: 1000000000 
-        },
-        advanced: { 
-            THz: 1000000000000, 
-            rpm: 0.0166666667 
-        }
+        basics: { Hz: 1, kHz: 1000, MHz: 1000000, GHz: 1000000000 },
+        advanced: { THz: 1000000000000, rpm: 0.0166666667 }
     },
 
     decimalprefixes: {
-        basics: { 
-            m: 0.001, 
-            c: 0.01, 
-            d: 0.1, 
-            Einheit: 1, 
-            da: 10, 
-            h: 100, 
-            k: 1000, 
-            M: 1000000, 
-            G: 1000000000 
-        },
-        advanced: { 
-            y: 1e-24, 
-            z: 1e-21, 
-            a: 1e-18, 
-            f: 1e-15, 
-            p: 1e-12, 
-            n: 1e-9, 
-            µ: 1e-6, 
-            T: 1e12, 
-            P: 1e15, 
-            E: 1e18, 
-            Z: 1e21, 
-            Y: 1e24 
-        }
+        basics: { m: 0.001, c: 0.01, d: 0.1, Einheit: 1, da: 10, h: 100, k: 1000, M: 1000000, G: 1000000000 },
+        advanced: { y: 1e-24, z: 1e-21, a: 1e-18, f: 1e-15, p: 1e-12, n: 1e-9, µ: 1e-6, T: 1e12, P: 1e15, E: 1e18, Z: 1e21, Y: 1e24 }
     },
 
     angle: {
-        basics: { 
-            "°": 1, 
-            rad: 57.29577951308232, 
-            gon: 0.9 
-        },
-        advanced: { 
-            "′": 0.0166666667, 
-            "″": 0.0002777778, 
-            Umdrehung: 360 
-        }
+        basics: { "°": 1, rad: 57.29577951308232, gon: 0.9 },
+        advanced: { "′": 0.0166666667, "″": 0.0002777778, Umdrehung: 360 }
     },
 
     datasize: {
-        basics: { 
-            Bit: 0.125, 
-            Byte: 1,
-            KB: 1000, 
-            KiB: 1024, 
-            MB: 1000000, 
-            MiB: 1048576 
-        },
-        advanced: { 
-            GB: 1000000000, 
-            GiB: 1073741824, 
-            TB: 1000000000000, 
-            TiB: 1099511627776, 
-            PB: 1000000000000000, 
-            PiB: 1125899906842624 
-        }
-    }
+        basics: { Bit: 0.125, Byte: 1, KB: 1000, KiB: 1024, MB: 1000000, MiB: 1048576 },
+        advanced: { GB: 1000000000, GiB: 1073741824, TB: 1000000000000, TiB: 1099511627776, PB: 1000000000000000, PiB: 1125899906842624 }
+    },
 
+    // Werte hier sind NUR Dropdown-Sortierung! Die echte Umrechnung läuft über
+    // temperatureConversions weiter unten (Offset-Formeln, kein fester Faktor).
+    temperature: {
+        basics: { "°C": 1, "°F": 2, "K": 3 },
+        advanced: { "°R": 4 }
+    },
+
+    // Werte hier sind NUR Dropdown-Sortierung! Die echte Umrechnung läuft über
+    // fuelConstants weiter unten (reziprokes Verhältnis, kein fester Faktor).
+    fuelconsumption: {
+        basics: { "l/100km": 1, "km/l": 2 },
+        advanced: { "mpg (US)": 3, "mpg (UK)": 4 }
+    }
 };
 
 // DOM Elemente abgreifen
@@ -245,16 +182,18 @@ const errorMessages = document.getElementById("errorMessages");
 const unitsButtons = document.querySelectorAll(".btnUnits");
 const advancedCheckbox = document.querySelector(".advancedMode input[type='checkbox']");
 
-let currentCategory = "length"; 
+let currentCategory = "length";
 
 // Liste aller imperialen, US-amerikanischen und astronomischen Einheiten
 const imperialUnits = [
-    "in", "ft", "yd", "mi", "NM", "ly",
+    "in", "ft", "yd", "mi", "nmi", "ly",
     "gr", "oz", "lb", "st", "ct",
     "in²", "ft²", "yd²", "ac", "mi²",
     "in/s", "ft/s", "mph", "kn", "mach", "c",
     "in³", "ft³", "fl oz (UK)", "fl oz (US)", "pt (US)", "pt (UK)", "gal (US)", "gal (UK)",
-    "psi", "inHg", "BTU"
+    "psi", "inHg", "BTU",
+    "°F", "°R",
+    "mpg (US)", "mpg (UK)"
 ];
 
 // Standard-Zuordnungen beim harten Wechsel der Hauptkategorie
@@ -270,13 +209,16 @@ const categoryDefaults = {
     frequency: { from: "Hz", to: "kHz" },
     decimalprefixes: { from: "k", to: "M" },
     angle: { from: "°", to: "rad" },
-    datasize: { from: "MB", to: "GB" }
+    datasize: { from: "MB", to: "GB" },
+    temperature: { from: "°C", to: "°F" },
+    fuelconsumption: { from: "l/100km", to: "mpg (US)" }
 };
 
 // Kategorien, die nur im Advanced Mode als Buttons sichtbar sind
 const advancedCategoryNames = [
     "volume", "pressure", "energy", "frequency",
-    "decimalprefixes", "angle", "datasize"
+    "decimalprefixes", "angle", "datasize",
+    "temperature", "fuelconsumption"
 ]; // wird mit jeder neuen Advanced-Kategorie ergänzt
 
 function updateAdvancedCategoryVisibility(isAdvanced) {
@@ -291,6 +233,54 @@ function updateAdvancedCategoryVisibility(isAdvanced) {
         if (lengthButton) lengthButton.click();
     }
 }
+
+// ==========================================================================
+// SONDERFÄLLE: Temperatur & Kraftstoffverbrauch
+// Diese zwei Kategorien lassen sich NICHT über einen einzelnen
+// Multiplikationsfaktor umrechnen (Temperatur hat einen Offset,
+// Kraftstoffverbrauch ist ein reziprokes Verhältnis), deshalb bekommen
+// sie eigene Umrechnungsfunktionen statt nur einen Eintrag in unitsConfig.
+// ==========================================================================
+
+const specialCategories = ["temperature", "fuelconsumption"];
+
+// --- Temperatur: Kelvin als Dreh- und Angelpunkt ---
+const temperatureConversions = {
+    "°C": { toKelvin: c => c + 273.15,                fromKelvin: k => k - 273.15 },
+    "°F": { toKelvin: f => (f - 32) * 5 / 9 + 273.15,  fromKelvin: k => (k - 273.15) * 9 / 5 + 32 },
+    "K":  { toKelvin: k => k,                          fromKelvin: k => k },
+    "°R": { toKelvin: r => r * 5 / 9,                  fromKelvin: k => k * 9 / 5 }
+};
+
+function convertTemperature(value, fromUnit, toUnit) {
+    const kelvin = temperatureConversions[fromUnit].toKelvin(value);
+    return temperatureConversions[toUnit].fromKelvin(kelvin);
+}
+
+// --- Kraftstoffverbrauch: l/100km als Dreh- und Angelpunkt ---
+// "null" bei l/100km bedeutet "ist schon die Basis, keine Konstante nötig"
+const fuelConstants = {
+    "l/100km": null,
+    "km/l": 100,
+    "mpg (US)": 235.214583,
+    "mpg (UK)": 282.480936
+};
+
+function fuelToBase(value, unit) {
+    const c = fuelConstants[unit];
+    return c === null ? value : c / value;
+}
+
+function fuelFromBase(literPer100km, unit) {
+    const c = fuelConstants[unit];
+    return c === null ? literPer100km : c / literPer100km;
+}
+
+function convertFuel(value, fromUnit, toUnit) {
+    const literPer100km = fuelToBase(value, fromUnit);
+    return fuelFromBase(literPer100km, toUnit);
+}
+
 // Hilfsfunktion: Holt die aktivierten Einheiten und sortiert sie sauber nach System und Größe
 function getActiveUnits() {
     const category = unitsConfig[currentCategory];
@@ -309,12 +299,12 @@ function getActiveUnits() {
 // Sortiert ein Objekt: Erst Metrisch (klein -> groß), dann Imperial/Astro (klein -> groß)
 function sortUnitsBySystemAndValue(obj) {
     const entries = Object.entries(obj);
-    
+
     // 1. Metrische Einheiten filtern und sortieren
     const metricEntries = entries
         .filter(([key]) => !imperialUnits.includes(key))
         .sort((a, b) => a[1] - b[1]);
-        
+
     // 2. Imperiale / US / Astro Einheiten filtern und sortieren
     const imperialEntries = entries
         .filter(([key]) => imperialUnits.includes(key))
@@ -335,17 +325,17 @@ function hideError() {
 
 function showError(msg = "Falsche Eingabe") {
     // 1. Rechenweg-Box komplett unsichtbar machen
-    ausgabeContainer.style.display = "none"; 
-    
+    ausgabeContainer.style.display = "none";
+
     // 2. Fehlermeldung befüllen und anzeigen
     errorMessages.textContent = msg;
-    errorMessages.style.display = "block"; 
+    errorMessages.style.display = "block";
 }
 
 // Die Berechnungs-Funktion
 function calculate() {
     const inputValue = inputEinheit.value.trim();
-    
+
     // Fall 1: Das Eingabefeld ist komplett leer
     if (inputValue === "") {
         loesungOutput.innerText = "Ergebnis";
@@ -363,7 +353,7 @@ function calculate() {
         rechenwegOutput.innerHTML = "";
         showError("Falsche Eingabe"); // Hier wird der Rechenweg versteckt und der rote Fehler gezeigt
         return;
-    } 
+    }
 
     // Wenn wir hier landen, ist die Zahl valide -> Fehler wegschalten!
     hideError();
@@ -374,8 +364,14 @@ function calculate() {
 
     if (!unitFrom || !unitTo) return;
 
+    // ── SONDERFÄLLE abfangen, bevor die normale Faktor-Logik startet ───────
+    if (specialCategories.includes(currentCategory)) {
+        calculateSpecial(parsedValue, unitFrom, unitTo);
+        return;
+    }
+
     const currentUnitsList = getActiveUnits();
-    
+
     if (!currentUnitsList[unitFrom] || !currentUnitsList[unitTo]) {
         loesungOutput.innerText = "Ergebnis";
         rechenwegOutput.innerHTML = "";
@@ -397,30 +393,100 @@ function calculate() {
     loesungOutput.innerText = `${formattedResult} ${unitTo}`;
 
     // Fall 3: Erfolgreiche Berechnung -> Rechenweg-Box einblenden
-    ausgabeContainer.style.display = "flex"; 
+    ausgabeContainer.style.display = "flex";
 
     if (unitFrom === unitTo) {
-    rechenwegOutput.innerHTML = `<pre>Identische Einheiten: Keine Berechnung notwendig.</pre>`;
+        rechenwegOutput.innerHTML = `<pre>Identische Einheiten: Keine Berechnung notwendig.</pre>`;
     } else {
-    // Faktor für die ANZEIGE bestimmen: manchmal ist der Kehrwert "schöner"
-    // (z.B. ÷ 3.6 statt × 0.2777777778 bei km/h -> m/s)
-    let displayOperator = "×";
-    let displayFactor = directFactor;
+        // Faktor für die ANZEIGE bestimmen: manchmal ist der Kehrwert "schöner"
+        // (z.B. ÷ 3.6 statt × 0.2777777778 bei km/h -> m/s)
+        let displayOperator = "×";
+        let displayFactor = directFactor;
 
-    if (directFactor >= 0.0001 && directFactor < 1) {
-        const inverse = 1 / directFactor;
-        if (countDecimals(inverse) <= 4 && countDecimals(inverse) < countDecimals(directFactor)) {
-            displayOperator = "÷";
-            displayFactor = inverse;
+        if (directFactor >= 0.0001 && directFactor < 1) {
+            const inverse = 1 / directFactor;
+            if (countDecimals(inverse) <= 4 && countDecimals(inverse) < countDecimals(directFactor)) {
+                displayOperator = "÷";
+                displayFactor = inverse;
+            }
         }
+
+        const printFactor = formatFactor(displayFactor);
+
+        rechenwegOutput.innerHTML = `
+            <pre>Formel:    Wert ${displayOperator} ${printFactor}\nRechnung:  ${parsedValue} ${unitFrom} ${displayOperator} ${printFactor} = <b>${formattedResult} ${unitTo}</b></pre>
+        `;
+    }
+}
+
+// ==========================================================================
+// SONDERFÄLLE: Berechnung für Temperatur & Kraftstoffverbrauch
+// ==========================================================================
+
+function calculateSpecial(parsedValue, unitFrom, unitTo) {
+    const validLookup = currentCategory === "temperature" ? temperatureConversions : fuelConstants;
+
+    // Schutz, falls Dropdowns gerade erst umgebaut werden (Race Condition)
+    if (!validLookup.hasOwnProperty(unitFrom) || !validLookup.hasOwnProperty(unitTo)) {
+        loesungOutput.innerText = "Ergebnis";
+        rechenwegOutput.innerHTML = "";
+        ausgabeContainer.style.display = "none";
+        return;
     }
 
-    const printFactor = formatFactor(displayFactor);
+    const result = currentCategory === "temperature"
+        ? convertTemperature(parsedValue, unitFrom, unitTo)
+        : convertFuel(parsedValue, unitFrom, unitTo);
 
-    rechenwegOutput.innerHTML = `
-        <pre>Formel:    Wert ${displayOperator} ${printFactor}\nRechnung:  ${parsedValue} ${unitFrom} ${displayOperator} ${printFactor} = <b>${formattedResult} ${unitTo}</b></pre>
-    `;
+    if (!isFinite(result)) {
+        showError("Diese Umrechnung ist bei diesem Wert nicht möglich (Division durch 0).");
+        return;
     }
+
+    const formattedResult = Number(result.toFixed(4));
+    loesungOutput.innerText = `${formattedResult} ${unitTo}`;
+    ausgabeContainer.style.display = "flex";
+
+    if (unitFrom === unitTo) {
+        rechenwegOutput.innerHTML = `<pre>Identische Einheiten: Keine Berechnung notwendig.</pre>`;
+        return;
+    }
+
+    rechenwegOutput.innerHTML = currentCategory === "temperature"
+        ? buildTemperatureRechenweg(parsedValue, unitFrom, unitTo, result)
+        : buildFuelRechenweg(parsedValue, unitFrom, unitTo, result);
+}
+
+function buildTemperatureRechenweg(value, fromUnit, toUnit, result) {
+    const kelvin = temperatureConversions[fromUnit].toKelvin(value);
+    const lines = [];
+
+    if (fromUnit !== "K") {
+        lines.push(`Schritt 1: ${fromUnit} → K (Kelvin als Zwischenschritt)`);
+        lines.push(`${value} ${fromUnit} = ${kelvin.toFixed(4)} K`);
+    }
+    if (toUnit !== "K") {
+        lines.push(`${fromUnit !== "K" ? "Schritt 2" : "Schritt 1"}: K → ${toUnit}`);
+        lines.push(`${kelvin.toFixed(4)} K = ${result.toFixed(4)} ${toUnit}`);
+    }
+
+    return `<pre>${lines.join("\n")}\n\nLösung: <b>${result.toFixed(4)} ${toUnit}</b></pre>`;
+}
+
+function buildFuelRechenweg(value, fromUnit, toUnit, result) {
+    const literPer100km = fuelToBase(value, fromUnit);
+    const lines = [];
+
+    if (fromUnit !== "l/100km") {
+        lines.push(`Schritt 1: ${fromUnit} → l/100km`);
+        lines.push(`${formatFactor(fuelConstants[fromUnit])} ÷ ${value} = ${literPer100km.toFixed(4)} l/100km`);
+    }
+    if (toUnit !== "l/100km") {
+        lines.push(`${fromUnit !== "l/100km" ? "Schritt 2" : "Schritt 1"}: l/100km → ${toUnit}`);
+        lines.push(`${formatFactor(fuelConstants[toUnit])} ÷ ${literPer100km.toFixed(4)} = ${result.toFixed(4)} ${toUnit}`);
+    }
+
+    return `<pre>${lines.join("\n")}\n\nLösung: <b>${result.toFixed(4)} ${toUnit}</b></pre>`;
 }
 
 // Generiert die Optionen für die Dropdowns basierend auf dem Advanced-Status
@@ -465,7 +531,6 @@ unitsButtons.forEach(button => {
             einheitZ.value = defaults.to;
         }
 
-
         calculate();
     });
 });
@@ -487,7 +552,6 @@ function formatFactor(num) {
     }
     return parseFloat(num.toFixed(10)).toString();
 }
-
 
 inputEinheit.addEventListener("input", calculate);
 einheitA.addEventListener("change", calculate);
