@@ -1089,3 +1089,29 @@ body {
         flex-direction: column;
     }
 }
+
+.designBtn{
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.4rem 1.4rem;
+    color: var(--text-secondary);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-lg);
+    outline: none;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.designBtn:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Wenn ein Design-Button aktiv ist */
+.designBtn.active {
+    background: var(--border-glow);
+    color: var(--text-primary);
+    box-shadow: 0 0 15px var(--glow-soft);
+    font-weight: 600;
+}

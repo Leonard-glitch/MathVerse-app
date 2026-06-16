@@ -267,6 +267,10 @@ function updateStrength(pw) {
 // ERSCHEINUNGSBILD-PANEL
 // =============================================================================
 
+// =============================================================================
+// ERSCHEINUNGSBILD-PANEL
+// =============================================================================
+
 function initAppearancePanel() {
     const swatches = document.querySelectorAll('.colorSwatch');
     const slider   = document.getElementById('fontSizeSlider');
@@ -275,53 +279,86 @@ function initAppearancePanel() {
     const resetBtn = document.getElementById('resetAppearanceBtn');
     const toast    = document.getElementById('appearanceToast');
 
-    const currentTheme    = window.MV.getTheme();
-    const currentFontSize = window.MV.getFontSize();
+    // NEU: Design Buttons holen
+    const designButtons = document.querySelectorAll('.designBtn');
 
+    // Aktuelle Werte als "Pending" (Vorschau-Zustand) laden
+    let pendingTheme    = window.MV.getTheme();
+    let pendingFontSize = window.MV.getFontSize();
+    let pendingDesign   = window.MV.getDesign(); // NEU
+
+    // Initialen aktiven Zustand für Akzentfarbe setzen
     swatches.forEach(s => s.classList.remove('active'));
-    document.querySelector(`.colorSwatch[data-theme="${currentTheme}"]`)
+    document.querySelector(`.colorSwatch[data-theme="${pendingTheme}"]`)
         ?.classList.add('active');
 
+    // NEU: Initialen aktiven Zustand für Design Buttons setzen
+    designButtons.forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.designBtn[data-design="${pendingDesign}"]`)
+        ?.classList.add('active');
+
+    // Event-Listener für Akzentfarben (Live-Vorschau)
     swatches.forEach(swatch => {
         swatch.addEventListener('click', () => {
             swatches.forEach(s => s.classList.remove('active'));
             swatch.classList.add('active');
             pendingTheme = swatch.dataset.theme;
-            window.MV.applyTheme(pendingTheme); // Live-Vorschau
+            window.MV.applyTheme(pendingTheme);
         });
     });
 
+    // NEU: Event-Listener für Design-Buttons (Live-Vorschau über var())
+    designButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            designButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            pendingDesign = btn.dataset.design;
+            window.MV.applyDesign(pendingDesign); // Wendet die CSS-Variablen live an
+        });
+    });
+
+    // Font-Size Slider Logik
     if (slider) {
-        slider.value = currentFontSize;
-        if (display) display.textContent = currentFontSize;
+        slider.value = pendingFontSize;
+        if (display) display.textContent = pendingFontSize;
 
         slider.addEventListener('input', () => {
             pendingFontSize = parseInt(slider.value, 10);
             if (display) display.textContent = pendingFontSize;
-            window.MV.applyFontSize(pendingFontSize); // Live-Vorschau
+            window.MV.applyFontSize(pendingFontSize);
         });
     }
 
+    // Design speichern
     saveBtn?.addEventListener('click', () => {
         window.MV.setTheme(pendingTheme);
         window.MV.setFontSize(pendingFontSize);
+        window.MV.setDesign(pendingDesign); // NEU
 
         toast.classList.remove('hidden');
         setTimeout(() => toast.classList.add('hidden'), 3000);
     });
 
+    // Zurücksetzen auf Standardwerte
     resetBtn?.addEventListener('click', () => {
         pendingTheme    = 'violet';
         pendingFontSize = 20;
+        pendingDesign   = 'abyss'; // NEU: Standard ist Abyss
 
         window.MV.applyTheme(pendingTheme);
         window.MV.applyFontSize(pendingFontSize);
+        window.MV.applyDesign(pendingDesign); // NEU
 
         if (slider)  slider.value         = 20;
         if (display) display.textContent  = 20;
 
         swatches.forEach(s => s.classList.remove('active'));
         document.querySelector('.colorSwatch[data-theme="violet"]')
+            ?.classList.add('active');
+
+        // NEU: Buttons auf Abyss zurücksetzen
+        designButtons.forEach(b => b.classList.remove('active'));
+        document.querySelector('.designBtn[data-design="abyss"]')
             ?.classList.add('active');
     });
 }

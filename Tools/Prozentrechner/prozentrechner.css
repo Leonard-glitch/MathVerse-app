@@ -20,6 +20,8 @@
     border: 3.5px solid var(--border-glow);
     border-radius: 30px;
     padding: 0.3rem;
+
+    background-color:  var(--bg-surface);;
 }
 
 legend{

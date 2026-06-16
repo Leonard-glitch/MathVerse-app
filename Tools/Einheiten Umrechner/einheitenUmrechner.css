@@ -181,7 +181,7 @@
     color: #e0e0ff;
     
     width: 100%;               /* Nutzt standardmäßig die 450px der Hauptbox */
-    white-space: pre;          /* Erzwingt, dass die Formel in ihrer Struktur bleibt */
+    white-space: pre-wrap;   /* war: white-space: pre; */
     
     /* Scrollbalken-Verhalten */
     overflow-x: auto;          /* Scrollbar ploppt NUR innerhalb dieses Feldes auf */

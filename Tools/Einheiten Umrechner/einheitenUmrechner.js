@@ -6,6 +6,8 @@ const unitsConfig = {
             cm: 0.01,
             dm: 0.1,
             m: 1,
+            dam: 10,
+            hm: 100,
             km: 1000
         },
         advanced: {
@@ -214,6 +216,100 @@ const categoryDefaults = {
     fuelconsumption: { from: "l/100km", to: "mpg (US)" }
 };
 
+// ==========================================================================
+// AUSGESCHRIEBENE EINHEITENNAMEN für die Dropdowns
+// Jeder Eintrag enthält bereits den fertigen Anzeigetext (inkl. Symbol in
+// Klammern, wo das sinnvoll ist). Bei Einheiten, deren Symbol selbst schon
+// runde Klammern enthält (z.B. "pt (US)") oder die schon ein eigenständiges
+// Wort sind (z.B. "Byte"), wird das Symbol bewusst NICHT noch einmal
+// angehängt, um doppelte Klammern bzw. Wiederholungen zu vermeiden.
+// ==========================================================================
+const unitLabels = {
+    length: {
+        mm: "Millimeter (mm)", cm: "Zentimeter (cm)", dm: "Dezimeter (dm)", m: "Meter (m)",
+        dam: "Dekameter (dam)", hm: "Hektometer (hm)", km: "Kilometer (km)",
+        nm: "Nanometer (nm)", µm: "Mikrometer (µm)", in: "Zoll (in)", ft: "Fuß (ft)",
+        yd: "Yard (yd)", mi: "Meile (mi)", nmi: "Seemeile (nmi)", ly: "Lichtjahr (ly)"
+    },
+    mass: {
+        mg: "Milligramm (mg)", g: "Gramm (g)", kg: "Kilogramm (kg)", t: "Tonne (t)",
+        µg: "Mikrogramm (µg)", cg: "Zentigramm (cg)", dg: "Dezigramm (dg)", dag: "Dekagramm (dag)",
+        hg: "Hektogramm (hg)", dt: "Doppelzentner (dt)", gr: "Gran (gr)", oz: "Unze (oz)",
+        lb: "Pfund (lb)", st: "Stone (st)", ct: "Karat (ct)"
+    },
+    time: {
+        s: "Sekunde (s)", min: "Minute (min)", h: "Stunde (h)", d: "Tag (d)",
+        ns: "Nanosekunde (ns)", µs: "Mikrosekunde (µs)", ms: "Millisekunde (ms)",
+        wk: "Woche (wk)", mo: "Monat (mo)", yr: "Jahr (yr)", dec: "Dekade (dec)", cen: "Jahrhundert (cen)"
+    },
+    area: {
+        "mm²": "Quadratmillimeter (mm²)", "cm²": "Quadratzentimeter (cm²)", "dm²": "Quadratdezimeter (dm²)",
+        "m²": "Quadratmeter (m²)", "a": "Ar (a)", "ha": "Hektar (ha)", "km²": "Quadratkilometer (km²)",
+        "in²": "Quadratzoll (in²)", "ft²": "Quadratfuß (ft²)", "yd²": "Quadratyard (yd²)",
+        "ac": "Acre (ac)", "mi²": "Quadratmeile (mi²)"
+    },
+    speed: {
+        "mm/s": "Millimeter pro Sekunde (mm/s)", "cm/s": "Zentimeter pro Sekunde (cm/s)",
+        "m/s": "Meter pro Sekunde (m/s)", "km/h": "Kilometer pro Stunde (km/h)",
+        "km/s": "Kilometer pro Sekunde (km/s)", "in/s": "Zoll pro Sekunde (in/s)",
+        "ft/s": "Fuß pro Sekunde (ft/s)", "mph": "Meilen pro Stunde (mph)",
+        "kn": "Knoten (kn)", "mach": "Mach (mach)", "c": "Lichtgeschwindigkeit (c)"
+    },
+    volume: {
+        "mm³": "Kubikmillimeter (mm³)", "ml": "Milliliter (ml)", "cm³": "Kubikzentimeter (cm³)",
+        "cl": "Zentiliter (cl)", "dl": "Deziliter (dl)", "l": "Liter (l)", "dm³": "Kubikdezimeter (dm³)",
+        "hl": "Hektoliter (hl)", "m³": "Kubikmeter (m³)", "dam³": "Kubikdekameter (dam³)",
+        "hm³": "Kubikhektometer (hm³)", "km³": "Kubikkilometer (km³)",
+        "µl": "Mikroliter (µl)", "nl": "Nanoliter (nl)", "in³": "Kubikzoll (in³)",
+        "fl oz (UK)": "Flüssigunze (UK)", "fl oz (US)": "Flüssigunze (US)",
+        "pt (US)": "Pint (US)", "pt (UK)": "Pint (UK)",
+        "gal (US)": "Gallone (US)", "gal (UK)": "Gallone (UK)", "ft³": "Kubikfuß (ft³)"
+    },
+    pressure: {
+        Pa: "Pascal (Pa)", hPa: "Hektopascal (hPa)", kPa: "Kilopascal (kPa)", MPa: "Megapascal (MPa)",
+        bar: "Bar (bar)", mbar: "Millibar (mbar)", atm: "Atmosphäre (atm)",
+        mmHg: "Millimeter-Quecksilbersäule (mmHg)", psi: "Pfund pro Quadratzoll (psi)",
+        inHg: "Zoll-Quecksilbersäule (inHg)"
+    },
+    energy: {
+        J: "Joule (J)", kJ: "Kilojoule (kJ)", MJ: "Megajoule (MJ)", Wh: "Wattstunde (Wh)",
+        kWh: "Kilowattstunde (kWh)", MWh: "Megawattstunde (MWh)", cal: "Kalorie (cal)",
+        kcal: "Kilokalorie (kcal)", eV: "Elektronenvolt (eV)", BTU: "British Thermal Unit (BTU)"
+    },
+    frequency: {
+        Hz: "Hertz (Hz)", kHz: "Kilohertz (kHz)", MHz: "Megahertz (MHz)", GHz: "Gigahertz (GHz)",
+        THz: "Terahertz (THz)", rpm: "Umdrehungen pro Minute (rpm)"
+    },
+    decimalprefixes: {
+        y: "Yokto (y)", z: "Zepto (z)", a: "Atto (a)", f: "Femto (f)", p: "Piko (p)", n: "Nano (n)",
+        µ: "Mikro (µ)", m: "Milli (m)", c: "Zenti (c)", d: "Dezi (d)", Einheit: "Keine Vorsilbe",
+        da: "Deka (da)", h: "Hekto (h)", k: "Kilo (k)", M: "Mega (M)", G: "Giga (G)",
+        T: "Tera (T)", P: "Peta (P)", E: "Exa (E)", Z: "Zetta (Z)", Y: "Yotta (Y)"
+    },
+    angle: {
+        "°": "Grad (°)", rad: "Radiant (rad)", gon: "Gon (gon)",
+        "′": "Bogenminute (′)", "″": "Bogensekunde (″)", Umdrehung: "Umdrehung"
+    },
+    datasize: {
+        Bit: "Bit", Byte: "Byte", KB: "Kilobyte (KB)", KiB: "Kibibyte (KiB)",
+        MB: "Megabyte (MB)", MiB: "Mebibyte (MiB)", GB: "Gigabyte (GB)", GiB: "Gibibyte (GiB)",
+        TB: "Terabyte (TB)", TiB: "Tebibyte (TiB)", PB: "Petabyte (PB)", PiB: "Pebibyte (PiB)"
+    },
+    temperature: {
+        "°C": "Grad Celsius (°C)", "°F": "Grad Fahrenheit (°F)", "K": "Kelvin (K)", "°R": "Grad Rankine (°R)"
+    },
+    fuelconsumption: {
+        "l/100km": "Liter pro 100 km (l/100km)", "km/l": "Kilometer pro Liter (km/l)",
+        "mpg (US)": "Miles per Gallon US (mpg)", "mpg (UK)": "Miles per Gallon UK (mpg)"
+    }
+};
+
+// Holt den Anzeigetext für eine Einheit; fällt auf das reine Symbol zurück,
+// falls (noch) kein ausgeschriebener Name hinterlegt ist.
+function getUnitDisplayLabel(unit) {
+    return (unitLabels[currentCategory] && unitLabels[currentCategory][unit]) || unit;
+}
+
 // Kategorien, die nur im Advanced Mode als Buttons sichtbar sind
 const advancedCategoryNames = [
     "volume", "pressure", "energy", "frequency",
@@ -413,9 +509,12 @@ function calculate() {
 
         const printFactor = formatFactor(displayFactor);
 
-        rechenwegOutput.innerHTML = `
-            <pre>Formel:    Wert ${displayOperator} ${printFactor}\nRechnung:  ${parsedValue} ${unitFrom} ${displayOperator} ${printFactor} = <b>${formattedResult} ${unitTo}</b></pre>
-        `;
+        const formelLine = `Formel:    Wert ${displayOperator} ${printFactor}`;
+        const rechnungLine = wrapAtEquals(
+            `Rechnung:  ${parsedValue} ${unitFrom} ${displayOperator} ${printFactor} = <b>${formattedResult} ${unitTo}</b>`
+        );
+
+        rechenwegOutput.innerHTML = `<pre>${formelLine}\n${rechnungLine}</pre>`;
     }
 }
 
@@ -463,11 +562,11 @@ function buildTemperatureRechenweg(value, fromUnit, toUnit, result) {
 
     if (fromUnit !== "K") {
         lines.push(`Schritt 1: ${fromUnit} → K (Kelvin als Zwischenschritt)`);
-        lines.push(`${value} ${fromUnit} = ${kelvin.toFixed(4)} K`);
+        lines.push(wrapAtEquals(`${value} ${fromUnit} = ${kelvin.toFixed(4)} K`));
     }
     if (toUnit !== "K") {
         lines.push(`${fromUnit !== "K" ? "Schritt 2" : "Schritt 1"}: K → ${toUnit}`);
-        lines.push(`${kelvin.toFixed(4)} K = ${result.toFixed(4)} ${toUnit}`);
+        lines.push(wrapAtEquals(`${kelvin.toFixed(4)} K = ${result.toFixed(4)} ${toUnit}`));
     }
 
     return `<pre>${lines.join("\n")}\n\nLösung: <b>${result.toFixed(4)} ${toUnit}</b></pre>`;
@@ -479,11 +578,11 @@ function buildFuelRechenweg(value, fromUnit, toUnit, result) {
 
     if (fromUnit !== "l/100km") {
         lines.push(`Schritt 1: ${fromUnit} → l/100km`);
-        lines.push(`${formatFactor(fuelConstants[fromUnit])} ÷ ${value} = ${literPer100km.toFixed(4)} l/100km`);
+        lines.push(wrapAtEquals(`${formatFactor(fuelConstants[fromUnit])} ÷ ${value} = ${literPer100km.toFixed(4)} l/100km`));
     }
     if (toUnit !== "l/100km") {
         lines.push(`${fromUnit !== "l/100km" ? "Schritt 2" : "Schritt 1"}: l/100km → ${toUnit}`);
-        lines.push(`${formatFactor(fuelConstants[toUnit])} ÷ ${literPer100km.toFixed(4)} = ${result.toFixed(4)} ${toUnit}`);
+        lines.push(wrapAtEquals(`${formatFactor(fuelConstants[toUnit])} ÷ ${literPer100km.toFixed(4)} = ${result.toFixed(4)} ${toUnit}`));
     }
 
     return `<pre>${lines.join("\n")}\n\nLösung: <b>${result.toFixed(4)} ${toUnit}</b></pre>`;
@@ -502,8 +601,9 @@ function updateDropdowns() {
     einheitZ.innerHTML = "";
 
     keys.forEach(unit => {
-        einheitA.innerHTML += `<option value="${unit}">${unit}</option>`;
-        einheitZ.innerHTML += `<option value="${unit}">${unit}</option>`;
+        const displayText = getUnitDisplayLabel(unit);
+        einheitA.innerHTML += `<option value="${unit}">${displayText}</option>`;
+        einheitZ.innerHTML += `<option value="${unit}">${displayText}</option>`;
     });
 
     // Versuchen die alten Werte zu setzen, sonst Fallback auf Standard basics
@@ -551,6 +651,20 @@ function formatFactor(num) {
         return num.toExponential(6);
     }
     return parseFloat(num.toFixed(10)).toString();
+}
+
+// Macht eine Zeile mit "=" gezielt umbruchfähig: Ersetzt alle Leerzeichen
+// AUSSER dem einen direkt nach "=" durch &nbsp; (nicht umbrechbar). Dadurch
+// kann der Browser nur an genau dieser Stelle umbrechen - und tut das auch
+// nur, wenn die Zeile tatsächlich zu lang für die Box ist ("wenn nötig").
+function wrapAtEquals(line) {
+    const idx = line.lastIndexOf("=");
+    if (idx === -1) return line;
+
+    const before = line.slice(0, idx + 1).replace(/ /g, "&nbsp;");
+    const after = line.slice(idx + 1).trim().replace(/ /g, "&nbsp;");
+
+    return `${before} ${after}`;
 }
 
 inputEinheit.addEventListener("input", calculate);

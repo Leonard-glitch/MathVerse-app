@@ -23,19 +23,41 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         gold:   { '--border-glow': '#f5c518', '--accent-color': '#f5c518', '--accent-hover': '#f7d04e', '--glow-soft': 'rgba(245, 197, 24, 0.25)', '--glow-hard': 'rgba(245, 197, 24, 0.4)', '--border-accent': '#f5c518' },
     };
 
-    // Schema für currentUser – einzige Quelle der Wahrheit
+    // ==========================================================================
+    // DESIGNS – Zentral gesteuerte Hintergrund- und Textfarben
+    // ==========================================================================
+    const DESIGNS = {
+        abyss: {
+            '--bg-body': '#09090e',
+            '--bg-card': '#0b1528',
+            '--text-color': '#f3f4f6',
+        },
+        dark: {
+            '--bg-body': '#121214a2',
+            '--bg-card': '#1a1a1e',
+            '--text-color': '#ffffff',
+        },
+        light: {
+            '--bg-body': '#f8fafc',
+            '--bg-card': '#ffffff',
+            '--text-color': '#0f172a',
+        }
+    };
+
+    // Schema für currentUser anpassen (Standard auf 'abyss')
     const DEFAULT_USER = () => ({
-    username: 'Gast',
-    email: '',
-    password: '',
-    favoriten: [],
-    pinnedGroups: [],
-    containerOrders: {},
-    advancedModes: {},
-    theme: 'violet',
-    fontsize: 20,
-    isPro: false
-});
+        username: 'Gast',
+        email: '',
+        password: '',
+        favoriten: [],
+        pinnedGroups: [],
+        containerOrders: {},
+        advancedModes: {},
+        theme: 'violet',
+        design: 'abyss',
+        fontsize: 20,
+        isPro: false
+    });
 
     // ==========================================================================
     // CORE STORAGE HELPERS
@@ -315,6 +337,33 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     }
 
     // ==========================================================================
+    // DESIGN (Hintergrund- und Textfarben) – gleiche Logik wie Theme, aber
+    // eigenständiger Speicher
+    // ==========================================================================
+
+    function getDesign() {
+        const u = getCurrentUser();
+        if (isLoggedIn() && u && u.design) return u.design;
+        return localStorage.getItem('mv-design') || 'abyss'; // Standard: abyss
+    }
+
+    function setDesign(design) {
+        if (isLoggedIn()) {
+            updateCurrentUser({ design });
+        } else {
+            localStorage.setItem('mv-design', design);
+        }
+    }
+
+    function applyDesign(designName) {
+        // Holt die CSS-Variablen aus dem DESIGNS-Objekt (Fallback zu abyss)
+        const vars = DESIGNS[designName] || DESIGNS.abyss;
+        Object.entries(vars).forEach(([key, val]) =>
+            document.documentElement.style.setProperty(key, val)
+        );
+    }
+
+    // ==========================================================================
     // PASSWORT-STÄRKE (zentral – wird von register.js & userArea.js genutzt)
     //
     // Wichtig: Lange, vom Browser/Passwortmanager generierte Passwörter
@@ -433,7 +482,8 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         getPinnedGroups, setPinnedGroups,
         getContainerOrders, setContainerOrders,
         getTheme, setTheme, getFontSize, setFontSize,
-        applyTheme, applyFontSize,
+        getDesign, setDesign,
+        applyTheme, applyFontSize, applyDesign,
         getPasswordStrength,
         showLoginPrompt, hideLoginPrompt,
         getUsername: () => (getCurrentUser()?.username) || 'Gast',
@@ -451,6 +501,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     // ==========================================================================
     applyTheme(getTheme());
     applyFontSize(getFontSize());
+    applyDesign(getDesign());
 
     // ==========================================================================
     // NAVBAR: Login/Register -> Useraccount-Link, wenn eingeloggt
