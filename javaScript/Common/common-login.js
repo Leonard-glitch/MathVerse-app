@@ -27,22 +27,43 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     // DESIGNS – Zentral gesteuerte Hintergrund- und Textfarben
     // ==========================================================================
     const DESIGNS = {
-        abyss: {
-            '--bg-body': '#09090e',
-            '--bg-card': '#0b1528',
-            '--text-color': '#f3f4f6',
-        },
-        dark: {
-            '--bg-body': '#121214a2',
-            '--bg-card': '#1a1a1e',
-            '--text-color': '#ffffff',
-        },
-        light: {
-            '--bg-body': '#f8fafc',
-            '--bg-card': '#ffffff',
-            '--text-color': '#0f172a',
-        }
-    };
+    abyss: {
+        '--bg-body':         '#09090e',
+        '--bg-surface':      '#0b1528',
+        '--bg-surface-glow': '#142036',
+        '--bg-input':        '#05060c',
+        '--bg-navbar':       'rgba(9, 9, 14, 0.75)',
+        '--border-color':    '#1c2740',
+        '--text-primary':    '#f3f4f6',
+        '--text-secondary':  '#8f8fbc',
+        '--text-muted':      '#44496a',
+        '--shadow-main':     '0 10px 30px rgba(0, 0, 0, 0.6)',
+    },
+    dark: {
+        '--bg-body':         '#121214',
+        '--bg-surface':      '#1a1a1e',
+        '--bg-surface-glow': '#232328',
+        '--bg-input':        '#0e0e10',
+        '--bg-navbar':       'rgba(18, 18, 20, 0.75)',
+        '--border-color':    '#2a2a30',
+        '--text-primary':    '#ffffff',
+        '--text-secondary':  '#a0a0ab',
+        '--text-muted':      '#5a5a64',
+        '--shadow-main':     '0 10px 30px rgba(0, 0, 0, 0.6)',
+    },
+    light: {
+        '--bg-body':         '#f8fafc',
+        '--bg-surface':      '#ffffff',
+        '--bg-surface-glow': '#f1f3f6',
+        '--bg-input':        '#f3f4f7',
+        '--bg-navbar':       'rgba(255, 255, 255, 0.75)',
+        '--border-color':    '#e2e4ea',
+        '--text-primary':    '#0f172a',
+        '--text-secondary':  '#51566b',
+        '--text-muted':      '#9598a8',
+        '--shadow-main':     '0 10px 30px rgba(15, 23, 42, 0.08)',
+    }
+};
 
     // Schema für currentUser anpassen (Standard auf 'abyss')
     const DEFAULT_USER = () => ({
