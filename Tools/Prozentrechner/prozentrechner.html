@@ -33,6 +33,12 @@
 
             <h1 class="zahlenHeader">Prozentrechnung</h1>
 
+            <div class="advancedMode">
+                <span class="advancedText">Advanced Mode</span>
+                <!-- Rounded switch -->
+                <label class="switch"><input type="checkbox"><span class="slider round"></span></label>
+            </div>
+
             <div class="tool" data-type="share-of">
                 <fieldset class="formula">
                     <legend>Anteil</legend>
@@ -82,12 +88,86 @@
                 <button type="button" class="buttonPercent">Berechnen</button>
             </div>
 
+            <!-- ==========================================================
+                 ADVANCED MODE – nur sichtbar, wenn der Schalter oben an ist
+                 ========================================================== -->
+            <div class="advancedToolsGroup" id="advancedToolsGroup">
 
+                
 
+                <div class="tool" data-type="percent-change">
+                    <fieldset class="formula">
+                        <legend>Prozentuale Veränderung</legend>
+                        <input data-role="alt" class="zahlenInputfeld" placeholder="80">
+                        <span class="textSpan">auf</span>
+                        <input data-role="neu" class="zahlenInputfeld" placeholder="100">
+                        <span class="textSpan">= ? % Veränderung</span>
 
+                            <div class="formulaErgebnis">
+                                <p class="ergebnisText"></p>
+                            </div>
+                    </fieldset>
 
-            
-            
+                    <button type="button" class="buttonPercent">Berechnen</button>
+                </div>
+
+                <div class="tool" data-type="increase-decrease">
+                    <fieldset class="formula">
+                        <legend>Erhöhung / Verminderung</legend>
+                        <input data-role="G" class="zahlenInputfeld" placeholder="150">
+                        <select data-role="op" class="selectPercent">
+                            <option value="increase">erhöht um</option>
+                            <option value="decrease">vermindert um</option>
+                        </select>
+                        <input data-role="p" class="zahlenInputfeld" placeholder="20">
+                        <span class="textSpan">% = ?</span>
+
+                            <div class="formulaErgebnis">
+                                <p class="ergebnisText"></p>
+                            </div>
+                    </fieldset>
+
+                    <button type="button" class="buttonPercent">Berechnen</button>
+                </div>
+
+                <div class="tool" data-type="vat">
+                    <fieldset class="formula">
+                        <legend>Mehrwertsteuer</legend>
+                        <select data-role="direction" class="selectPercent">
+                            <option value="net-to-gross">Netto → Brutto</option>
+                            <option value="gross-to-net">Brutto → Netto</option>
+                        </select>
+                        <input data-role="wert" class="zahlenInputfeld" placeholder="100">
+                        <span class="textSpan">bei</span>
+                        <input data-role="steuersatz" class="zahlenInputfeld" placeholder="20">
+                        <span class="textSpan">% MwSt = ?</span>
+
+                            <div class="formulaErgebnis">
+                                <p class="ergebnisText"></p>
+                            </div>
+                    </fieldset>
+
+                    <button type="button" class="buttonPercent">Berechnen</button>
+                </div>
+
+                <div class="tool" data-type="discount">
+                    <fieldset class="formula">
+                        <legend>Rabatt / Skonto</legend>
+                        <input data-role="G" class="zahlenInputfeld" placeholder="200">
+                        <span class="textSpan">− Rabatt von</span>
+                        <input data-role="p" class="zahlenInputfeld" placeholder="15">
+                        <span class="textSpan">% = ?</span>
+
+                            <div class="formulaErgebnis">
+                                <p class="ergebnisText"></p>
+                            </div>
+                    </fieldset>
+
+                    <button type="button" class="buttonPercent">Berechnen</button>
+                </div>
+
+            </div>
+
             <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
 
             <div class="zahlenAusgabestyle">
