@@ -8,6 +8,7 @@
 
 .instructionText{
     font-size: 0.85rem;
+    text-align: center;
     color: var(--text-secondary);
     margin: 1.5rem;
 }
@@ -106,7 +107,7 @@
 
 
 .rechenwegDiv {
-    display: none;
+    display: flex;
     flex-direction: column;
 }
 

@@ -1,7 +1,7 @@
 
 TOOLS:
 
-----Einheiten Umrechner:
+----Einheiten Umrechner----
 
 (https://www.convertworld.com/de/ + google Umrechner)
 No Advanced Mode + Extencion:
@@ -30,7 +30,7 @@ Advanced Mode:
 
 
 
-----Prozent Rechner:
+----Prozent Rechner----
 
 (https://www.blitzrechner.de/prozent/)
 No Advanced Mode + Extencion:
@@ -51,7 +51,7 @@ Advanced Mode:
 
 
 
-----Dreisatz Rechner
+----Dreisatz Rechner----
 
 https://www.finanz-tools.de/dreisatz-rechner
 
@@ -61,6 +61,12 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 
 
 
-----Zahlen Analyse
+----Zahlen Analyse----
 + ggT
 + kgV
+
+
+
+
+
+----Dezimal<-->Bruch----
