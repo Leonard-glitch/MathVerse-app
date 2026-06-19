@@ -5,12 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dreisatz Rechner</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
     <link rel="stylesheet" href="./dreisatz.css">
 </head>
 <body>
-    <header>
+        <header>
         <nav class="navbar">
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
@@ -20,65 +21,66 @@
             <div id="searchResults"></div>
         </div>
 
-        <div id="navUserArea">
-            <a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
+        <div id="navUserArea"><a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
             <a href="../../html/register.html" target="_self" class="navTextBorder">Register</a>
         </div>
     </nav>
     </header>
+
     <main>
         <section class="dreisatzSection">
             <h1 class="zahlenHeader">Dreisatz Rechner</h1>
 
-            <h2 class="instructionText">Geben Sie in eine Zeile das bekannte Verhältnis hinein und in die andere ihre dritte Variable</h2>
+            <div class="dreisatzTypeTabs">
+                <button class="dreisatzTypeBtn active" data-type="proportional">Proportional</button>
+                <button class="dreisatzTypeBtn" data-type="antiproportional">Antiproportional</button>
+            </div>
 
+            <p class="instructionText">Lasse das gesuchte Feld leer – es wird automatisch berechnet.</p>
+
+            <div class="dreisatzLabels">
+                <span>Größe 1</span>
+                <span>Größe 2</span>
+            </div>
             <div class="dreisatzContainer">
                 <div class="row">
-                    <input type="number" id="inputFeld1" placeholder="15" class="zahlenInputfeld">
-                    <input type="number" id="inputFeld2" placeholder="20" class="zahlenInputfeld">
+                    <input type="number" id="inputFeld1" placeholder="..." class="zahlenInputfeld">
+                    <input type="number" id="inputFeld2" placeholder="..." class="zahlenInputfeld">
                 </div>
                 <div class="row">
-                    <input type="number" id="inputFeld3" placeholder="23" class="zahlenInputfeld">
-                    <input type="number" id="inputFeld4" placeholder="?" class="zahlenInputfeld">
+                    <input type="number" id="inputFeld3" placeholder="..." class="zahlenInputfeld">
+                    <input type="number" id="inputFeld4" placeholder="..." class="zahlenInputfeld">
                 </div>
             </div>
 
-            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+            <p class="falscheEingabestyle" id="errorMessages"></p>
 
-            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
-
-            <div class="zahlenAusgabestyle">
+            <div class="zahlenAusgabestyle" id="ausgabeContainer" style="display: none;">
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                    <p class="rechenwegText">Rechenweg:</p>
+                    <div id="rechenwegOutput"></div>
                 </div>
-                <span id="tipp"></span>
             </div>
-
-            
         </section>
-
     </main>
+
     <footer>
         <div class="footerNav">
-
             <div class="footerSocial">
                 <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
                 <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
                 <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
             </div>
-
             <div class="linksFooterect">
                 <a href="../../html/datenSchutz.html">Datenschutz</a>
-
                 <button id="openFeedbackBtn">Feedback senden</button>
-
                 <a href="../../html/impressum.html">Impressum</a>
             </div>
-
             <div class="platzhalter">&copy; 2026 MathVerse</div>
         </div>
     </footer>
+
     <script src="../../javaScript/Common/common-login.js"></script>
     <script src="./dreisatz.js"></script>
     <script src="../../javaScript/feedback.js"></script>
