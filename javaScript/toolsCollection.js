@@ -78,6 +78,19 @@ export const tools = [
             big:   "/MathVerse-app/pictures/Prozentrechnung_Thumbnail.png",
             small: "/MathVerse-app/pictures/icons/prozentrechner-icon.png"
         }
+    },
+    {
+        id:       "card6",
+        title:    "Bruchrechner",
+        group:    "arithmetik",
+        filename: "bruchRechner.html",
+        url:      "/MathVerse-app/Tools/Bruchrechner/bruchRechner.html",
+        tags:     ["bruch", "bruchrechner", "addieren", "subtrahieren", "multiplizieren", "dividieren", "kürzen", "erweitern", "gemischte zahlen"],
+        info:     "Führt alle Grundrechenarten mit Brüchen durch – inklusive Kürzen, Erweitern, gemischten Zahlen und vollständigem Rechenweg.",
+        image: {
+            big:   "/MathVerse-app/pictures/bruchrechner-big.png",
+            small: "/MathVerse-app/pictures/icons/bruchrechner-icon.png"
+        }
     }
 
     // -----------------------------------------------------------------------

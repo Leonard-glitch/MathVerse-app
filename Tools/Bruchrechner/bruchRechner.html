@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <title>Bruchrechner</title>
-    <link rel="stylesheet" href="/MathVerse-app/css/feedback.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
     <link rel="stylesheet" href="./bruchRechner.css">
+    <title>Bruchrechner – MathVerse</title>
 </head>
 <body>
     <header>
         <nav class="navbar">
-            <a href="/MathVerse-app-main/3. MathematischeFunktionen/index.html"><img src="/MathVerse-app/pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
-            <div><input type="text" name="search" id="searchInput" placeholder="Suche..."></div>
-            <div id="navUserArea"><a href="" target="_self" class="navTextBorder">Login</a>
-                <a href="" target="_self" class="navTextBorder">Register</a>
+            <a href="../../index.html">
+                <img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="MathVerse" class="navImage">
+            </a>
+            <div class="searchContainer">
+                <input type="text" id="searchInput" placeholder="Suche..." autocomplete="off">
+                <div id="searchResults"></div>
+            </div>
+            <div id="navUserArea">
+                <a href="../../html/login.html" class="navTextBorder">Login</a>
+                <a href="../../html/register.html" class="navTextBorder">Register</a>
             </div>
         </nav>
     </header>
@@ -24,73 +31,96 @@
         <section class="bruchrechnerBody">
             <h1 class="zahlenHeader">Bruchrechner</h1>
 
+            <!-- Operation Tabs -->
             <div class="einheitenGruppenContainer">
-                <button data-operation="add" class="btnUnits active">Addieren</button>
-                <button data-operation="sub" class="btnUnits">Subtrahieren</button>
-                <button data-operation="mul" class="btnUnits">Multiplizieren</button>
-                <button data-operation="div" class="btnUnits">Dividieren</button>
-                <button data-operation="kuerzen" class="btnUnits">Kürzen</button>
+                <button data-operation="add"       class="btnUnits active">Addieren</button>
+                <button data-operation="sub"       class="btnUnits">Subtrahieren</button>
+                <button data-operation="mul"       class="btnUnits">Multiplizieren</button>
+                <button data-operation="div"       class="btnUnits">Dividieren</button>
+                <button data-operation="kuerzen"   class="btnUnits">Kürzen</button>
                 <button data-operation="erweitern" class="btnUnits">Erweitern</button>
             </div>
 
+            <!-- Mixed Numbers Toggle -->
             <div class="advancedMode">
                 <span class="advancedText">Gemischte Zahlen</span>
-                <label class="switch"><input type="checkbox" id="mixedToggle"><span class="slider round"></span></label>
+                <label class="switch">
+                    <input type="checkbox" id="mixedToggle">
+                    <span class="slider round"></span>
+                </label>
             </div>
 
+            <!-- Calculator Row -->
             <div class="bruchRechnerContainer">
+
+                <!-- Bruch 1 -->
                 <div class="bruchWrapper" id="wrapperBruch1">
-                    <input type="number" id="ganzzahl1" placeholder="Ganzzahl" class="zahlenInputfeld mixed-field">
+                    <input type="number" id="ganzzahl1" placeholder="0" class="zahlenInputfeld mixed-field">
                     <div class="bruchEingabe">
                         <input type="number" id="zaehler1" placeholder="Zähler" class="zahlenInputfeld">
                         <div class="bruchStrich"></div>
-                        <input type="number" id="nenner1" placeholder="Nenner" class="zahlenInputfeld">
+                        <input type="number" id="nenner1"  placeholder="Nenner" class="zahlenInputfeld">
                     </div>
                 </div>
 
+                <!-- Operator Symbol -->
                 <div id="operationZeichen" class="opSymbol">+</div>
 
+                <!-- Bruch 2 / Erweiterungsfaktor -->
                 <div class="bruchWrapper" id="wrapperBruch2">
-                    <input type="number" id="erwFaktor" placeholder="Faktor" class="zahlenInputfeld single-factor-field" style="display: none;">
-                    
+                    <input type="number" id="ganzzahl2" placeholder="0"      class="zahlenInputfeld mixed-field">
+                    <input type="number" id="erwFaktor" placeholder="Faktor" class="zahlenInputfeld single-factor-field">
                     <div class="bruchEingabe" id="bruch2Eingabe">
-                        <input type="number" id="ganzzahl2" placeholder="Ganzzahl" class="zahlenInputfeld mixed-field">
-                        <input type="number" id="zaehler2" placeholder="Zähler" class="zahlenInputfeld">
+                        
+                        <input type="number" id="zaehler2"  placeholder="Zähler" class="zahlenInputfeld">
                         <div class="bruchStrich"></div>
-                        <input type="number" id="nenner2" placeholder="Nenner" class="zahlenInputfeld">
+                        <input type="number" id="nenner2"   placeholder="Nenner" class="zahlenInputfeld">
                     </div>
                 </div>
 
+                <!-- Equals + Result -->
                 <div class="opSymbol">=</div>
-
                 <div class="loesungsDiv">
                     <p id="loesungOutput">Ergebnis</p>
                 </div>
+
             </div>
-            
+
+            <!-- Error Message -->
             <p id="errorMessages" class="falscheEingabestyle"></p>
 
+            <!-- Step-by-Step Rechenweg -->
             <div class="zahlenAusgabestyle" id="ausgabeContainer">
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p> 
+                    <p class="rechenwegText">Rechenweg:</p>
                     <div id="rechenwegOutput"></div>
                 </div>
             </div>
+
         </section>
     </main>
 
     <footer>
         <div class="footerNav">
-            <div class="platzhalter">Platzhalter</div>
-            <div class="linksFooterect">
-                <a href="">Datenschutz</a>
-                <button id="openFeedbackBtn">Feedback senden</button>
-                <a href="">Impressum</a>
+            <div class="footerSocial">
+                <a href="https://twitter.com"   target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com"   target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com"    target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
             </div>
+            <div class="linksFooterect">
+                <a href="../../html/datenSchutz.html">Datenschutz</a>
+                <button id="openFeedbackBtn">Feedback senden</button>
+                <a href="../../html/impressum.html">Impressum</a>
+            </div>
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
         </div>
     </footer>
 
+    <script src="../../javaScript/Common/common-login.js"></script>
     <script src="./bruchRechner.js"></script>
-    <script src="/MathVerse-app/javaScript/feedback.js"></script>
+    <script src="../../javaScript/feedback.js"></script>
+    <script type="module" src="../../javaScript/toolFavorite.js"></script>
+    <script type="module" src="../../javaScript/search.js"></script>
 </body>
 </html>

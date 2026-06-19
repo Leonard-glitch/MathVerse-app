@@ -1,6 +1,8 @@
 /* ==========================================================================
-   SPEZIFISCHES DESIGN FÜR BRUCHRECHNER (bruchrechner.css)
+   BRUCHRECHNER – TOOL SPECIFIC STYLES
    ========================================================================== */
+
+/* ── Page Layout ─────────────────────────────────────────────────────────── */
 
 .bruchrechnerBody {
     display: flex;
@@ -9,7 +11,8 @@
     padding: 0 1rem;
 }
 
-/* CONTAINER FÜR DIE OPERATIONEN */
+/* ── Operation Tab Bar ───────────────────────────────────────────────────── */
+
 .einheitenGruppenContainer {
     display: flex;
     flex-direction: row;
@@ -51,7 +54,8 @@
     transform: scale(1.02);
 }
 
-/* ERZWIINGT RECHNER-ZEILE IMMER ALS ROW (NEBENEINANDER) */
+/* ── Calculator Row ──────────────────────────────────────────────────────── */
+
 .bruchRechnerContainer {
     display: flex;
     flex-direction: row;
@@ -61,7 +65,10 @@
     width: 100%;
     max-width: 950px;
     margin-top: 2rem;
+    flex-wrap: wrap;
 }
+
+/* ── Fraction Wrappers & Inputs ──────────────────────────────────────────── */
 
 .bruchWrapper {
     display: flex;
@@ -85,55 +92,68 @@
     border-radius: 2px;
 }
 
-/* INPUT-ANPASSUNGEN */
+/* Override common.css margin-top on all inputs inside the calculator */
 .bruchWrapper .zahlenInputfeld {
-    margin-top: 0 !important;
+    margin-top: 0;
     padding: 0.5rem;
     font-size: 1.2rem;
+    text-align: center;
     border-radius: var(--radius-sm);
-    width: 100%;
+    width: 85px;
 }
 
-#ganzzahl1, #ganzzahl2 {
+/* Whole-number fields: slightly narrower */
+#ganzzahl1,
+#ganzzahl2 {
     width: 70px;
 }
 
+/* Mixed-number field: hidden until toggle is on */
 .mixed-field {
     display: none;
 }
 
-/* ENTFERNT DIE RAUF-RUNTER-PFEILE (SPINNER) BEI NUMMERN-INPUTS */
+/* Factor field for "Erweitern": hidden by default */
+.single-factor-field {
+    display: none;
+}
+
+/* Remove number input spinners */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 input[type="number"] {
-    -moz-appearance: textfield; /* Für Firefox */
+    -moz-appearance: textfield;
 }
+
+/* ── Operator Symbols ────────────────────────────────────────────────────── */
 
 .opSymbol {
     font-size: 1.8rem;
     font-weight: bold;
     color: var(--text-primary);
     text-shadow: 0 0 8px var(--glow-soft);
+    flex-shrink: 0;
 }
 
-.single-factor-field {
-    margin-top: 0 !important;
-    width: 85px !important;
-}
+/* ── Result Box ──────────────────────────────────────────────────────────── */
 
 .bruchRechnerContainer .loesungsDiv {
     min-width: 140px;
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 0.8rem;
-    text-align: center;
+    padding: 0.8rem 1.2rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: border-color var(--transition-speed);
+}
+
+.bruchRechnerContainer .loesungsDiv:hover {
+    border-color: rgba(0, 255, 204, 0.3);
 }
 
 .bruchRechnerContainer #loesungOutput {
@@ -143,99 +163,145 @@ input[type="number"] {
     text-shadow: 0 0 10px var(--glow-live);
 }
 
+/* Inline fraction display inside the result box */
 .resBruch {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
     vertical-align: middle;
     padding: 0 0.3rem;
+    gap: 2px;
 }
+
 .resBruchStrich {
     width: 100%;
     height: 2px;
     background-color: var(--accent-live);
+    border-radius: 2px;
     margin: 2px 0;
 }
 
-/* ==========================================================================
-   HIGH-TECH DESIGN FÜR DEN RECHENWEG (Optimierte Version)
-   ========================================================================== */
-#rechenwegOutput {
+/* ── Rechenweg Box ───────────────────────────────────────────────────────── */
+
+.zahlenAusgabestyle {
+    display: none;              /* shown via JS once result is ready */
+    flex-direction: column;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem; /* Mehr Luft zwischen den Hauptblöcken für bessere Struktur */
-    margin-top: 1rem;
+    max-width: 560px;
+    margin: 2rem 0 1rem;
+    padding: 1.5rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    transition: border-color var(--transition-speed);
 }
 
-/* Ein kompletter Rechenschritt-Block */
-.step-container {
-    background: rgba(255, 255, 255, 0.01); /* Minimaler Hintergrund für Tiefe */
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-lg);
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    transition: all var(--transition-speed) ease;
+.zahlenAusgabestyle:hover {
+    border-color: rgba(138, 22, 255, 0.3);
 }
 
-/* Schritt-Überschrift (z.B. "Schritt 1: Hauptnenner bestimmen") */
-.step-title {
-    font-size: 1rem;
+.rechenwegDiv {
+    display: flex;
+    flex-direction: column;
+}
+
+.rechenwegText {
+    font-size: 0.8rem;
     font-weight: 700;
-    color: var(--border-glow); /* Nutzt dein Neon-Lila für die Core-Struktur */
-    letter-spacing: 0.03rem;
+    color: var(--border-glow);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
 }
 
-/* Fließtext / Erklärung unter der Überschrift */
-.step-text {
+/* ── Step Cards ──────────────────────────────────────────────────────────── */
+
+#rechenwegOutput {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.step-container {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color var(--transition-speed);
+}
+
+.step-container:hover {
+    border-color: rgba(138, 22, 255, 0.15);
+}
+
+.step-title {
     font-size: 0.9rem;
-    color: var(--text-secondary); /* Angenehmes, dezentes Grau/Blau statt hartem Weiß */
-    font-weight: 400;
+    font-weight: 700;
+    color: var(--border-glow);
+    letter-spacing: 0.02em;
 }
 
-/* Die dunkle Formel-Box (Monospace-Codebereich) */
+.step-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
 .step-formula-box {
-    background-color: #040407; /* Extrem tiefes Schwarz für maximalen Kontrast */
-    border: 1px solid rgba(138, 22, 255, 0.15); /* Subtiler lila Rand passend zum Thema */
-    border-radius: var(--radius-md); /* Weichere, modernere Ecken */
-    padding: 1.2rem;
-    font-family: 'Fira Code', 'Courier New', Courier, monospace; /* Fira Code als Premium-Fallback */
-    font-size: 0.95rem;
-    color: var(--text-primary); /* Klares, helles Weiß für die eigentliche Mathe-Formel */
+    background-color: #030306;
+    border: 1px solid rgba(138, 22, 255, 0.12);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.2rem;
+    font-family: 'Fira Code', 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
     line-height: 1.6;
     white-space: pre-wrap;
-    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.8);
-    letter-spacing: 0.02rem;
+    letter-spacing: 0.02em;
 }
 
-/* Das "Lösung: ..." Highlight am Ende eines Schritts */
 .step-sub-solution {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-secondary);
-    padding-left: 0.2rem;
 }
 
-/* Spezielles Finish für das finale Endergebnis im Rechenweg */
+/* Final step: cyan accent */
 .step-container.final-step {
-    border: 1px solid rgba(0, 255, 204, 0.15); /* Zartes Cyan-Highlight um den ganzen Block */
+    border-color: rgba(0, 255, 204, 0.15);
     background: rgba(0, 255, 204, 0.01);
 }
 
 .step-container.final-step .step-title {
-    color: var(--accent-live); /* Cyan-Schriftzug */
+    color: var(--accent-live);
 }
 
 .step-container.final-step .step-formula-box {
-    border-color: rgba(0, 255, 204, 0.25); /* Cyan-Rahmen für die finale Formel-Box */
+    border-color: rgba(0, 255, 204, 0.2);
 }
 
 .step-container.final-step .step-sub-solution {
-    color: var(--accent-live); /* Macht das finale Ergebnis farblich prominent */
+    color: var(--accent-live);
     font-weight: 600;
-    text-shadow: 0 0 10px var(--glow-live);
+    text-shadow: 0 0 8px var(--glow-live);
 }
 
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .bruchRechnerContainer {
+        gap: 0.8rem;
+    }
+
+    .btnUnits {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+    }
+
+    .zahlenAusgabestyle {
+        padding: 1rem;
+    }
+}
