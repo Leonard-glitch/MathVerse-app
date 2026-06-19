@@ -1,11 +1,7 @@
-// ==========================================================================
-// BRUCHRECHNER – Logik
-// ==========================================================================
 
-// ── Zustand ─────────────────────────────────────────────────────────────────
+// ── Zustand 
 let currentOperation = "add";
 
-// ── DOM-Referenzen ───────────────────────────────────────────────────────────
 const opButtons       = document.querySelectorAll(".btnUnits");
 const mixedToggle     = document.getElementById("mixedToggle");
 const opZeichen       = document.getElementById("operationZeichen");
@@ -27,7 +23,7 @@ const rechenwegOutput  = document.getElementById("rechenwegOutput");
 const errorMessages    = document.getElementById("errorMessages");
 const ausgabeContainer = document.getElementById("ausgabeContainer");
 
-// ── Mathematische Hilfsfunktionen ────────────────────────────────────────────
+// ── Mathematische Hilfsfunktionen 
 function ggt(a, b) {
     return b === 0 ? Math.abs(a) : ggt(b, a % b);
 }
@@ -36,7 +32,7 @@ function kgv(a, b) {
     return Math.abs(a * b) / ggt(a, b);
 }
 
-// ── Fehler-Handling ──────────────────────────────────────────────────────────
+// ── Fehler-Handling 
 function hideError() {
     errorMessages.style.display = "none";
 }
@@ -48,7 +44,7 @@ function showError(msg) {
     errorMessages.style.display    = "block";
 }
 
-// ── UI-Update (Operation & Mixed-Mode) ───────────────────────────────────────
+// ── UI-Update (Operation & Mixed-Mode) 
 function updateUI() {
     const isMixed = mixedToggle.checked;
 
@@ -70,7 +66,7 @@ function updateUI() {
     } else if (currentOperation === "erweitern") {
         opZeichen.textContent       = "×";
         bruch2Eingabe.style.display = "none";
-        inputs.g2.style.display     = "none";   // ganzzahl2 im Erweitern-Modus verstecken
+        inputs.g2.style.display     = "none";  
         inputs.factor.style.display = "block";
 
     } else {
@@ -81,7 +77,7 @@ function updateUI() {
     calculate();
 }
 
-// ── Bruch aus Eingabefeldern lesen ───────────────────────────────────────────
+// ── Bruch aus Eingabefeldern lesen 
 function getFraction(gEl, zEl, nEl) {
     let g = parseInt(gEl.value) || 0;
     let z = parseInt(zEl.value);
@@ -98,7 +94,7 @@ function getFraction(gEl, zEl, nEl) {
     return { z, n };
 }
 
-// ── Ergebnis als HTML formatieren ────────────────────────────────────────────
+// ── Ergebnis als HTML formatieren 
 function formatResultHTML(z, n) {
     if (z === 0) return "0";
     if (n === 1) return `${z}`;
@@ -115,7 +111,7 @@ function formatResultHTML(z, n) {
     return `<div class="resBruch"><span>${z}</span><div class="resBruchStrich"></div><span>${n}</span></div>${extraMixed}`;
 }
 
-// ── Hauptberechnung ──────────────────────────────────────────────────────────
+// ── Hauptberechnung
 function calculate() {
     hideError();
 
@@ -127,7 +123,7 @@ function calculate() {
     const steps = [];
     const printBruch = (z, n) => `${z}/${n}`;
 
-    // ── Kürzen ──────────────────────────────────────────────────────────────
+    // ── Kürzen 
     if (currentOperation === "kuerzen") {
         const teiler = ggt(f1.z, f1.n);
         finalZ = f1.z / teiler;
@@ -145,7 +141,7 @@ function calculate() {
             solution: `Gekürzter Bruch: ${printBruch(finalZ, finalN)}`
         });
 
-    // ── Erweitern ────────────────────────────────────────────────────────────
+    // ── Erweitern 
     } else if (currentOperation === "erweitern") {
         const factor = parseInt(inputs.factor.value);
         if (isNaN(factor)) { resetOutput(); return; }
@@ -161,7 +157,7 @@ function calculate() {
             solution: `Erweiterter Bruch: ${printBruch(finalZ, finalN)}`
         });
 
-    // ── Grundrechenarten ─────────────────────────────────────────────────────
+    // ── Grundrechenarten 
     } else {
         const f2 = getFraction(inputs.g2, inputs.z2, inputs.n2);
         if (!f2)               { resetOutput(); return; }
@@ -258,7 +254,7 @@ function calculate() {
         finalN = Math.abs(finalN);
     }
 
-    // ── Ausgabe rendern ──────────────────────────────────────────────────────
+    // ── Ausgabe rendern 
     loesungOutput.innerHTML = formatResultHTML(finalZ, finalN);
 
     rechenwegOutput.innerHTML = steps.map((step, i) => {
@@ -275,14 +271,14 @@ function calculate() {
     ausgabeContainer.style.display = "flex";
 }
 
-// ── Reset ────────────────────────────────────────────────────────────────────
+// ── Reset 
 function resetOutput() {
     loesungOutput.innerText        = "Ergebnis";
     rechenwegOutput.innerHTML      = "";
     ausgabeContainer.style.display = "none";
 }
 
-// ── Event Listener ───────────────────────────────────────────────────────────
+// ── Event Listener 
 opButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         opButtons.forEach(b => b.classList.remove("active"));
@@ -298,5 +294,5 @@ Object.values(inputs).forEach(input => {
     input.addEventListener("input", calculate);
 });
 
-// ── Initialisierung ──────────────────────────────────────────────────────────
+// ── Initialisierung 
 document.addEventListener("DOMContentLoaded", updateUI);

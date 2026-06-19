@@ -26,9 +26,6 @@
     </nav>
     </header>
     <main>
-
-
-
         <section class="prozentrechnungSection">
 
             <h1 class="zahlenHeader">Prozentrechnung</h1>
@@ -42,9 +39,9 @@
             <div class="tool" data-type="share-of">
                 <fieldset class="formula">
                     <legend>Anteil</legend>
-                    <input data-role="p" class="zahlenInputfeld" placeholder="20">
+                    <input type="number" data-role="p" class="zahlenInputfeld" placeholder="20">
                     <span class="textSpan">% von</span>
-                    <input data-role="G" class="zahlenInputfeld" placeholder="150">
+                    <input type="number" data-role="G" class="zahlenInputfeld" placeholder="150">
                     <span class="textSpan">= ?</span>
 
                         <div class="formulaErgebnis">
@@ -58,9 +55,9 @@
             <div class="tool" data-type="percent-of">
                 <fieldset class="formula">
                     <legend>Prozentsatz</legend>
-                    <input data-role="A" class="zahlenInputfeld" placeholder="30">
+                    <input type="number" data-role="A" class="zahlenInputfeld" placeholder="30">
                     <span class="textSpan">von</span>
-                    <input data-role="G" class="zahlenInputfeld" placeholder="200">
+                    <input type="number" data-role="G" class="zahlenInputfeld" placeholder="200">
                     <span class="textSpan">sind wie viel % ?</span>
 
                         <div class="formulaErgebnis">
@@ -75,9 +72,9 @@
             <div class="tool" data-type="basis-value-of">
                 <fieldset class="formula">
                     <legend>Grundwert</legend>
-                    <input data-role="A" class="zahlenInputfeld" placeholder="50">
+                    <input type="number" data-role="A" class="zahlenInputfeld" placeholder="50">
                     <span class="textSpan">sind</span>
-                    <input data-role="p" class="zahlenInputfeld" placeholder="25">
+                    <input type="number" data-role="p" class="zahlenInputfeld" placeholder="25">
                     <span class="textSpan">% von ?</span>
 
                         <div class="formulaErgebnis">
@@ -98,9 +95,9 @@
                 <div class="tool" data-type="percent-change">
                     <fieldset class="formula">
                         <legend>Prozentuale Veränderung</legend>
-                        <input data-role="alt" class="zahlenInputfeld" placeholder="80">
+                        <input type="number" data-role="alt" class="zahlenInputfeld" placeholder="80">
                         <span class="textSpan">auf</span>
-                        <input data-role="neu" class="zahlenInputfeld" placeholder="100">
+                        <input type="number" data-role="neu" class="zahlenInputfeld" placeholder="100">
                         <span class="textSpan">= ? % Veränderung</span>
 
                             <div class="formulaErgebnis">
@@ -114,12 +111,12 @@
                 <div class="tool" data-type="increase-decrease">
                     <fieldset class="formula">
                         <legend>Erhöhung / Verminderung</legend>
-                        <input data-role="G" class="zahlenInputfeld" placeholder="150">
+                        <input type="number" data-role="G" class="zahlenInputfeld" placeholder="150">
                         <select data-role="op" class="selectPercent">
                             <option value="increase">erhöht um</option>
                             <option value="decrease">vermindert um</option>
                         </select>
-                        <input data-role="p" class="zahlenInputfeld" placeholder="20">
+                        <input type="number" data-role="p" class="zahlenInputfeld" placeholder="20">
                         <span class="textSpan">% = ?</span>
 
                             <div class="formulaErgebnis">
@@ -137,9 +134,9 @@
                             <option value="net-to-gross">Netto → Brutto</option>
                             <option value="gross-to-net">Brutto → Netto</option>
                         </select>
-                        <input data-role="wert" class="zahlenInputfeld" placeholder="100">
+                        <input type="number" data-role="wert" class="zahlenInputfeld" placeholder="100">
                         <span class="textSpan">bei</span>
-                        <input data-role="steuersatz" class="zahlenInputfeld" placeholder="20">
+                        <input type="number" data-role="steuersatz" class="zahlenInputfeld" placeholder="20">
                         <span class="textSpan">% MwSt = ?</span>
 
                             <div class="formulaErgebnis">
@@ -153,9 +150,9 @@
                 <div class="tool" data-type="discount">
                     <fieldset class="formula">
                         <legend>Rabatt / Skonto</legend>
-                        <input data-role="G" class="zahlenInputfeld" placeholder="200">
+                        <input type="number" data-role="G" class="zahlenInputfeld" placeholder="200">
                         <span class="textSpan">− Rabatt von</span>
-                        <input data-role="p" class="zahlenInputfeld" placeholder="15">
+                        <input type="number" data-role="p" class="zahlenInputfeld" placeholder="15">
                         <span class="textSpan">% = ?</span>
 
                             <div class="formulaErgebnis">
