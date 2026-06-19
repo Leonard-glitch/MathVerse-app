@@ -30,6 +30,30 @@
         <section class="dreisatzSection">
             <h1 class="zahlenHeader">Dreisatz Rechner</h1>
 
+            <h2 class="instructionText">Geben Sie in eine Zeile das bekannte Verhältnis hinein und in die andere ihre dritte Variable</h2>
+
+            <div class="dreisatzContainer">
+                <div class="row">
+                    <input type="text" id="inputFeld1" placeholder="15" class="zahlenInputfeld">
+                    <input type="text" id="inputFeld2" placeholder="20" class="zahlenInputfeld">
+                </div>
+                <div class="row">
+                    <input type="text" id="inputFeld3" placeholder="23" class="zahlenInputfeld">
+                    <input type="text" id="inputFeld4" placeholder="?" class="zahlenInputfeld">
+                </div>
+            </div>
+
+            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+
+            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
+
+            <div class="zahlenAusgabestyle">
+                <div class="rechenwegDiv">
+                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                </div>
+                <span id="tipp"></span>
+            </div>
+
             
         </section>
 
