@@ -1,0 +1,126 @@
+.dezBruchSection{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.cardsContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.cards{ /*Card Container Eingabe/Ausgabe*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card{
+    aspect-ratio: 1 / 1;
+    width: 15rem;
+    padding-top: 0.5rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: 3px dotted var(--border-glow);
+    border-radius: 20px;
+}
+
+.card h2{
+    margin-bottom: 2rem;
+}
+
+.zahlenInputfeld{
+    margin: 0;
+}
+
+
+.bruchStrich{
+    width: 100%;
+    height: 3px;
+    background-color: var(--text-secondary);
+    border-radius: 2px;
+}
+
+
+
+.zahlenAusgabestyle{
+    display: none;   
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    transition: border-color var(--transition-speed);
+}
+
+.zahlenAusgabestyle:hover{
+    border-color: rgba(138, 22, 255, 0.35);
+}
+
+.rechenwegDiv{
+    display: flex;
+    flex-direction: column;
+}
+
+.rechenwegText{
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--border-glow);
+    margin-bottom: 0.75rem;
+}
+
+/* Swap Button*/
+.swapBtn{
+    width: 2.5rem;
+    height: 2.5rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: var(--border-glow);
+    color: white;
+
+    font-size: 1.5rem;
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+.swapBtn:hover{
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(0,0,0,.2);
+}
+
+.swapBtn:active{
+    transform: scale(.95);
+}
+
+.swapBtn i{
+    transition: transform .35s ease;
+}
+
+.swapBtn.rotate i{
+    transform: rotate(180deg);
+}
