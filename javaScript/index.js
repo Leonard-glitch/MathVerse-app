@@ -398,6 +398,11 @@ function getGlobalTooltip() {
                 hideGlobalTooltip();
             }
         });
+
+        window.addEventListener("scroll", () => {
+            if (_activeInfoIcon) _activeInfoIcon._pinned = false;
+            hideGlobalTooltip();
+        }, { capture: true, passive: true });
     }
     return _globalTooltip;
 }
