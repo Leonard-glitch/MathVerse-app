@@ -124,3 +124,12 @@
 .swapBtn.rotate i{
     transform: rotate(180deg);
 }
+
+
+.zahlenInputfeld[readonly] {
+    background-color: rgba(255, 255, 255, 0.05); /* Leicht abgetönt (falls dunkler Hintergrund) */
+    color: var(--text-secondary);
+    border-color: transparent;
+    cursor: default;
+    outline: none; /* Verhindert den Fokus-Rahmen beim Anklicken */
+}
