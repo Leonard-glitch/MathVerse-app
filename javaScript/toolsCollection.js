@@ -1,8 +1,3 @@
-// ==========================================================================
-// MATHVERSE – ZENTRALE TOOL-DATENQUELLE
-// Alle anderen Dateien importieren von hier.
-// Neue Tools: NUR HIER eintragen, der Rest passiert automatisch.
-// ==========================================================================
 
 export const groups = [
     { id: "arithmetik",    title: "Arithmetik",    icon: "fa-percent" },
@@ -15,16 +10,16 @@ export const groups = [
 
 export const tools = [
     {
-        id:       "card1",                          // Favoriten-Key in localStorage
+        id:       "card1",
         title:    "Zahlen Analyse",
-        group:    "algebra",                        // Muss einer group.id entsprechen
-        filename: "zahlenAnalyse.html",             // Dateiname der Tool-Seite (für toolFavorite.js)
+        group:    "algebra",
+        filename: "zahlenAnalyse.html",
         url:      "/MathVerse-app/Tools/Zahlenanalyse/zahlenAnalyse.html",
         tags:     ["zahlen", "analyse", "algebra", "mathematik"],
         info:     "Analysiert eine kommagetrennte Zahlenliste und gibt Summe, Maximum, Minimum und Durchschnitt aus.",
         image: {
-            big:   "/MathVerse-app/pictures/51R9beEdSfL.jpg",            // Homepage-Cards
-            small: "/MathVerse-app/pictures/icons/zahlenAnalyse-icon.png" // UserArea, Suchvorschläge usw.
+            big:   "/MathVerse-app/pictures/51R9beEdSfL.jpg",
+            small: "/MathVerse-app/pictures/icons/zahlenAnalyse-icon.png"
         }
     },
     {
@@ -90,6 +85,19 @@ export const tools = [
         image: {
             big:   "/MathVerse-app/pictures/bruchrechner-big.png",
             small: "/MathVerse-app/pictures/icons/bruchrechner-icon.png"
+        }
+    },
+    {
+        id:       "card7",
+        title:    "Dreisatzrechner",
+        group:    "arithmetik",
+        filename: "dreisatz.html",
+        url:      "/MathVerse-app/Tools/Dreisatz Rechner/dreisatz.html",
+        tags:     ["dreisatz", "verhältnis", "proportional", "antiproportional", "mathematik"],
+        info:      "Berechnet den Dreisatz bei proportionalen und antiproportionalen Zuordnungen – inklusive Schritt-für-Schritt-Lösungsweg.",
+        image: {
+            big:   "/MathVerse-app/pictures/dreisatz.jpg",
+            small: "/MathVerse-app/pictures/icons/meinTool-icon.png"
         }
     }
 
