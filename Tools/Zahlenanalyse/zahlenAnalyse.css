@@ -1,42 +1,34 @@
-/* ==========================================================================
-   ZAHLEN ANALYSE - TOOL SPECIFIC STYLES
-   ========================================================================== */
 
-/* Layout-Basis für dieses Tool */
 .zahlenBody {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0 1rem;
 }
 
 .zahlenInputfeld {
-    /* ... deine bestehenden Styles (Größe, Text-Align etc.) ... */
-    
     border: 3px solid var(--border-glow);
-    
-    /* Permanenter, unübersehbarer Leuchteffekt im Ruhezustand */
-    box-shadow: 0 0 20px var(--glow-soft), var(--shadow-main) ;
-    
+
+    box-shadow: 0 0 20px var(--glow-soft), var(--shadow-main);
+
     transition: all var(--transition-speed) ease;
 }
 
 .zahlenInputfeld:focus {
-    border-color: var(--accent-live) ;
-    /* Brutaler Kontrastwechsel im Fokus: Schaltet auf helles Tech-Cyan um */
-    box-shadow: 0 0 30px rgba(0, 255, 204, 0.6), var(--shadow-main) ;
+    border-color: var(--accent-live);
+    box-shadow: 0 0 30px rgba(0, 255, 204, 0.6), var(--shadow-main);
 }
 
 ::placeholder {
-    color: var(--text-primary) ; /* Nutzt die weiße Haupttextfarbe statt Grau */
-    opacity: 0.8 ;              /* Fast volle Deckkraft für den Beispieltext */
+    color: var(--text-primary);
+    opacity: 0.8;
 }
 
-/* Spezifischer Button */
 .zahlenButtoncss {
-    font-size: 1.7rem;
+    font-size: 1.4rem;
     text-align: center;
     margin: 2rem 0;
-    padding: 0.1rem 0.5rem;
+    padding: 0.4rem 1.5rem;
 
     color: var(--text-primary);
     background-color: var(--bg-input);
@@ -44,8 +36,9 @@
     border: 4px solid var(--border-glow);
     border-radius: 30px;
     outline: none;
+    cursor: pointer;
 
-    box-shadow: 
+    box-shadow:
         0 5px 6px var(--shadow-main),
         0 10px 20px var(--shadow-main);
 
@@ -53,7 +46,7 @@
 }
 
 .zahlenButtoncss:hover {
-    box-shadow: 
+    box-shadow:
         0 5px 5px var(--border-glow),
         0 10px 15px var(--border-glow);
 }
@@ -62,49 +55,222 @@
     transform: translateY(3px);
 }
 
-/* Ausgabe-Container */
-.zahlenAusgabestyle {
-    display: flex;
-    flex-direction: column;
 
-    font-size: 1.7rem;
-    margin: 2rem 0;
-    padding: 0.1rem 0.5rem;
+.zahlenAusgabestyle {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
 
     background-color: var(--bg-surface);
     color: var(--text-primary);
 
-    border: 4px solid var(--border-color);
-    border-radius: 30px;
-    outline: none;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
 
-    box-shadow: 
-        0 5px 6px var(--shadow-main),
-        0 10px 20px var(--shadow-main);
+    box-shadow: var(--shadow-main);
 
-    transition: box-shadow 0.1s ease;
+    transition: border-color var(--transition-speed);
 }
 
 .zahlenAusgabestyle:hover {
-     box-shadow: 
-        0 5px 15px var(--glow-soft),
-        0 10px 25px var(--glow-soft);
+    border-color: rgba(138, 22, 255, 0.4);
 }
 
-.zahlenAusgabestyleZeilen {
+.ergebnisGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ergebnisItem {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    text-align: center;
 }
 
-.zahlenAusgabestyleZeilen p {
-    margin: 1.25rem;
-    text-decoration: none;
+.ergebnisLabel {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
-/* Highlight für die berechneten Ergebnisse (wie bei der Prozentrechnung) */
-.zahlenAusgabestyleZeilen p:last-child {
-    color: var(--accent-live);
+.ergebnisValue {
+    font-size: 1.2rem;
     font-weight: bold;
+    color: var(--accent-live);
     text-shadow: 0 0 5px var(--glow-live);
+    min-height: 1.4rem;
+}
+
+.rechenwegDiv {
+    display: flex;
+    flex-direction: column;
+}
+
+.rechenwegText {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--border-glow);
+    margin-bottom: 0.75rem;
+}
+
+#rechenwegOutput {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+#rechenwegOutput .rechenwegSchritt {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 1rem;
+}
+
+#rechenwegOutput .schrittTitel {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+#rechenwegOutput .schrittFormel {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ── Info-Icon (ggT/kgV Erklärung) ──────────────────────────────────────── */
+
+.ergebnisLabel {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.infoIcon {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: 0.3rem;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.infoIcon:hover {
+    color: var(--border-glow);
+}
+
+#rechenwegOutput .schrittTitel {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+/* ── Info-Tooltip (Singleton, position:fixed, an <body> gehängt) ─────────── */
+
+.infoTooltip {
+    position: fixed;
+    width: 220px;
+    z-index: 9000;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.infoTooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.infoTooltipText {
+    display: block;
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-sm);
+    box-shadow:
+        0 0 18px var(--glow-soft),
+        0 8px 24px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.infoTooltip.tooltip-above .infoTooltipText::before,
+.infoTooltip.tooltip-above .infoTooltipText::after {
+    content: '';
+    position: absolute;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+}
+.infoTooltip.tooltip-above .infoTooltipText::before {
+    bottom: -8px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--border-glow);
+}
+.infoTooltip.tooltip-above .infoTooltipText::after {
+    bottom: -6px;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 6px solid var(--bg-surface);
+}
+
+.infoTooltip.tooltip-below .infoTooltipText::before,
+.infoTooltip.tooltip-below .infoTooltipText::after {
+    content: '';
+    position: absolute;
+    left: var(--arrow-left, 50%);
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+}
+.infoTooltip.tooltip-below .infoTooltipText::before {
+    top: -8px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--border-glow);
+}
+.infoTooltip.tooltip-below .infoTooltipText::after {
+    top: -6px;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 6px solid var(--bg-surface);
+}
+
+/*  Responsive  */
+
+@media (max-width: 600px) {
+    .ergebnisGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .zahlenAusgabestyle {
+        padding: 1rem;
+    }
 }

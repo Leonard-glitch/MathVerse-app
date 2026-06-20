@@ -15,7 +15,7 @@ export const tools = [
         group:    "algebra",
         filename: "zahlenAnalyse.html",
         url:      "/MathVerse-app/Tools/Zahlenanalyse/zahlenAnalyse.html",
-        tags:     ["zahlen", "analyse", "algebra", "mathematik"],
+        tags:     ["zahlen", "analyse", "algebra", "mathematik", "summe", "max", "maximum", "min", "minimum", "durchschnitt", "ggT", "kgV"],
         info:     "Analysiert eine kommagetrennte Zahlenliste und gibt Summe, Maximum, Minimum und Durchschnitt aus.",
         image: {
             big:   "/MathVerse-app/pictures/51R9beEdSfL.jpg",

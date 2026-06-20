@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zahlen Analyse</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
     <link rel="stylesheet" href="./zahlenAnalyse.css">
@@ -29,17 +30,38 @@
         <section class="zahlenBody">
             <h1 class="zahlenHeader">Zahlen Analyse</h1>
 
-            <input type="text" id="zahlenInput" placeholder="0, 1, 2, 3, 4, 5, 6, 7, 8, 9" class="zahlenInputfeld">
+            <input type="text" id="zahlenInput" placeholder="z.B. 4, 8, 15, 16, 23, 42" class="zahlenInputfeld">
 
-            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Calculate</button>
+            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
 
             <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
 
-            <div class="zahlenAusgabestyle">
-                <div class="zahlenAusgabestyleZeilen">   <p>Summe:</p> <p id="ausgabeSumme"></p>   </div>
-                <div class="zahlenAusgabestyleZeilen">   <p>Max:</p> <p id="ausgabeMax"></p> </div>
-                <div class="zahlenAusgabestyleZeilen">   <p>Min:</p> <p id="ausgabeMin"></p> </div>
-                <div class="zahlenAusgabestyleZeilen">   <p>Durchschnitt:</p> <p id="ausgabeDurchschnitt"></p>    </div>
+            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+                <div class="ergebnisGrid">
+                    <div class="ergebnisItem"><p class="ergebnisLabel">Summe</p><p id="ausgabeSumme" class="ergebnisValue"></p></div>
+                    <div class="ergebnisItem"><p class="ergebnisLabel">Maximum</p><p id="ausgabeMax" class="ergebnisValue"></p></div>
+                    <div class="ergebnisItem"><p class="ergebnisLabel">Minimum</p><p id="ausgabeMin" class="ergebnisValue"></p></div>
+                    <div class="ergebnisItem"><p class="ergebnisLabel">Durchschnitt</p><p id="ausgabeDurchschnitt" class="ergebnisValue"></p></div>
+                    <div class="ergebnisItem">
+                        <p class="ergebnisLabel">
+                            ggT
+                            <i class="fa fa-info-circle infoIcon" data-info="Größter gemeinsamer Teiler"></i>
+                        </p>
+                        <p id="ausgabeGgt" class="ergebnisValue"></p>
+                    </div>
+                    <div class="ergebnisItem">
+                        <p class="ergebnisLabel">
+                            kgV
+                            <i class="fa fa-info-circle infoIcon" data-info="Kleinstes gemeinsames Vielfaches"></i>
+                        </p>
+                        <p id="ausgabeKgv" class="ergebnisValue"></p>
+                    </div>
+                </div>
+
+                <div class="rechenwegDiv">
+                    <p class="rechenwegText">Rechenweg:</p>
+                    <div id="rechenwegOutput"></div>
+                </div>
             </div>
         </section>
     </main>
