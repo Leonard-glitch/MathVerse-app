@@ -1,13 +1,47 @@
-/* ==========================================================================
-   ZAHLENSYSTEM RECHNER - TOOL SPECIFIC STYLES
-   ========================================================================== */
 
-/* Layout & Container */
 .zahlenBody {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0 1rem;
 }
+
+.basisAuswahlDiv {
+    margin: 0.5rem 0 1.5rem 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.labelBasea {
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    box-shadow: var(--shadow-main);
+}
+
+.selectBasea {
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    box-shadow: var(--shadow-main);
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--transition-speed);
+}
+
+.selectBasea:focus,
+.selectBasea:hover {
+    border-color: var(--border-glow);
+}
+
 
 #systemeContainer {
     display: flex;
@@ -18,7 +52,7 @@
 }
 
 .SytemDiv, .rechenZeichenSelectDiv {
-    margin: 0.8rem;
+    margin: 0.5rem;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -27,7 +61,6 @@
     width: 100%;
 }
 
-/* Optimierte Barrierefreiheit für die Inputs */
 .zahlenInput {
     background-color: var(--bg-input);
     color: var(--text-primary);
@@ -36,30 +69,29 @@
     padding: 0.5rem 1rem;
     width: 100%;
     max-width: 380px;
-    border: 3px solid var(--border-glow); /* Deutlicher lila Rahmen ab Start */
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     outline: none;
-    box-shadow: 0 0 15px var(--glow-soft), var(--shadow-main);
+    box-shadow: var(--shadow-main);
     transition: all var(--transition-speed) ease;
 }
 
 .zahlenInput:hover {
     transform: translateY(-2px);
-    border-color: var(--text-primary);
+    border-color: var(--border-glow);
 }
 
 .zahlenInput:focus {
-    border-color: var(--accent-live); /* Extrem starker Wechsel auf Cyan */
-    box-shadow: 0 0 25px rgba(0, 255, 204, 0.5), var(--shadow-main);
+    border-color: var(--accent-live);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.35), var(--shadow-main);
 }
 
-/* Select-Boxen (Basis & Operatoren) */
-.selectBase, .rechenZeichenSelect {
+.rechenZeichenSelect {
     background-color: var(--bg-input);
     color: var(--text-primary);
     padding: 0.5rem 1rem;
     font-size: 1rem;
-    border: 3px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-main);
     outline: none;
@@ -67,20 +99,28 @@
     transition: border-color var(--transition-speed);
 }
 
-.selectBase:focus, .rechenZeichenSelect:focus,
-.selectBase:hover, .rechenZeichenSelect:hover {
+.rechenZeichenSelect:focus,
+.rechenZeichenSelect:hover {
     border-color: var(--border-glow);
 }
 
-/* Zusätzliche Buttons (Add/Delete) */
+
+.inputSteuerungDiv {
+    display: flex;
+    flex-direction: row;
+    gap: 0.6rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
 .buttton {
     background-color: var(--bg-surface);
     color: var(--text-primary);
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     padding: 0.5rem 1.2rem;
-    margin: 0.5rem;
-    border: 3px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-main);
     outline: none;
@@ -88,10 +128,20 @@
     transition: all var(--transition-speed) ease;
 }
 
+.buttton i {
+    margin-right: 0.4rem;
+    color: var(--text-secondary);
+    transition: color var(--transition-speed);
+}
+
 .buttton:hover {
     border-color: var(--border-glow);
     box-shadow: 0 0 15px var(--glow-soft);
     transform: translateY(-1px);
+}
+
+.buttton:hover i {
+    color: var(--border-glow);
 }
 
 .buttton:active {
@@ -119,53 +169,71 @@
     transform: scale(1.02);
 }
 
-/* Ausgabe-Bereich */
 .zahlenAusgabestyle {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 450px;
-    font-size: 1.5rem;
+    max-width: 500px;
     margin: 1.5rem 0;
     padding: 1.5rem;
     background-color: var(--bg-surface);
     color: var(--text-primary);
-    border: 4px solid var(--border-color);
-    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
     box-shadow: var(--shadow-main);
+    transition: border-color var(--transition-speed);
 }
 
-.loesungsDiv, .rechenwegDiv {
+.zahlenAusgabestyle:hover {
+    border-color: rgba(138, 22, 255, 0.4);
+}
+
+.loesungsDiv {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: center;
-    margin-bottom: 1rem;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.8rem;
 }
 
-.loesungText, .rechenwegText {
+.loesungText {
+    font-size: 1.2rem;
     font-weight: bold;
     color: var(--text-secondary);
 }
 
 #loesungOutput {
-    padding-left: 0.5rem;
-    color: var(--accent-live); /* Ergebnis leuchtet in High-Tech Cyan */
+    padding-left: 0.8rem;
+    font-size: 1.4rem;
     font-weight: bold;
-    text-shadow: 0 0 8px var(--glow-live);
+    color: var(--accent-live);
+    text-shadow: 0 0 10px var(--glow-live);
+}
+
+.rechenwegDiv {
+    display: none;
+    flex-direction: column;
+}
+
+.rechenwegText {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--border-glow);
+    margin-bottom: 0.5rem;
 }
 
 #rechenwegOutput {
-    width: 100%;
-    margin-top: 1rem;
-    padding: 1rem;
-    font-size: 1.2rem;
-    font-family: 'Courier New', Courier, monospace; /* Zwingend erforderlich für bündige Spalten */
-    color: var(--text-secondary);
-    background-color: var(--bg-input);
+    margin: 8px 0 0 0;
+    padding: 12px 16px;
+    background: var(--bg-input);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    white-space: pre; /* Behält alle Leerzeichen und Zeilenumbrüche exakt bei */
-    line-height: 1.5;
-    letter-spacing: 2px; /* Macht es noch lesbarer */
+    border-radius: var(--radius-sm);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #e0e0ff;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-x: auto;
 }

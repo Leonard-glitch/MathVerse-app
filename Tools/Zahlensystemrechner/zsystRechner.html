@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zahlensystem Rechner</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
     <link rel="stylesheet" href="./zsystRechner.css">
@@ -27,75 +28,83 @@
     </header>
     <main>
 
-
-
         <section class="zahlenBody">
             <h1 class="zahlenHeader">Zahlensystem Rechner</h1>
 
+            <!-- Basis-Auswahl -->
+            <div class="basisAuswahlDiv">
+                <label for="basea" class="labelBasea">Basis:</label>
+                <select id="basea" class="selectBasea">
+                    <option value="2">2 (Dual)</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8 (Oktal)</option>
+                    <option value="9">9</option>
+                    <option value="10">10 (Dezimal)</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16 (Hexadezimal)</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+
+            <!-- Rechenausdruck -->
             <div id="systemeContainer">
 
-                <select id="basea" class="selectBase">
-                <option value="2">2 (Dual)</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8 (Oktal)</option>
-                <option value="9">9</option>
-                <option value="10">10 (Dezimal)</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16 (Hexadezimal)</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="20">20</option>
-                </select> 
-
-                <div class="SytemDiv"><input type="number" name="basea" id="zahl1Input" placeholder="Zahl1" class="zahlenInput"></div>
-
-                
-
-                <div class="rechenZeichenSelectDiv">
-                <select id="rechenZeichenMain" class="rechenZeichenSelect">
-                <option value="+">+</option>
-                <option value="-">-</option>
-                <option value="*">*</option>
-                <option value="/">/</option>
-         
-                </select> 
+                <div class="SytemDiv">
+                    <input type="number" name="zahl1" id="zahl1Input" placeholder="Zahl 1" class="zahlenInput">
                 </div>
 
-                <div class="SytemDiv"><input type="number" name="basez" id="zahl2Input" placeholder="Zahl2" class="zahlenInput"></div>
+                <div class="rechenZeichenSelectDiv">
+                    <select id="rechenZeichenMain" class="rechenZeichenSelect">
+                        <option value="+">+</option>
+                        <option value="-">−</option>
+                        <option value="*">×</option>
+                        <option value="/">÷</option>
+                    </select>
+                </div>
 
+                <div class="SytemDiv">
+                    <input type="number" name="zahl2" id="zahl2Input" placeholder="Zahl 2" class="zahlenInput">
+                </div>
 
             </div>
 
-            <div>
-                <button id="btnAddInput" class="buttton" type="button">Add Input</button>
-                <button id="btnDeleteInput" class="buttton" type="button">Delete Input</button>
+            <!-- Eingabefelder dynamisch erweitern -->
+            <div class="inputSteuerungDiv">
+                <button id="btnAddInput" class="buttton" type="button">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Zahl hinzufügen
+                </button>
+                <button id="btnDeleteInput" class="buttton" type="button">
+                    <i class="fa fa-minus" aria-hidden="true"></i> Zahl entfernen
+                </button>
             </div>
-
 
             <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
 
             <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
 
-            <div class="zahlenAusgabestyle">
-                <div class="loesungsDiv"> <p class="loesungText">Lösung:</p><p id="loesungOutput"></p></div>
+            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+                <div class="loesungsDiv">
+                    <p class="loesungText">Lösung:</p>
+                    <p id="loesungOutput"></p>
+                </div>
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                    <p class="rechenwegText">Rechenweg:</p>
+                    <div id="rechenwegOutput"></div>
                 </div>
                 <span id="tipp"></span>
             </div>
         </section>
-
-
-
 
     </main>
     <footer>

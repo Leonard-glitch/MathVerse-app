@@ -1,73 +1,18 @@
-// ==========================
-// 🔹 ELEMENTE
-// ==========================
-const btnAddInput = document.getElementById("btnAddInput");
+
+const btnAddInput    = document.getElementById("btnAddInput");
 const btnDeleteInput = document.getElementById("btnDeleteInput");
-const btnRechnen = document.getElementById("buttonZahlenInput");
-const container = document.getElementById("systemeContainer");
-const output = document.getElementById("loesungOutput");
-const errorBox = document.getElementById("errorMessages");
+const btnRechnen     = document.getElementById("buttonZahlenInput");
+const container      = document.getElementById("systemeContainer");
+
+const output           = document.getElementById("loesungOutput");
+const errorBox         = document.getElementById("errorMessages");
+const ausgabeContainer = document.getElementById("ausgabeContainer");
+const rechenwegDiv     = document.querySelector(".rechenwegDiv");
+const rechenwegOutput  = document.getElementById("rechenwegOutput");
 
 let anzahlZusatzInputs = 0;
 
-// ==========================
-// 🔹 INPUT HINZUFÜGEN
-// ==========================
-btnAddInput.addEventListener("click", () => {
-    anzahlZusatzInputs++;
 
-    // Erstelle Operator-Wrapper
-    const wrapperOp = document.createElement("div");
-    wrapperOp.className = "rechenZeichenSelectDiv zusatzElement"; // zusatzElement dient als Marker zum Löschen
-    wrapperOp.innerHTML = `
-        <select class="rechenZeichenSelect zusatzSelect">
-            <option value="+">+</option>
-            <option value="-">-</option>
-            <option value="*">*</option>
-            <option value="/">/</option>
-        </select>
-    `;
-
-    // Erstelle Input-Wrapper
-    const wrapperInput = document.createElement("div");
-    wrapperInput.className = "SytemDiv zusatzElement";
-    wrapperInput.innerHTML = `
-        <input type="number" 
-               placeholder="Zahl ${anzahlZusatzInputs + 2}" 
-               class="zahlenInput zusatzInput">
-    `;
-
-    container.appendChild(wrapperOp);
-    container.appendChild(wrapperInput);
-    
-    // Fehler ausblenden bei Interaktion
-    errorBox.style.display = "none";
-});
-
-// ==========================
-// 🔹 INPUT LÖSCHEN (Dynamisch von unten)
-// ==========================
-btnDeleteInput.addEventListener("click", () => {
-    // Finde alle dynamisch hinzugefügten Elemente
-    const zusatzElemente = container.querySelectorAll(".zusatzElement");
-    
-    // Sicherstellen, dass die 2 fixen Startfelder niemals gelöscht werden können
-    if (zusatzElemente.length >= 2) {
-        // Entferne das letzte Inputfeld und das letzte Rechenzeichen (die letzten beiden Elemente im Array)
-        container.removeChild(zusatzElemente[zusatzElemente.length - 1]); // Löscht das Input-Feld
-        container.removeChild(zusatzElemente[zusatzElemente.length - 2]); // Löscht das Operator-Feld
-        
-        anzahlZusatzInputs--;
-    } else {
-        errorBox.textContent = "Die Standard-Eingabefelder können nicht gelöscht werden!";
-        errorBox.style.display = "block";
-        setTimeout(() => { errorBox.style.display = "none"; }, 3000);
-    }
-});
-
-// ==========================
-// 🔹 VALIDIERUNG & PARSE
-// ==========================
 function isValidForBase(value, base) {
     const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".slice(0, base);
     const regex = new RegExp(`^-?[${chars}]+(\\.[${chars}]+)?$`, "i");
@@ -136,113 +81,146 @@ function calculate(a, b, op) {
     }
 }
 
-// ==========================
-// 🔹 MAIN LOGIK
-// ==========================
+function hideAusgabe() {
+    rechenwegDiv.style.display = "none";
+    output.textContent = "";
+    rechenwegOutput.innerHTML = "";
+}
+
+function showAusgabe() {
+    ausgabeContainer.style.display = "flex";
+    rechenwegDiv.style.display = "flex";
+}
+
+function zeigeFehler(text) {
+    errorBox.textContent = text;
+    errorBox.style.display = "block";
+    hideAusgabe();
+}
+
+
+function buildRechenwegHTML(zeilen, ergebnisStr, base) {
+    let maxLaenge = ergebnisStr.length;
+    zeilen.forEach(item => {
+        maxLaenge = Math.max(maxLaenge, item.op.length + item.zahl.length);
+    });
+
+    const padLeft = (str, len) => " ".repeat(Math.max(0, len - str.length)) + str;
+
+    const zeilenText = zeilen
+        .map(item => padLeft(item.op + item.zahl, maxLaenge))
+        .join("\n");
+
+    const trennlinie = "-".repeat(maxLaenge);
+    const schriftlicheRechnung = `${zeilenText}\n${trennlinie}\n${padLeft(ergebnisStr, maxLaenge)}<sub>${base}</sub>`;
+
+    return `<pre>${schriftlicheRechnung}</pre>`;
+}
+
+
+btnAddInput.addEventListener("click", () => {
+    anzahlZusatzInputs++;
+
+    const wrapperOp = document.createElement("div");
+    wrapperOp.className = "rechenZeichenSelectDiv zusatzElement"; 
+    wrapperOp.innerHTML = `
+        <select class="rechenZeichenSelect zusatzSelect">
+            <option value="+">+</option>
+            <option value="-">−</option>
+            <option value="*">×</option>
+            <option value="/">÷</option>
+        </select>
+    `;
+
+    const wrapperInput = document.createElement("div");
+    wrapperInput.className = "SytemDiv zusatzElement";
+    wrapperInput.innerHTML = `
+        <input type="number" 
+               placeholder="Zahl ${anzahlZusatzInputs + 2}" 
+               class="zahlenInput zusatzInput">
+    `;
+
+    container.appendChild(wrapperOp);
+    container.appendChild(wrapperInput);
+
+    errorBox.style.display = "none";
+});
+
+btnDeleteInput.addEventListener("click", () => {
+    const zusatzElemente = container.querySelectorAll(".zusatzElement");
+
+    if (zusatzElemente.length >= 2) {
+        container.removeChild(zusatzElemente[zusatzElemente.length - 1]); 
+        container.removeChild(zusatzElemente[zusatzElemente.length - 2]); 
+
+        anzahlZusatzInputs--;
+    } else {
+        errorBox.textContent = "Die Standard-Eingabefelder können nicht gelöscht werden!";
+        errorBox.style.display = "block";
+        setTimeout(() => { errorBox.style.display = "none"; }, 3000);
+    }
+});
+
+
 btnRechnen.addEventListener("click", () => {
     errorBox.style.display = "none";
     const base = parseInt(document.getElementById("basea").value);
 
     const zahl1Raw = document.getElementById("zahl1Input").value;
     const zahl2Raw = document.getElementById("zahl2Input").value;
-    const opMain = document.getElementById("rechenZeichenMain").value;
+    const opMain   = document.getElementById("rechenZeichenMain").value;
 
     const zahl1 = parseBaseNumber(zahl1Raw, base);
     const zahl2 = parseBaseNumber(zahl2Raw, base);
 
     if (zahl1 === null || zahl2 === null) {
-        errorBox.textContent = `Ungültige Eingabe für Basis ${base}`;
-        errorBox.style.display = "block";
-        output.textContent = "";
+        zeigeFehler(`Ungültige Eingabe für Basis ${base}`);
         return;
     }
 
-    // Wir sammeln alle Zeilen für den schriftlichen Rechenweg in einem Array
-    let rechenwegZeilen = [];
-    
-    // Erste Zahl hinzufügen
-    const strZahl1 = toBaseString(zahl1, base);
-    rechenwegZeilen.push({ op: "", zahl: strZahl1 });
-
-    // Zweite Zahl mit Hauptoperator hinzufügen
-    const strZahl2 = toBaseString(zahl2, base);
-    rechenwegZeilen.push({ op: opMain, zahl: strZahl2 });
+    const rechenwegZeilen = [
+        { op: "", zahl: toBaseString(zahl1, base) },
+        { op: opMain, zahl: toBaseString(zahl2, base) }
+    ];
 
     let aktuellesErgebnis = calculate(zahl1, zahl2, opMain);
 
     if (aktuellesErgebnis === "DIV0") {
-        errorBox.textContent = "Division durch 0!";
-        errorBox.style.display = "block";
-        output.textContent = "";
+        zeigeFehler("Division durch 0!");
         return;
     }
 
-    // Selektiert die dynamisch erzeugten Zusatzfelder
-    const ops = document.querySelectorAll(".zusatzSelect");
+    const ops    = document.querySelectorAll(".zusatzSelect");
     const values = document.querySelectorAll(".zusatzInput");
 
-    // Schleife für alle weiteren Zusatz-Eingaben
     for (let i = 0; i < ops.length; i++) {
         const valParsed = parseBaseNumber(values[i].value, base);
 
         if (valParsed === null) {
-            errorBox.textContent = `Ungültige Eingabe in Zusatzfeld ${i + 1}`;
-            errorBox.style.display = "block";
-            output.textContent = "";
+            zeigeFehler(`Ungültige Eingabe in Zusatzfeld ${i + 1}`);
             return;
         }
 
-        // Zusatzoperator und Zusatzzahl für das Schriftbild registrieren
-        const strZusatzZahl = toBaseString(valParsed, base);
-        rechenwegZeilen.push({ op: ops[i].value, zahl: strZusatzZahl });
-
+        rechenwegZeilen.push({ op: ops[i].value, zahl: toBaseString(valParsed, base) });
         aktuellesErgebnis = calculate(aktuellesErgebnis, valParsed, ops[i].value);
 
         if (aktuellesErgebnis === "DIV0") {
-            errorBox.textContent = "Division durch 0!";
-            errorBox.style.display = "block";
-            output.textContent = "";
+            zeigeFehler("Division durch 0!");
             return;
         }
     }
 
-    // Finale Lösung als String holen
     const strErgebnis = toBaseString(aktuellesErgebnis, base);
 
-    // 🔹 RECHENWEG GENERIEREN (Dynamische schriftliche Darstellung)
-    const rechenwegDiv = document.querySelector(".rechenwegDiv");
-    const rechenwegOutput = document.getElementById("rechenwegOutput");
+    rechenwegOutput.innerHTML = buildRechenwegHTML(rechenwegZeilen, strErgebnis, base);
+    output.innerHTML = `${strErgebnis}<sub>${base}</sub>`;
 
-    // Maximale Länge ermitteln, um alles perfekt rechtsbündig auszurichten
-    let maxLaenge = strErgebnis.length;
-    rechenwegZeilen.forEach(item => {
-        const kombinierteLaenge = item.op.length + item.zahl.length;
-        if (kombinierteLaenge > maxLaenge) {
-            maxLaenge = kombinierteLaenge;
-        }
-    });
+    showAusgabe();
+});
 
-    // Hilfsfunktion zum Auffüllen mit Leerzeichen links (Rechtsbündigkeit)
-    const padLeft = (str, len) => " ".repeat(Math.max(0, len - str.length)) + str;
 
-    // Block zeilenweise zusammensetzen
-    let ausgabeText = "";
-    rechenwegZeilen.forEach(item => {
-        // Verbindet Operator und Zahl (z.B. "+0111" oder bei der ersten Zeile einfach nur die Zahl)
-        const kombinierterString = item.op + item.zahl;
-        ausgabeText += padLeft(kombinierterString, maxLaenge) + "\n";
-    });
+hideAusgabe();
 
-    // Trennlinie und Endergebnis anhängen
-    const trennLinie = "-".repeat(maxLaenge);
-    ausgabeText += trennLinie + "\n" + padLeft(strErgebnis, maxLaenge);
-
-    // Text in das pre-Feld schreiben
-    rechenwegOutput.textContent = ausgabeText;
-    
-    // Rechenweg-Container sichtbar machen
-    rechenwegDiv.style.display = "flex";
-
-    // 🔹 Haupt-Ergebnis anzeigen
-    output.innerHTML = `${strErgebnis}<sub style="font-size:0.6em;">${base}</sub>`;
+document.querySelector(".zahlenBody").addEventListener("input", () => {
+    errorBox.style.display = "none";
 });
