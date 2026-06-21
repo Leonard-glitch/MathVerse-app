@@ -38,6 +38,10 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         '--text-secondary':  '#8f8fbc',
         '--text-muted':      '#44496a',
         '--shadow-main':     '0 10px 30px rgba(0, 0, 0, 0.6)',
+        '--accent-live':  '#00ffcc',
+        '--accent-error': '#ff2a5f',
+        '--glow-live':    'rgba(0, 255, 204, 0.2)',
+        '--glow-error':   'rgba(255, 42, 95, 0.35)',
     },
     dark: {
         '--bg-body':         '#121214',
@@ -50,6 +54,10 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         '--text-secondary':  '#a0a0ab',
         '--text-muted':      '#5a5a64',
         '--shadow-main':     '0 10px 30px rgba(0, 0, 0, 0.6)',
+        '--accent-live':  '#00ffcc',
+        '--accent-error': '#ff2a5f',
+        '--glow-live':    'rgba(0, 255, 204, 0.2)',
+        '--glow-error':   'rgba(255, 42, 95, 0.35)',
     },
     light: {
         '--bg-body':         '#f8fafc',
@@ -62,6 +70,10 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         '--text-secondary':  '#51566b',
         '--text-muted':      '#9598a8',
         '--shadow-main':     '0 10px 30px rgba(15, 23, 42, 0.08)',
+        '--accent-live':  '#0c7c69',
+        '--accent-error': '#dc2626',
+        '--glow-live':    'rgba(12, 124, 105, 0.18)',
+        '--glow-error':   'rgba(220, 38, 38, 0.18)',
     }
 };
 

@@ -232,7 +232,7 @@
     border-radius: var(--radius-sm);
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
-    color: #e0e0ff;
+    color: var(--text-primary);
     line-height: 1.7;
     white-space: pre-wrap;
     overflow-x: auto;

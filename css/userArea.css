@@ -183,7 +183,7 @@ body {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--border-glow), #3a00aa);
+    background: linear-gradient(135deg, var(--border-glow), color-mix(in srgb, var(--border-glow) 55%, black));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -274,7 +274,7 @@ body {
     font-weight: 800;
     color: var(--text-primary);
     letter-spacing: 0.03em;
-    background: linear-gradient(45deg, #ffffff, var(--text-secondary));
+    background: linear-gradient(45deg, var(--text-primary), var(--text-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -350,7 +350,7 @@ body {
 .bannerGradient {
     height: 100px;
     border-radius: var(--radius-md) var(--radius-md) 0 0;
-    background: linear-gradient(135deg, var(--border-glow), #050508 80%);
+    background: linear-gradient(135deg, var(--border-glow), var(--bg-body) 80%);
     border: 1px solid var(--border-color);
     border-bottom: none;
 }

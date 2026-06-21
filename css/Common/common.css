@@ -3,38 +3,38 @@
    ========================================================================== */
 :root {
     /* Backgrounds */
-    --bg-body: #09090e;                  /* Tiefes High-Tech Dunkelblau/Schwarz */
-    --bg-surface: #111118;               /* Container & Karten Hintergrund */
-    --bg-surface-glow: #1a1a26;          /* Hover-Zustände für Karten & Buttons */
-    --bg-input: #06060a;                 /* Kontrastreiches Dunkel für Input-Felder */
-    --bg-navbar: rgba(9, 9, 14, 0.75);   /* Transparente Navbar für Blur-Effekt */
+    --bg-body: #09090e;
+    --bg-surface: #0b1528;
+    --bg-surface-glow: #142036;
+    --bg-input: #05060c;
+    --bg-navbar: rgba(9, 9, 14, 0.75);
 
     /* Borders & Accents */
-    --border-color: #222232;             /* Subtile Standard-Strukturlinien */
-    --border-glow: #8a16ff;              /* Elektrisierendes Neon-Violett */
-    --border-accent: #00ffcc;            /* Alias für accent-live (Cyan-Akzent) */
-    --accent-color: #8a16ff;             /* Hauptakzent Violett (Alias für border-glow) */
-    --accent-hover: #a142ff;             /* Helleres Violett für Hover-Zustände */
-    --accent-live: #00ffcc;              /* High-Tech Cyan für Ergebnisse/Erfolge */
-    --accent-error: #ff2a5f;             /* Aggressives Tech-Rot für Fehler */
+    --border-color: #1c2740;
+    --border-glow: #8a16ff;
+    --border-accent: #8a16ff;
+    --accent-color: #8a16ff;
+    --accent-hover: #a142ff;
+    --accent-live: #00ffcc;
+    --accent-error: #ff2a5f;
 
     /* Interactive States */
-    --favorite-active: #ff2a5f;          /* Herz-Favorit Farbe */
-    --star-active: #ffb700;              /* Stern-Pin Gold-Farbe */
+    --favorite-active: #ff2a5f;
+    --star-active: #ffb700;
 
     /* Text Colors */
-    --text-primary: #ffffff;             /* Haupttext */
-    --text-secondary: #8f8fbc;           /* Nebentext / Labels / Legenden */
-    --text-muted: #444460;               /* Platzhalter */
+    --text-primary: #f3f4f6;
+    --text-secondary: #8f8fbc;
+    --text-muted: #44496a;
 
     /* Shadows & Glows */
     --shadow-main: 0 10px 30px rgba(0, 0, 0, 0.6);
     --glow-soft: rgba(138, 22, 255, 0.25);
-    --glow-hard: rgba(0, 255, 204, 0.3);
+    --glow-hard: rgba(138, 22, 255, 0.4);
     --glow-live: rgba(0, 255, 204, 0.2);
     --glow-error: rgba(255, 42, 95, 0.35);
 
-    /* Layout Tokens */
+    /* Layout Tokens – unverändert */
     --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     --radius-lg: 32px;
     --radius-md: 20px;
@@ -206,7 +206,7 @@ main {
     text-align: center;
     letter-spacing: 0.1rem;
     font-weight: 800;
-    background: linear-gradient(45deg, #ffffff, var(--text-secondary));
+    background: linear-gradient(45deg, var(--text-primary), var(--text-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

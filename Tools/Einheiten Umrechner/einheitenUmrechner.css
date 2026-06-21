@@ -178,7 +178,7 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     font-family: 'Courier New', Courier, monospace;
-    color: #e0e0ff;
+    color: var(--text-primary);
     
     width: 100%;               /* Nutzt standardmäßig die 450px der Hauptbox */
     white-space: pre-wrap;   /* war: white-space: pre; */

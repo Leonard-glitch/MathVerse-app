@@ -216,8 +216,8 @@
 }
 
 .step-formula-box {
-    background-color: #030306;
-    border: 1px solid rgba(138, 22, 255, 0.12);
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     padding: 1rem 1.2rem;
     font-family: 'Courier New', Courier, monospace;
