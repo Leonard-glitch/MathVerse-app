@@ -99,6 +99,19 @@ export const tools = [
             big:   "/MathVerse-app/pictures/dreisatz.jpg",
             small: "/MathVerse-app/pictures/icons/meinTool-icon.png"
         }
+    },
+    {
+        id:       "card8",
+        title:    "Dezimal ↔ Bruch Umrechner",
+        group:    "arithmetik",
+        filename: "dezBruchConverter.html",
+        url:      "/MathVerse-app/Tools/DezBruchConverter/dezBruchConverter.html",
+        tags:     ["dezimal", "bruch", "umrechner"],
+        info:      "Wandelt Brüche in Dezimalzahlen und Dezimalzahlen in Brüche um – inklusive Schritt-für-Schritt-Lösungsweg.",
+        image: {
+            big:   "/MathVerse-app/pictures/DezimalBruchConverter.png",
+            small: "/MathVerse-app/pictures/icons/meinTool-icon.png"
+        }
     }
 
     // -----------------------------------------------------------------------

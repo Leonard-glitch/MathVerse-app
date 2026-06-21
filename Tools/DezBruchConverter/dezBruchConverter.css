@@ -1,59 +1,158 @@
-.dezBruchSection{
+
+.dezBruchSection {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 0 1rem;
 }
 
-.cardsContainer{
+.cardsContainer {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 1.2rem;
     flex-wrap: wrap;
+    margin: 2rem 0 0.5rem 0;
 }
 
-.cards{ /*Card Container Eingabe/Ausgabe*/
+.cards {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
-.card{
-    aspect-ratio: 1 / 1;
-    width: 15rem;
-    padding-top: 0.5rem;
+.cards h3 {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
 
+
+.card {
+    width: 14rem;
+    padding: 1.6rem 1.2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    text-align: center;
 
-    border: 3px dotted var(--border-glow);
-    border-radius: 20px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
 }
 
-.card h2{
-    margin-bottom: 2rem;
+.card:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 15px var(--glow-soft), var(--shadow-main);
 }
 
-.zahlenInputfeld{
+.card h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
     margin: 0;
 }
 
+.card:has(.zahlenInputfeld[readonly]) {
+    border-color: rgba(0, 255, 204, 0.35);
+    box-shadow: 0 0 15px var(--glow-live), var(--shadow-main);
+}
 
-.bruchStrich{
+.card:has(.zahlenInputfeld[readonly]):hover{
+     box-shadow:
+        0 0 8px rgba(138, 22, 255, 0.20),
+        0 0 20px rgba(138, 22, 255, 0.12);
+}
+
+.zahlenInputfeld {
+    margin: 0;
+}
+
+.bruchEingabe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.bruchStrich {
     width: 100%;
     height: 3px;
     background-color: var(--text-secondary);
     border-radius: 2px;
 }
 
+.zahlenInputfeld[readonly] {
+    background-color: rgba(0, 255, 204, 0.05);
+    color: var(--accent-live);
+    font-weight: 700;
+    text-shadow: 0 0 8px var(--glow-live);
+    border-color: transparent;
+    cursor: default;
+    outline: none;
+}
+
+.zahlenInputfeld[readonly]:hover{
+    transform: none;
+}
+
+.zahlenInputfeld[readonly]:focus{
+    transform: none;
+    box-shadow: var(--shadow-main);
+}
+
+.swapBtn {
+    width: 2.6rem;
+    height: 2.6rem;
+    flex-shrink: 0;
+    margin-top: 1.6rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+    background: var(--border-glow);
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    cursor: pointer;
+
+    box-shadow: 0 0 15px var(--glow-soft);
+    transition: background var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.swapBtn:hover {
+    background: var(--accent-hover);
+    box-shadow: 0 0 22px var(--glow-soft);
+    transform: scale(1.06);
+}
+
+.swapBtn:active {
+    transform: scale(0.94);
+}
+
+.swapBtn i {
+    transition: transform 0.35s ease;
+}
+
+.swapBtn.rotate i {
+    transform: rotate(180deg);
+}
 
 
-.zahlenAusgabestyle{
-    display: none;   
+.zahlenAusgabestyle {
+    display: none;
     flex-direction: column;
     width: 100%;
     max-width: 500px;
@@ -66,16 +165,16 @@
     transition: border-color var(--transition-speed);
 }
 
-.zahlenAusgabestyle:hover{
-    border-color: rgba(138, 22, 255, 0.35);
+.zahlenAusgabestyle:hover {
+    border-color: rgba(138, 22, 255, 0.4);
 }
 
-.rechenwegDiv{
+.rechenwegDiv {
     display: flex;
     flex-direction: column;
 }
 
-.rechenwegText{
+.rechenwegText {
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -84,52 +183,91 @@
     margin-bottom: 0.75rem;
 }
 
-/* Swap Button*/
-.swapBtn{
-    width: 2.5rem;
-    height: 2.5rem;
-
+#rechenwegOutput {
     display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: none;
-    border-radius: 50%;
-
-    background: var(--border-glow);
-    color: white;
-
-    font-size: 1.5rem;
-    cursor: pointer;
-
-    transition:
-        background 0.2s,
-        transform 0.2s,
-        box-shadow 0.2s;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.swapBtn:hover{
-    transform: scale(1.04);
-    box-shadow: 0 6px 18px rgba(0,0,0,.2);
+.step-container {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color var(--transition-speed);
 }
 
-.swapBtn:active{
-    transform: scale(.95);
+.step-container:hover {
+    border-color: rgba(138, 22, 255, 0.15);
 }
 
-.swapBtn i{
-    transition: transform .35s ease;
+.step-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--border-glow);
 }
 
-.swapBtn.rotate i{
-    transform: rotate(180deg);
-}
-
-
-.zahlenInputfeld[readonly] {
-    background-color: rgba(255, 255, 255, 0.05); /* Leicht abgetönt (falls dunkler Hintergrund) */
+.step-text {
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    border-color: transparent;
-    cursor: default;
-    outline: none; /* Verhindert den Fokus-Rahmen beim Anklicken */
+}
+
+.step-formula-box {
+    background-color: #030306;
+    border: 1px solid rgba(138, 22, 255, 0.12);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.2rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.step-sub-solution {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-live);
+    text-shadow: 0 0 8px var(--glow-live);
+}
+
+.step-container.final-step {
+    border-color: rgba(0, 255, 204, 0.15);
+    background: rgba(0, 255, 204, 0.01);
+}
+
+.step-container.final-step .step-title {
+    color: var(--accent-live);
+}
+
+.step-container.final-step .step-formula-box {
+    border-color: rgba(0, 255, 204, 0.2);
+}
+
+
+@media (max-width: 600px) {
+    .cardsContainer {
+        flex-direction: column;
+    }
+
+    .swapBtn {
+        margin-top: 0;
+        transform: rotate(90deg);
+    }
+
+    .swapBtn:hover {
+        transform: rotate(90deg) scale(1.06);
+    }
+
+    .card {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .zahlenAusgabestyle {
+        padding: 1rem;
+    }
 }

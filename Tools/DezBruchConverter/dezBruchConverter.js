@@ -1,11 +1,11 @@
-const inputContainer = document.getElementById("cardDezimalContainer");
-const outputContainer = document.getElementById("cardBruchContainer");
-const swapBtn = document.getElementById("swapBtn");
-const errorMessages = document.getElementById("errorMessages");
-const ausgabeContainer = document.getElementById("ausgabeContainer");
-const rechenwegOutput = document.getElementById("rechenwegOutput");
 
-// HTML-Strukturen für die Karten (Wichtig: Backticks ` nutzen!)
+const inputContainer  = document.getElementById("cardDezimalContainer");
+const outputContainer = document.getElementById("cardBruchContainer");
+const swapBtn          = document.getElementById("swapBtn");
+const errorMessages    = document.getElementById("errorMessages");
+const ausgabeContainer = document.getElementById("ausgabeContainer");
+const rechenwegOutput  = document.getElementById("rechenwegOutput");
+
 const cardDezHTML = `
     <div class="card">
         <h2>Dezimal</h2>
@@ -22,166 +22,203 @@ const cardBruchHTML = `
         </div>
     </div>`;
 
-// Start-Zustand: true = Dezimal zu Bruch, false = Bruch zu Dezimal
 let isDezimalToBruch = true;
 
-// ── Mathematische Hilfsfunktionen ─────────────────────────────────────────
+const MAX_NACHKOMMASTELLEN = 10;
+
 function ggt(a, b) {
     a = Math.abs(a);
     b = Math.abs(b);
     return b === 0 ? a : ggt(b, a % b);
 }
 
-// ── Rechenweg-Strukturierungs-Hilfen (Dein Pattern) ───────────────────────
-function schrittHTML(titel, formel) {
-    return `
-        <div class="rechenwegSchritt" style="margin-bottom: 1rem;">
-            <p class="schrittTitel" style="font-weight: bold; margin: 0 0 0.25rem 0; font-size: 0.9rem;">${titel}</p>
-            <p class="schrittFormel" style="margin: 0; font-family: monospace; color: var(--text-secondary);">${formel}</p>
-        </div>`;
+function hideError() {
+    errorMessages.style.display = "none";
 }
 
-// ── Hauptlogik für die Live-Berechnung ────────────────────────────────────
+function showError(msg) {
+    ausgabeContainer.style.display = "none";
+    errorMessages.textContent = msg;
+    errorMessages.style.display = "block";
+}
+
+function renderRechenweg(steps) {
+    rechenwegOutput.innerHTML = steps.map((step, i) => {
+        const isLast = i === steps.length - 1;
+        return `
+            <div class="step-container ${isLast ? "final-step" : ""}">
+                <div class="step-title">${step.title}</div>
+                ${step.text     ? `<div class="step-text">${step.text}</div>`         : ""}
+                ${step.formula  ? `<div class="step-formula-box">${step.formula}</div>` : ""}
+                ${step.solution ? `<div class="step-sub-solution">${step.solution}</div>` : ""}
+            </div>`;
+    }).join("");
+}
+
 function berechneLive() {
-    errorMessages.innerText = ""; 
+    hideError();
     rechenwegOutput.innerHTML = "";
 
     if (isDezimalToBruch) {
-        // ── DEZIMAL ZU BRUCH ──
-        const dezInput = document.getElementById("inputFeld3");
-        const zaehlerOut = document.getElementById("zaehler1");
-        const nennerOut = document.getElementById("nenner1");
-        
-        if (!dezInput || !dezInput.value.trim()) {
-            zaehlerOut.value = "";
-            nennerOut.value = "";
-            ausgabeContainer.style.display = "none";
-            return;
-        }
-
-        const rawValue = dezInput.value.trim();
-        const decimalNumber = parseFloat(rawValue);
-
-        if (isNaN(decimalNumber)) return;
-
-        // Berechne Nachkommastellen für die Zehnerpotenz-Erweiterung
-        const teile = rawValue.split('.');
-        const nachkommastellen = teile[1] ? teile[1].length : 0;
-        const erweiterungsFaktor = Math.pow(10, nachkommastellen);
-
-        // Schritt 1: Erweitern
-        let startZaehler = Math.round(decimalNumber * erweiterungsFaktor);
-        let startNenner = erweiterungsFaktor;
-
-        // Schritt 2: Kürzen via GgT
-        const teiler = ggt(startZaehler, startNenner);
-        const gekuerzterZaehler = startZaehler / teiler;
-        const gekuerzterNenner = startNenner / teiler;
-
-        // Werte live ins schreibgeschützte Feld eintragen
-        zaehlerOut.value = gekuerzterZaehler;
-        nennerOut.value = gekuerzterNenner;
-
-        // Rechenweg im schrittHTML-Stil aufbauen
-        let html = schrittHTML("1. Ausgangswert", `Dezimalzahl = ${decimalNumber}`);
-        html += schrittHTML(
-            `2. Als Bruch schreiben (mit $10^{${nachkommastellen}}$ erweitert)`, 
-            `\\frac{${startZaehler}}{${startNenner}}`
-        );
-        html += schrittHTML("3. Größter gemeinsamer Teiler (ggT)", `ggT(${startZaehler}, ${startNenner}) = ${teiler}`);
-        html += schrittHTML("4. Gekürztes Ergebnis", `\\frac{${startZaehler} \\div ${teiler}}{${startNenner} \\div ${teiler}} = \\mathbf{\\frac{${gekuerzterZaehler}}{${gekuerzterNenner}}}`);
-
-        rechenwegOutput.innerHTML = html;
-        ausgabeContainer.style.display = "flex";
-
+        berechneDezimalZuBruch();
     } else {
-        // ── BRUCH ZU DEZIMAL ──
-        const zaehlerInput = document.getElementById("zaehler1");
-        const nennerInput = document.getElementById("nenner1");
-        const dezOut = document.getElementById("inputFeld3");
-        
-        if (!zaehlerInput || !nennerInput || !zaehlerInput.value.trim() || !nennerInput.value.trim()) {
-            dezOut.value = "";
-            ausgabeContainer.style.display = "none";
-            return;
-        }
-        
-        const z = parseFloat(zaehlerInput.value);
-        const n = parseFloat(nennerInput.value);
-        
-        if (isNaN(z) || isNaN(n)) return;
-
-        if (n === 0) {
-            errorMessages.innerText = "Division durch 0 ist nicht erlaubt! (Nenner darf nicht 0 sein)";
-            dezOut.value = "";
-            ausgabeContainer.style.display = "none";
-            return;
-        }
-        
-        const ergebnis = z / n;
-        // Runden auf max 6 Nachkommastellen (Floating-Point-Fehler abfangen)
-        const gerundetesErgebnis = Math.round((ergebnis + Number.EPSILON) * 1e6) / 1e6;
-        
-        dezOut.value = gerundetesErgebnis;
-
-        // Rechenweg im schrittHTML-Stil aufbauen
-        let html = schrittHTML("1. Gegebener Bruch", `\\frac{Zähler}{Nenner} = \\frac{${z}}{${n}}`);
-        html += schrittHTML("2. Berechnung", `${z} \\div ${n} = ${gerundetesErgebnis}`);
-        
-        rechenwegOutput.innerHTML = html;
-        ausgabeContainer.style.display = "flex";
+        berechneBruchZuDezimal();
     }
 }
 
-// ── Event-Handling & Card Swapping ────────────────────────────────────────
+function berechneDezimalZuBruch() {
+    const dezInput   = document.getElementById("inputFeld3");
+    const zaehlerOut = document.getElementById("zaehler1");
+    const nennerOut  = document.getElementById("nenner1");
+
+    const rawValue = dezInput.value.trim().replace(",", ".");
+
+    if (rawValue === "") {
+        zaehlerOut.value = "";
+        nennerOut.value  = "";
+        ausgabeContainer.style.display = "none";
+        return;
+    }
+
+    if (isNaN(Number(rawValue))) {
+        showError("Bitte eine gültige Dezimalzahl eingeben.");
+        return;
+    }
+
+    const [intPart, rawFrac = ""] = rawValue.split(".");
+    const fracPart           = rawFrac.slice(0, MAX_NACHKOMMASTELLEN);
+    const nachkommastellen   = fracPart.length;
+    const erweiterungsFaktor = Math.pow(10, nachkommastellen);
+    const decimalNumber      = parseFloat(fracPart ? `${intPart}.${fracPart}` : intPart);
+
+    const startZaehler = Math.round(decimalNumber * erweiterungsFaktor);
+    const startNenner  = erweiterungsFaktor;
+
+    const teiler  = ggt(startZaehler, startNenner);
+    const zaehler = startZaehler / teiler;
+    const nenner  = startNenner / teiler;
+
+    zaehlerOut.value = zaehler;
+    nennerOut.value  = nenner;
+
+    const steps = [{
+        title:   "Schritt 1: Nachkommastellen zählen",
+        text:    nachkommastellen > 0
+            ? `${decimalNumber} hat ${nachkommastellen} Nachkommastelle(n) → Erweiterungsfaktor 10^${nachkommastellen}.`
+            : `${decimalNumber} hat keine Nachkommastellen.`,
+        formula: `Erweiterungsfaktor = ${erweiterungsFaktor}`
+    }, {
+        title:    "Schritt 2: Mit dem Faktor erweitern",
+        text:     "Zahl mit dem Erweiterungsfaktor multiplizieren, um einen Bruch ohne Komma zu erhalten:",
+        formula:  `${decimalNumber} × ${erweiterungsFaktor} = ${startZaehler}`,
+        solution: `Zwischenergebnis: ${startZaehler}/${startNenner}`
+    }];
+
+    if (teiler > 1) {
+        steps.push({
+            title:    "Schritt 3: Bruch kürzen",
+            text:     "Größten gemeinsamen Teiler (ggT) von Zähler und Nenner berechnen und kürzen:",
+            formula:  `ggT(${startZaehler}, ${startNenner}) = ${teiler}\n${startZaehler} ÷ ${teiler} = ${zaehler}\n${startNenner} ÷ ${teiler} = ${nenner}`,
+            solution: `Endgültiges Ergebnis: ${zaehler}/${nenner}`
+        });
+    } else {
+        steps[steps.length - 1].solution = `Endgültiges Ergebnis: ${zaehler}/${nenner} (bereits vollständig gekürzt)`;
+    }
+
+    renderRechenweg(steps);
+    ausgabeContainer.style.display = "flex";
+}
+
+function berechneBruchZuDezimal() {
+    const zaehlerInput = document.getElementById("zaehler1");
+    const nennerInput  = document.getElementById("nenner1");
+    const dezOut       = document.getElementById("inputFeld3");
+
+    const zRaw = zaehlerInput.value.trim().replace(",", ".");
+    const nRaw = nennerInput.value.trim().replace(",", ".");
+
+    if (zRaw === "" || nRaw === "") {
+        dezOut.value = "";
+        ausgabeContainer.style.display = "none";
+        return;
+    }
+
+    const z = Number(zRaw);
+    const n = Number(nRaw);
+
+    if (isNaN(z) || isNaN(n)) {
+        showError("Bitte gültige Zahlen eingeben.");
+        return;
+    }
+
+    if (n === 0) {
+        showError("Division durch 0 ist nicht erlaubt! (Nenner darf nicht 0 sein)");
+        return;
+    }
+
+    const ergebnis       = z / n;
+    const gerundet       = Math.round((ergebnis + Number.EPSILON) * 1e6) / 1e6;
+    const wurdeGerundet  = ergebnis !== gerundet;
+
+    dezOut.value = gerundet;
+
+    const steps = [{
+        title:   "Schritt 1: Bruch als Division verstehen",
+        text:    "Ein Bruch entspricht der Division von Zähler durch Nenner:",
+        formula: `${z}/${n} = ${z} ÷ ${n}`
+    }, {
+        title:    "Schritt 2: Division berechnen",
+        text:     wurdeGerundet
+            ? "Ergebnis berechnen (auf 6 Nachkommastellen gerundet, da die Dezimalzahl unendlich lang wäre):"
+            : "Ergebnis berechnen:",
+        formula:  `${z} ÷ ${n} = ${gerundet}`,
+        solution: `Endgültiges Ergebnis: ${gerundet}`
+    }];
+
+    renderRechenweg(steps);
+    ausgabeContainer.style.display = "flex";
+}
 
 function initLiveEvents() {
     if (isDezimalToBruch) {
-        const dezInput = document.getElementById("inputFeld3");
-        if (dezInput) dezInput.addEventListener("input", berechneLive);
+        document.getElementById("inputFeld3")?.addEventListener("input", berechneLive);
     } else {
-        const zaehlerInput = document.getElementById("zaehler1");
-        const nennerInput = document.getElementById("nenner1");
-        if (zaehlerInput) zaehlerInput.addEventListener("input", berechneLive);
-        if (nennerInput) nennerInput.addEventListener("input", berechneLive);
+        document.getElementById("zaehler1")?.addEventListener("input", berechneLive);
+        document.getElementById("nenner1")?.addEventListener("input", berechneLive);
     }
 }
 
 function swapCards() {
-    isDezimalToBruch = !isDezimalToBruch;
-    
-    if (isDezimalToBruch) {
-        inputContainer.innerHTML = cardDezHTML;
-        outputContainer.innerHTML = cardBruchHTML;
-    } else {
-        inputContainer.innerHTML = cardBruchHTML;
-        outputContainer.innerHTML = cardDezHTML;
-    }
-    
-    // Setze alle Inputs im Ausgabe-Container auf Readonly
-    const outputInputs = outputContainer.querySelectorAll("input");
-    outputInputs.forEach(input => {
-        input.setAttribute("readonly", true);
-    });
+    const dezValue     = document.getElementById("inputFeld3")?.value ?? "";
+    const zaehlerValue = document.getElementById("zaehler1")?.value ?? "";
+    const nennerValue  = document.getElementById("nenner1")?.value ?? "";
 
-    ausgabeContainer.style.display = "none";
-    errorMessages.innerText = "";
+    isDezimalToBruch = !isDezimalToBruch;
+
+    if (isDezimalToBruch) {
+        inputContainer.innerHTML  = cardDezHTML;
+        outputContainer.innerHTML = cardBruchHTML;
+        document.getElementById("inputFeld3").value = dezValue;
+    } else {
+        inputContainer.innerHTML  = cardBruchHTML;
+        outputContainer.innerHTML = cardDezHTML;
+        document.getElementById("zaehler1").value = zaehlerValue;
+        document.getElementById("nenner1").value  = nennerValue;
+    }
+
+    outputContainer.querySelectorAll("input").forEach(input => input.setAttribute("readonly", true));
 
     initLiveEvents();
+    berechneLive();
 }
 
 swapBtn.addEventListener("click", () => {
     swapBtn.classList.add("rotate");
-    setTimeout(() => {
-        swapBtn.classList.remove("rotate");
-    }, 350);
-
+    setTimeout(() => swapBtn.classList.remove("rotate"), 350);
     swapCards();
 });
 
-// Setup beim ersten Laden der Seite
 document.addEventListener("DOMContentLoaded", () => {
-    const outputInputs = outputContainer.querySelectorAll("input");
-    outputInputs.forEach(input => input.setAttribute("readonly", true));
+    outputContainer.querySelectorAll("input").forEach(input => input.setAttribute("readonly", true));
     initLiveEvents();
 });

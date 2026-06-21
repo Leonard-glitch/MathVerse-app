@@ -4,7 +4,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dezimal<->Bruch</title>
+    <title>Dezimal ↔ Bruch Umrechner</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
     <link rel="stylesheet" href="./dezBruchConverter.css">
@@ -28,7 +29,7 @@
     <main>
 
         <section class="dezBruchSection">
-            <h1 class="zahlenHeader">Dezimal<->Bruch</h1>
+            <h1 class="zahlenHeader">Dezimal ↔ Bruch Umrechner</h1>
 
             <div class="cardsContainer">
                 <div class="cards">
@@ -37,12 +38,12 @@
                         <div class="card">
                             <h2>Dezimal</h2>
 
-                            <input type="number" id="inputFeld3" placeholder="20" class="zahlenInputfeld">
+                            <input type="number" id="inputFeld3" placeholder="z.B. 0.75" class="zahlenInputfeld">
                         </div>
                     </div>
                 </div>
 
-                <button class="swapBtn" id="swapBtn">
+                <button class="swapBtn" id="swapBtn" type="button" aria-label="Eingabe und Ausgabe tauschen">
                     <i class="fa fa-exchange"></i>
                 </button>
 
@@ -64,7 +65,7 @@
 
             <p class="falscheEingabestyle" id="errorMessages"></p>
 
-            <div class="zahlenAusgabestyle" id="ausgabeContainer" style="display: none;">
+            <div class="zahlenAusgabestyle" id="ausgabeContainer">
                 <div class="rechenwegDiv">
                     <p class="rechenwegText">Rechenweg:</p>
                     <div id="rechenwegOutput"></div>

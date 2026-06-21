@@ -13,6 +13,12 @@ const rechenwegOutput  = document.getElementById("rechenwegOutput");
 let anzahlZusatzInputs = 0;
 
 
+// Hilfsfunktion zum Runden, um JS-Fließkommafehler zu eliminieren (z.B. 20.69999999999998 -> 20.7)
+function exaktRunden(n) {
+    return Math.round(n * 1e12) / 1e12;
+}
+
+
 function isValidForBase(value, base) {
     const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".slice(0, base);
     const regex = new RegExp(`^-?[${chars}]+(\\.[${chars}]+)?$`, "i");
@@ -40,11 +46,11 @@ function parseBaseNumber(value, base) {
     let fracValue = 0;
     if (fracPart) {
         for (let i = 0; i < fracPart.length; i++) {
-            fracValue += parseInt(fracPart[i], base) / Math.pow(base, i + 1);
+            fracValue = exaktRunden(fracValue + parseInt(fracPart[i], base) / Math.pow(base, i + 1));
         }
     }
 
-    return sign * (intValue + fracValue);
+    return exaktRunden(sign * (intValue + fracValue));
 }
 
 function toBaseString(number, base, precision = 10) {
@@ -54,17 +60,17 @@ function toBaseString(number, base, precision = 10) {
     number = Math.abs(number);
 
     let intPart = Math.floor(number);
-    let fracPart = number - intPart;
+    let fracPart = exaktRunden(number - intPart);
 
     let intStr = intPart.toString(base).toUpperCase();
     if (fracPart === 0) return sign + intStr;
 
     let fracStr = "";
     for (let i = 0; i < precision; i++) {
-        fracPart *= base;
+        fracPart = exaktRunden(fracPart * base);
         let digit = Math.floor(fracPart);
         fracStr += digit.toString(base).toUpperCase();
-        fracPart -= digit;
+        fracPart = exaktRunden(fracPart - digit);
         if (fracPart === 0) break;
     }
 
@@ -72,12 +78,12 @@ function toBaseString(number, base, precision = 10) {
 }
 
 function calculate(a, b, op) {
-    if (op === "+") return a + b;
-    if (op === "-") return a - b;
-    if (op === "*") return a * b;
+    if (op === "+") return exaktRunden(a + b);
+    if (op === "-") return exaktRunden(a - b);
+    if (op === "*") return exaktRunden(a * b);
     if (op === "/") {
         if (b === 0) return "DIV0";
-        return a / b;
+        return exaktRunden(a / b);
     }
 }
 
