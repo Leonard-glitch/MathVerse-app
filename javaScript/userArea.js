@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initDeletePanel();
     initLogoutModal();
     initPasswordToggles();
+    initMobileSidebar();
 });
 
 // =============================================================================
@@ -72,6 +73,7 @@ function initPanelNav() {
             navItems.forEach(n => n.classList.remove('active'));
             item.classList.add('active');
             switchPanel(item.dataset.panel);
+            closeMobileSidebar(); // Sidebar auf Mobile nach Auswahl schließen
         });
     });
 }
@@ -488,4 +490,36 @@ function showFormError(el, msg, isSuccess = false) {
     el.style.borderColor     = isSuccess ? 'var(--accent-live)'     : 'rgba(255,42,95,0.3)';
     el.style.backgroundColor = isSuccess ? 'rgba(0,255,204,0.06)'   : 'rgba(255,42,95,0.06)';
     el.classList.remove('hidden');
+}
+
+// =============================================================================
+// MOBILE SIDEBAR
+// =============================================================================
+
+function initMobileSidebar() {
+    const toggleBtn = document.getElementById('sidebarMobileToggle');
+    const closeBtn  = document.getElementById('sidebarMobileClose');
+    const overlay   = document.getElementById('sidebarOverlay');
+
+    if (!toggleBtn) return;
+
+    toggleBtn.addEventListener('click', openMobileSidebar);
+    closeBtn?.addEventListener('click',  closeMobileSidebar);
+    overlay?.addEventListener('click',   closeMobileSidebar);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeMobileSidebar();
+    });
+}
+
+function openMobileSidebar() {
+    document.querySelector('.settingsSidebar')?.classList.add('mobile-open');
+    document.getElementById('sidebarOverlay')?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMobileSidebar() {
+    document.querySelector('.settingsSidebar')?.classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay')?.classList.remove('active');
+    document.body.style.overflow = '';
 }
