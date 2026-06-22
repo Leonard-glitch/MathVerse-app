@@ -1,9 +1,4 @@
-/* ==========================================================================
-   USER AREA / SETTINGS PAGE
-   Discord-inspired: fixed sidebar + scrollable content, MathVerse dark theme
-   ========================================================================== */
 
-/* ── Layout shell ─────────────────────────────────────────────────────────── */
 
 body {
     overflow: hidden;       /* No body scroll — each panel scrolls internally */
@@ -1029,65 +1024,112 @@ body {
     display: none !important;
 }
 
+/* ── Sidebar Overlay (Mobile) ─────────────────────────────────────────────── */
+.sidebarOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 9, 14, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 150;
+}
+.sidebarOverlay.active { display: block; }
+
+/* ── Mobile Hamburger Button ──────────────────────────────────────────────── */
+.sidebarMobileToggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--glow-soft);
+    transition: all var(--transition-fast);
+}
+.sidebarMobileToggle:hover { background: var(--border-glow); }
+
+/* ── Mobile Close Button (in Sidebar) ────────────────────────────────────── */
+.sidebarMobileClose {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.35rem;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
+    flex-shrink: 0;
+}
+.sidebarMobileClose:hover {
+    color: var(--accent-error);
+    background: rgba(255, 42, 95, 0.08);
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 680px) {
+    body { overflow: auto; }
+
     .settingsSidebar {
-        width: 56px;
-        min-width: 56px;
+        position: fixed;
+        left: -260px;
+        top: 0;
+        width: 240px;
+        min-width: 240px;
+        height: 100%;
+        z-index: 200;
+        transition: left 0.28s ease;
     }
 
-    .navGroupTitle,
-    .navItem span,
-    .backBtn span,
-    .sidebarUserInfo,
-    .navItem:not(.navItem--icon) {
-        display: none;
-    }
-
-    .navItem {
-        justify-content: center;
-        padding: 0.65rem;
-    }
-
-    .navItem::before {
-        height: 40%;
-    }
-
-    .navItemIcon {
-        width: auto;
-        font-size: 0.9rem;
-    }
-
-    .sidebarUserCard {
-        justify-content: center;
-        padding: 0.8rem 0;
+    .settingsSidebar.mobile-open {
+        left: 0;
+        box-shadow: 6px 0 30px rgba(0, 0, 0, 0.6);
     }
 
     .sidebarTop {
-        padding: 0.8rem 0.4rem;
+        padding: 1rem;
         display: flex;
-        justify-content: center;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    .backBtn {
-        padding: 0.5rem;
-        justify-content: center;
-    }
+    .sidebarMobileToggle { display: flex; }
+    .sidebarMobileClose  { display: block; }
+
+    .navItem            { justify-content: flex-start; padding: 0.55rem 0.75rem; }
+    .navItem::before    { height: 60%; }
+    .navItemIcon        { width: 16px; font-size: 0.8rem; }
+    .sidebarUserCard    { justify-content: flex-start; padding: 0.8rem 1rem; }
 
     .settingsContent {
-        padding: 1.5rem 1rem 3rem 1rem;
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: visible;
+        padding: 4.5rem 1rem 3rem 1rem;
+        max-width: 100%;
     }
 
-    .colorGrid {
-        gap: 0.6rem;
-    }
-
-    .previewContent {
-        flex-direction: column;
-    }
+    .colorGrid          { gap: 0.6rem; }
+    .previewContent     { flex-direction: column; }
+    .teaserRow          { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .editActions        { flex-wrap: wrap; }
+    .profileBanner      { margin-bottom: 3rem; }
+    .favoritesGrid      { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 }
 
 .designBtn{

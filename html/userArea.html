@@ -10,7 +10,7 @@
     <title>Einstellungen – MathVerse</title>
 </head>
 <body>
-
+    <div id="sidebarOverlay" class="sidebarOverlay"></div>
     <div class="settingsLayout">
 
         <!-- LEFT SIDEBAR -->
@@ -22,6 +22,9 @@
                     <i class="fa fa-arrow-left"></i>
                     <span>Zurück zu MathVerse</span>
                 </a>
+                <button class="sidebarMobileClose" id="sidebarMobileClose" aria-label="Menü schließen">
+                    <i class="fa fa-times"></i>
+                </button>
             </div>
 
             <!-- Nav groups -->
@@ -78,7 +81,9 @@
             </div>
 
         </aside>
-
+        <button class="sidebarMobileToggle" id="sidebarMobileToggle" aria-label="Menü öffnen">
+            <i class="fa fa-bars"></i>
+        </button>
         <!-- RIGHT CONTENT AREA -->
         <main class="settingsContent">
 
