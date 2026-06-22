@@ -563,4 +563,62 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         changeNavUserArea();
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    // NAVBAR BURGER MENU (beide Versionen: eingeloggt + nicht eingeloggt)
+    // ══════════════════════════════════════════════════════════════════════
+    function initNavBurger() {
+        const navbar = document.querySelector('.navbar');
+        // Nicht auf der UserArea-Seite (hat eigenes Layout)
+        if (!navbar || document.querySelector('.settingsLayout')) return;
+
+        // Burger-Button erstellen und anhängen
+        const burger = document.createElement('button');
+        burger.className = 'navBurger';
+        burger.setAttribute('aria-label', 'Menü öffnen');
+        burger.setAttribute('aria-expanded', 'false');
+        burger.innerHTML = `
+            <span class="burgerLine"></span>
+            <span class="burgerLine"></span>
+            <span class="burgerLine"></span>
+        `;
+        navbar.appendChild(burger);
+
+        function openMenu() {
+            navbar.classList.add('nav-open');
+            burger.classList.add('is-open');
+            burger.setAttribute('aria-expanded', 'true');
+            burger.setAttribute('aria-label', 'Menü schließen');
+        }
+
+        function closeMenu() {
+            navbar.classList.remove('nav-open');
+            burger.classList.remove('is-open');
+            burger.setAttribute('aria-expanded', 'false');
+            burger.setAttribute('aria-label', 'Menü öffnen');
+        }
+
+        burger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navbar.classList.contains('nav-open') ? closeMenu() : openMenu();
+        });
+
+        // Schließen bei Klick außerhalb
+        document.addEventListener('click', (e) => {
+            if (!navbar.contains(e.target)) closeMenu();
+        });
+
+        // Schließen bei Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
+        });
+
+        // Schließen wenn Nav-Link oder Suchergebnis geklickt
+        document.getElementById('navUserArea')?.addEventListener('click', (e) => {
+            if (e.target.closest('a')) closeMenu();
+        });
+        document.getElementById('searchResults')?.addEventListener('click', closeMenu);
+    }
+
+    initNavBurger();
+
 })();

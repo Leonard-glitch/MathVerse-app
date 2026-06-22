@@ -665,3 +665,118 @@ input[type="number"] {
     outline-offset: 3px;
 }
 
+
+/* ==========================================================================
+   BURGER BUTTON
+   ========================================================================== */
+.navBurger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: var(--bg-input);
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.navBurger:hover {
+    background: var(--border-glow);
+    box-shadow: 0 0 12px var(--glow-soft);
+}
+
+.burgerLine {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transform-origin: center;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+}
+
+/* Burger → X Animation */
+.navBurger.is-open .burgerLine:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.navBurger.is-open .burgerLine:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.navBurger.is-open .burgerLine:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@keyframes navFadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   RESPONSIVE NAVBAR  (≤ 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+
+    .navbar {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 0.6rem 1rem;
+        gap: 0;
+    }
+
+    .navBurger { display: flex; }
+
+    /* Search + NavArea: standardmäßig versteckt */
+    .searchContainer,
+    #navUserArea {
+        display: none;
+        width: 100%;
+        order: 3;
+    }
+
+    /* Geöffneter Zustand – Suche */
+    .navbar.nav-open .searchContainer {
+        display: block;
+        margin-top: 0.6rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+        animation: navFadeSlide 0.2s ease;
+    }
+
+    .navbar.nav-open .searchContainer #searchInput {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Geöffneter Zustand – Nav-Links */
+    .navbar.nav-open #navUserArea {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0 0.4rem;
+        border-top: 1px solid var(--border-color);
+        animation: navFadeSlide 0.22s ease;
+    }
+
+    /* Login / Register Buttons: gleichmäßig verteilen */
+    .navbar.nav-open .navTextBorder {
+        flex: 1;
+        text-align: center;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    /* Eingeloggter User: volle Breite */
+    .navbar.nav-open .userAccount {
+        width: 100%;
+        justify-content: center;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    /* Suchergebnisse: volle Breite des Containers */
+    #searchResults {
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
+}
