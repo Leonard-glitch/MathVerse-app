@@ -107,7 +107,7 @@ input {
 }
 
 .buttonPercent:active{
-    transform: translateY(10px);
+    transform: translateY(1px);
 }
 
 

@@ -654,3 +654,14 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
+.zahlenButtoncss:focus-visible {
+    outline: 2px solid var(--border-glow);
+    outline-offset: 3px;
+    box-shadow: 0 0 12px var(--glow-soft);
+}
+
+.navTextBorder:focus-visible {
+    outline: 2px solid var(--border-glow);
+    outline-offset: 3px;
+}
+
