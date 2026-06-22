@@ -114,8 +114,8 @@ function renderRechenweg(targetIndex, values, isProp, map, result) {
     const val   = i => formatNum(values[i]);
 
     const beziehungZeile = isProp
-        ? " Wert 1 : Wert 2 = Wert 3 : Wert 4"
-        : " Wert 1 × Wert 2 = Wert 3 × Wert 4";
+        ? "Wert 1 : Wert 2 = Wert 3 : Wert 4"
+        : "Wert 1 × Wert 2 = Wert 3 × Wert 4";
 
     const formelZeile   = `${label(targetIndex)} = (${label(map.num[0])} × ${label(map.num[1])}) / ${label(map.den)}`;
     const rechnungZeile = `${label(targetIndex)} = (${val(map.num[0])} × ${val(map.num[1])}) / ${val(map.den)}`;

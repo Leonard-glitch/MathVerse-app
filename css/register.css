@@ -1,6 +1,4 @@
-/* ==========================================================================
-   REGISTER PAGE – X-Inspired Style
-   ========================================================================== */
+
 
 section {
     display: flex;
@@ -32,10 +30,6 @@ section {
     flex-direction: column;
     gap: 1.5rem;
 }
-
-/* ==========================================================================
-   INPUT GROUP (Floating Label Pattern)
-   ========================================================================== */
 
 .inputGroup {
     position: relative;
@@ -310,4 +304,64 @@ section {
 .xInput:-webkit-autofill {
     animation-name: onAutoFillStart;
     animation-duration: 0.001s;
+}
+
+
+@media (max-width: 768px) {
+    section {
+        padding: 1rem 1rem;
+        min-height: 60vh;
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+
+    .loginContainer {
+        padding: 1.25rem 1rem;
+    }
+
+    .loginTitle {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .loginForm {
+        gap: 1.2rem;
+    }
+
+    .xInput {
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+
+    .xLoginBtn {
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+
+    .floatingLabel {
+        font-size: 0.85rem;
+    }
+
+    .strengthWrapper {
+        gap: 0.5rem;
+        margin-top: -0.5rem;
+    }
+
+    .checkboxText {
+        font-size: 0.72rem;
+    }
+
+    .field-error {
+        font-size: 0.72rem;
+    }
+
+    .signupPrompt {
+        margin-top: 1.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .loginTitle { font-size: 1.2rem; }
+    .xInput     { font-size: 0.9rem; }
 }

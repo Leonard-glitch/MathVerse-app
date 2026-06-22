@@ -13,9 +13,7 @@
     }
 }
 
-/* ==========================================================================
-   NAVBAR OVERRIDE (Homepage hat etwas kleineres navImage)
-   ========================================================================== */
+
 .navImage {
     height: 40px;
     filter: drop-shadow(0 0 8px var(--glow-soft));
@@ -25,9 +23,6 @@
     width: 250px;
 }
 
-/* ==========================================================================
-   LAYOUT STRUCTURE (3 Columns)
-   ========================================================================== */
 .bodyDivsinSection {
     display: flex;
     flex-direction: row;
@@ -44,9 +39,7 @@
     padding: 0 20px;
 }
 
-/* ==========================================================================
-   MAIN HEADERS
-   ========================================================================== */
+
 .headerOne {
     text-align: center;
     padding: 1.5rem 0 0.5rem 0;
@@ -403,4 +396,115 @@
     color: var(--border-glow) !important;
     filter: drop-shadow(0 0 5px var(--glow-soft));
     cursor: pointer;
+}
+
+
+@media (max-width: 1024px) {
+    .bodyDivContantLeft,
+    .bodyDivContantRight {
+        width: 5%;
+    }
+
+    .bodyDivContantMiddle {
+        width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Layout: 3 Spalten → 1 Spalte */
+    .bodyDivsinSection {
+        flex-direction: column;
+    }
+
+    .bodyDivContantLeft,
+    .bodyDivContantRight {
+        display: none;
+    }
+
+    .bodyDivContantMiddle {
+        width: 100%;
+        padding: 0 0.75rem;
+    }
+
+    /* Header */
+    .headerOne {
+        font-size: clamp(1.8rem, 8vw, 2.8rem);
+        padding: 1rem 0 0.25rem 0;
+        margin-top: 0.75rem;
+    }
+
+    .textUnderHeader1 {
+        font-size: 0.85rem;
+    }
+
+    /* Gruppen */
+    .restFuncionsDiv {
+        margin-top: 2.5rem;
+    }
+
+    .favoritenHeader2 {
+        font-size: 1.1rem;
+    }
+
+    /* Cards Container */
+    .cardsContainer {
+        gap: 0.85rem;
+        padding: 1rem;
+    }
+
+    /* Karten: 2 pro Reihe auf Mobile */
+    .card {
+        aspect-ratio: 1 / 0.7;
+        width: calc(50% - 0.5rem);
+        min-width: 0;
+        font-size: 0.75rem;
+    }
+
+    .cardImg {
+        height: 5.5em;
+    }
+
+    .cardText {
+        font-size: 0.72rem;
+        padding: 0 0.2rem;
+    }
+
+    /* Collapse-Button */
+    .restFuncionsDiv .expand-btn {
+        bottom: -18px;
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Footer */
+    .footerNav {
+        gap: 1.2rem;
+        margin-top: 4rem;
+        padding: 1.5rem 1rem 1rem 1rem;
+    }
+
+    .linksFooterect {
+        gap: 1.2rem;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 400px) {
+    /* Karten: weiterhin 2 pro Reihe, aber kompakter */
+    .card {
+        width: calc(50% - 0.4rem);
+    }
+
+    .cardsContainer {
+        gap: 0.6rem;
+        padding: 0.75rem;
+    }
+
+    .cardImg {
+        height: 4.5em;
+    }
+
+    .headerOne {
+        font-size: clamp(1.5rem, 9vw, 2rem);
+    }
 }

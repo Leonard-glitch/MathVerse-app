@@ -244,3 +244,58 @@ section {
     -webkit-box-shadow: 0 0 0px 1000px #09090e inset;
     transition: background-color 9999s ease-in-out 0s;
 }
+
+
+@media (max-width: 768px) {
+    section {
+        padding: 1rem 1rem;
+        min-height: 60vh;
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+
+    .loginContainer {
+        padding: 1.25rem 1rem;
+    }
+
+    .loginTitle {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .loginForm {
+        gap: 1.2rem;
+    }
+
+    .xInput {
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+
+    .xLoginBtn {
+        min-height: 44px;
+        font-size: 0.95rem;
+    }
+
+    .floatingLabel {
+        font-size: 0.85rem;
+    }
+
+    .forgotPasswordLink {
+        font-size: 0.8rem;
+    }
+
+    .signupPrompt {
+        margin-top: 1.5rem;
+        font-size: 0.8rem;
+    }
+
+    .field-error {
+        font-size: 0.72rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .loginTitle { font-size: 1.2rem; }
+    .xInput     { font-size: 0.9rem; }
+}

@@ -271,3 +271,76 @@
         padding: 1rem;
     }
 }
+
+
+@media (max-width: 768px) {
+    .dezBruchSection {
+        padding: 0 0.75rem;
+    }
+
+    .cardsContainer {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 1rem 0 0.5rem 0;
+    }
+
+    .cards {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .card {
+        width: 100%;
+        padding: 1.2rem 1rem;
+    }
+
+    /* Swap-Button: horizontal auf Mobile */
+    .swapBtn {
+        margin-top: 0;
+        transform: rotate(90deg);
+        width: 2.4rem;
+        height: 2.4rem;
+        font-size: 1.1rem;
+    }
+
+    .swapBtn:hover {
+        transform: rotate(90deg) scale(1.06);
+    }
+
+    .swapBtn.rotate i {
+        transform: rotate(180deg);
+    }
+
+    .zahlenInputfeld {
+        max-width: 100%;
+        min-height: 44px;
+    }
+
+    .zahlenAusgabestyle {
+        max-width: 100%;
+        padding: 1rem;
+    }
+
+    .step-formula-box {
+        font-size: 0.8rem;
+        padding: 0.75rem;
+        word-break: break-word;
+    }
+
+    .step-title {
+        font-size: 0.82rem;
+    }
+
+    .step-text {
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .card { padding: 1rem 0.75rem; }
+
+    .step-formula-box {
+        font-size: 0.75rem;
+    }
+}

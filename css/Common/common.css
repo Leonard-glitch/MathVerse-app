@@ -780,3 +780,86 @@ input[type="number"] {
         width: 100%;
     }
 }
+
+
+/* ==========================================================================
+   TOOL PAGES – RESPONSIVE (Mobile ≤ 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+
+    /* Header */
+    .zahlenHeader {
+        font-size: clamp(1.4rem, 6vw, 2rem);
+        padding: 1.5rem 1rem 1rem 1rem;
+    }
+
+    /* Input & Button – Touch-freundlich */
+    .zahlenInputfeld {
+        max-width: 100%;
+        min-height: 44px;
+    }
+
+    .zahlenButtoncss {
+        min-height: 44px;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    /* Tab-Bars (Einheiten, Bruchrechner etc.) – horizontal scrollbar */
+    .einheitenGruppenContainer {
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 6px;
+    }
+    .einheitenGruppenContainer::-webkit-scrollbar { display: none; }
+
+    .btnUnits {
+        flex-shrink: 0;
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+    }
+
+    /* Ausgabe-Boxen */
+    .zahlenAusgabestyle {
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
+    /* Fehler-Meldungen */
+    .falscheEingabestyle {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Footer */
+    .linksFooterect {
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .footerSocial { gap: 1.5rem; }
+
+    .footerNav {
+        margin-top: 3rem;
+        padding: 2rem 1rem 1.5rem 1rem;
+        gap: 1.5rem;
+    }
+}
+
+/* Sehr kleine Screens (≤ 400px) */
+@media (max-width: 400px) {
+    .zahlenHeader {
+        font-size: clamp(1.2rem, 7vw, 1.6rem);
+    }
+
+    .btnUnits {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+    }
+}

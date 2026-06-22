@@ -70,3 +70,25 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 
 
 ----Dezimal<-->Bruch----
+
+
+
+
+--------======Responsive=====-------------
+
+-, Das Hertz in den jeweiligen Tool Seiten!
+-, User Font Size Einstellung an Responsive anpassen!
+-, Die Einlapp Funktion der HomePage anpassen!
+-, In User Area kann man auf Mobile immer noch nicht scrollen!
+-, Maybe noch eine bessere Lösung für Bruchrechner, Einheiten Umrechner Boxen!
+
+Dreisatz-> GUT
+Zahlensystem Umrechner-> GUT
+Zahlensystem Rechner-> GUT
+Prozentrechnung-> GUT
+Zahlen Analyse-> GUT
+Einheiten Umrechner-> Ganz OKay
+Dez-Bruch Converter-> Responsiv GUT aber seit wann komma in Bruch erlaubt
+BruchRechner-> Rechenlogik überarbeiten(Ganz Zahl Switch Logik in verbindung mit Rechnung)
+
+

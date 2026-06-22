@@ -566,6 +566,15 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     // ══════════════════════════════════════════════════════════════════════
     // NAVBAR BURGER MENU (beide Versionen: eingeloggt + nicht eingeloggt)
     // ══════════════════════════════════════════════════════════════════════
+
+    // Auto-fix: searchContainer-Klasse setzen falls nicht vorhanden
+    (function fixSearchContainer() {
+        const input = document.getElementById('searchInput');
+        if (input && !input.parentElement.classList.contains('searchContainer')) {
+            input.parentElement.classList.add('searchContainer');
+        }
+    })();
+
     function initNavBurger() {
         const navbar = document.querySelector('.navbar');
         // Nicht auf der UserArea-Seite (hat eigenes Layout)

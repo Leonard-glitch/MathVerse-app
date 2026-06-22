@@ -274,3 +274,57 @@
         padding: 1rem;
     }
 }
+
+@media (max-width: 768px) {
+    .zahlenBody {
+        padding: 0 0.75rem;
+    }
+
+    .zahlenInputfeld {
+        max-width: 100%;
+    }
+
+    .zahlenAusgabestyle {
+        max-width: 100%;
+        padding: 1rem;
+    }
+
+    .ergebnisGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .ergebnisValue {
+        font-size: 1rem;
+    }
+
+    .ergebnisLabel {
+        font-size: 0.62rem;
+    }
+
+    #rechenwegOutput .rechenwegSchritt {
+        padding: 0.65rem 0.85rem;
+    }
+
+    #rechenwegOutput .schrittTitel {
+        font-size: 0.8rem;
+    }
+
+    #rechenwegOutput .schrittFormel {
+        font-size: 0.78rem;
+        word-break: break-word;
+    }
+}
+
+@media (max-width: 400px) {
+    .ergebnisGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .ergebnisValue {
+        font-size: 0.9rem;
+    }
+}

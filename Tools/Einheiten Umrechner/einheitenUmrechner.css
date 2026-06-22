@@ -1,6 +1,3 @@
-/* ==========================================================================
-   SPEZIFISCHES DESIGN FÜR EINHEITEN-UMRECHNER (einheitenUmrechner.css)
-   ========================================================================== */
 
 .einheitenBody {
     display: flex;
@@ -13,10 +10,10 @@
 .einheitenGruppenContainer {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    gap: 0.5rem;
     justify-content: center;
-    gap: 0.6rem;
     margin-bottom: 2rem;
+    max-width: 100%;
     flex-wrap: wrap;
     background-color: var(--bg-input);
     padding: 6px;
@@ -185,4 +182,71 @@
     
     /* Scrollbalken-Verhalten */
     overflow-x: auto;          /* Scrollbar ploppt NUR innerhalb dieses Feldes auf */
+}
+
+
+@media (max-width: 768px) {
+    .einheitenBody {
+        padding: 0 0.75rem;
+    }
+
+    .einheitenGruppenContainer {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px;
+        margin-bottom: 1rem;
+    }
+    .einheitenGruppenContainer::-webkit-scrollbar { display: none; }
+
+    .btnUnits {
+        flex-shrink: 0;
+        white-space: nowrap;
+        min-height: 36px;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.78rem;
+    }
+
+    .einheitsDiv {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 0.25rem;
+    }
+
+    .zahlenInputfeld {
+        max-width: 100%;
+    }
+
+    .selection {
+        font-size: 0.9rem;
+        min-height: 44px;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .einheitsDiv .loesungsDiv {
+        width: 100%;
+    }
+
+    .einheitsDiv #loesungOutput {
+        font-size: 1.1rem;
+        word-break: break-all;
+    }
+
+    .zahlenAusgabestyle {
+        max-width: 100%;
+        padding: 1rem;
+    }
+
+    #rechenwegOutput pre {
+        font-size: 0.8rem;
+        padding: 0.75rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+}
+
+@media (max-width: 400px) {
+    .btnUnits {
+        padding: 0.3rem 0.7rem;
+        font-size: 0.72rem;
+    }
 }
