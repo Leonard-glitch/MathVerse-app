@@ -76,9 +76,9 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 
 --------======Responsive=====-------------
 
--, Das Hertz in den jeweiligen Tool Seiten!
+-, Das Hertz in den jeweiligen Tool Seiten(positionierung)!
 -, User Font Size Einstellung an Responsive anpassen!
--, Die Einlapp Funktion der HomePage anpassen!
+-, Die Einklapp Funktion der HomePage Gruppen anpassen!
 -, In User Area kann man auf Mobile immer noch nicht scrollen!
 -, Maybe noch eine bessere Lösung für Bruchrechner, Einheiten Umrechner Boxen!
 
