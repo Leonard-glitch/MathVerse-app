@@ -86,9 +86,14 @@ function getFraction(gEl, zEl, nEl) {
     if (isNaN(z) || isNaN(n)) return null;
     if (n === 0)               return "NaN_Nenner";
 
-    // Gemischte Zahl → unechter Bruch
     if (g !== 0) {
-        z = g < 0 ? g * n - z : g * n + z;
+        n = Math.abs(n);
+        const absZ = Math.abs(z);
+        z = g < 0 ? g * n - absZ : g * n + absZ;
+    } else if (n < 0) {
+        // Reiner Bruch: negativen Nenner früh normalisieren
+        z = -z;
+        n = -n;
     }
 
     return { z, n };

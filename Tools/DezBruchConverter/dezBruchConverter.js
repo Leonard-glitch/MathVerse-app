@@ -16,9 +16,9 @@ const cardBruchHTML = `
     <div class="card">
         <h2>Bruch</h2>
         <div class="bruchEingabe">
-            <input type="number" id="zaehler1" placeholder="Zähler" class="zahlenInputfeld">
+            <input type="number" id="zaehler1" placeholder="Zähler" class="zahlenInputfeld" step="1">
             <div class="bruchStrich"></div>
-            <input type="number" id="nenner1" placeholder="Nenner" class="zahlenInputfeld">
+            <input type="number" id="nenner1" placeholder="Nenner" class="zahlenInputfeld" step="1">
         </div>
     </div>`;
 
@@ -150,6 +150,11 @@ function berechneBruchZuDezimal() {
         showError("Bitte gültige Zahlen eingeben.");
         return;
     }
+
+    if (!Number.isInteger(z) || !Number.isInteger(n)) {
+    showError("Zähler und Nenner müssen ganze Zahlen sein.");
+    return;
+}
 
     if (n === 0) {
         showError("Division durch 0 ist nicht erlaubt! (Nenner darf nicht 0 sein)");

@@ -366,7 +366,9 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         );
     }
     function applyFontSize(size) {
-        document.documentElement.style.fontSize = `${size}px`;
+    const isMobile = window.innerWidth <= 768;
+    const effective = isMobile ? Math.min(size, 18) : size;
+    document.documentElement.style.fontSize = `${effective}px`;
     }
 
     // ==========================================================================
@@ -535,6 +537,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     applyTheme(getTheme());
     applyFontSize(getFontSize());
     applyDesign(getDesign());
+    window.addEventListener("resize", () => applyFontSize(getFontSize()), { passive: true });
 
     // ==========================================================================
     // NAVBAR: Login/Register -> Useraccount-Link, wenn eingeloggt

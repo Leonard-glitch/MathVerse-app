@@ -432,7 +432,7 @@ body {
 }
 
 .tool-page-heart {
-    position: absolute;
+    position: fixed;
     top: 5rem;          /* Komfortabler Abstand unter der Navbar */
     right: 1.5rem;
     z-index: 500;

@@ -352,17 +352,29 @@ function applyCollapsibleLogic() {
             expandBtn.innerHTML = '<i class="fa fa-chevron-down"></i>';
             expandBtn.style.display = "flex";
 
+            // neu:
             expandBtn.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const isExpanded = container.classList.contains("expanded");
                 if (isExpanded) {
+                    // Höhe pinnen → Klasse weg → reflow → Inline lösen → CSS animiert auf 330px
+                    container.style.maxHeight = container.scrollHeight + "px";
                     container.classList.remove("expanded");
                     groupDiv.classList.remove("is-expanded");
+                    void container.offsetHeight;
+                    container.style.maxHeight = "";
                     groupDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
                 } else {
+                    // Klasse setzen → exakte Zielhöhe inline → nach Transition freigeben
                     container.classList.add("expanded");
                     groupDiv.classList.add("is-expanded");
+                    container.style.maxHeight = container.scrollHeight + "px";
+                    container.addEventListener("transitionend", () => {
+                        if (container.classList.contains("expanded")) {
+                            container.style.maxHeight = "";
+                        }
+                    }, { once: true });
                 }
             });
 

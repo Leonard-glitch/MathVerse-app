@@ -1084,6 +1084,13 @@ body {
 @media (max-width: 680px) {
     body { overflow: auto; }
 
+    /* FIX: Layout-Container nicht mehr clippen */
+    .settingsLayout {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
     .settingsSidebar {
         position: fixed;
         left: -260px;

@@ -245,7 +245,7 @@
 
 /* Komplett geöffneter Zustand */
 .cardsContainer.expanded {
-    max-height: none !important;
+    max-height: 5000px;
     padding-bottom: 4rem;
 }
 

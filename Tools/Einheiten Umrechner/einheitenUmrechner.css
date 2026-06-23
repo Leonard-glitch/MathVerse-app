@@ -87,11 +87,40 @@
 }
 
 /* Pulsierender Tech-Pfeil */
-.fa-long-arrow-alt-down {
+.einheitenSwapRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.einheitenArrow {
     color: var(--text-secondary);
     font-size: 1.3rem;
-    margin: 0.2rem 0;
     animation: techPulse 2s infinite ease-in-out;
+}
+
+.einheitenSwapBtn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    transition: all var(--transition-speed);
+}
+
+.einheitenSwapBtn:hover {
+    border-color: var(--border-glow);
+    color: var(--border-glow);
+    box-shadow: 0 0 8px var(--glow-soft);
 }
 
 @keyframes techPulse {

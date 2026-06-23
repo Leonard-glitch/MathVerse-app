@@ -666,7 +666,12 @@ function wrapAtEquals(line) {
 
     return `${before} ${after}`;
 }
-
+document.getElementById("swapEinheiten")?.addEventListener("click", () => {
+    const tmp = einheitA.value;
+    einheitA.value = einheitZ.value;
+    einheitZ.value = tmp;
+    calculate();
+});
 inputEinheit.addEventListener("input", calculate);
 einheitA.addEventListener("change", calculate);
 einheitZ.addEventListener("change", calculate);
