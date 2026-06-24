@@ -243,6 +243,10 @@
     overflow-x: auto;
 }
 
+sub {
+    user-select: none;
+}
+
 
 @media (max-width: 768px) {
     .basisAuswahlDiv {

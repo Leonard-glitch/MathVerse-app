@@ -361,11 +361,9 @@ pre {
 
 
 sub {
-
     font-size: 0.65rem;
-
     color: var(--text-secondary);
-
+    user-select: none;
 }
 
 @media (max-width: 768px) {

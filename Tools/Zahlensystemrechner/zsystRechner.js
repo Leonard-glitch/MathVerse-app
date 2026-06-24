@@ -141,7 +141,7 @@ btnAddInput.addEventListener("click", () => {
     const wrapperInput = document.createElement("div");
     wrapperInput.className = "SytemDiv zusatzElement";
     wrapperInput.innerHTML = `
-        <input type="number" 
+        <input type="text" 
                placeholder="Zahl ${anzahlZusatzInputs + 2}" 
                class="zahlenInput zusatzInput">
     `;
