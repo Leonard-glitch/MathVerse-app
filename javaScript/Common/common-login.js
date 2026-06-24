@@ -1,12 +1,7 @@
-/**
- * common-login.js – MathVerse zentrale User-Daten- & Login-Logik
- *
- * Stellt window.MV bereit – die EINZIGE Stelle, an der mit
- * localStorage("currentUser" / "isLoggedIn") gearbeitet wird.
- * Wird als normales <script> geladen (kein type="module"), damit
- * auch Module (index.js, userArea.js, toolFavorite.js, ...) per
- * window.MV darauf zugreifen können.
- */
+
+// BASE-URL automatisch aus dem Skript-Pfad ermitteln – kein Hardcoding nötig
+window.MV_BASE = ((document.currentScript || {}).src || '')
+    .replace(/\/javaScript\/Common\/common-login\.js([?#].*)?$/, '');
 
 localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen!
 (function () {
@@ -476,7 +471,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
                 <p class="mv-modalText" id="mvLoginPromptText">Melde dich an, um diese Funktion zu nutzen.</p>
                 <div class="mv-modalActions">
                     <button class="mv-modalBtnSecondary" id="mvLoginPromptCancel">Abbrechen</button>
-                    <a class="mv-modalBtnPrimary" href="/MathVerse-app/html/login.html">Anmelden</a>
+                    <a class="mv-modalBtnPrimary" href="${window.MV_BASE}/html/login.html">Anmelden</a>
                 </div>
             </div>
         `;
@@ -550,7 +545,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         const displayName = name.length > 10 ? name.substring(0, 10) + '...' : name;
 
         const userAccount = document.createElement('a');
-        userAccount.href = '/MathVerse-app/html/userArea.html';
+        userAccount.href = `${window.MV_BASE}/html/userArea.html`;
         userAccount.target = '_self';
         userAccount.classList.add('userAccount');
         userAccount.innerHTML = `

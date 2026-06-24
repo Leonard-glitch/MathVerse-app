@@ -318,7 +318,7 @@ input:-webkit-autofill:focus {
    ========================================================================== */
 
 .searchContainer {
-    position: relative;
+    position: static;
 }
 
 #searchResults {
