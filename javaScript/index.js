@@ -342,23 +342,29 @@ function applyCollapsibleLogic() {
         const existingBtn = groupDiv.querySelector(".expand-btn");
         if (existingBtn) existingBtn.remove();
 
+        // Klassen entfernen + Reflow → natürliche Höhe ohne max-height Einschränkung messen
         container.classList.remove("collapsible", "expanded");
         groupDiv.classList.remove("is-expanded");
-        container.classList.add("collapsible");
+        void container.offsetHeight;
 
-        if (container.scrollHeight > container.clientHeight) {
+        const naturalHeight = container.scrollHeight;
+        const threshold = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--container-max-height')
+        ) || 330;
+
+        if (naturalHeight > threshold) {
+            container.classList.add("collapsible");
+
             const expandBtn = document.createElement("div");
             expandBtn.className = "expand-btn";
             expandBtn.innerHTML = '<i class="fa fa-chevron-down"></i>';
             expandBtn.style.display = "flex";
 
-            // neu:
             expandBtn.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const isExpanded = container.classList.contains("expanded");
                 if (isExpanded) {
-                    // Höhe pinnen → Klasse weg → reflow → Inline lösen → CSS animiert auf 330px
                     container.style.maxHeight = container.scrollHeight + "px";
                     container.classList.remove("expanded");
                     groupDiv.classList.remove("is-expanded");
@@ -366,7 +372,6 @@ function applyCollapsibleLogic() {
                     container.style.maxHeight = "";
                     groupDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
                 } else {
-                    // Klasse setzen → exakte Zielhöhe inline → nach Transition freigeben
                     container.classList.add("expanded");
                     groupDiv.classList.add("is-expanded");
                     container.style.maxHeight = container.scrollHeight + "px";
@@ -384,8 +389,6 @@ function applyCollapsibleLogic() {
                 container.classList.add("expanded");
                 groupDiv.classList.add("is-expanded");
             }
-        } else {
-            container.classList.remove("collapsible");
         }
     });
 }
@@ -491,3 +494,10 @@ window.addEventListener("storage", (e) => {
     // da Favoriten/Pins komplett anders aussehen können.
     initMathVerse();
 });
+
+// Collapsible-Höhen bei Resize neu auswerten (debounced)
+let _collapsibleResizeTimer;
+window.addEventListener("resize", () => {
+    clearTimeout(_collapsibleResizeTimer);
+    _collapsibleResizeTimer = setTimeout(applyCollapsibleLogic, 200);
+}, { passive: true });

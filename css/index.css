@@ -161,7 +161,7 @@
 
 .cardImg {
     width: 100%;
-    height: 6.8em;
+    height: 6.2em;
     object-fit: cover;
     border-radius: var(--radius-sm);
     opacity: 0.85;
@@ -306,10 +306,6 @@
 }
 
 
-/* ==========================================================================
-   INFO TOOLTIP – Singleton, position:fixed, an <body> gehängt
-   Kein overflow-clipping durch Eltern-Container möglich.
-   ========================================================================== */
 
 .info-tooltip {
     position: fixed;
@@ -454,19 +450,17 @@
 
     /* Karten: 2 pro Reihe auf Mobile */
     .card {
-        aspect-ratio: 1 / 0.7;
+        aspect-ratio: 1 / 1;        /* war: 1 / 0.7 — zu flach */
         width: calc(50% - 0.5rem);
-        min-width: 0;
-        font-size: 0.75rem;
+        font-size: 0.75rem;          /* war: 0.72rem */
     }
 
     .cardImg {
-        height: 5.5em;
+        height: 5em;                 /* war: 5.5em */
     }
 
     .cardText {
-        font-size: 0.72rem;
-        padding: 0 0.2rem;
+        font-size: 0.75rem;          /* war: 0.72rem */
     }
 
     /* Collapse-Button */
@@ -501,7 +495,7 @@
     }
 
     .cardImg {
-        height: 4.5em;
+        height: 4.2em;               /* war: 4.5em */
     }
 
     .headerOne {
