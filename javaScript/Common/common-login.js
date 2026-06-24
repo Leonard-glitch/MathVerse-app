@@ -367,7 +367,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     }
     function applyFontSize(size) {
     const isMobile = window.innerWidth <= 768;
-    const effective = isMobile ? Math.min(size, 18) : size;
+    const effective = isMobile ? Math.min(size, 20) : size;
     document.documentElement.style.fontSize = `${effective}px`;
     }
 

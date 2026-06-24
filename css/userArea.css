@@ -1143,6 +1143,7 @@ body {
 .designButtons {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.3rem;
     background-color: var(--bg-input);
     padding: 4px;
@@ -1175,4 +1176,23 @@ body {
     color: var(--text-primary);
     box-shadow: 0 0 15px var(--glow-soft);
     font-weight: 600;
+}
+
+.fontSizeHint {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.fontSizeHint i {
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.fontSizeHint strong {
+    color: var(--text-secondary);
 }
