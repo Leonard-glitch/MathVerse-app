@@ -1,11 +1,4 @@
-/**
- * login.js – MathVerse Login-Validierung
- *
- * Wichtig: Zustandsverwaltung via CSS-Klassen (.is-valid / .is-error),
- * NICHT via this.style.borderColor === 'var(--…)' – das funktioniert im
- * Browser nicht zuverlässig, weil CSS-Variablen in inline Styles zu
- * computed values aufgelöst werden.
- */
+
 
 const form           = document.querySelector('.loginForm');
 const usernameInput  = document.getElementById('username');
@@ -14,7 +7,11 @@ const usernameError  = document.getElementById('usernameError');
 const formError      = document.getElementById('formError');
 const toggleBtn      = document.getElementById('togglePassword');
 
-window.MV.redirectIfLoggedIn("../index.html")
+window.MV.redirectIfLoggedIn("../index.html");
+
+window.addEventListener('pageshow', (e) => {
+    if (e.persisted) window.MV.redirectIfLoggedIn("../index.html");
+});
 
 // ===========================================================================
 // STATE HELPERS

@@ -1,10 +1,4 @@
-/**
- * register.js – MathVerse Registrierungs-Validierung
- *
- * Zustandsverwaltung via CSS-Klassen (.is-valid / .is-error),
- * niemals via inline-style-Vergleiche (das funktioniert nicht
- * zuverlässig mit CSS-Variablen).
- */
+
 
 const form             = document.querySelector('.loginForm');
 const usernameInput    = document.getElementById('userName');
@@ -26,7 +20,11 @@ const TAKEN_NAMES    = ['admin', 'test', 'max_mustermann', 'mathverse', 'moderat
 const MIN_PW_LENGTH  = 6;
 const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/;
 
-window.MV.redirectIfLoggedIn("../index.html")
+window.MV.redirectIfLoggedIn("../index.html");
+
+window.addEventListener('pageshow', (e) => {
+    if (e.persisted) window.MV.redirectIfLoggedIn("../index.html");
+});
 
 // ===========================================================================
 // STATE HELPERS
