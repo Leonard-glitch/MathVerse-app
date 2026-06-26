@@ -1,14 +1,10 @@
 
-// BASE-URL automatisch aus dem Skript-Pfad ermitteln – kein Hardcoding nötig
 window.MV_BASE = ((document.currentScript || {}).src || '')
     .replace(/\/javaScript\/Common\/common-login\.js([?#].*)?$/, '');
 
-localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen!
+localStorage.removeItem(""); 
 (function () {
 
-    // ==========================================================================
-    // THEMES – zentral, damit überall (Navbar, Tools, UserArea) anwendbar
-    // ==========================================================================
     const THEMES = {
         violet: { '--border-glow': '#8a16ff', '--accent-color': '#8a16ff', '--accent-hover': '#a142ff', '--glow-soft': 'rgba(138, 22, 255, 0.25)', '--glow-hard': 'rgba(138, 22, 255, 0.4)', '--border-accent': '#8a16ff' },
         cyan:   { '--border-glow': '#00e5b5', '--accent-color': '#00e5b5', '--accent-hover': '#00ffcc', '--glow-soft': 'rgba(0, 229, 181, 0.25)', '--glow-hard': 'rgba(0, 229, 181, 0.4)', '--border-accent': '#00e5b5' },
@@ -18,9 +14,6 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         gold:   { '--border-glow': '#f5c518', '--accent-color': '#f5c518', '--accent-hover': '#f7d04e', '--glow-soft': 'rgba(245, 197, 24, 0.25)', '--glow-hard': 'rgba(245, 197, 24, 0.4)', '--border-accent': '#f5c518' },
     };
 
-    // ==========================================================================
-    // DESIGNS – Zentral gesteuerte Hintergrund- und Textfarben
-    // ==========================================================================
     const DESIGNS = {
     abyss: {
         '--bg-body':         '#09090e',
@@ -87,13 +80,18 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         isPro: false
     });
 
-    // ==========================================================================
-    // CORE STORAGE HELPERS
-    // ==========================================================================
+
 
     function redirectIfLoggedIn(path) {
-    if (isLoggedIn()) window.location.href = path;
+    if (!isLoggedIn()) return;
+    const returnUrl = sessionStorage.getItem('mv-return-url');
+    if (returnUrl) {
+        sessionStorage.removeItem('mv-return-url');
+        window.location.href = returnUrl;
+    } else {
+        window.location.href = path;
     }
+}
 
     function isLoggedIn() {
         return localStorage.getItem('isLoggedIn') === 'true' && !!localStorage.getItem('currentUser');
@@ -393,14 +391,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         );
     }
 
-    // ==========================================================================
-    // PASSWORT-STÄRKE (zentral – wird von register.js & userArea.js genutzt)
-    //
-    // Wichtig: Lange, vom Browser/Passwortmanager generierte Passwörter
-    // (z.B. 16 Zeichen, Groß/Klein/Zahlen, aber OFT OHNE Sonderzeichen)
-    // sollen trotzdem als "Stark" gelten -> Länge wird stärker gewichtet
-    // und mit Math.ceil statt Math.round gerundet.
-    // ==========================================================================
+
     function getPasswordStrength(pw) {
         if (!pw) return 0;
         let score = 0;
@@ -413,9 +404,7 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
         return Math.min(4, Math.max(1, Math.ceil(score / 1.5)));
     }
 
-    // ==========================================================================
-    // LOGIN-PROMPT MODAL (ersetzt die alert()-Aufrufe)
-    // ==========================================================================
+
     let modalReady = false;
 
     function injectModal() {
@@ -627,5 +616,11 @@ localStorage.removeItem(""); //Nur zum Testen – Bitte vor Deployment entfernen
     }
 
     initNavBurger();
+
+    // Return-URL merken (nur auf nicht-Auth-Seiten)
+    const _mvPath = window.location.pathname;
+    if (!_mvPath.endsWith('/login.html') && !_mvPath.endsWith('/register.html')) {
+        sessionStorage.setItem('mv-return-url', window.location.href);
+    }
 
 })();

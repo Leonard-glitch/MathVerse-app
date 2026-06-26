@@ -169,9 +169,7 @@ function validatePasswordConf(silent = false) {
     return true;
 }
 
-// ===========================================================================
 // PASSWORT-STÄRKE INDIKATOR
-// ===========================================================================
 
 
 function updateStrengthBar(pw) {
@@ -190,9 +188,7 @@ function updateStrengthBar(pw) {
     strengthLabel.textContent = labels[lvl];
 }
 
-// ===========================================================================
 // BLUR EVENTS
-// ===========================================================================
 
 usernameInput.addEventListener('blur',    () => validateUsername());
 emailInput.addEventListener('blur',       () => validateEmail());
@@ -392,10 +388,9 @@ form.addEventListener('submit', (e) => {
             isPro: false
         });
 
-        console.log('Registrierung erfolgreich! User eingeloggt.');
-
-        // Weiterleitung zur Startseite
-        window.location.href = '../index.html';
+        const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
+        sessionStorage.removeItem('mv-return-url');
+        window.location.href = returnUrl;
     }
 });
 

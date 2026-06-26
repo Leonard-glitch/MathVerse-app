@@ -13,9 +13,7 @@ window.addEventListener('pageshow', (e) => {
     if (e.persisted) window.MV.redirectIfLoggedIn("../index.html");
 });
 
-// ===========================================================================
-// STATE HELPERS
-// ===========================================================================
+
 
 function setValid(input, errEl) {
     input.classList.remove('is-error', 'shake');
@@ -126,8 +124,9 @@ form.addEventListener('submit', (e) => {
             return;
         }
 
-        console.log('Login erfolgreich!');
-        window.location.href = '../index.html';
+        const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
+        sessionStorage.removeItem('mv-return-url');
+        window.location.href = returnUrl;
     }
 });
 
