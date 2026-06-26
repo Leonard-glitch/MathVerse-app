@@ -617,10 +617,39 @@ localStorage.removeItem("");
 
     initNavBurger();
 
-    // Return-URL merken (nur auf nicht-Auth-Seiten)
     const _mvPath = window.location.pathname;
     if (!_mvPath.endsWith('/login.html') && !_mvPath.endsWith('/register.html')) {
         sessionStorage.setItem('mv-return-url', window.location.href);
     }
+
+    window.addEventListener('pageshow', function (e) {
+        if (!e.persisted) return;
+
+        applyTheme(getTheme());
+        applyFontSize(getFontSize());
+        applyDesign(getDesign());
+
+        const path = window.location.pathname;
+
+        if (path.endsWith('userArea.html') && !isLoggedIn()) {
+            window.location.replace(window.MV_BASE + '/html/login.html');
+            return;
+        }
+
+        if ((path.endsWith('login.html') || path.endsWith('register.html')) && isLoggedIn()) {
+            const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
+            sessionStorage.removeItem('mv-return-url');
+            window.location.replace(returnUrl);
+            return;
+        }
+
+        if (navUserArea) {
+            navUserArea.innerHTML = `
+                <a href="${window.MV_BASE}/html/login.html" class="navTextBorder">Login</a>
+                <a href="${window.MV_BASE}/html/register.html" class="navTextBorder">Register</a>
+            `;
+            if (isLoggedIn()) changeNavUserArea();
+        }
+    });
 
 })();
