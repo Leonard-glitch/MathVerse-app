@@ -240,13 +240,12 @@
     overflow: hidden;
     transition: max-height 0.35s ease-in-out;
     position: relative;
-    padding-bottom: 3.5rem;
+    padding-bottom: 4rem;
 }
 
 /* Komplett geöffneter Zustand */
 .cardsContainer.expanded {
     max-height: 5000px;
-    padding-bottom: 4rem;
 }
 
 /* Der Pfeil-Button */

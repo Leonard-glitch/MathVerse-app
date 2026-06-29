@@ -345,6 +345,7 @@ function applyCollapsibleLogic() {
         // Klassen entfernen + Reflow → natürliche Höhe ohne max-height Einschränkung messen
         container.classList.remove("collapsible", "expanded");
         groupDiv.classList.remove("is-expanded");
+        container.style.maxHeight = "";
         void container.offsetHeight;
 
         const naturalHeight = container.scrollHeight;
@@ -361,27 +362,31 @@ function applyCollapsibleLogic() {
             expandBtn.style.display = "flex";
 
             expandBtn.addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const isExpanded = container.classList.contains("expanded");
-                if (isExpanded) {
-                    container.style.maxHeight = container.scrollHeight + "px";
-                    container.classList.remove("expanded");
-                    groupDiv.classList.remove("is-expanded");
-                    void container.offsetHeight;
-                    container.style.maxHeight = "";
-                    groupDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
-                } else {
-                    container.classList.add("expanded");
-                    groupDiv.classList.add("is-expanded");
-                    container.style.maxHeight = container.scrollHeight + "px";
-                    container.addEventListener("transitionend", () => {
-                        if (container.classList.contains("expanded")) {
-                            container.style.maxHeight = "";
-                        }
-                    }, { once: true });
-                }
-            });
+    e.preventDefault();
+    e.stopPropagation();
+    const isExpanded = container.classList.contains("expanded");
+    if (isExpanded) {
+        container.style.maxHeight = container.scrollHeight + "px";
+        void container.offsetHeight;
+        container.classList.remove("expanded");
+        groupDiv.classList.remove("is-expanded");
+        container.style.maxHeight = getComputedStyle(document.documentElement)
+            .getPropertyValue('--container-max-height').trim();
+        container.addEventListener("transitionend", () => {
+            container.style.maxHeight = "";
+            groupDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, { once: true });
+    } else {
+        container.style.maxHeight = container.scrollHeight + "px";
+        container.classList.add("expanded");
+        groupDiv.classList.add("is-expanded");
+        container.addEventListener("transitionend", () => {
+            if (container.classList.contains("expanded")) {
+                container.style.maxHeight = "none";
+            }
+        }, { once: true });
+    }
+});
 
             groupDiv.appendChild(expandBtn);
 

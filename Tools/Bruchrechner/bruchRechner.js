@@ -79,7 +79,7 @@ function updateUI() {
 
 // ── Bruch aus Eingabefeldern lesen 
 function getFraction(gEl, zEl, nEl) {
-    let g = parseInt(gEl.value) || 0;
+    let g = mixedToggle.checked ? (parseInt(gEl.value) || 0) : 0;
     let z = parseInt(zEl.value);
     let n = parseInt(nEl.value);
 
