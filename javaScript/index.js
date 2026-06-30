@@ -331,6 +331,40 @@ function initSearch() {
 // 8. COLLAPSIBLE LOGIC
 // ==========================================================================
 
+function calcTwoRowHeight(container) {
+    const TOLERANCE = 3; // px – toleriert Sub-Pixel-Rendering ohne Math.round
+
+    const cards = Array.from(container.querySelectorAll(".card"))
+        .filter(c => c.style.display !== "none");
+    if (!cards.length) return null;
+
+    const cRect = container.getBoundingClientRect();
+    const rects = cards.map(c => c.getBoundingClientRect());
+    const tops  = rects.map(r => r.top - cRect.top);
+
+    const rowTops = [];
+    tops.forEach(top => {
+        if (!rowTops.some(t => Math.abs(t - top) < TOLERANCE)) rowTops.push(top);
+    });
+    rowTops.sort((a, b) => a - b);
+
+    if (rowTops.length <= 2) return null; // ≤ 2 Reihen → kein Collapse
+
+    const secondRowTop = rowTops[1];
+    let secondRowBottom = 0;
+    rects.forEach((r, i) => {
+        if (Math.abs(tops[i] - secondRowTop) < TOLERANCE) {
+            const bottom = r.bottom - cRect.top;
+            if (bottom > secondRowBottom) secondRowBottom = bottom;
+        }
+    });
+
+    const rootFontPx     = parseFloat(getComputedStyle(document.documentElement).fontSize) || 20;
+    const borderBottomPx = parseFloat(getComputedStyle(container).borderBottomWidth) || 0;
+
+    return Math.ceil(secondRowBottom + 4 * rootFontPx + borderBottomPx);
+}
+
 function applyCollapsibleLogic() {
     document.querySelectorAll(".restFuncionsDiv").forEach(groupDiv => {
         const container = groupDiv.querySelector(".cardsContainer");
@@ -342,19 +376,18 @@ function applyCollapsibleLogic() {
         const existingBtn = groupDiv.querySelector(".expand-btn");
         if (existingBtn) existingBtn.remove();
 
-        // Klassen entfernen + Reflow → natürliche Höhe ohne max-height Einschränkung messen
+        // Klassen und Inline-Style entfernen → natürliches Layout messen
         container.classList.remove("collapsible", "expanded");
         groupDiv.classList.remove("is-expanded");
         container.style.maxHeight = "";
         void container.offsetHeight;
 
-        const naturalHeight = container.scrollHeight;
-        const threshold = parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue('--container-max-height')
-        ) || 330;
+        const collapsedH = calcTwoRowHeight(container);
 
-        if (naturalHeight > threshold) {
+        if (collapsedH !== null) {
+            container.dataset.collapsedHeight = collapsedH;
             container.classList.add("collapsible");
+            container.style.maxHeight = collapsedH + "px";
 
             const expandBtn = document.createElement("div");
             expandBtn.className = "expand-btn";
@@ -362,37 +395,37 @@ function applyCollapsibleLogic() {
             expandBtn.style.display = "flex";
 
             expandBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const isExpanded = container.classList.contains("expanded");
-    if (isExpanded) {
-        container.style.maxHeight = container.scrollHeight + "px";
-        void container.offsetHeight;
-        container.classList.remove("expanded");
-        groupDiv.classList.remove("is-expanded");
-        container.style.maxHeight = getComputedStyle(document.documentElement)
-            .getPropertyValue('--container-max-height').trim();
-        container.addEventListener("transitionend", () => {
-            container.style.maxHeight = "";
-            groupDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }, { once: true });
-    } else {
-        container.style.maxHeight = container.scrollHeight + "px";
-        container.classList.add("expanded");
-        groupDiv.classList.add("is-expanded");
-        container.addEventListener("transitionend", () => {
-            if (container.classList.contains("expanded")) {
-                container.style.maxHeight = "none";
-            }
-        }, { once: true });
-    }
-});
+                e.preventDefault();
+                e.stopPropagation();
+                const isExpanded = container.classList.contains("expanded");
+                if (isExpanded) {
+                    container.style.maxHeight = container.scrollHeight + "px";
+                    void container.offsetHeight;
+                    container.classList.remove("expanded");
+                    groupDiv.classList.remove("is-expanded");
+                    const ch = parseInt(container.dataset.collapsedHeight, 10);
+                    container.style.maxHeight = ch + "px";
+                    container.addEventListener("transitionend", () => {
+                        groupDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }, { once: true });
+                } else {
+                    container.style.maxHeight = container.scrollHeight + "px";
+                    container.classList.add("expanded");
+                    groupDiv.classList.add("is-expanded");
+                    container.addEventListener("transitionend", () => {
+                        if (container.classList.contains("expanded")) {
+                            container.style.maxHeight = "none";
+                        }
+                    }, { once: true });
+                }
+            });
 
             groupDiv.appendChild(expandBtn);
 
             if (wasExpanded) {
                 container.classList.add("expanded");
                 groupDiv.classList.add("is-expanded");
+                container.style.maxHeight = "none";
             }
         }
     });

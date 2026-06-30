@@ -7,16 +7,14 @@
     <link rel="icon" type="image/x-icon" href="../pictures/favicon v1.png">
     <link rel="stylesheet" href="../css/Common/common.css">
     <link rel="stylesheet" href="../css/userArea.css">
-    <title>Einstellungen – MathVerse</title>
+    <title>Einstellungen</title>
 </head>
 <body>
     <div id="sidebarOverlay" class="sidebarOverlay"></div>
     <div class="settingsLayout">
 
-        <!-- LEFT SIDEBAR -->
         <aside class="settingsSidebar">
 
-            <!-- Back button -->
             <div class="sidebarTop">
                 <a href="../index.html" class="backBtn">
                     <i class="fa fa-arrow-left"></i>
@@ -27,7 +25,6 @@
                 </button>
             </div>
 
-            <!-- Nav groups -->
             <nav class="sidebarNav">
 
                 <div class="navGroup">
@@ -71,7 +68,6 @@
 
             </nav>
 
-            <!-- Sidebar user card (Discord-style bottom info) -->
             <div class="sidebarUserCard">
                 <div class="sidebarAvatar" id="sidebarAvatarEl">L</div>
                 <div class="sidebarUserInfo">
@@ -84,32 +80,25 @@
         <button class="sidebarMobileToggle" id="sidebarMobileToggle" aria-label="Menü öffnen">
             <i class="fa fa-bars"></i>
         </button>
-        <!-- RIGHT CONTENT AREA -->
         <main class="settingsContent">
 
-            <!-- ─────────────────────────────────────
-                 PANEL: Mein Konto
-                 ───────────────────────────────────── -->
             <section class="settingsPanel active" id="panel-account">
 
                 <div class="panelHeader">
                     <h1 class="panelTitle">Mein Konto</h1>
                 </div>
 
-                <!-- Profile Banner + Avatar -->
                 <div class="profileBanner">
                     <div class="bannerGradient" id="bannerEl"></div>
                     <div class="profileAvatarLarge" id="profileAvatarEl">L</div>
                 </div>
 
-                <!-- Username / Display Card -->
                 <div class="settingsCard profileNameCard">
                     <div class="profileNameRow">
                         <div class="profileDisplayName" id="displayNameEl">Leolegend6260</div>
                     </div>
                 </div>
 
-                <!-- Account Info Card -->
                 <div class="settingsCard">
                     <div class="cardHeader">
                         <h2 class="cardTitle">Kontoinformationen</h2>
@@ -118,7 +107,6 @@
                         </button>
                     </div>
 
-                    <!-- View mode -->
                     <div id="accountViewMode">
                         <div class="infoRow">
                             <div class="infoLabel">Benutzername</div>
@@ -134,7 +122,6 @@
                         </div>
                     </div>
 
-                    <!-- Edit mode -->
                     <div id="accountEditMode" class="hidden">
                         <p class="editModeHint">Gib dein aktuelles Passwort ein, um Änderungen zu bestätigen.</p>
 
@@ -161,7 +148,6 @@
                     </div>
                 </div>
 
-                <!-- Success toast -->
                 <div class="toastMessage hidden" id="accountToast">
                     <i class="fa fa-check-circle"></i>
                     <span>Gespeichert!</span>
@@ -169,16 +155,12 @@
 
             </section>
 
-            <!-- ─────────────────────────────────────
-                 PANEL: Sicherheit
-                 ───────────────────────────────────── -->
             <section class="settingsPanel" id="panel-security">
 
                 <div class="panelHeader">
                     <h1 class="panelTitle">Sicherheit</h1>
                 </div>
 
-                <!-- Password Change -->
                 <div class="settingsCard">
                     <h2 class="cardTitle">Passwort ändern</h2>
 
@@ -217,7 +199,6 @@
                     </div>
                 </div>
 
-                <!-- 2FA Teaser -->
                 <div class="settingsCard settingsCard--dimmed">
                     <div class="teaserRow">
                         <div>
@@ -230,9 +211,6 @@
 
             </section>
 
-            <!-- ─────────────────────────────────────
-                 PANEL: Erscheinungsbild
-                 ───────────────────────────────────── -->
             <section class="settingsPanel" id="panel-appearance">
 
                 <div class="panelHeader">
@@ -240,7 +218,6 @@
                     <p class="panelSubtitle">Passe MathVerse an deinen Stil an. Änderungen werden sofort übernommen.</p>
                 </div>
 
-                <!-- Hauptdesign -->
                 <div class="settingsCard">
                     <h2 class="cardTitle">Design</h2>
                     <p class="cardSubtitle">Wähle das Hauptdesign für dein Konto.</p>
@@ -260,7 +237,6 @@
 
 
 
-                <!-- Color Theme -->
                 <div class="settingsCard">
                     <h2 class="cardTitle">Akzentfarbe</h2>
                     <p class="cardSubtitle">Wähle die Hauptfarbe für Rahmen, Buttons und Glüheffekte.</p>
@@ -305,7 +281,6 @@
                     </div>
                 </div>
 
-                <!-- Font Size -->
                 <div class="settingsCard">
                     <h2 class="cardTitle">Schriftgröße</h2>
                     <p class="cardSubtitle">Basis-Schriftgröße der gesamten App.</p>
@@ -322,7 +297,6 @@
                     </p>
                 </div>
 
-                <!-- Preview -->
                 <div class="settingsCard settingsCard--preview">
                     <h2 class="cardTitle">Vorschau</h2>
                     <div class="appearancePreview">
@@ -355,9 +329,6 @@
 
             </section>
 
-            <!-- ─────────────────────────────────────
-                 PANEL: Favoriten
-                 ───────────────────────────────────── -->
             <section class="settingsPanel" id="panel-favorites">
 
                 <div class="panelHeader">
@@ -366,7 +337,6 @@
                 </div>
 
                 <div class="favoritesGrid" id="favoritesGrid">
-                    <!-- Dynamisch befüllt via JS aus toolsCollection.js -->
                 </div>
 
                 <div class="emptyState hidden" id="favEmptyState">
@@ -380,9 +350,6 @@
 
             </section>
 
-            <!-- ─────────────────────────────────────
-                 PANEL: Konto löschen
-                 ───────────────────────────────────── -->
             <section class="settingsPanel" id="panel-delete">
 
                 <div class="panelHeader">
@@ -415,9 +382,6 @@
         </main>
     </div>
 
-    <!-- =====================================================================
-         LOGOUT CONFIRMATION MODAL
-         ===================================================================== -->
     <div class="modalOverlay hidden" id="logoutModal">
         <div class="modalBox">
             <h2 class="modalTitle">Abmelden?</h2>
