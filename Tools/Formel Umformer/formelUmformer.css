@@ -1,0 +1,137 @@
+
+.formelUmformerSection{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+#mathInput{
+    margin: 0;
+    width: 100%;
+    max-width: 500px;
+}
+
+
+/* Dropdown Menüs */
+.selection {
+    font-size: 1rem;
+    text-align: center;
+    padding: 0.6rem 1rem;
+    width: 100%;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    outline: none;
+    box-shadow: var(--shadow-main);
+    cursor: pointer;
+    transition: border-color var(--transition-speed);
+}
+
+.selection:hover, .selection:focus {
+    border-color: var(--border-glow);
+}
+
+.selection option {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    padding: 0.5rem;
+}
+
+
+
+/* Button */
+
+.zahlenButtoncss {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 1.5rem 0;
+    padding: 0.5rem 2rem;
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-glow);
+    border-radius: var(--radius-lg);
+    outline: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-main);
+    transition: all var(--transition-speed);
+}
+
+.zahlenButtoncss:hover {
+    background-color: var(--border-glow);
+    box-shadow: 0 0 20px var(--glow-soft), var(--shadow-main);
+    transform: translateY(-2px);
+}
+
+.zahlenButtoncss:active {
+    transform: translateY(1px);
+}
+
+
+/* Ausgabe & Rechenweg Box */
+
+.zahlenAusgabestyle {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    transition: border-color var(--transition-speed);
+}
+
+.zahlenAusgabestyle:hover {
+    border-color: rgba(138, 22, 255, 0.4);
+}
+
+.loesungsDiv {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.8rem;
+}
+
+.loesungText {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+#loesungOutput {
+    overflow-wrap: anywhere;
+    padding-left: 0.8rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--accent-live);
+    text-shadow: 0 0 10px var(--glow-live);
+}
+
+.rechenwegDiv {
+    display: none;
+    flex-direction: column;
+}
+
+.rechenwegText {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--border-glow);
+    margin-bottom: 0.5rem;
+}
+
+#rechenwegOutput {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.loesungEndeRechnung{
+    overflow-wrap: anywhere;
+}
