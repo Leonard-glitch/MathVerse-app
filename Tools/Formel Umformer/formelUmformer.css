@@ -135,3 +135,157 @@
 .loesungEndeRechnung{
     overflow-wrap: anywhere;
 }
+
+/* ZIEL-VARIABLE (Dropdown "Umformen nach")*/
+.zielVariableDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+.zielVariableLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--border-glow);
+    margin: 0;
+}
+
+.selection:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.zahlenButtoncss:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* RECHENWEG – Umformungs-Zeilen (Schulnotation: Gleichung | Operation)*/
+.umformBox {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.umformZeile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    font-family: 'Courier New', Courier, monospace;
+    flex-wrap: wrap;
+}
+
+.umformZeile:last-child {
+    border-bottom: none;
+}
+
+.umformGleichung {
+    font-size: 1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.umformOperation {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-live);
+    white-space: nowrap;
+}
+
+.umformHinweis {
+    width: 100%;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 0 1rem 0.6rem 1rem;
+    margin-top: -0.4rem;
+    background: var(--bg-input);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.umformZeile.umformFinal {
+    background: rgba(0, 255, 204, 0.04);
+}
+.umformZeile.umformFinal .umformGleichung {
+    color: var(--accent-live);
+    font-weight: 700;
+    text-shadow: 0 0 8px var(--glow-live);
+}
+
+   /*MATHE-BAUSTEINE (Brüche, Wurzeln, Beträge, Potenzen) – für Rechenweg & Lösung*/
+.fu-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    padding: 0 0.25rem;
+    line-height: 1.2;
+}
+.fu-frac-num, .fu-frac-den {
+    padding: 0 0.2rem;
+}
+.fu-frac-bar {
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    margin: 2px 0;
+}
+
+.fu-sqrt {
+    display: inline-flex;
+    align-items: flex-start;
+    vertical-align: middle;
+}
+.fu-sqrt-index {
+    font-size: 0.6em;
+    margin-right: -0.3em;
+    margin-top: -0.2em;
+    align-self: flex-start;
+}
+.fu-sqrt-symbol {
+    font-size: 1.1em;
+    margin-right: 0.05em;
+}
+.fu-sqrt-radicand {
+    border-top: 1.5px solid currentColor;
+    padding: 0 0.15em;
+}
+
+.fu-abs {
+    padding: 0 0.15em;
+    border-left: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+}
+
+.fu-exp {
+    font-size: 0.7em;
+    vertical-align: super;
+}
+
+@media (max-width: 768px) {
+    .umformZeile {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    .umformGleichung {
+        font-size: 0.9rem;
+    }
+    .umformOperation {
+        font-size: 0.78rem;
+    }
+}
