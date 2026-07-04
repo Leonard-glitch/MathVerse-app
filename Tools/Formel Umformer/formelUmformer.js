@@ -30,6 +30,18 @@ function checkBlacklist(latex) {
     }
 }
 
+
+const GREEK_LETTERS = {
+    alpha: "α", beta: "β", gamma: "γ", delta: "δ", epsilon: "ε",
+    zeta: "ζ", eta: "η", theta: "θ", iota: "ι", kappa: "κ",
+    lambda: "λ", mu: "μ", nu: "ν", xi: "ξ", rho: "ρ",
+    sigma: "σ", tau: "τ", upsilon: "υ", phi: "φ", chi: "χ",
+    psi: "ψ", omega: "ω",
+
+    Gamma: "Γ", Delta: "Δ", Theta: "Θ", Lambda: "Λ", Xi: "Ξ",
+    Pi: "Π", Sigma: "Σ", Phi: "Φ", Psi: "Ψ", Omega: "Ω"
+};
+
 // ==========================================================================
 // 2. TOKENIZER
 // ==========================================================================
@@ -66,7 +78,11 @@ function tokenize(latex) {
                 case "arccos": tokens.push({ type: "FUNC", name: "acos" }); continue;
                 case "arctan": tokens.push({ type: "FUNC", name: "atan" }); continue;
                 default:
-                    throw new FormulaError(`Nicht unterstütztes Element: \\${cmd}`);
+                    if (GREEK_LETTERS.hasOwnProperty(cmd)) {
+                        tokens.push({ type: "LETTER", value: GREEK_LETTERS[cmd] });
+                        continue;
+                    }
+                    throw new FormulaError("Dieses mathematische Element wird aktuell nicht unterstützt.");
             }
         }
 
@@ -104,7 +120,7 @@ function tokenize(latex) {
             continue;
         }
 
-        throw new FormulaError(`Unbekanntes Zeichen: "${ch}"`);
+        throw new FormulaError(`Das Zeichen „${ch}" wird nicht erkannt. Bitte überprüfe deine Eingabe.`);
     }
 
     tokens.push({ type: "EOF" });
@@ -170,7 +186,7 @@ function parseEquation(tokens) {
         if (peek().type === "LBRACE") {
             advance();
             const e = parseExpression();
-            expect("RBRACE", "Erwartet: } im Exponenten");
+            expect("RBRACE", "Der Exponent wurde nicht richtig geschlossen.");
             return e;
         }
         return parseFactor();
@@ -181,11 +197,11 @@ function parseEquation(tokens) {
             advance();
             let text = "";
             while (peek().type !== "RBRACE") {
-                if (peek().type === "EOF") throw new FormulaError("Index nicht geschlossen (fehlende })");
+                if (peek().type === "EOF") throw new FormulaError("Der Index wurde nicht geschlossen.");
                 const t = advance();
                 if (t.type === "LETTER") text += t.value;
                 else if (t.type === "NUM") text += t.raw;
-                else throw new FormulaError("Ungültiger Index.");
+                else throw new FormulaError("Der Index enthält ein ungültiges Zeichen.");
             }
             advance();
             return text;
@@ -193,14 +209,14 @@ function parseEquation(tokens) {
         const t = advance();
         if (t.type === "LETTER") return t.value;
         if (t.type === "NUM") return t.raw;
-        throw new FormulaError("Ungültiger Index.");
+        throw new FormulaError("Der Index enthält ein ungültiges Zeichen.");
     }
 
     function parseSubscriptExpr() {
         if (peek().type === "LBRACE") {
             advance();
             const e = parseExpression();
-            expect("RBRACE", "Erwartet: }");
+            expect("RBRACE", "Die Basis des Logarithmus wurde nicht richtig geschlossen.");
             return e;
         }
         return parseAtom();
@@ -234,25 +250,25 @@ function parseEquation(tokens) {
             case "LPAREN": {
                 advance();
                 const e = parseExpression();
-                expect("RPAREN", "Klammer nicht geschlossen: erwartet )");
+                expect("RPAREN", "Eine runde Klammer wurde nicht geschlossen.");
                 return e;
             }
 
             case "PIPE": {
                 advance();
                 const e = parseExpression();
-                expect("PIPE", "Betragsstriche nicht geschlossen: erwartet |");
+                expect("PIPE", "Die Betragsstriche wurden nicht geschlossen.");
                 return { type: "abs", arg: e };
             }
 
             case "FRAC": {
                 advance();
-                expect("LBRACE", "Erwartet: { nach \\frac");
+                expect("LBRACE", "Der Bruch ist unvollständig – der Zähler fehlt.");
                 const num = parseExpression();
-                expect("RBRACE", "Erwartet: } (Zähler)");
-                expect("LBRACE", "Erwartet: { (Nenner)");
+                expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
+                expect("LBRACE", "Der Bruch ist unvollständig – der Nenner fehlt.");
                 const den = parseExpression();
-                expect("RBRACE", "Erwartet: } (Nenner)");
+                expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
                 return { type: "div", left: num, right: den };
             }
 
@@ -262,11 +278,11 @@ function parseEquation(tokens) {
                 if (peek().type === "LBRACKET") {
                     advance();
                     index = parseExpression();
-                    expect("RBRACKET", "Erwartet: ]");
+                    expect("RBRACKET", "Der Wurzelindex wurde nicht geschlossen.");
                 }
-                expect("LBRACE", "Erwartet: { nach \\sqrt");
+                expect("LBRACE", "Der Inhalt der Wurzel fehlt.");
                 const arg = parseExpression();
-                expect("RBRACE", "Erwartet: }");
+                expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
                 return { type: "sqrt", arg, index };
             }
 
@@ -277,25 +293,24 @@ function parseEquation(tokens) {
                     advance();
                     base = parseSubscriptExpr();
                 }
-                expect("LPAREN", `Erwartet: ( nach ${t.name}`);
+                expect("LPAREN", `Nach der Funktion „${t.name}" fehlt eine öffnende Klammer.`);
                 const arg = parseExpression();
-                expect("RPAREN", "Klammer nach Funktion nicht geschlossen");
-                return { type: "func", name: t.name, arg, base };
+                expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
             }
 
             default:
-                throw new FormulaError("Unerwartetes oder nicht unterstütztes Element in der Formel.");
+                throw new FormulaError("Die Formel enthält an dieser Stelle ein unerwartetes Element.");
         }
     }
 
     const left = parseExpression();
-    expect("EQUALS", "Die Gleichung muss genau ein \"=\" enthalten.");
+    expect("EQUALS", "Deine Formel muss genau ein Gleichheitszeichen (=) enthalten.");
     const right = parseExpression();
     if (peek().type === "EQUALS") {
-        throw new FormulaError("Es ist nur eine Gleichung mit genau einem \"=\" erlaubt.");
+        throw new FormulaError("Es darf nur ein Gleichheitszeichen (=) vorkommen.");
     }
     if (peek().type !== "EOF") {
-        throw new FormulaError("Unerwartete Zeichen am Ende der Formel.");
+        throw new FormulaError("Am Ende der Formel befinden sich überzählige Zeichen. Bitte überprüfe deine Eingabe.");
     }
     return { left, right };
 }
@@ -355,6 +370,74 @@ function numNode(v) {
 //    sauberen, schulischen Rechenweg statt "4 − 10" oder "−(−x)")
 // ==========================================================================
 
+function flattenTerms(node, sign, terms) {
+    if (node.type === "add") {
+        flattenTerms(node.left, sign, terms);
+        flattenTerms(node.right, sign, terms);
+    } else if (node.type === "sub") {
+        flattenTerms(node.left, sign, terms);
+        flattenTerms(node.right, -sign, terms);
+    } else if (node.type === "neg") {
+        flattenTerms(node.arg, -sign, terms);
+    } else {
+        terms.push({ sign, node });
+    }
+}
+
+function combineAddSub(node) {
+    const terms = [];
+    flattenTerms(node, 1, terms);
+
+    let constantSum = 0;
+    let hasConstant = false;
+    const symbolicTerms = [];
+
+    terms.forEach(t => {
+        if (t.node.type === "num") {
+            constantSum += t.sign * t.node.value;
+            hasConstant = true;
+        } else {
+            symbolicTerms.push(t);
+        }
+    });
+    constantSum = exaktRunden(constantSum);
+
+    if (symbolicTerms.length === 0) return numNode(constantSum);
+
+    // Bevorzugt einen positiven symbolischen Term als Start. Gibt es keinen,
+    // aber eine positive Konstante, führt die Konstante (z.B. "5 − λ_2" statt
+    // "−λ_2 + 5"). Nur wenn beides fehlt, wird der erste Term negiert.
+    const firstPosIdx = symbolicTerms.findIndex(t => t.sign === 1);
+    const leadWithConstant = firstPosIdx === -1 && hasConstant && constantSum > 0;
+
+    let result, remainingSymbolic;
+
+    if (firstPosIdx !== -1) {
+        result = symbolicTerms[firstPosIdx].node;
+        remainingSymbolic = symbolicTerms.filter((_, i) => i !== firstPosIdx);
+    } else if (leadWithConstant) {
+        result = numNode(constantSum);
+        remainingSymbolic = symbolicTerms;
+    } else {
+        result = { type: "neg", arg: symbolicTerms[0].node };
+        remainingSymbolic = symbolicTerms.slice(1);
+    }
+
+    remainingSymbolic.forEach(t => {
+        result = t.sign === 1
+            ? { type: "add", left: result, right: t.node }
+            : { type: "sub", left: result, right: t.node };
+    });
+
+    if (hasConstant && constantSum !== 0 && !leadWithConstant) {
+        result = constantSum > 0
+            ? { type: "add", left: result, right: numNode(constantSum) }
+            : { type: "sub", left: result, right: numNode(-constantSum) };
+    }
+
+    return result;
+}
+
 function simplify(node) {
     switch (node.type) {
         case "num": case "var": case "const":
@@ -368,24 +451,17 @@ function simplify(node) {
             return { type: "neg", arg };
         }
 
-        case "add": {
-            const left = simplify(node.left), right = simplify(node.right);
-            if (right.type === "neg") return simplify({ type: "sub", left, right: right.arg });
-            if (left.type === "neg") return simplify({ type: "sub", left: right, right: left.arg });
-            if (left.type === "num" && right.type === "num") return numNode(left.value + right.value);
-            return { type: "add", left, right };
-        }
-
+        case "add":
         case "sub": {
             const left = simplify(node.left), right = simplify(node.right);
-            if (right.type === "neg") return simplify({ type: "add", left, right: right.arg });
-            if (left.type === "num" && right.type === "num") return numNode(left.value - right.value);
-            return { type: "sub", left, right };
+            return combineAddSub({ type: node.type, left, right });
         }
 
         case "mul": {
             const left = simplify(node.left), right = simplify(node.right);
             if (left.type === "num" && right.type === "num") return numNode(left.value * right.value);
+            if (left.type === "num" && left.value === 0) return numNode(0);
+            if (right.type === "num" && right.value === 0) return numNode(0);
             if (left.type === "num" && left.value === 1) return right;
             if (right.type === "num" && right.value === 1) return left;
             return { type: "mul", left, right };
@@ -394,6 +470,7 @@ function simplify(node) {
         case "div": {
             const left = simplify(node.left), right = simplify(node.right);
             if (left.type === "num" && right.type === "num" && right.value !== 0) return numNode(left.value / right.value);
+            if (left.type === "num" && left.value === 0 && right.type !== "num") return numNode(0);
             if (right.type === "num" && right.value === 1) return left;
             return { type: "div", left, right };
         }
@@ -401,6 +478,8 @@ function simplify(node) {
         case "pow": {
             const base = simplify(node.base), exp = simplify(node.exp);
             if (base.type === "num" && exp.type === "num") return numNode(Math.pow(base.value, exp.value));
+            if (exp.type === "num" && exp.value === 1) return base;
+            if (exp.type === "num" && exp.value === 0 && !(base.type === "num" && base.value === 0)) return numNode(1);
             return { type: "pow", base, exp };
         }
 
@@ -432,7 +511,12 @@ function tryEvalNumeric(node) {
         case "sub": { const a = tryEvalNumeric(node.left), b = tryEvalNumeric(node.right); return (a === null || b === null) ? null : a - b; }
         case "mul": { const a = tryEvalNumeric(node.left), b = tryEvalNumeric(node.right); return (a === null || b === null) ? null : a * b; }
         case "div": { const a = tryEvalNumeric(node.left), b = tryEvalNumeric(node.right); return (a === null || b === null || b === 0) ? null : a / b; }
-        case "pow": { const a = tryEvalNumeric(node.base), b = tryEvalNumeric(node.exp); return (a === null || b === null) ? null : Math.pow(a, b); }
+        case "pow": {
+            const a = tryEvalNumeric(node.base), b = tryEvalNumeric(node.exp);
+            if (a === null || b === null) return null;
+            if (a < 0 && !Number.isInteger(b)) return null; // z.B. (-4)^0.5 ist nicht reell
+            return Math.pow(a, b);
+        }
         case "sqrt": {
             const a = tryEvalNumeric(node.arg);
             const n = node.index ? tryEvalNumeric(node.index) : 2;
@@ -520,7 +604,11 @@ function renderExpr(node) {
 
         case "pow": {
             const b = node.base;
-            const wrapBase = (b.type === "add" || b.type === "sub" || b.type === "mul" || b.type === "div" || b.type === "neg");
+            const wrapBase = (
+                b.type === "add" || b.type === "sub" || b.type === "mul" ||
+                b.type === "div" || b.type === "neg" || b.type === "pow" ||
+                (b.type === "num" && b.value < 0)
+            );
             const baseHtml = wrapBase ? `(${renderExpr(b)})` : renderExpr(b);
             return `${baseHtml}<sup class="fu-exp">${renderExpr(node.exp)}</sup>`;
         }
@@ -775,6 +863,27 @@ function canSolveFor(eq, varName) {
     return isolate(eq, varName) !== null;
 }
 
+function hasVarInSqrtIndex(node, varName) {
+    if (!node) return false;
+    if (node.type === "sqrt" && node.index && containsVar(node.index, varName)) return true;
+    return getChildren(node).some(child => hasVarInSqrtIndex(child, varName));
+}
+
+function findSpecificSolveIssue(eq, varName) {
+    const totalOccurrences = countVarOccurrences(eq.left, varName) + countVarOccurrences(eq.right, varName);
+
+    if (totalOccurrences > 1) {
+        return `Die Variable ${formatVarName(varName)} kommt mehrfach in der Gleichung vor (u. a. möglich, wenn sie gleichzeitig in Basis und Exponent auftritt). Aktuell können nur Gleichungen gelöst werden, in denen die gesuchte Variable genau einmal vorkommt.`;
+    }
+    if (totalOccurrences === 0) return null;
+
+    if (hasVarInSqrtIndex(eq.left, varName) || hasVarInSqrtIndex(eq.right, varName)) {
+        return `Die Variable ${formatVarName(varName)} befindet sich im Wurzelindex. Das Auflösen nach einer Variable an dieser Stelle wird aktuell nicht unterstützt.`;
+    }
+
+    return `Diese Art von Gleichung wird für ${formatVarName(varName)} aktuell noch nicht unterstützt.`;
+}
+
 // ==========================================================================
 // 8. UI-ANBINDUNG
 // ==========================================================================
@@ -847,7 +956,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentEquation = null;
                 disableSelection();
                 hideError();
-                tipp.textContent = "Diese Gleichung enthält keine Variable, die sich eindeutig isolieren lässt.";
+                tipp.textContent = (varNames.length === 1 && findSpecificSolveIssue(eq, varNames[0]))
+                    || "Diese Gleichung enthält keine Variable, die sich eindeutig isolieren lässt – z. B. weil eine Variable mehrfach vorkommt, im Wurzelindex steht oder gleichzeitig in Basis und Exponent auftritt.";
                 return;
             }
 
@@ -861,7 +971,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (err) {
             currentEquation = null;
-            const msg = err instanceof FormulaError ? err.message : "Die Formel konnte nicht gelesen werden.";
+            const msg = err instanceof FormulaError ? err.message : "Deine Formel konnte nicht verarbeitet werden. Bitte überprüfe die Eingabe.";
             showError(msg);
         }
     }
