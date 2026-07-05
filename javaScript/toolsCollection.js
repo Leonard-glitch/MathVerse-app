@@ -113,6 +113,19 @@ export const tools = [
             big:   `${BASE}/pictures/DezimalBruchConverter.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
+    },
+    {
+        id:       "card9",
+        title:    "Formel Umformer",
+        group:    "algebra",
+        filename: "formelUmformer.html",
+        url:      `${BASE}/Tools/Formel Umformer/formelUmformer.html`,
+        tags:     ["formel", "umformer", "algebra"],
+        info:      "Formt mathematische Formeln um – inklusive Schritt-für-Schritt-Lösungsweg.",
+        image: {
+            big:   `${BASE}/pictures/FormelUmformer.jpg`,
+            small: `${BASE}/pictures/icons/meinTool-icon.png`
+        }
     }
 
     // -----------------------------------------------------------------------

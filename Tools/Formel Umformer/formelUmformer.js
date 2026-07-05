@@ -222,6 +222,14 @@ function parseEquation(tokens) {
         return parseAtom();
     }
 
+    function parseFuncArgNoParens() {
+        let node = parseFactor();
+        while (startsAtom(peek().type)) {
+            node = { type: "mul", left: node, right: parseFactor() };
+        }
+        return node;
+    }
+
     function parseAtom() {
         const t = peek();
 
@@ -293,9 +301,17 @@ function parseEquation(tokens) {
                     advance();
                     base = parseSubscriptExpr();
                 }
-                expect("LPAREN", `Nach der Funktion „${t.name}" fehlt eine öffnende Klammer.`);
-                const arg = parseExpression();
-                expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
+                if (peek().type === "LPAREN") {
+                    advance();
+                    const arg = parseExpression();
+                    expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
+                    return { type: "func", name: t.name, arg, base };
+                }
+                if (!startsAtom(peek().type) && peek().type !== "MINUS") {
+                    throw new FormulaError(`Nach der Funktion „${t.name}" fehlt ein Argument (z. B. eine Zahl, Variable oder Klammer).`);
+                }
+                const arg = parseFuncArgNoParens();
+                return { type: "func", name: t.name, arg, base };
             }
 
             default:
