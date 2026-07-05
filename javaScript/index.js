@@ -331,7 +331,7 @@ function initSearch() {
 // 8. COLLAPSIBLE LOGIC
 // ==========================================================================
 
-function calcTwoRowHeight(container) {
+function calcFirstRowHeight(container) {
     const TOLERANCE = 3; // px – toleriert Sub-Pixel-Rendering ohne Math.round
 
     const cards = Array.from(container.querySelectorAll(".card"))
@@ -348,21 +348,21 @@ function calcTwoRowHeight(container) {
     });
     rowTops.sort((a, b) => a - b);
 
-    if (rowTops.length <= 2) return null; // ≤ 2 Reihen → kein Collapse
+    if (rowTops.length <= 1) return null; // ≤ 1 Reihe → kein Collapse
 
-    const secondRowTop = rowTops[1];
-    let secondRowBottom = 0;
+    const firstRowTop = rowTops[0];
+    let firstRowBottom = 0;
     rects.forEach((r, i) => {
-        if (Math.abs(tops[i] - secondRowTop) < TOLERANCE) {
+        if (Math.abs(tops[i] - firstRowTop) < TOLERANCE) {
             const bottom = r.bottom - cRect.top;
-            if (bottom > secondRowBottom) secondRowBottom = bottom;
+            if (bottom > firstRowBottom) firstRowBottom = bottom;
         }
     });
 
     const rootFontPx     = parseFloat(getComputedStyle(document.documentElement).fontSize) || 20;
     const borderBottomPx = parseFloat(getComputedStyle(container).borderBottomWidth) || 0;
 
-    return Math.ceil(secondRowBottom + 4 * rootFontPx + borderBottomPx);
+    return Math.ceil(firstRowBottom + 4 * rootFontPx + borderBottomPx);
 }
 
 function applyCollapsibleLogic() {
@@ -382,7 +382,7 @@ function applyCollapsibleLogic() {
         container.style.maxHeight = "";
         void container.offsetHeight;
 
-        const collapsedH = calcTwoRowHeight(container);
+        const collapsedH = calcFirstRowHeight(container);
 
         if (collapsedH !== null) {
             container.dataset.collapsedHeight = collapsedH;
