@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gleichungslöser</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../../css/feedback.css">
+    <link rel="stylesheet" href="../../css/Common/common.css">
+    <link rel="stylesheet" href="./gleichungslöser.css">
+
+    <script type="module">
+        import "https://esm.run/mathlive";
+    </script>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+        <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div>
+            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+            <div id="searchResults"></div>
+        </div>
+
+        <div id="navUserArea"><a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
+            <a href="../../html/register.html" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
+    </header>
+    <main>
+
+        <section class="gleichungSection">
+            <h1 class="zahlenHeader">Gleichungslöser</h1>
+
+            <div class="gleichungSwitchDiv">
+                <button class="gleichungTypeBtn active" data-type="allgemein">Allgemeine Gleichungen</button>
+                <button class="gleichungTypeBtn" data-type="linear">Lineare Gleichungen</button>
+            </div>
+
+            <div class="gleichungsContainer" id="allgemeineGleichungsContainer">
+
+                <math-field id="mathInput" class="zahlenInputfeld" placeholder="z.B.: $$a^2+b^2=c^2 $$"></math-field>
+
+                <div class="zielVariableDiv">
+                    <h2 class="zielVariableLabel">Lösen nach</h2>
+
+                    <select name="selectVariable" id="selectVariable" class="selection">
+                        <option value=""> ...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="gleichungsContainer" id="lineareGleichungsContainer">
+                <div class="inputsContainer">
+                    <div class="inputRow"><span class="rowNumber">1&#41;</span><math-field id="mathInput" class="zahlenInputfeld" placeholder="z.B.: $$a^2+b^2=c^2 $$"></math-field></div>
+                    <div class="inputRow"><span class="rowNumber">2&#41;</span><math-field id="mathInput" class="zahlenInputfeld" placeholder="z.B.: $$a^2+b^2=c^2 $$"></math-field></div>
+                </div>
+
+                    <!-- Eingabefelder dynamisch erweitern -->
+                <div class="inputSteuerungDiv">
+                    <button id="btnAddInput" class="buttton" type="button">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Feld hinzufügen
+                    </button>
+                    <button id="btnDeleteInput" class="buttton" type="button">
+                        <i class="fa fa-minus" aria-hidden="true"></i> Feld entfernen
+                    </button>
+                </div>
+
+                <div class="lösungsVerfahrenDiv">
+                    <div class="lösungsVerfahrenExpendDiv"><h2 class="lösungsVerfahrenLabel">Lösungsverfahren</h2><button class="expandBtn" aria-label="Ausklappen"><i class="fa fa-chevron-down"></i></button></div>
+
+                    <select name="selectProcedure" id="selectProcedure" class="selection">
+                        <option value="automatic">Automatisch</option>
+                        <option value="substitution">Einsetzungsverfahren</option>
+                        <option value="addition">Additionsverfahren</option>
+                        <option value="equalization">Gleichsetzungsverfahren</option>
+                        <option value="gaussian">Gauß-Verfahren</option>
+                    </select>
+                </div>
+
+                <div class="zielVariableDiv">
+                    <h2 class="zielVariableLabel">Lösen nach</h2>
+
+                    <select name="selectVariable" id="selectVariable" class="selection">
+                        <option value="">Alle</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Lösen</button>
+
+            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+
+            <div class="zahlenAusgabestyle">
+                <div class="loesungsDiv"> <p class="loesungText">Lösung:</p><p id="loesungOutput"></p></div>
+                <div class="rechenwegDiv">
+                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                </div>
+                <span id="tipp"></span>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footerNav">
+
+            <div class="footerSocial">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+            </div>
+
+            <div class="linksFooterect">
+                <a href="../../html/datenSchutz.html">Datenschutz</a>
+
+                <button id="openFeedbackBtn">Feedback senden</button>
+
+                <a href="../../html/impressum.html">Impressum</a>
+            </div>
+
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
+        </div>
+    </footer>
+    <script src="../../javaScript/Common/common-login.js"></script>
+    <script src="./gleichungslöser.js"></script>
+    <script src="../../javaScript/feedback.js"></script>
+    <script type="module" src="../../javaScript/toolFavorite.js"></script>
+    <script type="module" src="../../javaScript/search.js"></script>
+</body>
+</html>
