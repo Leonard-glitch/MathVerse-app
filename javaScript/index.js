@@ -362,7 +362,15 @@ function calcFirstRowHeight(container) {
     const rootFontPx     = parseFloat(getComputedStyle(document.documentElement).fontSize) || 20;
     const borderBottomPx = parseFloat(getComputedStyle(container).borderBottomWidth) || 0;
 
-    return Math.ceil(firstRowBottom + 4 * rootFontPx + borderBottomPx);
+    // Etwas Luft unterhalb Reihe 1 (analog zum normalen Container-Padding),
+    // aber niemals so viel, dass Reihe 2 angeschnitten sichtbar wird.
+    const secondRowTop     = rowTops[1];
+    const maxAllowedBottom = secondRowTop - 2; // Sicherheitsabstand vor Reihe 2
+    const desiredBottom    = firstRowBottom + 1.5 * rootFontPx;
+
+    const finalBottom = Math.min(desiredBottom, maxAllowedBottom);
+
+    return Math.ceil(finalBottom + borderBottomPx);
 }
 
 function applyCollapsibleLogic() {
