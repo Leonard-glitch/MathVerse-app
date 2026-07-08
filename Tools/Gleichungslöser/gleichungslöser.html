@@ -42,12 +42,12 @@
 
             <div class="gleichungsContainer" id="allgemeineGleichungsContainer">
 
-                <math-field id="mathInput" class="zahlenInputfeld" placeholder="z.B.: $$2+4=c $$"></math-field>
+                <math-field id="mathInputAllgemein" class="zahlenInputfeld" placeholder="z.B.: $$2+4=c $$"></math-field>
 
                 <div class="zielVariableDiv">
                     <h2 class="zielVariableLabel">Lösen nach</h2>
 
-                    <select name="selectVariable" id="selectVariable" class="selection">
+                    <select name="selectVariable" id="selectVariableAllgemein" class="selection">
                         <option value=""> ...</option>
                     </select>
                 </div>
@@ -55,8 +55,8 @@
 
             <div class="gleichungsContainer" id="lineareGleichungsContainer">
                 <div class="inputsContainer">
-                    <div class="inputRow"><span class="rowNumber">1&#41;</span><math-field id="mathInput" class="zahlenInputfeld" placeholder="z.B.: $$a+7b=6 $$"></math-field></div>
-                    <div class="inputRow"><span class="rowNumber">2&#41;</span><math-field id="mathInput" class="zahlenInputfeld" placeholder="z.B.: $$a+7b=6 $$"></math-field></div>
+                    <div class="inputRow"><span class="rowNumber">1&#41;</span><math-field class="zahlenInputfeld lgsGleichungInput" placeholder="z.B.: $$a+7b=6 $$"></math-field></div>
+                    <div class="inputRow"><span class="rowNumber">2&#41;</span><math-field class="zahlenInputfeld lgsGleichungInput" placeholder="z.B.: $$a+7b=6 $$"></math-field></div>
                 </div>
 
                     <!-- Eingabefelder dynamisch erweitern -->
@@ -84,7 +84,7 @@
                 <div class="zielVariableDiv">
                     <h2 class="zielVariableLabel">Lösen nach</h2>
 
-                    <select name="selectVariable" id="selectVariable" class="selection">
+                    <select name="selectVariable" id="selectVariableLinear" class="selection">
                         <option value="all">Alle</option>
                         <option value="">...</option>
                     </select>

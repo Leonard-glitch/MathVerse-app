@@ -692,6 +692,14 @@ function peelOnce(node, other, varName) {
             };
         }
 
+        case "neg": {
+            return {
+                opLabel: `· (−1)`,
+                newSubject: node.arg,
+                newOther: { type: "neg", arg: other }
+            };
+        }
+
          case "mul": {
             const inLeft = containsVar(node.left, varName);
             const keep = inLeft ? node.left : node.right;

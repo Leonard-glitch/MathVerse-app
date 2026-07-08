@@ -13,8 +13,6 @@
     margin-bottom: 1.5rem;
     background-color: var(--bg-input);
     padding: 5px;
-    
-    
 }
 
 .gleichungTypeBtn{
@@ -53,7 +51,7 @@
     font-weight: 600;
 }
 
-#mathInput{
+.zahlenInputfeld{
     margin: 0;
     width: 100%;
     max-width: 500px;
@@ -472,6 +470,82 @@
 .fu-exp {
     font-size: 0.7em;
     vertical-align: super;
+}
+
+.lgsSchrittTitel {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--border-glow);
+    margin: 1rem 0 0.4rem 0;
+}
+
+.gaussMatrixBlock {
+    margin: 0.6rem 0;
+}
+
+.gaussOpLabel {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent-live);
+    margin-bottom: 0.35rem;
+}
+
+.gaussMatrix {
+    border-collapse: collapse;
+    font-family: 'Courier New', Courier, monospace;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.gaussMatrix td {
+    padding: 0.4rem 0.7rem;
+    text-align: center;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.gaussMatrix tr:last-child td {
+    border-bottom: none;
+}
+
+.gaussRowLabel {
+    font-weight: 700;
+    color: var(--border-glow);
+    padding-right: 0.5rem !important;
+}
+
+.gaussSep {
+    color: var(--text-muted);
+    padding: 0.4rem 0.3rem !important;
+}
+
+.gaussConst {
+    color: var(--accent-live);
+    font-weight: 600;
+}
+
+.gaussHeaderCell {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.lgsAutoNote {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    background: rgba(0, 255, 204, 0.05);
+    border: 1px solid var(--accent-live);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.lgsAutoNote strong {
+    color: var(--accent-live);
 }
 
 @media (max-width: 768px) {
