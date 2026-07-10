@@ -133,6 +133,7 @@ function tokenize(latex) {
 
 function parseEquation(tokens) {
     let pos = 0;
+    let openPipes = 0;
     const peek = () => tokens[pos];
     const advance = () => tokens[pos++];
     const expect = (type, msg) => {
@@ -158,6 +159,7 @@ function parseEquation(tokens) {
             const t = peek().type;
             if (t === "MUL") { advance(); node = { type: "mul", left: node, right: parseFactor() }; }
             else if (t === "DIV") { advance(); node = { type: "div", left: node, right: parseFactor() }; }
+            else if (t === "PIPE" && openPipes > 0) { break; } // schließendes Betragsstrich-Zeichen, keine implizite Multiplikation
             else if (startsAtom(t)) { node = { type: "mul", left: node, right: parseFactor() }; }
             else break;
         }
@@ -263,9 +265,11 @@ function parseEquation(tokens) {
             }
 
             case "PIPE": {
+                openPipes++;
                 advance();
                 const e = parseExpression();
                 expect("PIPE", "Die Betragsstriche wurden nicht geschlossen.");
+                openPipes--;
                 return { type: "abs", arg: e };
             }
 

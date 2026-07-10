@@ -21,7 +21,7 @@ typeButtons.forEach(btn => {
         }
     });
 });
-
+extractCoefficient(node);
 
 
 const btnAddInput    = document.getElementById("btnAddInput");
@@ -225,6 +225,7 @@ function tokenize(latex) {
 
 function parseEquation(tokens) {
     let pos = 0;
+    let openPipes = 0;
     const peek = () => tokens[pos];
     const advance = () => tokens[pos++];
     const expect = (type, msg) => {
@@ -250,6 +251,7 @@ function parseEquation(tokens) {
             const t = peek().type;
             if (t === "MUL") { advance(); node = { type: "mul", left: node, right: parseFactor() }; }
             else if (t === "DIV") { advance(); node = { type: "div", left: node, right: parseFactor() }; }
+            else if (t === "PIPE" && openPipes > 0) { break; } // schließendes Betragsstrich-Zeichen, keine implizite Multiplikation
             else if (startsAtom(t)) { node = { type: "mul", left: node, right: parseFactor() }; }
             else break;
         }
@@ -355,9 +357,11 @@ function parseEquation(tokens) {
             }
 
             case "PIPE": {
+                openPipes++;
                 advance();
                 const e = parseExpression();
                 expect("PIPE", "Die Betragsstriche wurden nicht geschlossen.");
+                openPipes--;
                 return { type: "abs", arg: e };
             }
 
@@ -512,8 +516,18 @@ function structuralKey(node) {
 // Zerlegt einen Term in Vorfaktor und "Basis" (z.B. 3·x -> Vorfaktor 3, Basis x).
 function extractCoefficient(node) {
     if (node.type === "mul") {
-        if (node.left.type === "num") return { coeff: node.left.value, base: node.right };
-        if (node.right.type === "num") return { coeff: node.right.value, base: node.left };
+        if (node.left.type === "num") {
+            const inner = extractCoefficient(node.right);
+            return { coeff: node.left.value * inner.coeff, base: inner.base };
+        }
+        if (node.right.type === "num") {
+            const inner = extractCoefficient(node.left);
+            return { coeff: node.right.value * inner.coeff, base: inner.base };
+        }
+    }
+    if (node.type === "div" && node.right.type === "num" && node.right.value !== 0) {
+        const inner = extractCoefficient(node.left);
+        return { coeff: inner.coeff / node.right.value, base: inner.base };
     }
     return { coeff: 1, base: node };
 }
@@ -622,16 +636,44 @@ function simplify(node) {
 
         case "mul": {
             const left = simplify(node.left), right = simplify(node.right);
+
+            // Distributivgesetz: a·(b±c) -> a·b ± a·c (und gespiegelt (b±c)·a)
+            if (left.type === "add" || left.type === "sub") {
+                return simplify({ type: left.type, left: { type: "mul", left: left.left, right }, right: { type: "mul", left: left.right, right } });
+            }
+            if (right.type === "add" || right.type === "sub") {
+                return simplify({ type: right.type, left: { type: "mul", left, right: right.left }, right: { type: "mul", left, right: right.right } });
+            }
+
             if (left.type === "num" && right.type === "num") return numNode(left.value * right.value);
             if (left.type === "num" && left.value === 0) return numNode(0);
             if (right.type === "num" && right.value === 0) return numNode(0);
             if (left.type === "num" && left.value === 1) return right;
             if (right.type === "num" && right.value === 1) return left;
+
+            // Koeffizienten-Folding bei verschachtelter Multiplikation: a·(b·c) -> (a·b)·c,
+            // falls a und b Zahlen sind – sonst bleiben z.B. 2·(3·x) und 6·x strukturell
+            // verschieden und combineAddSub kann gleichartige Terme nicht zusammenfassen.
+            if (left.type === "num" && right.type === "mul") {
+                if (right.left.type === "num")  return simplify({ type: "mul", left: numNode(left.value * right.left.value),  right: right.right });
+                if (right.right.type === "num") return simplify({ type: "mul", left: numNode(left.value * right.right.value), right: right.left });
+            }
+            if (right.type === "num" && left.type === "mul") {
+                if (left.left.type === "num")  return simplify({ type: "mul", left: numNode(right.value * left.left.value),  right: left.right });
+                if (left.right.type === "num") return simplify({ type: "mul", left: numNode(right.value * left.right.value), right: left.left });
+            }
+
             return { type: "mul", left, right };
         }
 
         case "div": {
             const left = simplify(node.left), right = simplify(node.right);
+
+            // Distribution bei Division durch eine Zahl: (a±b)/c -> a/c ± b/c
+            if ((left.type === "add" || left.type === "sub") && right.type === "num" && right.value !== 0) {
+                return simplify({ type: left.type, left: { type: "div", left: left.left, right }, right: { type: "div", left: left.right, right } });
+            }
+
             if (left.type === "num" && right.type === "num" && right.value !== 0) return numNode(left.value / right.value);
             if (left.type === "num" && left.value === 0 && right.type !== "num") return numNode(0);
             if (right.type === "num" && right.value === 1) return left;
@@ -646,14 +688,25 @@ function simplify(node) {
             return { type: "pow", base, exp };
         }
 
-        case "sqrt":
-            return { type: "sqrt", arg: simplify(node.arg), index: node.index ? simplify(node.index) : null };
+        case "sqrt": {
+            const arg = simplify(node.arg);
+            const index = node.index ? simplify(node.index) : null;
+            const numeric = tryEvalNumeric({ type: "sqrt", arg, index });
+            return numeric !== null ? numNode(numeric) : { type: "sqrt", arg, index };
+        }
 
-        case "abs":
-            return { type: "abs", arg: simplify(node.arg) };
+        case "abs": {
+            const arg = simplify(node.arg);
+            const numeric = tryEvalNumeric({ type: "abs", arg });
+            return numeric !== null ? numNode(numeric) : { type: "abs", arg };
+        }
 
-        case "func":
-            return { type: "func", name: node.name, arg: simplify(node.arg), base: node.base ? simplify(node.base) : null };
+        case "func": {
+            const arg = simplify(node.arg);
+            const base = node.base ? simplify(node.base) : null;
+            const numeric = tryEvalNumeric({ type: "func", name: node.name, arg, base });
+            return numeric !== null ? numNode(numeric) : { type: "func", name: node.name, arg, base };
+        }
 
         default:
             return node;
@@ -1472,18 +1525,24 @@ function findDegenerateMessage(eqs) {
     return null;
 }
 
-function solveLinearSystemSubstitution(equations, varNames) {
+function solveLinearSystemSubstitution(equations, varNames, targetVar) {
     let eqs = equations.map(eq => ({ left: eq.left, right: eq.right }));
     let remainingVars = varNames.slice();
     const steps = [];
     const solvedValues = {};
     const eliminationOrder = [];
+    // Zielvariable möglichst zuletzt eliminieren, damit sie am Ende direkt
+    // (ohne Rückwärtseinsetzung) aus der letzten Gleichung folgt.
+    const avoidVar = (targetVar && targetVar !== "all") ? targetVar : null;
 
     while (remainingVars.length > 0) {
         let chosen = null;
+        const orderedVars = avoidVar && remainingVars.length > 1
+            ? [...remainingVars.filter(v => v !== avoidVar), avoidVar]
+            : remainingVars;
 
         for (let i = 0; i < eqs.length && !chosen; i++) {
-            for (const vName of remainingVars) {
+            for (const vName of orderedVars) {
                 if (canSolveFor(eqs[i], vName)) {
                     chosen = { eqIndex: i, varName: vName };
                     break;
@@ -1543,6 +1602,7 @@ function solveLinearSystemSubstitution(equations, varNames) {
             }
         }
         finalValues[vName] = expr;
+        if (avoidVar && vName === avoidVar) break; // Rest wird für die Zielvariable nicht mehr gebraucht
     }
 
     return { steps, values: finalValues, eliminationOrder };
@@ -1622,6 +1682,21 @@ function chooseAutomaticProcedure(equations, varNames) {
         return { procedure: "equalization", reason: "Eine Variable steht in mehreren Gleichungen bereits isoliert – das Gleichsetzungsverfahren passt hier am besten." };
     }
 
+    // Additionsverfahren ist konkurrenzlos günstig, wenn eine Variable ohne
+    // jede Skalierung wegfällt (Koeffizienten bereits gleich oder exakt
+    // entgegengesetzt) – das braucht dann nur eine Addition/Subtraktion,
+    // keine einzige Multiplikation. Das schlägt selbst einen Koeffizienten von 1.
+    if (n === 2) {
+        const [c1, c2] = canonicals;
+        const freeVar = varNames.find(v => {
+            const { kA, kB } = computeEliminationFactors(c1.coeffs[v] || 0, c2.coeffs[v] || 0);
+            return Math.abs(kA) === 1 && Math.abs(kB) === 1;
+        });
+        if (freeVar) {
+            return { procedure: "addition", reason: `Bei ${formatVarName(freeVar)} heben sich die Koeffizienten direkt auf – das Additionsverfahren braucht hier keinerlei Skalierung.` };
+        }
+    }
+
     const hasUnitCoefficient = canonicals.some(c =>
         varNames.some(v => Math.abs(c.coeffs[v] || 0) === 1)
     );
@@ -1661,16 +1736,16 @@ btnLoesen.addEventListener("click", () => {
     let result, rechenwegHtml;
 
     if (verfahren === "substitution") {
-        result = solveLinearSystemSubstitution(currentLgsEquations, currentLgsVarNames);
+        result = solveLinearSystemSubstitution(currentLgsEquations, currentLgsVarNames, targetVar);
         if (!result.error) rechenwegHtml = renderLgsSubstitutionRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
     } else if (verfahren === "equalization") {
-        result = solveLinearSystemEqualization(currentLgsEquations, currentLgsVarNames);
+        result = solveLinearSystemEqualization(currentLgsEquations, currentLgsVarNames, targetVar);
         if (!result.error) rechenwegHtml = renderLgsEqualizationRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
     } else if (verfahren === "addition") {
-        result = solveLinearSystemAddition(currentLgsEquations, currentLgsVarNames);
+        result = solveLinearSystemAddition(currentLgsEquations, currentLgsVarNames, targetVar);
         if (!result.error) rechenwegHtml = renderLgsAdditionRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
     } else if (verfahren === "gaussian") {
-        result = solveLinearSystemGauss(currentLgsEquations, currentLgsVarNames);
+        result = solveLinearSystemGauss(currentLgsEquations, currentLgsVarNames, targetVar);
         if (!result.error) rechenwegHtml = renderLgsGaussRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
     } else {
         showSolveErrorLinear("Dieses Lösungsverfahren ist aktuell nicht verfügbar.");
@@ -1701,18 +1776,22 @@ btnLoesen.addEventListener("click", () => {
 // GLEICHSETZUNGSVERFAHREN – isoliert dieselbe Variable in allen Gleichungen,
 
 
-function solveLinearSystemEqualization(equations, varNames) {
+function solveLinearSystemEqualization(equations, varNames, targetVar) {
     let eqs = equations.map(eq => ({ left: eq.left, right: eq.right }));
     let remainingVars = varNames.slice();
     const steps = [];
     const isolatedExprByVar = {};
     const eliminationOrder = [];
+    const avoidVar = (targetVar && targetVar !== "all") ? targetVar : null;
 
     while (eqs.length > 1) {
         let chosenVar = null;
         let chosenIndices = null;
+        const orderedVars = avoidVar && remainingVars.length > 1
+            ? [...remainingVars.filter(v => v !== avoidVar), avoidVar]
+            : remainingVars;
 
-        for (const vName of remainingVars) {
+        for (const vName of orderedVars) {
             const containingIdx = [];
             let allIsolatable = true;
 
@@ -1777,6 +1856,7 @@ function solveLinearSystemEqualization(equations, varNames) {
 
     const values = { [lastVar]: lastValue };
     for (let i = eliminationOrder.length - 1; i >= 0; i--) {
+        if (avoidVar && Object.prototype.hasOwnProperty.call(values, avoidVar)) break;
         const vName = eliminationOrder[i];
         let expr = isolatedExprByVar[vName];
         for (const [otherVar, otherVal] of Object.entries(values)) {
@@ -1910,18 +1990,22 @@ function addEquations(eqA, eqB) {
     };
 }
 
-function solveLinearSystemAddition(equations, varNames) {
+function solveLinearSystemAddition(equations, varNames, targetVar) {
     let workingEquations = equations.map(eq => ({ left: eq.left, right: eq.right }));
     let remainingVars = varNames.slice();
     const steps = [];
     const referenceEquations = {};
     const eliminationOrder = [];
+    const avoidVar = (targetVar && targetVar !== "all") ? targetVar : null;
 
     while (workingEquations.length > 1) {
         let chosenVar = null;
         let candidates = null;
+        const orderedVars = avoidVar && remainingVars.length > 1
+            ? [...remainingVars.filter(v => v !== avoidVar), avoidVar]
+            : remainingVars;
 
-        for (const vName of remainingVars) {
+        for (const vName of orderedVars) {
             const found = [];
             let normalizationFailed = false;
 
@@ -1996,6 +2080,7 @@ function solveLinearSystemAddition(equations, varNames) {
     steps.push({ type: "finalSolve", varName: lastVar, isolateSteps: finalIsolate.steps, resultExpr: values[lastVar] });
 
     for (let i = eliminationOrder.length - 1; i >= 0; i--) {
+        if (avoidVar && Object.prototype.hasOwnProperty.call(values, avoidVar)) break;
         const vName = eliminationOrder[i];
         let refEq = referenceEquations[vName];
         const substSteps = [];
@@ -2110,13 +2195,19 @@ function rowToEquationNode(row, varNames) {
     return { left: simplify(leftNode), right: numNode(row[n]) };
 }
 
-function solveLinearSystemGauss(equations, varNames) {
-    const n = varNames.length;
+function solveLinearSystemGauss(equations, varNames, targetVar) {
+    // Zielvariable als letzte Spalte einsortieren: löst sich dadurch als
+    // letzte Zeile direkt (keine Rückwärtseinsetzung für andere Variablen nötig).
+    const avoidVar = (targetVar && targetVar !== "all") ? targetVar : null;
+    const orderedVarNames = avoidVar && varNames.includes(avoidVar)
+        ? [...varNames.filter(v => v !== avoidVar), avoidVar]
+        : varNames;
+    const n = orderedVarNames.length;
 
     const initialMatrix = equations.map(eq => {
         const canon = normalizeToCanonical(eq);
         if (!canon) return null;
-        return [...varNames.map(v => exaktRunden(canon.coeffs[v] || 0)), canon.constant];
+        return [...orderedVarNames.map(v => exaktRunden(canon.coeffs[v] || 0)), canon.constant];
     });
 
     if (initialMatrix.some(r => r === null)) {
@@ -2181,12 +2272,12 @@ function solveLinearSystemGauss(equations, varNames) {
 
     const values = {};
     for (let i = n - 1; i >= 0; i--) {
-        const vName = varNames[i];
-        let eq = rowToEquationNode(matrix[i], varNames);
+        const vName = orderedVarNames[i];
+        let eq = rowToEquationNode(matrix[i], orderedVarNames);
         const substApplied = [];
 
         for (let j = i + 1; j < n; j++) {
-            const otherVar = varNames[j];
+            const otherVar = orderedVarNames[j];
             const val = values[otherVar];
             if (containsVar(eq.left, otherVar) || containsVar(eq.right, otherVar)) {
                 eq = {
@@ -2204,12 +2295,13 @@ function solveLinearSystemGauss(equations, varNames) {
         values[vName] = simplify(isoResult.headlineResult);
         steps.push({
             type: "backSubstitute", varName: vName,
-            baseEq: rowToEquationNode(matrix[i], varNames),
+            baseEq: rowToEquationNode(matrix[i], orderedVarNames),
             substApplied, isolateSteps: isoResult.steps, resultExpr: values[vName]
         });
+        if (avoidVar && vName === avoidVar) break; // Rest wird für die Zielvariable nicht mehr gebraucht
     }
 
-    return { steps, values, initialMatrix, initialLabels: ROW_LABELS.slice(0, n) };
+    return { steps, values, initialMatrix, initialLabels: ROW_LABELS.slice(0, n), varNamesUsed: orderedVarNames };
 }
 
 // ── Matrix-Rendering (eigene Tabellen-Notation neben umformBox) ──────────
@@ -2232,6 +2324,8 @@ function renderGaussMatrix(matrix, labels, varNames, opLabel) {
 }
 
 function renderLgsGaussRechenweg(equations, result, targetVar, varNames) {
+    const matrixVarNames = result.varNamesUsed || varNames;
+
     let html = `<div class="lgsSchrittTitel">Ausgangssystem</div><div class="umformBox">`;
     equations.forEach((eq, i) => {
         html += `<div class="umformZeile"><span class="umformGleichung">${renderExpr(eq.left)} = ${renderExpr(eq.right)}</span><span class="umformOperation">(${result.initialLabels[i]})</span></div>`;
@@ -2239,18 +2333,18 @@ function renderLgsGaussRechenweg(equations, result, targetVar, varNames) {
     html += `</div>`;
 
     html += `<div class="lgsSchrittTitel">Erweiterte Koeffizientenmatrix</div>`;
-    html += renderGaussMatrix(result.initialMatrix, result.initialLabels, varNames, null);
+    html += renderGaussMatrix(result.initialMatrix, result.initialLabels, matrixVarNames, null);
 
     result.steps.forEach(step => {
         if (step.type === "swap") {
-            html += renderGaussMatrix(step.matrix, step.labels, varNames, `${step.labelA} ↔ ${step.labelB} tauschen`);
+            html += renderGaussMatrix(step.matrix, step.labels, matrixVarNames, `${step.labelA} ↔ ${step.labelB} tauschen`);
         } else if (step.type === "eliminate") {
             const labels = step.labels;
             const opSign = step.factor >= 0 ? "−" : "+";
             const absFactor = Math.abs(step.factor);
             const factorLabel = absFactor === 1 ? "" : `${formatGaussNum(absFactor)}·`;
             const opLabel = `${labels[step.targetRow]} → ${labels[step.targetRow]} ${opSign} ${factorLabel}${labels[step.pivotRow]}`;
-            html += renderGaussMatrix(step.matrix, step.labels, varNames, opLabel);
+            html += renderGaussMatrix(step.matrix, step.labels, matrixVarNames, opLabel);
         }
     });
 
