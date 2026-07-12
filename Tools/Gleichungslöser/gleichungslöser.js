@@ -21,7 +21,6 @@ typeButtons.forEach(btn => {
         }
     });
 });
-extractCoefficient(node);
 
 
 const btnAddInput    = document.getElementById("btnAddInput");
@@ -397,17 +396,24 @@ function parseEquation(tokens) {
                     advance();
                     base = parseSubscriptExpr();
                 }
+                let funcExponent = null;
+                if (peek().type === "CARET") {
+                    advance();
+                    funcExponent = parseExponent();
+                }
                 if (peek().type === "LPAREN") {
                     advance();
                     const arg = parseExpression();
                     expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
-                    return { type: "func", name: t.name, arg, base };
+                    const funcNode = { type: "func", name: t.name, arg, base };
+                    return funcExponent ? { type: "pow", base: funcNode, exp: funcExponent } : funcNode;
                 }
                 if (!startsAtom(peek().type) && peek().type !== "MINUS") {
                     throw new FormulaError(`Nach der Funktion „${t.name}" fehlt ein Argument (z. B. eine Zahl, Variable oder Klammer).`);
                 }
                 const arg = parseFuncArgNoParens();
-                return { type: "func", name: t.name, arg, base };
+                const funcNode = { type: "func", name: t.name, arg, base };
+                return funcExponent ? { type: "pow", base: funcNode, exp: funcExponent } : funcNode;
             }
 
             default:
@@ -939,11 +945,16 @@ function peelOnce(node, other, varName) {
                     return { domainError: "Diese Gleichung hat keine reelle Lösung – eine gerade Potenz kann nicht negativ werden." };
                 }
 
+                if (isEven) {
+                    return {
+                        ambiguous: `Die gesuchte Variable steht hier in einer geraden Potenz (${isSquare ? "Quadrat" : `Exponent ${opnd(node.exp)}`}). Das führt in der Regel zu zwei möglichen Lösungen (positiver und negativer Lösungszweig) – diese Fallunterscheidung wird aktuell noch nicht unterstützt.`
+                    };
+                }
+
                 return {
-                    opLabel: isSquare ? `√` : `${opnd(node.exp)}√`,
+                    opLabel: `${opnd(node.exp)}√`,
                     newSubject: node.base,
-                    newOther: { type: "sqrt", arg: other, index: isSquare ? null : node.exp },
-                    note: isEven ? "Es wird der positive Lösungszweig angenommen." : undefined
+                    newOther: { type: "sqrt", arg: other, index: node.exp }
                 };
             }
             if (inExp && !inBase) {
@@ -992,10 +1003,7 @@ function peelOnce(node, other, varName) {
                 return { domainError: "Diese Gleichung hat keine reelle Lösung – ein Betrag kann nicht negativ sein." };
             }
             return {
-                opLabel: `Betrag auflösen`,
-                newSubject: node.arg,
-                newOther: other,
-                note: "Angenommen, der Inhalt des Betrags ist ≥ 0."
+                ambiguous: "Diese Gleichung enthält einen Betrag der gesuchten Variable. Ein Betrag führt in der Regel zu zwei möglichen Lösungen (z. B. x = 5 oder x = −5) – diese Fallunterscheidung wird aktuell noch nicht unterstützt."
             };
         }
 
@@ -1027,6 +1035,12 @@ function peelOnce(node, other, varName) {
             }
             if ((node.name === "sin" || node.name === "cos") && otherVal !== null && (otherVal < -1 || otherVal > 1)) {
                 return { domainError: "Diese Gleichung hat keine reelle Lösung – Sinus- und Kosinuswerte liegen immer zwischen −1 und 1." };
+            }
+
+            if (node.name === "sin" || node.name === "cos" || node.name === "tan") {
+                return {
+                    ambiguous: `Die gesuchte Variable steht hier im Argument von ${FUNC_LABELS[node.name]}(...). Trigonometrische Funktionen sind periodisch und haben unendlich viele Lösungen – aktuell wird nur der Hauptwert unterstützt, eine vollständige Lösungsmenge wird noch nicht berechnet.`
+                };
             }
 
             return {
@@ -1092,6 +1106,7 @@ function isolate(eq, varName) {
         const result = peelOnce(targetNode, otherNode, varName);
         if (!result) return null;
         if (result.domainError) return { error: result.domainError };
+        if (result.ambiguous) return { error: result.ambiguous };
 
         steps.push({ beforeLeft: curLeft, beforeRight: curRight, opLabel: result.opLabel, note: result.note });
 
@@ -1434,14 +1449,6 @@ function validateLinearSystem() {
         return;
     }
 
-    if (equations.length > varNames.length) {
-        currentLgsEquations = null;
-        currentLgsVarNames = null;
-        disableLinearSolution();
-        showError("Es befinden sich mehr Gleichungen als Variablen im System – dieser Fall wird aktuell noch nicht unterstützt.");
-        return;
-    }
-
     currentLgsEquations = equations;
     currentLgsVarNames  = varNames;
 
@@ -1551,17 +1558,17 @@ function solveLinearSystemSubstitution(equations, varNames, targetVar) {
         }
 
         if (!chosen) {
-            return { error: findDegenerateMessage(eqs) || "Dieses Gleichungssystem lässt sich mit dem Einsetzungsverfahren aktuell nicht lösen." };
+            return { error: findDegenerateMessage(eqs) || "Dieses Gleichungssystem lässt sich mit dem Einsetzungsverfahren aktuell nicht lösen.", steps };
         }
 
         const { eqIndex, varName } = chosen;
         const isolated = isolate(eqs[eqIndex], varName);
 
         if (!isolated) {
-            return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren." };
+            return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren.", steps };
         }
         if (isolated.error) {
-            return { error: isolated.error };
+            return { error: isolated.error, steps };
         }
 
         const expr = simplify(isolated.headlineResult);
@@ -1632,6 +1639,11 @@ function renderLgsSubstitutionRechenweg(equations, result, targetVar, varNames) 
             html += `</div>`;
         }
     });
+
+    if (result.error) {
+        html += `<div class="umformBox"><div class="umformZeile"><span class="umformGleichung">${result.error}</span></div></div>`;
+        return html;
+    }
 
     html += `<div class="lgsSchrittTitel">Ergebnis</div><div class="umformBox">`;
     if (targetVar === "all") {
@@ -1708,7 +1720,60 @@ function chooseAutomaticProcedure(equations, varNames) {
     return { procedure: "addition", reason: "Da keine Variable den Koeffizienten 1 hat, vermeidet das Additionsverfahren unnötige Brüche beim Isolieren." };
 }
 
+// ── Überschüssige Gleichungen (mehr Gleichungen als Variablen) ───────────
+// Löst das System mit den ersten n Gleichungen (via Gauß, unabhängig vom
+// gewählten Verfahren) und prüft, ob die restlichen Gleichungen von dieser
+// Lösung ebenfalls erfüllt werden.
+function verifyExtraEquations(coreEquations, extraEquations, varNames) {
+    const fullSolve = solveLinearSystemGauss(coreEquations, varNames, "all");
+    if (fullSolve.error) {
+        return { verified: false };
+    }
 
+    const values = fullSolve.values;
+    let failingIndex = null;
+
+    for (let i = 0; i < extraEquations.length; i++) {
+        let left = extraEquations[i].left;
+        let right = extraEquations[i].right;
+
+        varNames.forEach(vName => {
+            left = simplify(substituteVar(left, vName, values[vName]));
+            right = simplify(substituteVar(right, vName, values[vName]));
+        });
+
+        const leftVal = tryEvalNumeric(left);
+        const rightVal = tryEvalNumeric(right);
+
+        if (leftVal === null || rightVal === null || Math.abs(leftVal - rightVal) > 1e-6) {
+            failingIndex = i;
+            break;
+        }
+    }
+
+    return { verified: true, allConsistent: failingIndex === null, failingIndex, values };
+}
+
+function renderExtraEquationsCheck(extraEquations, check, n) {
+    let html = `<div class="lgsSchrittTitel">Zusätzliche Gleichung(en) (mehr Gleichungen als Variablen)</div><div class="umformBox">`;
+
+    extraEquations.forEach((eq, i) => {
+        let status = "";
+        if (check.verified) status = (check.failingIndex === i) ? " ✗" : " ✓";
+        html += `<div class="umformZeile"><span class="umformGleichung">${renderExpr(eq.left)} = ${renderExpr(eq.right)}</span><span class="umformOperation">(${n + i + 1})${status}</span></div>`;
+    });
+
+    if (!check.verified) {
+        html += `<div class="umformHinweis">Diese zusätzliche(n) Gleichung(en) konnten nicht automatisch überprüft werden.</div>`;
+    } else if (check.allConsistent) {
+        html += `<div class="umformHinweis">Alle zusätzlichen Gleichungen werden von der Lösung erfüllt – das Gesamtsystem ist konsistent.</div>`;
+    } else {
+        html += `<div class="umformHinweis">Gleichung (${n + check.failingIndex + 1}) wird von der Lösung nicht erfüllt – das Gesamtsystem ist widersprüchlich.</div>`;
+    }
+
+    html += `</div>`;
+    return html;
+}
 
 // ── Klick-Handler (eigener Listener, rührt Phase-2-Code für "allgemein" nicht an) ──
 btnLoesen.addEventListener("click", () => {
@@ -1718,11 +1783,15 @@ btnLoesen.addEventListener("click", () => {
     const targetVar = selectVariableLinear.value;
     if (!targetVar) return;
 
+    const n = currentLgsVarNames.length;
+    const coreEquations = currentLgsEquations.slice(0, n);
+    const extraEquations = currentLgsEquations.slice(n);
+
     let verfahren = procedureSelect.value;
     let autoNote = "";
 
     if (verfahren === "automatic") {
-        const choice = chooseAutomaticProcedure(currentLgsEquations, currentLgsVarNames);
+        const choice = chooseAutomaticProcedure(coreEquations, currentLgsVarNames);
         verfahren = choice.procedure;
         const verfahrenNamen = {
             substitution: "Einsetzungsverfahren",
@@ -1736,25 +1805,46 @@ btnLoesen.addEventListener("click", () => {
     let result, rechenwegHtml;
 
     if (verfahren === "substitution") {
-        result = solveLinearSystemSubstitution(currentLgsEquations, currentLgsVarNames, targetVar);
-        if (!result.error) rechenwegHtml = renderLgsSubstitutionRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
+        result = solveLinearSystemSubstitution(coreEquations, currentLgsVarNames, targetVar);
+        rechenwegHtml = renderLgsSubstitutionRechenweg(coreEquations, result, targetVar, currentLgsVarNames);
     } else if (verfahren === "equalization") {
-        result = solveLinearSystemEqualization(currentLgsEquations, currentLgsVarNames, targetVar);
-        if (!result.error) rechenwegHtml = renderLgsEqualizationRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
+        result = solveLinearSystemEqualization(coreEquations, currentLgsVarNames, targetVar);
+        rechenwegHtml = renderLgsEqualizationRechenweg(coreEquations, result, targetVar, currentLgsVarNames);
     } else if (verfahren === "addition") {
-        result = solveLinearSystemAddition(currentLgsEquations, currentLgsVarNames, targetVar);
-        if (!result.error) rechenwegHtml = renderLgsAdditionRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
+        result = solveLinearSystemAddition(coreEquations, currentLgsVarNames, targetVar);
+        rechenwegHtml = renderLgsAdditionRechenweg(coreEquations, result, targetVar, currentLgsVarNames);
     } else if (verfahren === "gaussian") {
-        result = solveLinearSystemGauss(currentLgsEquations, currentLgsVarNames, targetVar);
-        if (!result.error) rechenwegHtml = renderLgsGaussRechenweg(currentLgsEquations, result, targetVar, currentLgsVarNames);
+        result = solveLinearSystemGauss(coreEquations, currentLgsVarNames, targetVar);
+        rechenwegHtml = renderLgsGaussRechenweg(coreEquations, result, targetVar, currentLgsVarNames);
     } else {
         showSolveErrorLinear("Dieses Lösungsverfahren ist aktuell nicht verfügbar.");
         return;
     }
 
     if (result.error) {
-        showSolveErrorLinear(result.error);
+        errorMessages.textContent = result.error;
+        errorMessages.style.display = "block";
+        loesungOutput.innerHTML = "";
+        rechenwegOutput.innerHTML = autoNote + rechenwegHtml;
+        rechenwegDiv.style.display = "flex";
         return;
+    }
+
+    // ── Überschüssige Gleichungen prüfen (mehr Gleichungen als Variablen) ──
+    let extraNote = "";
+    if (extraEquations.length > 0) {
+        const check = verifyExtraEquations(coreEquations, extraEquations, currentLgsVarNames);
+
+        if (check.verified && !check.allConsistent) {
+            errorMessages.textContent = `Das Gleichungssystem ist widersprüchlich: Gleichung ${n + check.failingIndex + 1} wird von der Lösung der ersten ${n} Gleichungen nicht erfüllt.`;
+            errorMessages.style.display = "block";
+            loesungOutput.innerHTML = "";
+            rechenwegOutput.innerHTML = autoNote + rechenwegHtml + renderExtraEquationsCheck(extraEquations, check, n);
+            rechenwegDiv.style.display = "flex";
+            return;
+        }
+
+        extraNote = renderExtraEquationsCheck(extraEquations, check, n);
     }
 
     hideError();
@@ -1767,7 +1857,7 @@ btnLoesen.addEventListener("click", () => {
         loesungOutput.innerHTML = `${formatVarName(targetVar)} = ${renderExpr(result.values[targetVar])}`;
     }
 
-    rechenwegOutput.innerHTML = autoNote + rechenwegHtml;
+    rechenwegOutput.innerHTML = autoNote + rechenwegHtml + extraNote;
     rechenwegDiv.style.display = "flex";
 });
 
@@ -1811,13 +1901,13 @@ function solveLinearSystemEqualization(equations, varNames, targetVar) {
         }
 
         if (!chosenVar) {
-            return { error: findDegenerateMessage(eqs) || "Dieses Gleichungssystem lässt sich mit dem Gleichsetzungsverfahren aktuell nicht lösen." };
+            return { error: findDegenerateMessage(eqs) || "Dieses Gleichungssystem lässt sich mit dem Gleichsetzungsverfahren aktuell nicht lösen.", steps };
         }
 
         const isolatedResults = chosenIndices.map(i => ({ idx: i, result: isolate(eqs[i], chosenVar) }));
         for (const ir of isolatedResults) {
-            if (!ir.result) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren." };
-            if (ir.result.error) return { error: ir.result.error };
+            if (!ir.result) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren.", steps };
+            if (ir.result.error) return { error: ir.result.error, steps };
         }
 
         const exprs = isolatedResults.map(ir => simplify(ir.result.headlineResult));
@@ -1843,13 +1933,13 @@ function solveLinearSystemEqualization(equations, varNames, targetVar) {
     }
 
     if (eqs.length !== 1 || remainingVars.length !== 1) {
-        return { error: "Dieses Gleichungssystem lässt sich mit dem Gleichsetzungsverfahren aktuell nicht lösen." };
+        return { error: "Dieses Gleichungssystem lässt sich mit dem Gleichsetzungsverfahren aktuell nicht lösen.", steps };
     }
 
     const lastVar = remainingVars[0];
     const finalIsolate = isolate(eqs[0], lastVar);
-    if (!finalIsolate) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren." };
-    if (finalIsolate.error) return { error: finalIsolate.error };
+    if (!finalIsolate) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren.", steps };
+    if (finalIsolate.error) return { error: finalIsolate.error, steps };
 
     const lastValue = simplify(finalIsolate.headlineResult);
     steps.push({ type: "finalSolve", varName: lastVar, isolateSteps: finalIsolate.steps, resultExpr: lastValue });
@@ -1904,6 +1994,11 @@ function renderLgsEqualizationRechenweg(equations, result, targetVar, varNames) 
             html += `<div class="umformZeile umformFinal"><span class="umformGleichung">${formatVarName(step.varName)} = ${renderExpr(step.resultExpr)}</span></div></div>`;
         }
     });
+
+    if (result.error) {
+        html += `<div class="umformBox"><div class="umformZeile"><span class="umformGleichung">${result.error}</span></div></div>`;
+        return html;
+    }
 
     html += `<div class="lgsSchrittTitel">Ergebnis</div><div class="umformBox">`;
     if (targetVar === "all") {
@@ -2017,7 +2112,7 @@ function solveLinearSystemAddition(equations, varNames, targetVar) {
             });
 
             if (normalizationFailed) {
-                return { error: "Dieses Gleichungssystem enthält Terme, die für das Additionsverfahren aktuell nicht verarbeitet werden können (z. B. eine Variable im Nenner)." };
+                return { error: "Dieses Gleichungssystem enthält Terme, die für das Additionsverfahren aktuell nicht verarbeitet werden können (z. B. eine Variable im Nenner).", steps };
             }
 
             if (found.length >= 2) {
@@ -2028,7 +2123,7 @@ function solveLinearSystemAddition(equations, varNames, targetVar) {
         }
 
         if (!chosenVar) {
-            return { error: findDegenerateMessage(workingEquations) || "Dieses Gleichungssystem lässt sich mit dem Additionsverfahren aktuell nicht lösen." };
+            return { error: findDegenerateMessage(workingEquations) || "Dieses Gleichungssystem lässt sich mit dem Additionsverfahren aktuell nicht lösen.", steps };
         }
 
         // Pivot = erste Gleichung mit dieser Variable; ALLE weiteren
@@ -2050,7 +2145,7 @@ function solveLinearSystemAddition(equations, varNames, targetVar) {
             const newEq = addEquations(scaledA, scaledB);
 
             if (containsVar(newEq.left, chosenVar) || containsVar(newEq.right, chosenVar)) {
-                return { error: "Dieses Gleichungssystem lässt sich mit dem Additionsverfahren aktuell nicht lösen." };
+                return { error: "Dieses Gleichungssystem lässt sich mit dem Additionsverfahren aktuell nicht lösen.", steps };
             }
 
             eliminationSteps.push({ eqA: pivotEq, eqB: otherEq, kA, kB, scaledA, scaledB, newEq });
@@ -2067,14 +2162,14 @@ function solveLinearSystemAddition(equations, varNames, targetVar) {
         eliminationOrder.push(chosenVar);
     }
 
-    if (workingEquations.length !== 1 || remainingVars.length !== 1) {
-        return { error: "Dieses Gleichungssystem lässt sich mit dem Additionsverfahren aktuell nicht lösen." };
+   if (workingEquations.length !== 1 || remainingVars.length !== 1) {
+        return { error: "Dieses Gleichungssystem lässt sich mit dem Additionsverfahren aktuell nicht lösen.", steps };
     }
 
     const lastVar = remainingVars[0];
     const finalIsolate = isolate(workingEquations[0], lastVar);
-    if (!finalIsolate) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren." };
-    if (finalIsolate.error) return { error: finalIsolate.error };
+    if (!finalIsolate) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren.", steps };
+    if (finalIsolate.error) return { error: finalIsolate.error, steps };
 
     const values = { [lastVar]: simplify(finalIsolate.headlineResult) };
     steps.push({ type: "finalSolve", varName: lastVar, isolateSteps: finalIsolate.steps, resultExpr: values[lastVar] });
@@ -2096,8 +2191,8 @@ function solveLinearSystemAddition(equations, varNames, targetVar) {
         });
 
         const backIsolate = isolate(refEq, vName);
-        if (!backIsolate) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren." };
-        if (backIsolate.error) return { error: backIsolate.error };
+        if (!backIsolate) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren.", steps };
+        if (backIsolate.error) return { error: backIsolate.error, steps };
 
         values[vName] = simplify(backIsolate.headlineResult);
         steps.push({ type: "backSubstitute", varName: vName, refEq: referenceEquations[vName], substSteps, isolateSteps: backIsolate.steps, resultExpr: values[vName] });
@@ -2153,6 +2248,11 @@ function renderLgsAdditionRechenweg(equations, result, targetVar, varNames) {
             html += `<div class="umformZeile umformFinal"><span class="umformGleichung">${formatVarName(step.varName)} = ${renderExpr(step.resultExpr)}</span></div></div>`;
         }
     });
+
+    if (result.error) {
+        html += `<div class="umformBox"><div class="umformZeile"><span class="umformGleichung">${result.error}</span></div></div>`;
+        return html;
+    }
 
     html += `<div class="lgsSchrittTitel">Ergebnis</div><div class="umformBox">`;
     if (targetVar === "all") {
@@ -2220,13 +2320,30 @@ function solveLinearSystemGauss(equations, varNames, targetVar) {
 
     for (let pivotCol = 0; pivotCol < n; pivotCol++) {
         let pivotRow = pivotCol;
-        let maxAbs = Math.abs(matrix[pivotRow][pivotCol]);
+
+        // Größten verfügbaren Pivot in dieser Spalte ermitteln (nur für die
+        // Stabilitätsprüfung unten – wird nur bei Bedarf tatsächlich genutzt).
+        let bestRow = pivotCol;
+        let bestAbs = Math.abs(matrix[pivotCol][pivotCol]);
         for (let r = pivotCol + 1; r < n; r++) {
-            if (Math.abs(matrix[r][pivotCol]) > maxAbs) {
-                maxAbs = Math.abs(matrix[r][pivotCol]);
-                pivotRow = r;
+            if (Math.abs(matrix[r][pivotCol]) > bestAbs) {
+                bestAbs = Math.abs(matrix[r][pivotCol]);
+                bestRow = r;
             }
         }
+
+        const naturalAbs = Math.abs(matrix[pivotRow][pivotCol]);
+
+        // Zeilen nur vertauschen, wenn der natürliche Pivot (praktisch) 0 ist
+        // ODER deutlich kleiner (Faktor 1000+) als der größte verfügbare Pivot
+        // in der Spalte. Der zweite Fall schützt vor Rechenungenauigkeiten durch
+        // Division mit sehr kleinen Zahlen, ohne bei normalen Schulaufgaben
+        // (ähnlich große Koeffizienten) unnötig Zeilen zu tauschen.
+        if (naturalAbs < 1e-9 || (bestAbs > 1e-9 && naturalAbs < bestAbs / 1000)) {
+            pivotRow = bestRow;
+        }
+
+        const maxAbs = Math.abs(matrix[pivotRow][pivotCol]);
 
         if (maxAbs < 1e-9) {
             let hasContradiction = false;
@@ -2238,9 +2355,9 @@ function solveLinearSystemGauss(equations, varNames, targetVar) {
                     else hasRedundant = true;
                 }
             }
-            if (hasContradiction) return { error: "Dieses Gleichungssystem hat keine Lösung." };
-            if (hasRedundant) return { error: "Dieses Gleichungssystem hat unendlich viele Lösungen." };
-            return { error: "Dieses Gleichungssystem hat keine eindeutige Lösung." };
+            if (hasContradiction) return { error: "Dieses Gleichungssystem hat keine Lösung.", steps, initialMatrix, initialLabels: ROW_LABELS.slice(0, n), varNamesUsed: orderedVarNames };
+            if (hasRedundant) return { error: "Dieses Gleichungssystem hat unendlich viele Lösungen.", steps, initialMatrix, initialLabels: ROW_LABELS.slice(0, n), varNamesUsed: orderedVarNames };
+            return { error: "Dieses Gleichungssystem hat keine eindeutige Lösung.", steps, initialMatrix, initialLabels: ROW_LABELS.slice(0, n), varNamesUsed: orderedVarNames };
         }
 
         if (pivotRow !== pivotCol) {
@@ -2266,7 +2383,7 @@ function solveLinearSystemGauss(equations, varNames, targetVar) {
 
     for (let i = 0; i < n; i++) {
         if (Math.abs(matrix[i][i]) < 1e-9) {
-            return { error: "Dieses Gleichungssystem hat keine eindeutige Lösung." };
+            return { error: "Dieses Gleichungssystem hat keine eindeutige Lösung.", steps, initialMatrix, initialLabels: ROW_LABELS.slice(0, n), varNamesUsed: orderedVarNames };
         }
     }
 
@@ -2289,8 +2406,8 @@ function solveLinearSystemGauss(equations, varNames, targetVar) {
         }
 
         const isoResult = isolate(eq, vName);
-        if (!isoResult) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren." };
-        if (isoResult.error) return { error: isoResult.error };
+        if (!isoResult) return { error: "Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren.", steps, initialMatrix, initialLabels: ROW_LABELS.slice(0, n), varNamesUsed: orderedVarNames };
+        if (isoResult.error) return { error: isoResult.error, steps, initialMatrix, initialLabels: ROW_LABELS.slice(0, n), varNamesUsed: orderedVarNames };
 
         values[vName] = simplify(isoResult.headlineResult);
         steps.push({
@@ -2325,17 +2442,20 @@ function renderGaussMatrix(matrix, labels, varNames, opLabel) {
 
 function renderLgsGaussRechenweg(equations, result, targetVar, varNames) {
     const matrixVarNames = result.varNamesUsed || varNames;
+    const initialLabels = result.initialLabels || ROW_LABELS.slice(0, equations.length);
 
     let html = `<div class="lgsSchrittTitel">Ausgangssystem</div><div class="umformBox">`;
     equations.forEach((eq, i) => {
-        html += `<div class="umformZeile"><span class="umformGleichung">${renderExpr(eq.left)} = ${renderExpr(eq.right)}</span><span class="umformOperation">(${result.initialLabels[i]})</span></div>`;
+        html += `<div class="umformZeile"><span class="umformGleichung">${renderExpr(eq.left)} = ${renderExpr(eq.right)}</span><span class="umformOperation">(${initialLabels[i]})</span></div>`;
     });
     html += `</div>`;
 
-    html += `<div class="lgsSchrittTitel">Erweiterte Koeffizientenmatrix</div>`;
-    html += renderGaussMatrix(result.initialMatrix, result.initialLabels, matrixVarNames, null);
+    if (result.initialMatrix) {
+        html += `<div class="lgsSchrittTitel">Erweiterte Koeffizientenmatrix</div>`;
+        html += renderGaussMatrix(result.initialMatrix, initialLabels, matrixVarNames, null);
+    }
 
-    result.steps.forEach(step => {
+    (result.steps || []).forEach(step => {
         if (step.type === "swap") {
             html += renderGaussMatrix(step.matrix, step.labels, matrixVarNames, `${step.labelA} ↔ ${step.labelB} tauschen`);
         } else if (step.type === "eliminate") {
@@ -2347,6 +2467,11 @@ function renderLgsGaussRechenweg(equations, result, targetVar, varNames) {
             html += renderGaussMatrix(step.matrix, step.labels, matrixVarNames, opLabel);
         }
     });
+
+    if (result.error) {
+        html += `<div class="umformBox"><div class="umformZeile"><span class="umformGleichung">${result.error}</span></div></div>`;
+        return html;
+    }
 
     html += `<div class="lgsSchrittTitel">Rückwärtseinsetzen</div>`;
     result.steps.filter(s => s.type === "backSubstitute").forEach(step => {

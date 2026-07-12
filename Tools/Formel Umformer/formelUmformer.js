@@ -305,17 +305,24 @@ function parseEquation(tokens) {
                     advance();
                     base = parseSubscriptExpr();
                 }
+                let funcExponent = null;
+                if (peek().type === "CARET") {
+                    advance();
+                    funcExponent = parseExponent();
+                }
                 if (peek().type === "LPAREN") {
                     advance();
                     const arg = parseExpression();
                     expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
-                    return { type: "func", name: t.name, arg, base };
+                    const funcNode = { type: "func", name: t.name, arg, base };
+                    return funcExponent ? { type: "pow", base: funcNode, exp: funcExponent } : funcNode;
                 }
                 if (!startsAtom(peek().type) && peek().type !== "MINUS") {
                     throw new FormulaError(`Nach der Funktion „${t.name}" fehlt ein Argument (z. B. eine Zahl, Variable oder Klammer).`);
                 }
                 const arg = parseFuncArgNoParens();
-                return { type: "func", name: t.name, arg, base };
+                const funcNode = { type: "func", name: t.name, arg, base };
+                return funcExponent ? { type: "pow", base: funcNode, exp: funcExponent } : funcNode;
             }
 
             default:
@@ -404,6 +411,45 @@ function flattenTerms(node, sign, terms) {
     }
 }
 
+// Struktureller Schlüssel eines Ausdrucks, um gleichartige Terme (z.B. 3x
+// und 2x, oder 3·√x und √x) unabhängig vom Vorfaktor zu erkennen.
+function structuralKey(node) {
+    switch (node.type) {
+        case "num": return `num:${node.value}`;
+        case "const": return `const:${node.name}`;
+        case "var": return `var:${node.name}`;
+        case "neg": return `neg:${structuralKey(node.arg)}`;
+        case "add": return `add:${structuralKey(node.left)}:${structuralKey(node.right)}`;
+        case "sub": return `sub:${structuralKey(node.left)}:${structuralKey(node.right)}`;
+        case "mul": return `mul:${structuralKey(node.left)}:${structuralKey(node.right)}`;
+        case "div": return `div:${structuralKey(node.left)}:${structuralKey(node.right)}`;
+        case "pow": return `pow:${structuralKey(node.base)}:${structuralKey(node.exp)}`;
+        case "sqrt": return `sqrt:${structuralKey(node.arg)}:${node.index ? structuralKey(node.index) : ""}`;
+        case "abs": return `abs:${structuralKey(node.arg)}`;
+        case "func": return `func:${node.name}:${structuralKey(node.arg)}:${node.base ? structuralKey(node.base) : ""}`;
+        default: return "?";
+    }
+}
+
+// Zerlegt einen Term in Vorfaktor und "Basis" (z.B. 3·x -> Vorfaktor 3, Basis x).
+function extractCoefficient(node) {
+    if (node.type === "mul") {
+        if (node.left.type === "num") {
+            const inner = extractCoefficient(node.right);
+            return { coeff: node.left.value * inner.coeff, base: inner.base };
+        }
+        if (node.right.type === "num") {
+            const inner = extractCoefficient(node.left);
+            return { coeff: node.right.value * inner.coeff, base: inner.base };
+        }
+    }
+    if (node.type === "div" && node.right.type === "num" && node.right.value !== 0) {
+        const inner = extractCoefficient(node.left);
+        return { coeff: inner.coeff / node.right.value, base: inner.base };
+    }
+    return { coeff: 1, base: node };
+}
+
 function combineAddSub(node) {
     const terms = [];
     flattenTerms(node, 1, terms);
@@ -422,25 +468,54 @@ function combineAddSub(node) {
     });
     constantSum = exaktRunden(constantSum);
 
-    if (symbolicTerms.length === 0) return numNode(constantSum);
+    // Gleichartige Terme zusammenfassen (z.B. 3x + 2x -> 5x, 2x − x -> x),
+    // damit eine Variable auch bei mehreren Vorfaktoren isolierbar bleibt.
+    const groups = [];
+    const groupIndexByKey = new Map();
+
+    symbolicTerms.forEach(t => {
+        const { coeff, base } = extractCoefficient(t.node);
+        const key = structuralKey(base);
+        const signedCoeff = t.sign * coeff;
+
+        if (groupIndexByKey.has(key)) {
+            groups[groupIndexByKey.get(key)].coeff += signedCoeff;
+        } else {
+            groupIndexByKey.set(key, groups.length);
+            groups.push({ base, coeff: signedCoeff });
+        }
+    });
+
+    const combinedTerms = groups
+        .map(g => ({ coeff: exaktRunden(g.coeff), base: g.base }))
+        .filter(g => g.coeff !== 0)
+        .map(g => {
+            if (g.coeff === 1)  return { sign: 1,  node: g.base };
+            if (g.coeff === -1) return { sign: -1, node: g.base };
+            return g.coeff > 0
+                ? { sign: 1,  node: { type: "mul", left: numNode(g.coeff), right: g.base } }
+                : { sign: -1, node: { type: "mul", left: numNode(-g.coeff), right: g.base } };
+        });
+
+    if (combinedTerms.length === 0) return numNode(constantSum);
 
     // Bevorzugt einen positiven symbolischen Term als Start. Gibt es keinen,
     // aber eine positive Konstante, führt die Konstante (z.B. "5 − λ_2" statt
     // "−λ_2 + 5"). Nur wenn beides fehlt, wird der erste Term negiert.
-    const firstPosIdx = symbolicTerms.findIndex(t => t.sign === 1);
+    const firstPosIdx = combinedTerms.findIndex(t => t.sign === 1);
     const leadWithConstant = firstPosIdx === -1 && hasConstant && constantSum > 0;
 
     let result, remainingSymbolic;
 
     if (firstPosIdx !== -1) {
-        result = symbolicTerms[firstPosIdx].node;
-        remainingSymbolic = symbolicTerms.filter((_, i) => i !== firstPosIdx);
+        result = combinedTerms[firstPosIdx].node;
+        remainingSymbolic = combinedTerms.filter((_, i) => i !== firstPosIdx);
     } else if (leadWithConstant) {
         result = numNode(constantSum);
-        remainingSymbolic = symbolicTerms;
+        remainingSymbolic = combinedTerms;
     } else {
-        result = { type: "neg", arg: symbolicTerms[0].node };
-        remainingSymbolic = symbolicTerms.slice(1);
+        result = { type: "neg", arg: combinedTerms[0].node };
+        remainingSymbolic = combinedTerms.slice(1);
     }
 
     remainingSymbolic.forEach(t => {
@@ -479,16 +554,44 @@ function simplify(node) {
 
         case "mul": {
             const left = simplify(node.left), right = simplify(node.right);
+
+            // Distributivgesetz: a·(b±c) -> a·b ± a·c (und gespiegelt (b±c)·a)
+            if (left.type === "add" || left.type === "sub") {
+                return simplify({ type: left.type, left: { type: "mul", left: left.left, right }, right: { type: "mul", left: left.right, right } });
+            }
+            if (right.type === "add" || right.type === "sub") {
+                return simplify({ type: right.type, left: { type: "mul", left, right: right.left }, right: { type: "mul", left, right: right.right } });
+            }
+
             if (left.type === "num" && right.type === "num") return numNode(left.value * right.value);
             if (left.type === "num" && left.value === 0) return numNode(0);
             if (right.type === "num" && right.value === 0) return numNode(0);
             if (left.type === "num" && left.value === 1) return right;
             if (right.type === "num" && right.value === 1) return left;
+
+            // Koeffizienten-Folding bei verschachtelter Multiplikation: a·(b·c) -> (a·b)·c,
+            // falls a und b Zahlen sind – sonst bleiben z.B. 2·(3·x) und 6·x strukturell
+            // verschieden und combineAddSub kann gleichartige Terme nicht zusammenfassen.
+            if (left.type === "num" && right.type === "mul") {
+                if (right.left.type === "num")  return simplify({ type: "mul", left: numNode(left.value * right.left.value),  right: right.right });
+                if (right.right.type === "num") return simplify({ type: "mul", left: numNode(left.value * right.right.value), right: right.left });
+            }
+            if (right.type === "num" && left.type === "mul") {
+                if (left.left.type === "num")  return simplify({ type: "mul", left: numNode(right.value * left.left.value),  right: left.right });
+                if (left.right.type === "num") return simplify({ type: "mul", left: numNode(right.value * left.right.value), right: left.left });
+            }
+
             return { type: "mul", left, right };
         }
 
         case "div": {
             const left = simplify(node.left), right = simplify(node.right);
+
+            // Distribution bei Division durch eine Zahl: (a±b)/c -> a/c ± b/c
+            if ((left.type === "add" || left.type === "sub") && right.type === "num" && right.value !== 0) {
+                return simplify({ type: left.type, left: { type: "div", left: left.left, right }, right: { type: "div", left: left.right, right } });
+            }
+
             if (left.type === "num" && right.type === "num" && right.value !== 0) return numNode(left.value / right.value);
             if (left.type === "num" && left.value === 0 && right.type !== "num") return numNode(0);
             if (right.type === "num" && right.value === 1) return left;
@@ -503,14 +606,25 @@ function simplify(node) {
             return { type: "pow", base, exp };
         }
 
-        case "sqrt":
-            return { type: "sqrt", arg: simplify(node.arg), index: node.index ? simplify(node.index) : null };
+        case "sqrt": {
+            const arg = simplify(node.arg);
+            const index = node.index ? simplify(node.index) : null;
+            const numeric = tryEvalNumeric({ type: "sqrt", arg, index });
+            return numeric !== null ? numNode(numeric) : { type: "sqrt", arg, index };
+        }
 
-        case "abs":
-            return { type: "abs", arg: simplify(node.arg) };
+        case "abs": {
+            const arg = simplify(node.arg);
+            const numeric = tryEvalNumeric({ type: "abs", arg });
+            return numeric !== null ? numNode(numeric) : { type: "abs", arg };
+        }
 
-        case "func":
-            return { type: "func", name: node.name, arg: simplify(node.arg), base: node.base ? simplify(node.base) : null };
+        case "func": {
+            const arg = simplify(node.arg);
+            const base = node.base ? simplify(node.base) : null;
+            const numeric = tryEvalNumeric({ type: "func", name: node.name, arg, base });
+            return numeric !== null ? numNode(numeric) : { type: "func", name: node.name, arg, base };
+        }
 
         default:
             return node;
@@ -749,11 +863,16 @@ function peelOnce(node, other, varName) {
                     return { domainError: "Diese Gleichung hat keine reelle Lösung – eine gerade Potenz kann nicht negativ werden." };
                 }
 
+                if (isEven) {
+                    return {
+                        ambiguous: `Die gesuchte Variable steht hier in einer geraden Potenz (${isSquare ? "Quadrat" : `Exponent ${opnd(node.exp)}`}). Das führt in der Regel zu zwei möglichen Lösungen (positiver und negativer Lösungszweig) – diese Fallunterscheidung wird aktuell noch nicht unterstützt.`
+                    };
+                }
+
                 return {
-                    opLabel: isSquare ? `√` : `${opnd(node.exp)}√`,
+                    opLabel: `${opnd(node.exp)}√`,
                     newSubject: node.base,
-                    newOther: { type: "sqrt", arg: other, index: isSquare ? null : node.exp },
-                    note: isEven ? "Es wird der positive Lösungszweig angenommen." : undefined
+                    newOther: { type: "sqrt", arg: other, index: node.exp }
                 };
             }
             if (inExp && !inBase) {
@@ -802,10 +921,7 @@ function peelOnce(node, other, varName) {
                 return { domainError: "Diese Gleichung hat keine reelle Lösung – ein Betrag kann nicht negativ sein." };
             }
             return {
-                opLabel: `Betrag auflösen`,
-                newSubject: node.arg,
-                newOther: other,
-                note: "Angenommen, der Inhalt des Betrags ist ≥ 0."
+                ambiguous: "Diese Gleichung enthält einen Betrag der gesuchten Variable. Ein Betrag führt in der Regel zu zwei möglichen Lösungen (z. B. x = 5 oder x = −5) – diese Fallunterscheidung wird aktuell noch nicht unterstützt."
             };
         }
 
@@ -839,6 +955,12 @@ function peelOnce(node, other, varName) {
                 return { domainError: "Diese Gleichung hat keine reelle Lösung – Sinus- und Kosinuswerte liegen immer zwischen −1 und 1." };
             }
 
+            if (node.name === "sin" || node.name === "cos" || node.name === "tan") {
+                return {
+                    ambiguous: `Die gesuchte Variable steht hier im Argument von ${FUNC_LABELS[node.name]}(...). Trigonometrische Funktionen sind periodisch und haben unendlich viele Lösungen – aktuell wird nur der Hauptwert unterstützt, eine vollständige Lösungsmenge wird noch nicht berechnet.`
+                };
+            }
+
             return {
                 opLabel: `${FUNC_LABELS[invName]}( )`,
                 newSubject: node.arg,
@@ -858,6 +980,30 @@ function isolate(eq, varName) {
 
     if (!containsVar(curLeft, varName) && !containsVar(curRight, varName)) return null;
 
+    // Variable auf BEIDEN Seiten (z.B. "5x + 2 = 3x + 10"): zuerst alle
+    // Variablen-Terme der rechten Seite auf die linke bringen und
+    // zusammenfassen ("Variablen zusammenfassen" wie in der Schule).
+    if (containsVar(curLeft, varName) && containsVar(curRight, varName)) {
+        const rightTerms = [];
+        flattenTerms(curRight, 1, rightTerms);
+        const rightVarTerm = rightTerms.find(t => containsVar(t.node, varName));
+
+        const beforeLeft = curLeft, beforeRight = curRight;
+        const opLabel = rightVarTerm.sign === 1 ? `− ${opnd(rightVarTerm.node)}` : `+ ${opnd(rightVarTerm.node)}`;
+        const buildOp = rightVarTerm.sign === 1 ? "sub" : "add";
+
+        const newLeft = simplify({ type: buildOp, left: curLeft, right: rightVarTerm.node });
+        const newRight = simplify({ type: buildOp, left: curRight, right: rightVarTerm.node });
+
+        if (countVarOccurrences(newLeft, varName) + countVarOccurrences(newRight, varName) !== 1) {
+            return null;
+        }
+
+        steps.push({ beforeLeft, beforeRight, opLabel });
+        curLeft = newLeft;
+        curRight = newRight;
+    }
+
     let guard = 0;
     while (!((curLeft.type === "var" && curLeft.name === varName) ||
              (curRight.type === "var" && curRight.name === varName))) {
@@ -870,6 +1016,7 @@ function isolate(eq, varName) {
         const result = peelOnce(targetNode, otherNode, varName);
         if (!result) return null;
         if (result.domainError) return { error: result.domainError };
+        if (result.ambiguous) return { error: result.ambiguous };
 
         steps.push({ beforeLeft: curLeft, beforeRight: curRight, opLabel: result.opLabel, note: result.note });
 
@@ -887,7 +1034,7 @@ function isolate(eq, varName) {
 }
 
 function canSolveFor(eq, varName) {
-    if (countVarOccurrences(eq.left, varName) + countVarOccurrences(eq.right, varName) !== 1) return false;
+    if (countVarOccurrences(eq.left, varName) + countVarOccurrences(eq.right, varName) === 0) return false;
     return isolate(eq, varName) !== null;
 }
 

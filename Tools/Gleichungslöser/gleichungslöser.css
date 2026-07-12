@@ -481,6 +481,8 @@
 
 .gaussMatrixBlock {
     margin: 0.6rem 0;
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 .gaussOpLabel {
@@ -558,5 +560,9 @@
     }
     .umformOperation {
         font-size: 0.78rem;
+    }
+    .gaussMatrix td {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.85rem;
     }
 }

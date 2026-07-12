@@ -126,12 +126,25 @@ export const tools = [
             big:   `${BASE}/pictures/FormelUmformer.jpg`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
+    },
+    {
+        id:       "card10",
+        title:    "Gleichungslöser",
+        group:    "algebra",
+        filename: "gleichungslöser.html",
+        url:      `${BASE}/Tools/Gleichungslöser/gleichungslöser.html`,
+        tags:     ["gleichung", "linear", "lösen", "algebra", "lineare-gleichungen", "Verfahren"],
+        info:      "Löst allgemeine und lineare Gleichungssysteme – inklusive automatischer Auswahl des besten Lösungsverfahrens.",
+        image: {
+            big:   `${BASE}/pictures/Gleichungslöser.jpg`,
+            small: `${BASE}/pictures/icons/meinTool-icon.png`
+        }
     }
 
     // -----------------------------------------------------------------------
     // Neues Tool hinzufügen? Schema:
     // {
-    //     id:       "card9",
+    //     id:       "card11",
     //     title:    "Tool Titel",
     //     group:    "eine-der-gruppen-ids",
     //     filename: "meinTool.html",
