@@ -37,25 +37,85 @@
             <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
 
             <div class="zahlenAusgabestyle" id="ausgabeContainer">
-                <div class="ergebnisGrid">
-                    <div class="ergebnisItem"><p class="ergebnisLabel">Summe</p><p id="ausgabeSumme" class="ergebnisValue"></p></div>
-                    <div class="ergebnisItem"><p class="ergebnisLabel">Maximum</p><p id="ausgabeMax" class="ergebnisValue"></p></div>
-                    <div class="ergebnisItem"><p class="ergebnisLabel">Minimum</p><p id="ausgabeMin" class="ergebnisValue"></p></div>
-                    <div class="ergebnisItem"><p class="ergebnisLabel">Durchschnitt</p><p id="ausgabeDurchschnitt" class="ergebnisValue"></p></div>
-                    <div class="ergebnisItem">
-                        <p class="ergebnisLabel">
-                            ggT
-                            <i class="fa fa-info-circle infoIcon" data-info="Größter gemeinsamer Teiler"></i>
-                        </p>
-                        <p id="ausgabeGgt" class="ergebnisValue"></p>
+
+                <!-- Gruppe 1: Kennzahlen (bestehend) -->
+                <div class="ergebnisGruppe">
+                    <p class="ergebnisGruppenTitel">Kennzahlen</p>
+                    <div class="ergebnisGrid">
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Summe</p><p id="ausgabeSumme" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Maximum</p><p id="ausgabeMax" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Minimum</p><p id="ausgabeMin" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Durchschnitt</p><p id="ausgabeDurchschnitt" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem">
+                            <p class="ergebnisLabel">
+                                ggT
+                                <i class="fa fa-info-circle infoIcon" data-info="Größter gemeinsamer Teiler"></i>
+                            </p>
+                            <p id="ausgabeGgt" class="ergebnisValue"></p>
+                        </div>
+                        <div class="ergebnisItem">
+                            <p class="ergebnisLabel">
+                                kgV
+                                <i class="fa fa-info-circle infoIcon" data-info="Kleinstes gemeinsames Vielfaches"></i>
+                            </p>
+                            <p id="ausgabeKgv" class="ergebnisValue"></p>
+                        </div>
                     </div>
-                    <div class="ergebnisItem">
-                        <p class="ergebnisLabel">
-                            kgV
-                            <i class="fa fa-info-circle infoIcon" data-info="Kleinstes gemeinsames Vielfaches"></i>
-                        </p>
-                        <p id="ausgabeKgv" class="ergebnisValue"></p>
+                </div>
+
+                <!-- Gruppe 2: Grundlegende Statistik (neu) -->
+                <div class="ergebnisGruppe">
+                    <p class="ergebnisGruppenTitel">Grundlegende Statistik</p>
+                    <div class="ergebnisGrid">
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Median</p><p id="ausgabeMedian" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem">
+                            <p class="ergebnisLabel">
+                                Modus
+                                <i class="fa fa-info-circle infoIcon" data-info="Der/die am häufigsten vorkommende(n) Wert(e)"></i>
+                            </p>
+                            <p id="ausgabeModus" class="ergebnisValue"></p>
+                        </div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Spannweite</p><p id="ausgabeSpannweite" class="ergebnisValue"></p></div>
                     </div>
+                </div>
+
+                <!-- Gruppe 3: Erweiterte Statistik (neu) -->
+                <div class="ergebnisGruppe">
+                    <p class="ergebnisGruppenTitel">Erweiterte Statistik</p>
+                    <div class="ergebnisGrid">
+                        <div class="ergebnisItem">
+                            <p class="ergebnisLabel">
+                                Varianz
+                                <i class="fa fa-info-circle infoIcon" data-info="Durchschnittliche quadratische Abweichung vom Mittelwert"></i>
+                            </p>
+                            <p id="ausgabeVarianz" class="ergebnisValue"></p>
+                        </div>
+                        <div class="ergebnisItem">
+                            <p class="ergebnisLabel">
+                                Standardabw.
+                                <i class="fa fa-info-circle infoIcon" data-info="Quadratwurzel der Varianz"></i>
+                            </p>
+                            <p id="ausgabeStdAbw" class="ergebnisValue"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gruppe 4: Datenübersicht (neu) -->
+                <div class="ergebnisGruppe">
+                    <p class="ergebnisGruppenTitel">Datenübersicht</p>
+                    <div class="ergebnisGrid">
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Anzahl</p><p id="ausgabeAnzahl" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Positiv</p><p id="ausgabePositiv" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Negativ</p><p id="ausgabeNegativ" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Nullen</p><p id="ausgabeNullen" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Eindeutige Werte</p><p id="ausgabeEindeutig" class="ergebnisValue"></p></div>
+                    </div>
+                </div>
+
+                <!-- Gruppe 5: Sortierte Liste (neu, eigener Block statt Grid-Zelle) -->
+                <div class="ergebnisGruppe ergebnisGruppeSortiert">
+                    <p class="ergebnisGruppenTitel">Sortierte Liste (aufsteigend)</p>
+                    <p id="ausgabeSortiert" class="sortierteListeBox"></p>
                 </div>
 
                 <div class="rechenwegDiv">

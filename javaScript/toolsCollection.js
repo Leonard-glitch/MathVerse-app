@@ -6,7 +6,8 @@ export const groups = [
     { id: "algebra",       title: "Algebra",       icon: "fa-bar-chart" },
     { id: "geometrie",     title: "Geometrie",     icon: "fa-circle-o" },
     { id: "statistik",     title: "Statistik",     icon: "fa-line-chart" },
-    { id: "einheiten",     title: "Einheiten",     icon: "fa-arrows-h" }
+    { id: "einheiten",     title: "Einheiten",     icon: "fa-arrows-h" },
+    { id: "finanzen",      title: "Finanzen",      icon: "fa-money" }
 ];
 
 export const tools = [
