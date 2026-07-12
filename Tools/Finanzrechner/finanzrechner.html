@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzrechner</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../../css/feedback.css">
+    <link rel="stylesheet" href="../../css/Common/common.css">
+    <link rel="stylesheet" href="./finanzrechner.css">
+</head>
+<body>
+        <header>
+        <nav class="navbar">
+        <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div>
+            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+            <div id="searchResults"></div>
+        </div>
+
+        <div id="navUserArea"><a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
+            <a href="../../html/register.html" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
+    </header>
+
+    <main class="finanzrechnerMain">
+        <section class="finanzenSection" aria-labelledby="pageTitle">
+            
+            <h1 id="pageTitle" class="zahlenHeader">Finanzrechner</h1>
+
+            <div class="calculatorShell">
+                <div class="calculatorToolbar">
+                    <div
+                        class="finanzenTypeTabs"
+                        role="tablist"
+                        aria-label="Berechnungsart auswählen"
+                    >
+                        <button
+                            type="button"
+                            class="finanzenTypeBtn active"
+                            id="tabButton-sparplan"
+                            role="tab"
+                            aria-selected="true"
+                            aria-controls="tab-sparplan"
+                            tabindex="0"
+                            data-tab="sparplan"
+                        >
+                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                            <span>Sparplan</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="finanzenTypeBtn"
+                            id="tabButton-inflation"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="tab-inflation"
+                            tabindex="-1"
+                            data-tab="inflation"
+                        >
+                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                            <span>Inflation</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="finanzenTypeBtn"
+                            id="tabButton-rendite"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="tab-rendite"
+                            tabindex="-1"
+                            data-tab="rendite"
+                        >
+                            <i class="fa fa-percent" aria-hidden="true"></i>
+                            <span>Rendite</span>
+                        </button>
+                    </div>
+
+                    <button type="button" class="resetButton" id="resetCalculator">
+                        <i class="fa fa-undo" aria-hidden="true"></i>
+                        Zurücksetzen
+                    </button>
+                </div>
+
+                <p class="instructionText">
+                    Werte direkt eingeben oder über die Regler anpassen. Die Berechnung
+                    aktualisiert sich automatisch.
+                </p>
+
+                <div class="calculatorGrid">
+                    <div class="inputPanel">
+                        <div
+                            id="tab-sparplan"
+                            class="tabContent active"
+                            role="tabpanel"
+                            aria-labelledby="tabButton-sparplan"
+                        >
+                            <div class="panelHeading">
+                                <div>
+                                    <span class="sectionKicker">Vermögensaufbau</span>
+                                    <h2>Sparplan konfigurieren</h2>
+                                </div>
+                                <span class="liveBadge">
+                                    <span aria-hidden="true"></span>
+                                    Live
+                                </span>
+                            </div>
+
+                            <div class="inputGrid">
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="sparStart">Startkapital</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="sparStart"
+                                                min="0"
+                                                max="1000000"
+                                                step="500"
+                                                value="10000"
+                                                inputmode="decimal"
+                                            >
+                                            <span>€</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="sparStartSlider"
+                                        min="0"
+                                        max="100000"
+                                        step="500"
+                                        value="10000"
+                                        class="finanzenSlider"
+                                        aria-label="Startkapital einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>0 €</span>
+                                        <span>100.000 €</span>
+                                    </div>
+                                </div>
+
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="sparRate">Monatliche Sparrate</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="sparRate"
+                                                min="0"
+                                                max="100000"
+                                                step="25"
+                                                value="150"
+                                                inputmode="decimal"
+                                            >
+                                            <span>€</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="sparRateSlider"
+                                        min="0"
+                                        max="2000"
+                                        step="25"
+                                        value="150"
+                                        class="finanzenSlider"
+                                        aria-label="Monatliche Sparrate einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>0 €</span>
+                                        <span>2.000 €</span>
+                                    </div>
+                                </div>
+
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="sparZins">
+                                            Erwartete Rendite
+                                            <button
+                                                type="button"
+                                                class="infoButton"
+                                                data-tooltip="Nominale jährliche Rendite vor Steuern, Gebühren und Inflation."
+                                                aria-label="Information zur erwarteten Rendite"
+                                            >
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="sparZins"
+                                                min="0"
+                                                max="100"
+                                                step="0.1"
+                                                value="5"
+                                                inputmode="decimal"
+                                            >
+                                            <span>% p.a.</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="sparZinsSlider"
+                                        min="0"
+                                        max="15"
+                                        step="0.1"
+                                        value="5"
+                                        class="finanzenSlider"
+                                        aria-label="Erwartete Rendite einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>0 %</span>
+                                        <span>15 %</span>
+                                    </div>
+                                </div>
+
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="sparJahre">Anlagedauer</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="sparJahre"
+                                                min="1"
+                                                max="100"
+                                                step="1"
+                                                value="10"
+                                                inputmode="numeric"
+                                            >
+                                            <span>Jahre</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="sparJahreSlider"
+                                        min="1"
+                                        max="50"
+                                        step="1"
+                                        value="10"
+                                        class="finanzenSlider"
+                                        aria-label="Anlagedauer einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>1 Jahr</span>
+                                        <span>50 Jahre</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            id="tab-inflation"
+                            class="tabContent"
+                            role="tabpanel"
+                            aria-labelledby="tabButton-inflation"
+                            hidden
+                        >
+                            <div class="panelHeading">
+                                <div>
+                                    <span class="sectionKicker">Kaufkraft</span>
+                                    <h2>Inflation berechnen</h2>
+                                </div>
+                                <span class="liveBadge">
+                                    <span aria-hidden="true"></span>
+                                    Live
+                                </span>
+                            </div>
+
+                            <div class="inputGrid">
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="infBetrag">Heutiger Betrag</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="infBetrag"
+                                                min="0"
+                                                max="10000000"
+                                                step="500"
+                                                value="5000"
+                                                inputmode="decimal"
+                                            >
+                                            <span>€</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="infBetragSlider"
+                                        min="0"
+                                        max="100000"
+                                        step="500"
+                                        value="5000"
+                                        class="finanzenSlider"
+                                        aria-label="Heutigen Betrag einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>0 €</span>
+                                        <span>100.000 €</span>
+                                    </div>
+                                </div>
+
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="infRate">
+                                            Inflationsrate
+                                            <button
+                                                type="button"
+                                                class="infoButton"
+                                                data-tooltip="Angenommene durchschnittliche Preissteigerung pro Jahr."
+                                                aria-label="Information zur Inflationsrate"
+                                            >
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                            </button>
+                                        </label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="infRate"
+                                                min="0"
+                                                max="100"
+                                                step="0.1"
+                                                value="2.5"
+                                                inputmode="decimal"
+                                            >
+                                            <span>% p.a.</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="infRateSlider"
+                                        min="0"
+                                        max="15"
+                                        step="0.1"
+                                        value="2.5"
+                                        class="finanzenSlider"
+                                        aria-label="Inflationsrate einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>0 %</span>
+                                        <span>15 %</span>
+                                    </div>
+                                </div>
+
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="infJahre">Zeitraum</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="infJahre"
+                                                min="1"
+                                                max="100"
+                                                step="1"
+                                                value="10"
+                                                inputmode="numeric"
+                                            >
+                                            <span>Jahre</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="infJahreSlider"
+                                        min="1"
+                                        max="50"
+                                        step="1"
+                                        value="10"
+                                        class="finanzenSlider"
+                                        aria-label="Zeitraum einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>1 Jahr</span>
+                                        <span>50 Jahre</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            id="tab-rendite"
+                            class="tabContent"
+                            role="tabpanel"
+                            aria-labelledby="tabButton-rendite"
+                            hidden
+                        >
+                            <div class="panelHeading">
+                                <div>
+                                    <span class="sectionKicker">Performance</span>
+                                    <h2>Rendite berechnen</h2>
+                                </div>
+                                <span class="liveBadge">
+                                    <span aria-hidden="true"></span>
+                                    Live
+                                </span>
+                            </div>
+
+                            <div class="inputGrid">
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="renInv">Investiertes Kapital</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="renInv"
+                                                min="1"
+                                                max="10000000"
+                                                step="500"
+                                                value="8000"
+                                                inputmode="decimal"
+                                            >
+                                            <span>€</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="renInvSlider"
+                                        min="1"
+                                        max="100000"
+                                        step="500"
+                                        value="8000"
+                                        class="finanzenSlider"
+                                        aria-label="Investiertes Kapital einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>1 €</span>
+                                        <span>100.000 €</span>
+                                    </div>
+                                </div>
+
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="renEnd">Endwert der Anlage</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="renEnd"
+                                                min="0"
+                                                max="20000000"
+                                                step="500"
+                                                value="12000"
+                                                inputmode="decimal"
+                                            >
+                                            <span>€</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="renEndSlider"
+                                        min="0"
+                                        max="200000"
+                                        step="500"
+                                        value="12000"
+                                        class="finanzenSlider"
+                                        aria-label="Endwert der Anlage einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>0 €</span>
+                                        <span>200.000 €</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="errorMessage"
+                            id="errorMessages"
+                            role="alert"
+                            aria-live="assertive"
+                            hidden
+                        ></div>
+                    </div>
+
+                    <aside
+                        class="resultPanel"
+                        id="ausgabeContainer"
+                        aria-labelledby="resultTitle"
+                        aria-live="polite"
+                    >
+                        <div class="resultPanelHeader">
+                            <div>
+                                <span class="sectionKicker">Dein Ergebnis</span>
+                                <h2 id="resultTitle">Auswertung</h2>
+                            </div>
+                            <span class="calculationStatus">
+                                <i class="fa fa-bolt" aria-hidden="true"></i>
+                                Automatisch
+                            </span>
+                        </div>
+
+                        <div class="liveErgebnisKarten" id="ergebnisKartenOutput"></div>
+
+                        <div class="chartCard" id="chartCard">
+                            <div class="chartHeader">
+                                <div>
+                                    <span class="chartTitle" id="chartTitle">Kapitalentwicklung</span>
+                                    <span class="chartSubtitle" id="chartSubtitle">
+                                        Entwicklung über die gesamte Laufzeit
+                                    </span>
+                                </div>
+                                <div class="chartLegend" id="chartLegend"></div>
+                            </div>
+
+                            <div class="chartWrap">
+                                <svg
+                                    id="financeChart"
+                                    viewBox="0 0 720 260"
+                                    role="img"
+                                    aria-labelledby="chartAccessibleTitle chartAccessibleDescription"
+                                    preserveAspectRatio="none"
+                                >
+                                    <title id="chartAccessibleTitle">Finanzielle Entwicklung</title>
+                                    <desc id="chartAccessibleDescription">
+                                        Visualisierung der berechneten Werte.
+                                    </desc>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <details class="calculationDetails">
+                            <summary>
+                                <span>
+                                    <i class="fa fa-calculator" aria-hidden="true"></i>
+                                    Berechnung und Annahmen
+                                </span>
+                                <i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i>
+                            </summary>
+                            <div id="rechenwegOutput"></div>
+                        </details>
+                    </aside>
+                </div>
+            </div>
+
+            <p class="calculatorDisclaimer">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                Die Berechnung berücksichtigt keine Steuern, Gebühren oder individuellen
+                Vertragsbedingungen und stellt keine Anlageberatung dar.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footerNav">
+            <div class="footerSocial">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+            </div>
+            <div class="linksFooterect">
+                <a href="../../html/datenSchutz.html">Datenschutz</a>
+                <button id="openFeedbackBtn">Feedback senden</button>
+                <a href="../../html/impressum.html">Impressum</a>
+            </div>
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
+        </div>
+    </footer>
+
+    <script src="../../javaScript/Common/common-login.js"></script>
+    <script src="./finanzrechner.js"></script>
+    <script src="../../javaScript/feedback.js"></script>
+    <script type="module" src="../../javaScript/toolFavorite.js"></script>
+    <script type="module" src="../../javaScript/search.js"></script>
+</body>
+</html>
