@@ -13,7 +13,7 @@ export const tools = [
     {
         id:       "card1",
         title:    "Zahlen Analyse",
-        group:    "algebra",
+        group:    "statistik",
         filename: "zahlenAnalyse.html",
         url:      `${BASE}/Tools/Zahlenanalyse/zahlenAnalyse.html`,
         tags:     ["zahlen", "analyse", "algebra", "mathematik", "summe", "max", "maximum", "min", "minimum", "durchschnitt", "ggT", "kgV"],
