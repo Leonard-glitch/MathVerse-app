@@ -1084,6 +1084,15 @@ body {
 @media (max-width: 680px) {
     body { overflow: auto; }
 
+    .editCardBtn span {
+        display: none;
+    }
+
+    .editCardBtn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem; /* Icon minimal größer auf Mobile */
+    }
+
     /* FIX: Layout-Container nicht mehr clippen */
     .settingsLayout {
         height: auto;
