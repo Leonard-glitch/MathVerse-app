@@ -462,6 +462,38 @@
                                         <span>200.000 €</span>
                                     </div>
                                 </div>
+
+                                <div class="inputControl">
+                                    <div class="inputControlHeader">
+                                        <label for="renJahre">Anlagedauer</label>
+                                        <div class="numberField">
+                                            <input
+                                                type="number"
+                                                id="renJahre"
+                                                min="1"
+                                                max="100"
+                                                step="1"
+                                                value="10"
+                                                inputmode="numeric"
+                                            >
+                                            <span>Jahre</span>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        id="renJahreSlider"
+                                        min="1"
+                                        max="50"
+                                        step="1"
+                                        value="10"
+                                        class="finanzenSlider"
+                                        aria-label="Anlagedauer einstellen"
+                                    >
+                                    <div class="rangeMeta" aria-hidden="true">
+                                        <span>1 Jahr</span>
+                                        <span>50 Jahre</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -516,6 +548,17 @@
                                     <desc id="chartAccessibleDescription">
                                         Visualisierung der berechneten Werte.
                                     </desc>
+                                    <defs>
+                                        <linearGradient id="financeAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" style="stop-color: var(--finance-accent); stop-opacity: 0.35" />
+                                            <stop offset="100%" style="stop-color: var(--finance-accent); stop-opacity: 0" />
+                                        </linearGradient>
+                                    </defs>
+                                    <g id="chartGrid"></g>
+                                    <path id="chartAreaPath" class="chartArea" d="" />
+                                    <path id="chartSecondaryPath" class="chartLineSecondary" d="" />
+                                    <path id="chartPrimaryPath" class="chartLinePrimary" d="" />
+                                    <circle id="chartEndPoint" class="chartPoint" r="5" cx="0" cy="0" style="display:none;" />
                                 </svg>
                             </div>
                         </div>
