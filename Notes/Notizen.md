@@ -67,6 +67,16 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 
 
 
+
+----Finanzrechner----
+
++ Auswahl zwischen Dollar und Euro da es eine weltumfassende Website werden soll!
++ Alles prüfen (vorallem Rechenlogik und Diagramm!)
++ Auf irgendwas Rechtliches prüfen
+
+
+
+
 --------======Responsive=====-------------
 
 -, User Font Size Einstellung an Responsive anpassen!

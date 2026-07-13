@@ -18,16 +18,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Koppelung von Slider und Nummernfeld
     const syncPairs = [
-        { num: "sparStart", slider: "sparStartSlider" },
-        { num: "sparRate", slider: "sparRateSlider" },
-        { num: "sparZins", slider: "sparZinsSlider" },
-        { num: "sparJahre", slider: "sparJahreSlider" },
-        { num: "infBetrag", slider: "infBetragSlider" },
-        { num: "infRate", slider: "infRateSlider" },
-        { num: "infJahre", slider: "infJahreSlider" },
-        { num: "renInv", slider: "renInvSlider" },
-        { num: "renEnd", slider: "renEndSlider" },
-        { num: "renJahre", slider: "renJahreSlider" }
+        { num: "sparStart", slider: "sparStartSlider", tab: "sparplan" },
+        { num: "sparRate", slider: "sparRateSlider", tab: "sparplan" },
+        { num: "sparZins", slider: "sparZinsSlider", tab: "sparplan" },
+        { num: "sparJahre", slider: "sparJahreSlider", tab: "sparplan" },
+        { num: "infBetrag", slider: "infBetragSlider", tab: "inflation" },
+        { num: "infRate", slider: "infRateSlider", tab: "inflation" },
+        { num: "infJahre", slider: "infJahreSlider", tab: "inflation" },
+        { num: "renInv", slider: "renInvSlider", tab: "rendite" },
+        { num: "renEnd", slider: "renEndSlider", tab: "rendite" },
+        { num: "renJahre", slider: "renJahreSlider", tab: "rendite" }
     ];
 
     syncPairs.forEach(pair => {
@@ -60,9 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Reset-Button: alle Felder (inkl. dynamisch erweiterter Slider-Limits) zurücksetzen
+    // Reset-Button: nur Felder des aktuell aktiven Tabs zurücksetzen
     document.getElementById("resetCalculator")?.addEventListener("click", () => {
-        syncPairs.forEach(pair => {
+        syncPairs.filter(pair => pair.tab === currentTab).forEach(pair => {
             const numEl = document.getElementById(pair.num);
             const sliderEl = document.getElementById(pair.slider);
             if (numEl) numEl.value = numEl.defaultValue;
@@ -193,6 +193,20 @@ document.addEventListener("DOMContentLoaded", () => {
         chartLegendEl.innerHTML = legendHtml;
     }
 
+    // Rechenweg im gleichen Step-Container-Format wie Bruchrechner/DezBruchConverter
+    function renderRechenwegSteps(steps) {
+        rechenwegOutput.innerHTML = steps.map((step, i) => {
+            const isLast = i === steps.length - 1;
+            return `
+                <div class="step-container ${isLast ? "final-step" : ""}">
+                    <div class="step-title">${step.title}</div>
+                    ${step.text ? `<div class="step-text">${step.text}</div>` : ""}
+                    ${step.formula ? `<div class="step-formula-box">${step.formula}</div>` : ""}
+                    ${step.solution ? `<div class="step-sub-solution">${step.solution}</div>` : ""}
+                </div>`;
+        }).join("");
+    }
+
     function berechneFinanzen() {
         versteckeFehler();
         ergebnisKartenOutput.innerHTML = "";
@@ -245,20 +259,41 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
 
-            rechenwegOutput.innerHTML = `<pre><b>Verwendetes Modell:</b> Monatliche Verzinsung & Einzahlung
-Monate (n) = ${n}
-Zinsfaktor (q) = 1 + (${p}% / 12) = ${q.toFixed(6)}
+            const sparSteps = [{
+                title: "Grundlagen",
+                text: "Es wird mit monatlicher Verzinsung und nachschüssiger monatlicher Einzahlung gerechnet.",
+                formula: `Monate: n = ${jahre} × 12 = ${n}\nZinsfaktor: q = 1 + (${p}% / 12) = ${q.toFixed(6)}`
+            }];
 
-<b>1. Zinseszins auf Startkapital:</b>
-E_start = K0 * q^n 
-E_start = ${K0} * ${q.toFixed(4)}^${n} = <b>${formatEuro(endkapitalStart)}</b>
+            if (p > 0) {
+                sparSteps.push({
+                    title: "Zinseszins auf das Startkapital",
+                    text: "Das Startkapital wird über die gesamte Laufzeit verzinst:",
+                    formula: `E_start = K₀ × q^n\nE_start = ${K0} × ${q.toFixed(4)}^${n} = ${formatEuro(endkapitalStart)}`,
+                    solution: `Endkapital aus Startkapital: ${formatEuro(endkapitalStart)}`
+                });
+                sparSteps.push({
+                    title: "Zinseszins auf die Sparraten",
+                    text: "Für die monatlichen Einzahlungen gilt die Rentenendwertformel:",
+                    formula: `E_rate = R × ((q^n − 1) / (q − 1))\nE_rate = ${R} × ((${q.toFixed(4)}^${n} − 1) / (${q.toFixed(4)} − 1)) = ${formatEuro(endkapitalRaten)}`,
+                    solution: `Endkapital aus Sparraten: ${formatEuro(endkapitalRaten)}`
+                });
+            } else {
+                sparSteps.push({
+                    title: "Kapitalentwicklung ohne Verzinsung",
+                    text: "Bei 0% Rendite wächst das Kapital nur durch die Einzahlungen selbst:",
+                    formula: `E_start = K₀ = ${formatEuro(endkapitalStart)}\nE_rate = R × n = ${R} × ${n} = ${formatEuro(endkapitalRaten)}`
+                });
+            }
 
-<b>2. Zinseszins auf Sparraten:</b>
-E_rate = R * ((q^n - 1) / (q - 1))
-E_rate = ${R} * ((... - 1) / ...) = <b>${formatEuro(endkapitalRaten)}</b>
+            sparSteps.push({
+                title: "Gesamtkapital",
+                text: "Beide Anteile ergeben zusammen das Endkapital:",
+                formula: `${formatEuro(endkapitalStart)} + ${formatEuro(endkapitalRaten)} = ${formatEuro(gesamtEndkapital)}`,
+                solution: `Endgültiges Ergebnis: ${formatEuro(gesamtEndkapital)}`
+            });
 
-<b>3. Gesamtkapital:</b>
-${formatEuro(endkapitalStart)} + ${formatEuro(endkapitalRaten)} = <b>${formatEuro(gesamtEndkapital)}</b></pre>`;
+            renderRechenwegSteps(sparSteps);
 
             // Chart-Daten: Kapitalentwicklung pro Jahr
             const chartJahre = [], chartKapital = [], chartEingezahlt = [];
@@ -307,11 +342,19 @@ ${formatEuro(endkapitalStart)} + ${formatEuro(endkapitalRaten)} = <b>${formatEur
                 </div>
             `;
 
-            rechenwegOutput.innerHTML = `<pre><b>Abzinsungsformel:</b>
-Kaufkraft = Betrag / (1 + Inflationsrate)^Jahre
-Kaufkraft = ${betrag} / (1 + ${rate/100})^${jahre}
-
-Ergebnis = <b>${formatEuro(kaufkraft)}</b></pre>`;
+            renderRechenwegSteps([
+                {
+                    title: "Abzinsungsfaktor bestimmen",
+                    text: "Der jährliche Abzinsungsfaktor ergibt sich aus der Inflationsrate:",
+                    formula: `q = 1 + ${rate}/100 = ${q.toFixed(4)}`
+                },
+                {
+                    title: "Kaufkraft berechnen",
+                    text: "Der heutige Betrag wird durch den Abzinsungsfaktor hoch Anzahl Jahre geteilt:",
+                    formula: `Kaufkraft = Betrag / q^Jahre\nKaufkraft = ${betrag} / ${q.toFixed(4)}^${jahre} = ${formatEuro(kaufkraft)}`,
+                    solution: `Reale Kaufkraft: ${formatEuro(kaufkraft)} (Kaufkraftverlust: ${formatEuro(verlust)})`
+                }
+            ]);
 
             // Chart-Daten: Kaufkraftentwicklung pro Jahr
             const chartJahre = [], chartKaufkraft = [], chartNominal = [];
@@ -364,13 +407,20 @@ Ergebnis = <b>${formatEuro(kaufkraft)}</b></pre>`;
                 </div>
             `;
 
-            rechenwegOutput.innerHTML = `<pre><b>Gesamtrendite (ROI):</b>
-                ROI = ((Endwert - Investition) / Investition) * 100
-                ROI = ((${endwert} - ${invest}) / ${invest}) * 100 = <b>${roi.toFixed(2)} %</b>
-
-                <b>Jährliche Rendite (CAGR) über ${jahre} Jahre:</b>
-                CAGR = ((Endwert / Investition)^(1 / Jahre) - 1) * 100
-                CAGR = ((${endwert} / ${invest})^(1/${jahre}) - 1) * 100 = <b>${cagr.toFixed(2)} % p.a.</b></pre>`;
+           renderRechenwegSteps([
+                {
+                    title: "Gesamtrendite (ROI) berechnen",
+                    text: "Der ROI setzt den Gewinn ins Verhältnis zum eingesetzten Kapital:",
+                    formula: `ROI = ((Endwert − Investition) / Investition) × 100\nROI = ((${endwert} − ${invest}) / ${invest}) × 100 = ${roi.toFixed(2)} %`,
+                    solution: `Gesamtrendite: ${roi.toFixed(2)} %`
+                },
+                {
+                    title: "Jährliche Rendite (CAGR) berechnen",
+                    text: `Die CAGR verteilt die Gesamtrendite gleichmäßig auf die ${jahre} Jahre Anlagedauer:`,
+                    formula: `CAGR = ((Endwert / Investition)^(1/Jahre) − 1) × 100\nCAGR = ((${endwert} / ${invest})^(1/${jahre}) − 1) × 100 = ${cagr.toFixed(2)} %`,
+                    solution: `Jährliche Rendite: ${cagr.toFixed(2)} % p.a.`
+                }
+            ]);
 
             // Chart-Daten: angenommene gleichmäßige Wertsteigerung (CAGR) über die Anlagedauer
             const chartJahre = [], chartWert = [], chartStart = [];

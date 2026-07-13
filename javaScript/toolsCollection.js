@@ -17,8 +17,8 @@ export const tools = [
         group:    "statistik",
         filename: "zahlenAnalyse.html",
         url:      `${BASE}/Tools/Zahlenanalyse/zahlenAnalyse.html`,
-        tags:     ["zahlen", "analyse", "algebra", "mathematik", "summe", "max", "maximum", "min", "minimum", "durchschnitt", "ggT", "kgV"],
-        info:     "Analysiert eine kommagetrennte Zahlenliste und gibt Summe, Maximum, Minimum und Durchschnitt aus.",
+        tags:     ["zahlen", "analyse", "algebra", "mathematik", "summe", "max", "maximum", "min", "minimum", "durchschnitt", "ggT", "kgV", "median", "modus", "spannweite", "varianz", "standardabweichung", "statistik"],
+        info:     "Analysiert eine Zahlenliste und liefert umfassende statistische Kennzahlen wie Summe, Mittelwerte (Durchschnitt, Median, Modus), Streuungsmaße (Varianz, Standardabweichung, Spannweite) sowie ggT und kgV.",
         image: {
             big:   `${BASE}/pictures/51R9beEdSfL.jpg`,
             small: `${BASE}/pictures/icons/zahlenAnalyse-icon.png`
@@ -69,8 +69,8 @@ export const tools = [
         group:    "arithmetik",
         filename: "prozentrechner.html",
         url:      `${BASE}/Tools/Prozentrechner/prozentrechner.html`,
-        tags:     ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner"],
-        info:     "Berechnet Anteil, Prozentsatz und Grundwert – drei Formeln auf einen Blick, mit sofortigem Rechenweg.",
+        tags:     ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner", "anteil", "prozentsatz", "grundwert", "veränderung", "erhöhung", "verminderung", "netto", "brutto", "skonto", "rechenweg", "advanced"],
+        info:     "Umfassender Prozentrechner mit Advanced Mode: Berechnet Anteil, Prozentsatz, Grundwert, prozentuale Veränderungen, Erhöhungen/Verminderungen, MwSt (Netto/Brutto) sowie Rabatte inklusive detailliertem Rechenweg.",
         image: {
             big:   `${BASE}/pictures/Prozentrechnung_Thumbnail.png`,
             small: `${BASE}/pictures/icons/prozentrechner-icon.png`
@@ -134,10 +134,23 @@ export const tools = [
         group:    "algebra",
         filename: "gleichungslöser.html",
         url:      `${BASE}/Tools/Gleichungslöser/gleichungslöser.html`,
-        tags:     ["gleichung", "linear", "lösen", "algebra", "lineare-gleichungen", "Verfahren"],
+        tags:     ["gleichung", "linear", "lösen", "algebra", "lineare-gleichungen", "verfahren"],
         info:      "Löst allgemeine und lineare Gleichungssysteme – inklusive automatischer Auswahl des besten Lösungsverfahrens.",
         image: {
             big:   `${BASE}/pictures/Gleichungslöser.jpg`,
+            small: `${BASE}/pictures/icons/meinTool-icon.png`
+        }
+    },
+    {
+        id:       "card11",
+        title:    "Finanzrechner",
+        group:    "finanzen",
+        filename: "finanzrechner.html",
+        url:      `${BASE}/Tools/Finanzrechner/finanzrechner.html`,
+        tags:     ["finanzen", "rechner", "investition", "sparplan", "rendite", "inflation", "zinseszins"],
+        info:      "All-in-One-Finanzrechner mit drei spezialisierten Tools: Berechnet den langfristigen Vermögensaufbau per Sparplan (Zinseszins), ermittelt den realen Kaufkraftverlust durch Inflation oder analysiert die genaue Performance (ROI & CAGR) von Investments – inklusive Live-Diagrammen und transparentem Rechenweg.",
+        image: {
+            big:   `${BASE}/pictures/Finanzrechner.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     }
