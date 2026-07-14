@@ -45,8 +45,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Event: Zahl wird direkt eingetippt
             numEl.addEventListener("input", () => {
-                let val = parseFloat(numEl.value) || 0;
-                
+                const raw = numEl.value.trim();
+
+                // Leerer/ungültiger Zwischenzustand (z. B. direkt nach "Alles markieren" beim
+                // Neu-Eintippen): Slider bewusst NICHT anfassen, sonst springt der Thumb kurz
+                // auf 0. Die Berechnung selbst verträgt leere Felder (interner ||0-Fallback).
+                if (raw === "" || isNaN(parseFloat(raw))) {
+                    berechneFinanzen();
+                    return;
+                }
+
+                let val = parseFloat(raw);
+
                 // PRO FEATURE: Dynamisches Limit. Wenn User mehr eintippt als der Slider erlaubt,
                 // erweitern wir das Limit des Sliders automatisch!
                 let currentMax = parseFloat(sliderEl.max);
@@ -56,6 +66,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 sliderEl.value = val;
                 berechneFinanzen();
+            });
+
+            // Beim Verlassen des Feldes auf die im HTML definierten Grenzen klemmen
+            // (verhindert unsinnige Werte wie 99999 Jahre) – bewusst nicht live beim
+            // Tippen, damit z. B. Dezimaleingaben nicht unterbrochen werden.
+            numEl.addEventListener("blur", () => {
+                let val = parseFloat(numEl.value);
+                if (isNaN(val)) val = parseFloat(numEl.min) || 0;
+
+                const hardMin = numEl.min !== "" ? parseFloat(numEl.min) : -Infinity;
+                const hardMax = numEl.max !== "" ? parseFloat(numEl.max) : Infinity;
+                const clamped = Math.min(Math.max(val, hardMin), hardMax);
+
+                // Slider-Limit defensiv mitziehen, falls es (noch) kleiner als der
+                // geklemmte Wert ist – Absicherung für Fälle, in denen die dynamische
+                // Erweiterung aus dem input-Handler übersprungen wurde.
+                if (clamped > parseFloat(sliderEl.max)) {
+                    sliderEl.max = clamped;
+                }
+
+                // Slider immer nachziehen: beim Tippen eines leeren Zwischenzustands
+                // wurde er oben bewusst nicht synchronisiert.
+                sliderEl.value = clamped;
+
+                if (clamped !== val || numEl.value === "") {
+                    numEl.value = clamped;
+                    berechneFinanzen();
+                }
             });
         }
     });
@@ -77,13 +115,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // Tab-Wechsel-Eventhandler
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
-            tabs.forEach(t => t.classList.remove("active"));
-            tabContents.forEach(c => c.classList.remove("active"));
+            tabs.forEach(t => {
+                t.classList.remove("active");
+                t.setAttribute("aria-selected", "false");
+                t.tabIndex = -1;
+            });
+            tabContents.forEach(c => {
+                c.classList.remove("active");
+                c.hidden = true;
+            });
 
             tab.classList.add("active");
+            tab.setAttribute("aria-selected", "true");
+            tab.tabIndex = 0;
+
             currentTab = tab.getAttribute("data-tab");
-            document.getElementById(`tab-${currentTab}`).classList.add("active");
-            
+            const panel = document.getElementById(`tab-${currentTab}`);
+            panel.classList.add("active");
+            panel.hidden = false;
+
             berechneFinanzen();
         });
     });
