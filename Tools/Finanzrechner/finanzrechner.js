@@ -16,6 +16,16 @@ document.addEventListener("DOMContentLoaded", () => {
     
     let currentTab = "sparplan";
 
+    // Setzt die CSS-Variable --slider-progress passend zum aktuellen Wert,
+    // damit der gefüllte Teil des Reglers (Akzentfarbe) korrekt angezeigt wird.
+    function updateSliderProgress(sliderEl) {
+        const min = parseFloat(sliderEl.min) || 0;
+        const max = parseFloat(sliderEl.max) || 100;
+        const val = parseFloat(sliderEl.value) || 0;
+        const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
+        sliderEl.style.setProperty("--slider-progress", `${Math.min(100, Math.max(0, pct))}%`);
+    }
+
     // Koppelung von Slider und Nummernfeld
     const syncPairs = [
         { num: "sparStart", slider: "sparStartSlider", tab: "sparplan" },
@@ -36,10 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (numEl && sliderEl) {
             pair.originalMax = sliderEl.max; // Ausgangswert merken, bevor er dynamisch erweitert wird
+            updateSliderProgress(sliderEl); // Initialzustand beim Laden setzen
 
             // Event: Slider wird bewegt
             sliderEl.addEventListener("input", () => {
                 numEl.value = sliderEl.value;
+                updateSliderProgress(sliderEl);
                 berechneFinanzen();
             });
 
@@ -65,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 
                 sliderEl.value = val;
+                updateSliderProgress(sliderEl);
                 berechneFinanzen();
             });
 
@@ -89,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Slider immer nachziehen: beim Tippen eines leeren Zwischenzustands
                 // wurde er oben bewusst nicht synchronisiert.
                 sliderEl.value = clamped;
+                updateSliderProgress(sliderEl);
 
                 if (clamped !== val || numEl.value === "") {
                     numEl.value = clamped;
@@ -107,6 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (sliderEl) {
                 sliderEl.max = pair.originalMax;
                 sliderEl.value = sliderEl.defaultValue;
+                updateSliderProgress(sliderEl);
             }
         });
         berechneFinanzen();
