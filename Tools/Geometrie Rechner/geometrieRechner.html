@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometrie Rechner</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../../css/feedback.css">
+    <link rel="stylesheet" href="../../css/Common/common.css">
+    <link rel="stylesheet" href="./geometrieRechner.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+        <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div>
+            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+            <div id="searchResults"></div>
+        </div>
+
+        <div id="navUserArea"><a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
+            <a href="../../html/register.html" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
+    </header>
+    <main>
+
+        <section class="geometrySection">
+            <h1 class="zahlenHeader">Geometrie Rechner</h1>
+
+            <div class="geometryContainer">
+                <div class="geometryDivTop">
+                    <div class="geometrySettingsContainer">
+                        <div class="dimensionSwitchDiv">
+                            <button class="dimensionTypeBtn active" data-type="2d">2D</button>
+                            <button class="dimensionTypeBtn" data-type="3d">3D</button>
+                        </div>
+
+                        <div class="formSelectDiv">
+                            <select name="selectForm" id="selectForm" class="selection">
+                                <option value="">Rechtwinkliges Dreieck</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="advancedSettingsContainer">
+                        <button class="button" id="advancedSettingsBtn" type="button">Erweiterte Einstellungen</button>
+                    </div>
+                </div>
+
+                <div class="geometryInputAndFormContainer">
+                    <div class="geometryLeftInputContainer">
+                        <div id="variousInputContainer">
+                            <div class="inputContainer" id="circleInputContainer">
+                                <div class="inputSelectDiv">
+                                    <select name="selectInput" id="selectInput" class="selection">
+                                        <option value="r">Radius</option>
+                                    </select>
+                                </div>
+                                <input type="number" id="zahlenInput" placeholder="Zahl" class="zahlenInputfeld">
+                            </div>
+                        </div>
+
+                        <div class="zahlenAusgabestyle" id="ausgabeContainer">
+
+                            <!-- Gruppe 1: Kennzahlen (bestehend) -->
+                            <div class="ergebnisGruppe">
+                                <p class="ergebnisGruppenTitel">Ergebnisse</p>
+                                <div class="ergebnisGrid">
+                                    <div class="ergebnisItem"><p class="ergebnisLabel">d</p><p id="ausgabeSumme" class="ergebnisValue"></p></div>
+                                    <div class="ergebnisItem"><p class="ergebnisLabel">A</p><p id="ausgabeMax" class="ergebnisValue"></p></div>
+                                    <div class="ergebnisItem"><p class="ergebnisLabel">U</p><p id="ausgabeMin" class="ergebnisValue"></p></div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+
+                       <details class="calculationDetails">
+                            <summary>
+                                <span>
+                                    <i class="fa fa-calculator" aria-hidden="true"></i>
+                                    Rechenweg
+                                </span>
+                                <i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i>
+                            </summary>
+                            <div id="rechenwegOutput"></div>
+                        </details> 
+                    
+                    </div>
+                <div class="geometryRightFormContainer"></div>
+            </div>
+        </section>
+
+
+
+
+
+    </main>
+    <footer>
+        <div class="footerNav">
+
+            <div class="footerSocial">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+            </div>
+
+            <div class="linksFooterect">
+                <a href="../../html/datenSchutz.html">Datenschutz</a>
+
+                <button id="openFeedbackBtn">Feedback senden</button>
+
+                <a href="../../html/impressum.html">Impressum</a>
+            </div>
+
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
+        </div>
+    </footer>
+    <script src="../../javaScript/Common/common-login.js"></script>
+    <script src="./geometrieRechner.js"></script>
+    <script src="../../javaScript/feedback.js"></script>
+    <script type="module" src="../../javaScript/toolFavorite.js"></script>
+    <script type="module" src="../../javaScript/search.js"></script>
+</body>
+</html>

@@ -75,6 +75,9 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 + Auf irgendwas Rechtliches prüfen
 
 
+----Geometrie Rechner----
+
++ A, U usw. Im Rechenweg ausschreiben
 
 
 --------======Responsive=====-------------

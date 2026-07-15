@@ -1,0 +1,318 @@
+.geometrySection{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Dropdown Menüs */
+.selection {
+    font-size: 1rem;
+    text-align: center;
+    padding: 0.2rem 1.4rem;
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    outline: none;
+    box-shadow: var(--shadow-main);
+    cursor: pointer;
+    transition: border-color var(--transition-speed);
+}
+.selection:hover, .selection:focus {
+    border-color: var(--border-glow);
+}
+.selection option {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    padding: 0.5rem;
+}
+.button {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.2rem 1.4rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    outline: none;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+.zahlenInputfeld{margin: 0;}
+
+
+
+.geometryContainer{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.025),
+            rgba(255, 255, 255, 0)
+        ),
+        var(--bg-surface);
+    box-shadow: var(--shadow-main);
+    
+    margin-top: 2rem;
+    width: 97%;
+}
+
+/* Top Section with Dropdowns and Buttons */
+
+.geometryDivTop{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.1rem 1rem;
+}
+
+.geometrySettingsContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.dimensionSwitchDiv{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+
+.dimensionTypeBtn{
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.2rem 1.4rem;
+    color: var(--text-secondary);
+    background-color: transparent;
+    border-radius: var(--radius-lg);
+    outline: none;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: all var(--transition-speed) ease;
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+}
+.dimensionTypeBtn:first-child {
+    border-radius: 20px 0 0 20px;
+}
+.dimensionTypeBtn:last-child {
+    border-radius: 0 20px 20px 0;
+}
+.dimensionTypeBtn:hover:not(.active){
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+.dimensionTypeBtn.active{
+    background: var(--border-glow);
+    color: var(--text-primary);
+    box-shadow: 0 0 15px var(--glow-soft);
+    font-weight: 600;
+}
+
+/*.formSelectDiv{
+
+}*/
+
+#selectForm{
+    color: var(--text-primary);
+    width: 15rem;
+}
+
+/* Main Section */
+
+.geometryInputAndFormContainer{
+    display: flex;
+    flex-direction: row;
+}
+
+.geometryLeftInputContainer{
+    width: 60%;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.geometryRightFormContainer{
+    width: 50%;
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+#variousInputContainer{
+    width: 100%;
+    margin-top: 3rem;
+    
+}
+
+.inputContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+
+
+.zahlenAusgabestyle {
+    display: flex;
+    opacity: 1; /* Besser da somit die Höhe unverändert bleibt! */
+    flex-direction: column;
+    width: 90%;
+    max-width: 500px;
+    margin-top: 4rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-main);
+
+    transition: border-color var(--transition-speed);
+}
+
+.zahlenAusgabestyle:hover {
+    border-color: var(--border-glow);
+}
+
+.ergebnisGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.ergebnisItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    text-align: center;
+}
+
+.ergebnisLabel {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.ergebnisValue {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-live);
+    text-shadow: 0 0 5px var(--glow-live);
+    min-height: 1.4rem;
+}
+
+/* ── Ergebnis-Gruppen (thematische Blöcke innerhalb der Ausgabe) ─────────── */
+
+.ergebnisGruppenTitel {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--accent-live);
+    margin-bottom: 0.8rem;
+}
+
+
+.calculationDetails {
+    margin-top: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: transparent;
+    width: 90%;
+}
+
+.calculationDetails summary {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.1rem 1rem;
+    color: var(--finance-secondary);
+    font-size: 0.76rem;
+    font-weight: 750;
+    list-style: none;
+    border-radius: 12px;
+    outline: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.calculationDetails summary::-webkit-details-marker {
+    display: none;
+}
+
+.calculationDetails summary > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.calculationDetails summary > span i {
+    color: var(--finance-accent);
+}
+
+.detailsChevron {
+    color: var(--finance-muted);
+    transition: transform 180ms ease;
+}
+
+.calculationDetails[open] .detailsChevron {
+    transform: rotate(180deg);
+}
+
+#rechenwegOutput {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 1rem 1rem;
+}
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 1024px) {
+    .geometryInputAndFormContainer{
+        flex-direction: column;
+    }
+    .geometryLeftInputContainer, .geometryRightFormContainer{
+        width: 100%;
+        border: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .geometryContainer{
+        width: 100%;
+    }
+}
