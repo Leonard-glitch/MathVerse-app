@@ -135,5 +135,33 @@
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>
+
+    <div id="settingsModal" class="modalOverlay">
+    <div class="modalContent">
+        <div class="modalHeader">
+            <h2>Erweiterte Einstellungen</h2>
+            <button id="closeModalBtn" class="closeBtn">&times;</button>
+        </div>
+        
+        <div class="modalBody">
+            <div class="settingItem">
+                <label for="decimalPlaces">Nachkommastellen:</label>
+                <select id="decimalPlaces" class="selection">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+            
+            </div>
+        
+        <div class="modalFooter">
+            <button id="saveSettingsBtn" class="button">Speichern</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

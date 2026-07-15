@@ -295,6 +295,100 @@
 
 
 
+/* ── Modal (Erweiterte Einstellungen) ─────────── */
+
+.modalOverlay {
+    display: none; /* Standardmäßig versteckt */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px); /* Schöner Unschärfe-Effekt für den Hintergrund */
+    z-index: 9999; /* Garantiert über allen anderen Elementen */
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Wenn das Modal aktiv ist, zeigen wir es als Flexbox an */
+.modalOverlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modalContent {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transform: translateY(-30px); /* Für eine kleine Einflug-Animation */
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.modalOverlay.show .modalContent {
+    transform: translateY(0);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: color var(--transition-speed);
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: var(--accent-live, #ff4757); /* Nutzt deine Akzentfarbe, falls definiert */
+}
+
+.modalBody {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Abstand zwischen verschiedenen Einstellungen */
+}
+
+.settingItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    font-family: var(--font-main);
+}
+
+.modalFooter {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end; /* Button nach rechts schieben */
+}
+
+
+
 
 @media (max-width: 1440px) {
     .geometryContainer{

@@ -42,3 +42,46 @@ function showError(message) {
 function hideError() {
     errorMessages.style.display = "none";
 }
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Elemente aus dem DOM holen
+    const advancedSettingsBtn = document.getElementById('advancedSettingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const decimalPlacesSelect = document.getElementById('decimalPlaces');
+
+    // Globale Variable für deine Berechnungen (Standard: 2)
+    let currentDecimalPlaces = 2; 
+
+    // Modal öffnen
+    advancedSettingsBtn.addEventListener('click', () => {
+        settingsModal.classList.add('show');
+    });
+
+    // Modal schließen (Klick auf das X)
+    closeModalBtn.addEventListener('click', () => {
+        settingsModal.classList.remove('show');
+    });
+
+    // Modal schließen (Klick irgendwo auf den abgedunkelten Hintergrund)
+    window.addEventListener('click', (event) => {
+        if (event.target === settingsModal) {
+            settingsModal.classList.remove('show');
+        }
+    });
+
+    // Einstellungen speichern
+    saveSettingsBtn.addEventListener('click', () => {
+        // Wert auslesen und als Zahl speichern
+        currentDecimalPlaces = parseInt(decimalPlacesSelect.value, 10);
+        
+        // Hier kannst du später eine Funktion aufrufen, 
+        // die deine Ausgabe aktualisiert z.B. updateResults();
+        
+        // Modal wieder schließen
+        settingsModal.classList.remove('show');
+    });
+});
