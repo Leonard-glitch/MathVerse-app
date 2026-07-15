@@ -51,6 +51,10 @@
                         <i class="fa fa-heart navItemIcon"></i>
                         Meine Favoriten
                     </button>
+                    <button class="navItem" data-panel="extras">
+                        <i class="fa fa-sliders navItemIcon"></i>
+                        Zusatzeinstellungen
+                    </button>
                 </div>
 
                 <div class="navDivider"></div>
@@ -346,6 +350,34 @@
                     <a href="../index.html" class="saveChangesBtn" style="display:inline-block; margin-top:1rem;">
                         Zur Startseite
                     </a>
+                </div>
+
+            </section>
+
+            <section class="settingsPanel" id="panel-extras">
+
+                <div class="panelHeader">
+                    <h1 class="panelTitle">Zusatzeinstellungen</h1>
+                    <p class="panelSubtitle">Kleinere, werkzeugübergreifende Einstellungen an einem Ort.</p>
+                </div>
+
+                <div class="settingsCard">
+                    <h2 class="cardTitle">Währung</h2>
+                    <p class="cardSubtitle">Wird von allen Finanz-Tools verwendet (z. B. Finanzrechner). Ändert nur die Anzeige, keine Umrechnung.</p>
+
+                    <select id="extrasCurrencySelect" class="settingsInput settingsSelect" aria-label="Währung auswählen"></select>
+                </div>
+
+                <div class="settingsCard">
+                    <h2 class="cardTitle">Advanced Modes</h2>
+                    <p class="cardSubtitle">Erweiterte Optionen für einzelne Tools zentral an- und ausschalten.</p>
+
+                    <div class="extrasToggleList" id="advancedModesList"></div>
+                </div>
+
+                <div class="toastMessage hidden" id="extrasToast">
+                    <i class="fa fa-check-circle"></i>
+                    <span>Gespeichert!</span>
                 </div>
 
             </section>

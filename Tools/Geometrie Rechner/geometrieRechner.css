@@ -59,7 +59,7 @@
     box-shadow: var(--shadow-main);
     
     margin-top: 2rem;
-    width: 97%;
+    width: 80%;
 }
 
 /* Top Section with Dropdowns and Buttons */
@@ -296,12 +296,24 @@
 
 
 
+@media (max-width: 1440px) {
+    .geometryContainer{
+        width: 90%;
+    }
+}
 
-
-
+@media (max-width: 1280px) {
+    .geometryContainer{
+        width: 95%;
+    }
+}
 
 
 @media (max-width: 1024px) {
+    .geometryContainer{
+        width: 98%;
+    }
+
     .geometryInputAndFormContainer{
         flex-direction: column;
     }

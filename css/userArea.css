@@ -1208,3 +1208,48 @@ body {
 .fontSizeHint strong {
     color: var(--text-secondary);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ZUSATZEINSTELLUNGEN-PANEL (Währung, Advanced Modes)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.settingsSelect {
+    cursor: pointer;
+}
+
+.settingsSelect option {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.extrasToggleList {
+    display: flex;
+    flex-direction: column;
+}
+
+.extrasToggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.extrasToggleRow:last-child {
+    border-bottom: none;
+}
+
+.extrasToggleLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+}
+
+.extrasToggleLabel i {
+    width: 16px;
+    text-align: center;
+    color: var(--text-secondary);
+}

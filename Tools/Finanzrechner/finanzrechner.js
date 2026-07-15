@@ -127,6 +127,56 @@ document.addEventListener("DOMContentLoaded", () => {
         berechneFinanzen();
     });
 
+    // ── Währungsauswahl ──────────────────────────────────────────────────
+    // Global gespeichert über window.MV (wie Theme/Design), damit künftige
+    // Finanz-Tools dieselbe Einstellung automatisch übernehmen.
+    const currencySelect = document.getElementById("currencySelect");
+
+    if (currencySelect) {
+        currencySelect.innerHTML = Object.entries(window.MV.CURRENCIES)
+            .map(([code, name]) => `<option value="${code}">${code} – ${name}</option>`)
+            .join("");
+        currencySelect.value = window.MV.getCurrency();
+
+        currencySelect.addEventListener("change", () => {
+            window.MV.setCurrency(currencySelect.value);
+            updateCurrencyLabels();
+            berechneFinanzen();
+        });
+    }
+
+    // Aktualisiert alle statischen Währungs-Labels (Einheiten-Symbole neben
+    // den Eingabefeldern, Min/Max-Beschriftungen unter den Reglern)
+    function updateCurrencyLabels() {
+        const symbol = window.MV.getCurrencySymbol();
+        document.querySelectorAll(".currencyUnit").forEach(el => {
+            el.textContent = symbol;
+        });
+        document.querySelectorAll(".currencyRangeLabel").forEach(el => {
+            el.textContent = window.MV.formatCurrencyCompact(parseFloat(el.dataset.value));
+        });
+    }
+
+    // Hält das Dropdown synchron, falls die Währung anderswo geändert wurde:
+    // (a) UserArea in einem anderen Tab -> storage-Event,
+    // (b) diese Seite lag im bfcache und wird per Zurück/Vor wiederhergestellt -> pageshow.
+    function refreshCurrencyFromStorage() {
+        if (!currencySelect) return;
+        currencySelect.value = window.MV.getCurrency();
+        updateCurrencyLabels();
+        berechneFinanzen();
+    }
+
+    window.addEventListener("pageshow", (e) => {
+        if (e.persisted) refreshCurrencyFromStorage();
+    });
+
+    window.addEventListener("storage", (e) => {
+        if (e.key === "currentUser" || e.key === "isLoggedIn" || e.key === "mv-currency") {
+            refreshCurrencyFromStorage();
+        }
+    });
+
     // Tab-Wechsel-Eventhandler
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
@@ -153,16 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Währungsformatierer (z.B. 10.000,00 €)
-    function formatEuro(amount) {
-        return new Intl.NumberFormat("de-DE", { 
-            style: "currency", 
-            currency: "EUR",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(amount);
-    }
-
     function zeigeFehler(msg) {
         errorContainer.textContent = msg;
         errorContainer.hidden = false;
@@ -173,9 +213,17 @@ document.addEventListener("DOMContentLoaded", () => {
         errorContainer.textContent = "";
     }
 
+    // Währungsformatierer (z.B. 10.000,00 €)
+    // Delegiert an die zentrale, währungsbewusste Formatierung in window.MV
+    // (Funktionsname bewusst beibehalten, um alle bestehenden Aufrufstellen
+    // unangetastet zu lassen – formatiert jetzt in der vom Nutzer gewählten Währung).
+    function formatEuro(amount) {
+        return window.MV.formatCurrency(amount);
+    }
+
     // Kompakte Formatierung für Achsenbeschriftungen (ohne Nachkommastellen)
     function formatEuroCompact(amount) {
-        return new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 }).format(amount) + " €";
+        return window.MV.formatCurrencyCompact(amount);
     }
 
     function buildLinePath(coords) {
@@ -508,5 +556,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Init-Run
+    updateCurrencyLabels();
     berechneFinanzen();
 });

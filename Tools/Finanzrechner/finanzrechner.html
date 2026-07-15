@@ -82,10 +82,14 @@
                         </button>
                     </div>
 
-                    <button type="button" class="resetButton" id="resetCalculator">
-                        <i class="fa fa-undo" aria-hidden="true"></i>
-                        Zurücksetzen
-                    </button>
+                    <div class="toolbarActions">
+                        <select id="currencySelect" class="currencySelect" aria-label="Währung auswählen"></select>
+
+                        <button type="button" class="resetButton" id="resetCalculator">
+                            <i class="fa fa-undo" aria-hidden="true"></i>
+                            Zurücksetzen
+                        </button>
+                    </div>
                 </div>
 
                 <p class="instructionText">
@@ -126,7 +130,7 @@
                                                 value="10000"
                                                 inputmode="decimal"
                                             >
-                                            <span>€</span>
+                                            <span class="currencyUnit">€</span>
                                         </div>
                                     </div>
                                     <input
@@ -140,8 +144,8 @@
                                         aria-label="Startkapital einstellen"
                                     >
                                     <div class="rangeMeta" aria-hidden="true">
-                                        <span>0 €</span>
-                                        <span>100.000 €</span>
+                                        <span class="currencyRangeLabel" data-value="0">0 €</span>
+                                        <span class="currencyRangeLabel" data-value="100000">100.000 €</span>
                                     </div>
                                 </div>
 
@@ -158,22 +162,22 @@
                                                 value="150"
                                                 inputmode="decimal"
                                             >
-                                            <span>€</span>
+                                            <span class="currencyUnit">€</span>
                                         </div>
                                     </div>
                                     <input
                                         type="range"
-                                        id="sparRateSlider"
+                                        id="sparStartSlider"
                                         min="0"
-                                        max="2000"
-                                        step="25"
-                                        value="150"
+                                        max="100000"
+                                        step="500"
+                                        value="10000"
                                         class="finanzenSlider"
-                                        aria-label="Monatliche Sparrate einstellen"
+                                        aria-label="Startkapital einstellen"
                                     >
                                     <div class="rangeMeta" aria-hidden="true">
-                                        <span>0 €</span>
-                                        <span>2.000 €</span>
+                                        <span class="currencyRangeLabel" data-value="0">0 €</span>
+                                        <span class="currencyRangeLabel" data-value="100000">100.000 €</span>
                                     </div>
                                 </div>
 
@@ -285,7 +289,7 @@
                                                 value="5000"
                                                 inputmode="decimal"
                                             >
-                                            <span>€</span>
+                                            <span class="currencyUnit">€</span>
                                         </div>
                                     </div>
                                     <input
@@ -299,8 +303,8 @@
                                         aria-label="Heutigen Betrag einstellen"
                                     >
                                     <div class="rangeMeta" aria-hidden="true">
-                                        <span>0 €</span>
-                                        <span>100.000 €</span>
+                                        <span class="currencyRangeLabel" data-value="0">0 €</span>
+                                        <span class="currencyRangeLabel" data-value="100000">100.000 €</span>
                                     </div>
                                 </div>
 
@@ -412,7 +416,7 @@
                                                 value="8000"
                                                 inputmode="decimal"
                                             >
-                                            <span>€</span>
+                                            <span class="currencyUnit">€</span>
                                         </div>
                                     </div>
                                     <input
@@ -426,8 +430,8 @@
                                         aria-label="Investiertes Kapital einstellen"
                                     >
                                     <div class="rangeMeta" aria-hidden="true">
-                                        <span>1 €</span>
-                                        <span>100.000 €</span>
+                                        <span class="currencyRangeLabel" data-value="1">1 €</span>
+                                        <span class="currencyRangeLabel" data-value="100000">100.000 €</span>
                                     </div>
                                 </div>
 
@@ -444,7 +448,7 @@
                                                 value="12000"
                                                 inputmode="decimal"
                                             >
-                                            <span>€</span>
+                                            <span class="currencyUnit">€</span>
                                         </div>
                                     </div>
                                     <input
@@ -458,8 +462,8 @@
                                         aria-label="Endwert der Anlage einstellen"
                                     >
                                     <div class="rangeMeta" aria-hidden="true">
-                                        <span>0 €</span>
-                                        <span>200.000 €</span>
+                                        <span class="currencyRangeLabel" data-value="0">0 €</span>
+                                        <span class="currencyRangeLabel" data-value="200000">200.000 €</span>
                                     </div>
                                 </div>
 

@@ -385,6 +385,7 @@ form.addEventListener('submit', (e) => {
             containerOrders: {},
             theme: 'violet',
             fontsize: 20,
+            currency: window.MV.getCurrency(),
             isPro: false
         });
 

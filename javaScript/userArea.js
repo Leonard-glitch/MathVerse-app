@@ -9,7 +9,13 @@
 import { tools, groups } from './toolsCollection.js';
 
 
-const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/; // ganz oben in der Datei ergänzen
+const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/;
+
+// Tools mit eigenem Advanced Mode – bei neuen Tools mit Advanced Mode hier ergänzen.
+const ADVANCED_MODE_TOOLS = [
+    { key: 'einheitenUmrechner', label: 'Einheiten Umrechner', icon: 'fa-arrows-h' },
+    { key: 'prozentrechner', label: 'Prozentrechnung', icon: 'fa-percent' }
+];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let pendingTheme    = window.MV.getTheme();
@@ -57,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAccountPanel();
     initSecurityPanel();
     initAppearancePanel();
+    initExtrasPanel();
     initDeletePanel();
     initLogoutModal();
     initPasswordToggles();
@@ -366,9 +373,62 @@ function initAppearancePanel() {
 }
 
 // =============================================================================
-// FAVORITEN-PANEL
+// ZUSATZEINSTELLUNGEN-PANEL (Währung, Advanced Modes – werkzeugübergreifend)
 // =============================================================================
 
+function initExtrasPanel() {
+    const currencySelect = document.getElementById('extrasCurrencySelect');
+    const togglesList    = document.getElementById('advancedModesList');
+    const toast          = document.getElementById('extrasToast');
+
+    if (!currencySelect && !togglesList) return;
+
+    function showExtrasToast() {
+        if (!toast) return;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // ── Währung ──────────────────────────────────────────────────────────
+    if (currencySelect) {
+        currencySelect.innerHTML = Object.entries(window.MV.CURRENCIES)
+            .map(([code, name]) => `<option value="${code}">${code} – ${name}</option>`)
+            .join('');
+        currencySelect.value = window.MV.getCurrency();
+
+        currencySelect.addEventListener('change', () => {
+            window.MV.setCurrency(currencySelect.value);
+            showExtrasToast();
+        });
+    }
+
+    // ── Advanced Modes ───────────────────────────────────────────────────
+    if (togglesList) {
+        togglesList.innerHTML = ADVANCED_MODE_TOOLS.map(tool => `
+            <div class="extrasToggleRow">
+                <span class="extrasToggleLabel"><i class="fa ${tool.icon}"></i> ${tool.label}</span>
+                <label class="switch">
+                    <input type="checkbox" data-advanced-key="${tool.key}">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        `).join('');
+
+        togglesList.querySelectorAll('input[data-advanced-key]').forEach(input => {
+            const key = input.dataset.advancedKey;
+            input.checked = window.MV.getAdvancedMode(key);
+
+            input.addEventListener('change', () => {
+                window.MV.toggleAdvancedMode(key);
+                showExtrasToast();
+            });
+        });
+    }
+}
+
+// =============================================================================
+// FAVORITEN-PANEL
+// =============================================================================
 function populateFavorites() {
     const grid       = document.getElementById('favoritesGrid');
     const emptyState = document.getElementById('favEmptyState');

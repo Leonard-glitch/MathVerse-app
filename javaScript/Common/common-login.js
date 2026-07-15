@@ -65,6 +65,22 @@ localStorage.removeItem("");
     }
 };
 
+    // Top-10-Währungen für Finanz-Tools (weltweite Nutzung). Locale bleibt
+    // fest 'de-DE' (Zahlenformat der restlichen Seite), nur der Currency-Code
+    // wechselt – siehe formatCurrency() weiter unten.
+    const CURRENCIES = {
+        EUR: 'Euro',
+        USD: 'US-Dollar',
+        GBP: 'Britisches Pfund',
+        JPY: 'Japanischer Yen',
+        CHF: 'Schweizer Franken',
+        CAD: 'Kanadischer Dollar',
+        AUD: 'Australischer Dollar',
+        CNY: 'Chinesischer Yuan',
+        INR: 'Indische Rupie',
+        BRL: 'Brasilianischer Real'
+    };
+
     // Schema für currentUser anpassen (Standard auf 'abyss')
     const DEFAULT_USER = () => ({
         username: 'Gast',
@@ -77,6 +93,7 @@ localStorage.removeItem("");
         theme: 'violet',
         design: 'abyss',
         fontsize: 20,
+        currency: 'EUR',
         isPro: false
     });
 
@@ -391,6 +408,45 @@ localStorage.removeItem("");
         );
     }
 
+    // ==========================================================================
+    // WÄHRUNG – gleiche Logik wie Theme/Design (global, nicht pro-Tool wie die
+    // Advanced Modes), damit künftige Finanz-Tools dieselbe Einstellung nutzen.
+    // ==========================================================================
+
+    function getCurrency() {
+        const u = getCurrentUser();
+        if (isLoggedIn() && u && u.currency) return u.currency;
+        return localStorage.getItem('mv-currency') || 'EUR';
+    }
+
+    function setCurrency(code) {
+        if (isLoggedIn()) {
+            updateCurrentUser({ currency: code });
+        } else {
+            localStorage.setItem('mv-currency', code);
+        }
+    }
+
+    // Reines Symbol/Kürzel der aktuellen Währung (z.B. "€", "$") – für
+    // Einheiten-Labels neben Eingabefeldern, ohne vollen Zahlenwert.
+    function getCurrencySymbol() {
+        const parts = new Intl.NumberFormat('de-DE', { style: 'currency', currency: getCurrency() }).formatToParts(0);
+        const symbolPart = parts.find(p => p.type === 'currency');
+        return symbolPart ? symbolPart.value : getCurrency();
+    }
+
+    // Formatiert einen Betrag in der gespeicherten Währung. Locale bleibt
+    // 'de-DE'; Nachkommastellen richten sich nach der jeweiligen Währung
+    // (z.B. 0 bei Yen), statt sie hart auf 2 zu erzwingen.
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('de-DE', { style: 'currency', currency: getCurrency() }).format(amount);
+    }
+
+    // Kompakte Variante ohne Nachkommastellen, für Achsenbeschriftungen/Range-Labels.
+    function formatCurrencyCompact(amount) {
+        return new Intl.NumberFormat('de-DE', { style: 'currency', currency: getCurrency(), maximumFractionDigits: 0 }).format(amount);
+    }
+
 
     function getPasswordStrength(pw) {
         if (!pw) return 0;
@@ -491,6 +547,7 @@ localStorage.removeItem("");
     // ==========================================================================
     window.MV = {
         THEMES,
+        CURRENCIES,
         redirectIfLoggedIn,
         isLoggedIn,
         getCurrentUser,
@@ -503,6 +560,7 @@ localStorage.removeItem("");
         getTheme, setTheme, getFontSize, setFontSize,
         getDesign, setDesign,
         applyTheme, applyFontSize, applyDesign,
+        getCurrency, setCurrency, getCurrencySymbol, formatCurrency, formatCurrencyCompact,
         getPasswordStrength,
         showLoginPrompt, hideLoginPrompt,
         getUsername: () => (getCurrentUser()?.username) || 'Gast',
