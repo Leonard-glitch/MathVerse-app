@@ -41,7 +41,13 @@
 
                         <div class="formSelectDiv">
                             <select name="selectForm" id="selectForm" class="selection">
-                                <option value="">Rechtwinkliges Dreieck</option>
+                                <option value="circle">Kreis</option>
+                                <option value="rectangle">Rechteck</option>
+                                <option value="square">Quadrat</option>
+                                <option value="triangle">Allgemeines Dreieck</option>
+                                <option value="right_triangle">Rechtwinkliges Dreieck</option>
+                                <option value="trapezoid">Trapez</option>
+                                <option value="parallelogram">Parallelogramm</option>
                             </select>
                         </div>
                     </div>
@@ -63,6 +69,9 @@
                                 <input type="number" id="zahlenInput" placeholder="Zahl" class="zahlenInputfeld">
                             </div>
                         </div>
+
+                        <p class="falscheEingabestyle" id="errorMessages"></p>
+
 
                         <div class="zahlenAusgabestyle" id="ausgabeContainer">
 
