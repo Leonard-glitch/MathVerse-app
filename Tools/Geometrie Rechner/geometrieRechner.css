@@ -142,7 +142,7 @@
 }
 
 .geometryLeftInputContainer{
-    width: 60%;
+    width: 58%;
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
@@ -150,11 +150,12 @@
     gap: 3rem;
 }
 .geometryRightFormContainer{
-    width: 50%;
-    border-left: 1px solid var(--border-color);
+    width: 42%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
 }
 
 
@@ -409,7 +410,64 @@
 }
 
 
+/* ── Skizze / Formvorschau ────────────────────────────────────────────── */
 
+.shapeSketch {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    overflow: visible;
+}
+
+.shapeSketch .sketchOutline {
+    fill: none;
+    stroke: var(--border-color);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+}
+
+.shapeSketch .sketchCenter {
+    fill: var(--text-muted);
+}
+
+.shapeSketch .sketchDim {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+.shapeSketch .sketchDim.is-active {
+    stroke: var(--accent-live);
+}
+
+.shapeSketch .sketchLabel {
+    fill: var(--text-secondary);
+    font-family: var(--font-main);
+    font-size: 13px;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.shapeSketch .sketchLabel.is-active {
+    fill: var(--accent-live);
+    font-weight: 700;
+    filter: drop-shadow(0 0 4px var(--glow-live));
+}
+
+.sketchPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    text-align: center;
+}
+
+.sketchPlaceholder i {
+    font-size: 1.6rem;
+}
 
 @media (max-width: 1440px) {
     .geometryContainer{

@@ -4,6 +4,7 @@ const shapeConfig = {
     // --- 2D FIGUREN ---
     circle: {
         name: 'Kreis',
+        dimension: '2d',
         type: 1,
         inputs: [
             { id: 'r', label: 'Radius (r)' },
@@ -14,6 +15,7 @@ const shapeConfig = {
     },
     rectangle: {
         name: 'Rechteck',
+        dimension: '2d',
         type: 2,
         inputs: [
             { id: 'a', label: 'Seite a' },
@@ -25,6 +27,7 @@ const shapeConfig = {
     },
     square: {
         name: 'Quadrat',
+        dimension: '2d',
         type: 1,
         inputs: [
             { id: 'a', label: 'Seitenlänge (a)' },
@@ -35,6 +38,7 @@ const shapeConfig = {
     },
     triangle: {
         name: 'Allgemeines Dreieck',
+        dimension: '2d',
         type: 3,
         inputs: [
             { id: 'a', label: 'Seite a' },
@@ -51,6 +55,7 @@ const shapeConfig = {
     },
     rightTriangle: {
         name: 'Rechtwinkliges Dreieck',
+        dimension: '2d',
         type: 2,
         inputs: [
             { id: 'a', label: 'Kathete a' },
@@ -63,6 +68,7 @@ const shapeConfig = {
     },
     trapezoid: {
         name: 'Trapez',
+        dimension: '2d',
         type: 3,
         inputs: [
             { id: 'a', label: 'Grundseite a' },
@@ -73,6 +79,7 @@ const shapeConfig = {
     },
     parallelogram: {
         name: 'Parallelogramm',
+        dimension: '2d',
         type: 3,
         inputs: [
             { id: 'a', label: 'Seite a' },
@@ -81,10 +88,24 @@ const shapeConfig = {
             { id: 'A', label: 'Fläche (A)' }
         ]
     },
+    rhombus: {
+        name: 'Raute',
+        dimension: '2d',
+        type: 3,
+        inputs: [
+            { id: 'a', label: 'Seitenlänge (a)' },
+            { id: 'e', label: 'Diagonale e' },
+            { id: 'f', label: 'Diagonale f' },
+            { id: 'h', label: 'Höhe (h)' },
+            { id: 'u', label: 'Umfang (U)' },
+            { id: 'A', label: 'Fläche (A)' }
+        ]
+    },
 
     // --- 3D KÖRPER ---
     cube: {
         name: 'Würfel',
+        dimension: '3d',
         type: 1,
         inputs: [
             { id: 'a', label: 'Kantenlänge (a)' },
@@ -95,6 +116,7 @@ const shapeConfig = {
     },
     cuboid: {
         name: 'Quader',
+        dimension: '3d',
         type: 3,
         inputs: [
             { id: 'a', label: 'Länge (a)' },
@@ -108,6 +130,7 @@ const shapeConfig = {
     },
     sphere: {
         name: 'Kugel',
+        dimension: '3d',
         type: 1,
         inputs: [
             { id: 'r', label: 'Radius (r)' },
@@ -118,6 +141,7 @@ const shapeConfig = {
     },
     cylinder: {
         name: 'Zylinder',
+        dimension: '3d',
         type: 2,
         inputs: [
             { id: 'r', label: 'Radius (r)' },
@@ -131,6 +155,7 @@ const shapeConfig = {
     },
     cone: {
         name: 'Kegel',
+        dimension: '3d',
         type: 2,
         inputs: [
             { id: 'r', label: 'Radius (r)' },
@@ -145,6 +170,7 @@ const shapeConfig = {
     },
     quadrangularpyramid: {
         name: 'Quadratische Pyramide',
+        dimension: '3d',
         type: 2,
         inputs: [
             { id: 'a', label: 'Grundkante (a)' },
@@ -158,6 +184,7 @@ const shapeConfig = {
     },
     rectangularpyramid: {
         name: 'Rechteckige Pyramide',
+        dimension: '3d',
         type: 3,
         inputs: [
             { id: 'a', label: 'Grundkante a' },
@@ -172,6 +199,13 @@ const shapeConfig = {
         ]
     }
 };
+
+function buildFormOptions(dimension) {
+    return Object.entries(shapeConfig)
+        .filter(([, cfg]) => cfg.dimension === dimension)
+        .map(([key, cfg]) => `<option value="${key}">${cfg.name}</option>`)
+        .join("");
+}
 
 const inputsContainer = document.getElementById("variousInputContainer");
 
@@ -235,37 +269,142 @@ inputTypeThree.innerHTML =`
 const errorMessages=document.getElementById("errorMessages");
 const typeButtons=document.querySelectorAll(".dimensionTypeBtn");
 const formSelectContainer=document.getElementById("selectForm");
+const sketchContainer=document.querySelector(".geometryRightFormContainer");
 
-let currentType = "2d"; 
+let currentType = "2d";
+
+// ── Gegenseitiger Ausschluss der Dropdown-Werte ─────────────────────────
+// Ein bereits in einem anderen Dropdown gewählter Wert darf nicht ein
+// zweites Mal auswählbar sein
+function getAllActiveSelects() {
+    return Array.from(inputsContainer.querySelectorAll(".inputContainer .selection"));
+}
+
+function refreshSelectOptions(shape) {
+    const selects = getAllActiveSelects();
+
+    selects.forEach(select => {
+        const usedByOthers = new Set(
+            selects.filter(s => s !== select && s.value).map(s => s.value)
+        );
+        const currentValue = select.value;
+
+        select.innerHTML = shape.inputs
+            .filter(input => input.id === currentValue || !usedByOthers.has(input.id))
+            .map(input => `<option value="${input.id}">${input.label}</option>`)
+            .join("");
+
+        if (currentValue) select.value = currentValue;
+    });
+}
+
+// ── Skizze / Formvorschau ────────────────────────────────────────────────
+function sketchCircle(given) {
+    const on = id => given[id] !== undefined ? "is-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <circle class="sketchOutline" cx="120" cy="120" r="80" />
+    <circle class="sketchCenter" cx="120" cy="120" r="2.5" />
+
+    <line class="sketchDim ${on('r')}" x1="120" y1="120" x2="177" y2="63" />
+    <text class="sketchLabel ${on('r')}" x="156" y="82">r</text>
+
+    <line class="sketchDim ${on('d')}" x1="40" y1="120" x2="200" y2="120" />
+    <text class="sketchLabel ${on('d')}" x="120" y="138">d</text>
+
+    <text class="sketchLabel ${on('A')}" x="95" y="150">A</text>
+    <text class="sketchLabel ${on('u')}" x="120" y="214">U</text>
+</svg>`;
+}
+
+function sketchSquare(given) {
+    const on = id => given[id] !== undefined ? "is-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <rect class="sketchOutline" x="60" y="60" width="120" height="120" />
+
+    <line class="sketchDim ${on('a')}" x1="60" y1="192" x2="180" y2="192" />
+    <text class="sketchLabel ${on('a')}" x="120" y="208">a</text>
+
+    <line class="sketchDim ${on('d')}" x1="60" y1="60" x2="180" y2="180" />
+    <text class="sketchLabel ${on('d')}" x="152" y="98">d</text>
+
+    <text class="sketchLabel ${on('A')}" x="95" y="145">A</text>
+    <text class="sketchLabel ${on('u')}" x="45" y="45">U</text>
+</svg>`;
+}
+
+function sketchRectangle(given) {
+    const on = id => given[id] !== undefined ? "is-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <rect class="sketchOutline" x="40" y="70" width="160" height="100" />
+
+    <line class="sketchDim ${on('a')}" x1="40" y1="184" x2="200" y2="184" />
+    <text class="sketchLabel ${on('a')}" x="120" y="200">a</text>
+
+    <line class="sketchDim ${on('b')}" x1="214" y1="70" x2="214" y2="170" />
+    <text class="sketchLabel ${on('b')}" x="228" y="120">b</text>
+
+    <line class="sketchDim ${on('d')}" x1="40" y1="70" x2="200" y2="170" />
+    <text class="sketchLabel ${on('d')}" x="165" y="100">d</text>
+
+    <text class="sketchLabel ${on('A')}" x="90" y="140">A</text>
+    <text class="sketchLabel ${on('u')}" x="40" y="55">U</text>
+</svg>`;
+}
+
+// Formkey -> Zeichenfunktion. Formen ohne Eintrag zeigen einen Platzhalter,
+const shapeSketches = {
+    circle: sketchCircle,
+    square: sketchSquare,
+    rectangle: sketchRectangle
+};
+
+function renderSketch(shapeKey, given) {
+    if (!sketchContainer) return;
+
+    const sketchFn = shapeSketches[shapeKey];
+    if (sketchFn) {
+        sketchContainer.innerHTML = sketchFn(given);
+        return;
+    }
+
+    const shape = shapeConfig[shapeKey];
+    sketchContainer.innerHTML = `
+        <div class="sketchPlaceholder">
+            <i class="fa fa-square-o" aria-hidden="true"></i>
+            <span>Skizze für „${shape ? shape.name : ""}" folgt in Kürze.</span>
+        </div>`;
+}
+
+// Liest, welche Werte aktuell einem Dropdown zugeordnet UND bereits
+// eingetippt sind -> steuert die Hervorhebung in der Skizze.
+function getGivenValues() {
+    const given = {};
+    getAllActiveSelects().forEach(select => {
+        const row = select.closest(".inputContainer, .inputRow");
+        const numberInput = row ? row.querySelector(".zahlenInputfeld") : null;
+        if (numberInput && numberInput.value.trim() !== "") {
+            given[select.value] = parseFloat(numberInput.value.replace(",", "."));
+        }
+    });
+    return given;
+}
+
+function refreshSketch() {
+    const shape = shapeConfig[formSelectContainer.value];
+    if (shape) renderSketch(formSelectContainer.value, getGivenValues());
+} 
 
 typeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         typeButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         currentType = btn.dataset.type;
-        if(currentType==="2d"){
-            formSelectContainer.innerHTML = `
-                <option value="circle">Kreis</option>
-                <option value="rectangle">Rechteck</option>
-                <option value="square">Quadrat</option>
-                <option value="triangle">Allgemeines Dreieck</option>
-                <option value="right_triangle">Rechtwinkliges Dreieck</option>
-                <option value="trapezoid">Trapez</option>
-                <option value="parallelogram">Parallelogramm</option>
-            `;
-        setCurrentInputType("circle");
-        }else if(currentType==="3d"){
-           formSelectContainer.innerHTML = `
-                <option value="cube">Würfel</option>
-                <option value="cuboid">Quader</option>
-                <option value="sphere">Kugel</option>
-                <option value="cylinder">Zylinder</option>
-                <option value="cone">Kegel</option>
-                <option value="quadrangularpyramid">Quadratische Pyramide</option>
-                <option value="rectangularpyramid">Rechteckige Pyramide</option>
-            `;
-        setCurrentInputType("square");
-        }
+
+        formSelectContainer.innerHTML = buildFormOptions(currentType);
+        setCurrentInputType(formSelectContainer.value);
     });
 });
 
@@ -282,91 +421,108 @@ function hideError() {
 
 
 
+let currentDecimalPlaces = window.MV.getDecimalPlaces();
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Elemente aus dem DOM holen
     const advancedSettingsBtn = document.getElementById('advancedSettingsBtn');
     const settingsModal = document.getElementById('settingsModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
     const decimalPlacesSelect = document.getElementById('decimalPlaces');
 
-    // Globale Variable für deine Berechnungen (Standard: 2)
-    let currentDecimalPlaces = 2; 
+    decimalPlacesSelect.value = currentDecimalPlaces;
 
-    // Modal öffnen
-    advancedSettingsBtn.addEventListener('click', () => {
-        settingsModal.classList.add('show');
-    });
-
-    // Modal schließen (Klick auf das X)
-    closeModalBtn.addEventListener('click', () => {
-        settingsModal.classList.remove('show');
-    });
-
-    // Modal schließen (Klick irgendwo auf den abgedunkelten Hintergrund)
+    advancedSettingsBtn.addEventListener('click', () => { settingsModal.classList.add('show'); });
+    closeModalBtn.addEventListener('click', () => { settingsModal.classList.remove('show'); });
     window.addEventListener('click', (event) => {
-        if (event.target === settingsModal) {
-            settingsModal.classList.remove('show');
-        }
+        if (event.target === settingsModal) settingsModal.classList.remove('show');
     });
 
-    // Einstellungen speichern
     saveSettingsBtn.addEventListener('click', () => {
-        // Wert auslesen und als Zahl speichern
         currentDecimalPlaces = parseInt(decimalPlacesSelect.value, 10);
-        
-        // Hier kannst du später eine Funktion aufrufen, 
-        // die deine Ausgabe aktualisiert z.B. updateResults();
-        
-        // Modal wieder schließen
+        window.MV.setDecimalPlaces(currentDecimalPlaces);
         settingsModal.classList.remove('show');
+    });
+
+    // Cross-Tab/bfcache-Sync, gleiche Logik wie im Finanzrechner
+    window.addEventListener('mv:staterestore', () => {
+        currentDecimalPlaces = window.MV.getDecimalPlaces();
+        decimalPlacesSelect.value = currentDecimalPlaces;
     });
 });
 
 function addThirdInput(){
+    const shape = shapeConfig[formSelectContainer.value];
+    if (!shape) return;
+
     document.querySelector(".inputContainer").insertAdjacentHTML('beforeend', `
     <div class="inputRow" id="inputRow3">
         <div class="inputSelectDiv">
-            <select name="selectInput" id="selectInputRow3" class="selection">
-                <option value="r">Radius</option>
-                <option value="r">langer Durchmesser d</option>
-            </select>
+            <select name="selectInput" id="selectInputRow3" class="selection"></select>
         </div>
         <input type="number" id="zahlenInputRow3" placeholder="Zahl" class="zahlenInputfeld">
     </div>`);
+
+    const select3 = document.getElementById("selectInputRow3");
+    select3.innerHTML = shape.inputs
+        .map(input => `<option value="${input.id}">${input.label}</option>`)
+        .join("");
+
+    // Ersten noch freien Wert vorauswählen (üblicherweise der 3. Input der Form)
+    const used = new Set(getAllActiveSelects().filter(s => s !== select3 && s.value).map(s => s.value));
+    const free = shape.inputs.find(input => !used.has(input.id));
+    if (free) select3.value = free.id;
+
+    refreshSelectOptions(shape);
+    refreshSketch();
 }
 
 function deleteThirdInput(){
     const row = document.getElementById("inputRow3");
-    if (row) {
-        row.remove();
-    }
+    if (row) row.remove();
+
+    const shape = shapeConfig[formSelectContainer.value];
+    if (shape) refreshSelectOptions(shape);
+    refreshSketch();
 }
 
-let currentType2 = "2Inputs"; 
+// Delegiert auf inputTypeThree selbst (persistenter Node, wird nur ein-/ausgehängt,
+// nie neu erstellt) – vorher lief querySelectorAll auf einem noch nicht
+// eingehängten Element und band daher nie einen Listener.
+inputTypeThree.addEventListener("click", (e) => {
+    const btn = e.target.closest(".numbInputTypeBtn");
+    if (!btn) return;
 
-document.querySelectorAll(".numbInputTypeBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        numbInputTypeBtn=document.querySelectorAll(".numbInputTypeBtn");
-        numbInputTypeBtn.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+    inputTypeThree.querySelectorAll(".numbInputTypeBtn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
 
-        console.log(true)
-        const currentType = btn.dataset.type;
-        const thirdInput = document.getElementById("zahlenInputRow3");
+    const thirdInput = document.getElementById("zahlenInputRow3");
 
-        if (currentType === "2Inputs" && thirdInput) {
-            deleteThirdInput();
-        } else if (currentType === "3Inputs" && !thirdInput) {
-            addThirdInput();
-        }
-    });
+    if (btn.dataset.type === "2Inputs" && thirdInput) {
+        deleteThirdInput();
+    } else if (btn.dataset.type === "3Inputs" && !thirdInput) {
+        addThirdInput();
+    }
 });
 
 
 formSelectContainer.addEventListener("change", (event) => {
     const selectedShape = event.target.value;
     setCurrentInputType(selectedShape);
+});
+
+// Delegiert auf dem Container statt auf einzelnen Selects/Inputs, damit auch
+// die per addThirdInput() nachträglich eingefügte 3. Zeile erfasst wird.
+inputsContainer.addEventListener("change", (e) => {
+    if (!e.target.classList.contains("selection")) return;
+    const shape = shapeConfig[formSelectContainer.value];
+    if (shape) refreshSelectOptions(shape);
+    refreshSketch();
+});
+
+inputsContainer.addEventListener("input", (e) => {
+    if (!e.target.classList.contains("zahlenInputfeld")) return;
+    refreshSketch();
 });
 
 function setCurrentInputType(type){
@@ -387,34 +543,26 @@ function setCurrentInputType(type){
     }
 
     populateDropdowns(type);
+    refreshSketch();
 }
 
 function populateDropdowns(shapeKey) {
     const shape = shapeConfig[shapeKey];
     if (!shape) return;
 
-    // Wir holen uns alle Select-Elemente, die GERADE im Container aktiv sind
-    const selects = inputsContainer.querySelectorAll(".inputContainer .selection");
+    const selects = getAllActiveSelects();
 
     selects.forEach((select, index) => {
-        // Zuerst löschen wir alte Optionen raus
-        select.innerHTML = "";
+        select.innerHTML = shape.inputs
+            .map(input => `<option value="${input.id}">${input.label}</option>`)
+            .join("");
 
-        // Jetzt fügen wir für jeden Input aus der Config eine Option hinzu
-        shape.inputs.forEach((input) => {
-            const option = document.createElement("option");
-            option.value = input.id;
-            option.textContent = input.label;
-            select.appendChild(option);
-        });
-
-        // Smarter Bonus: Wenn wir mehrere Inputs haben (z.B. Typ 2 oder 3),
-        // wählen wir automatisch für das zweite Feld auch die zweite Option aus,
-        // damit nicht überall standardmäßig das Gleiche ausgewählt ist.
-        if (selects.length > 1 && index < shape.inputs.length) {
-            select.selectedIndex = index;
-        }
+        // Sinnvolle Default-Zuordnung: 1. Dropdown -> 1. Input, 2. -> 2. usw.
+        if (index < shape.inputs.length) select.selectedIndex = index;
     });
+
+    refreshSelectOptions(shape);
 }
 
-setCurrentInputType("circle");
+formSelectContainer.innerHTML = buildFormOptions("2d");
+setCurrentInputType(formSelectContainer.value);

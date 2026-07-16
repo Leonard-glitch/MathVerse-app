@@ -94,6 +94,7 @@ localStorage.removeItem("");
         design: 'abyss',
         fontsize: 20,
         currency: 'EUR',
+        decimalPlaces: 2,
         isPro: false
     });
 
@@ -447,6 +448,24 @@ localStorage.removeItem("");
         return new Intl.NumberFormat('de-DE', { style: 'currency', currency: getCurrency(), maximumFractionDigits: 0 }).format(amount);
     }
 
+    // ==========================================================================
+    // NACHKOMMASTELLEN (Geometrie Rechner u.a.) – gleiche Logik wie Währung
+    // ==========================================================================
+
+    function getDecimalPlaces() {
+        const u = getCurrentUser();
+        if (isLoggedIn() && u && u.decimalPlaces !== undefined) return parseInt(u.decimalPlaces, 10);
+        return parseInt(localStorage.getItem('mv-decimalPlaces') || '2', 10);
+    }
+
+    function setDecimalPlaces(count) {
+        if (isLoggedIn()) {
+            updateCurrentUser({ decimalPlaces: count });
+        } else {
+            localStorage.setItem('mv-decimalPlaces', String(count));
+        }
+    }
+
 
     function getPasswordStrength(pw) {
         if (!pw) return 0;
@@ -561,6 +580,7 @@ localStorage.removeItem("");
         getDesign, setDesign,
         applyTheme, applyFontSize, applyDesign,
         getCurrency, setCurrency, getCurrencySymbol, formatCurrency, formatCurrencyCompact,
+        getDecimalPlaces, setDecimalPlaces,
         getPasswordStrength,
         showLoginPrompt, hideLoginPrompt,
         getUsername: () => (getCurrentUser()?.username) || 'Gast',
@@ -688,7 +708,7 @@ localStorage.removeItem("");
     // Listener mehr zu bauen, sondern hören nur noch auf dieses eine Event:
     //   window.addEventListener('mv:staterestore', meineRefreshFunktion)
     // ==========================================================================
-    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize'];
+    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize', 'mv-decimalPlaces'];
 
     function dispatchStateRestore() {
         window.dispatchEvent(new CustomEvent('mv:staterestore'));

@@ -386,10 +386,11 @@ function initAppearancePanel() {
 
 function initExtrasPanel() {
     const currencySelect = document.getElementById('extrasCurrencySelect');
+    const decimalSelect  = document.getElementById('extrasDecimalSelect');
     const togglesList    = document.getElementById('advancedModesList');
     const toast          = document.getElementById('extrasToast');
 
-    if (!currencySelect && !togglesList) return;
+    if (!currencySelect && !decimalSelect && !togglesList) return;
 
     function showExtrasToast() {
         if (!toast) return;
@@ -406,6 +407,19 @@ function initExtrasPanel() {
 
         currencySelect.addEventListener('change', () => {
             window.MV.setCurrency(currencySelect.value);
+            showExtrasToast();
+        });
+    }
+
+    // ── Nachkommastellen ─────────────────────────────────────────────────
+    if (decimalSelect) {
+        decimalSelect.innerHTML = [0, 1, 2, 3, 4, 5]
+            .map(n => `<option value="${n}">${n}</option>`)
+            .join('');
+        decimalSelect.value = window.MV.getDecimalPlaces();
+
+        decimalSelect.addEventListener('change', () => {
+            window.MV.setDecimalPlaces(parseInt(decimalSelect.value, 10));
             showExtrasToast();
         });
     }
@@ -439,6 +453,9 @@ function initExtrasPanel() {
 function refreshExtrasPanelValues() {
     const currencySelect = document.getElementById('extrasCurrencySelect');
     if (currencySelect) currencySelect.value = window.MV.getCurrency();
+
+    const decimalSelect = document.getElementById('extrasDecimalSelect');
+    if (decimalSelect) decimalSelect.value = window.MV.getDecimalPlaces();
 
     document.querySelectorAll('#advancedModesList input[data-advanced-key]').forEach(input => {
         input.checked = window.MV.getAdvancedMode(input.dataset.advancedKey);

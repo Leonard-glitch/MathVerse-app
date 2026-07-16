@@ -386,6 +386,7 @@ form.addEventListener('submit', (e) => {
             theme: 'violet',
             fontsize: 20,
             currency: window.MV.getCurrency(),
+            decimalPlaces: window.MV.getDecimalPlaces(),
             isPro: false
         });
 
