@@ -343,14 +343,15 @@ function deleteThirdInput(){
     }
 }
 
-const numbInputTypeBtn = document.querySelectorAll(".numbInputTypeBtn");
 let currentType2 = "2Inputs"; 
 
-numbInputTypeBtn.forEach(btn => {
+document.querySelectorAll(".numbInputTypeBtn").forEach(btn => {
     btn.addEventListener("click", () => {
+        numbInputTypeBtn=document.querySelectorAll(".numbInputTypeBtn");
         numbInputTypeBtn.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        
+
+        console.log(true)
         const currentType = btn.dataset.type;
         const thirdInput = document.getElementById("zahlenInputRow3");
 

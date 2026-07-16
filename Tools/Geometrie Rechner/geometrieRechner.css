@@ -147,6 +147,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 3rem;
 }
 .geometryRightFormContainer{
     width: 50%;
@@ -159,8 +160,7 @@
 
 #variousInputContainer{
     width: 100%;
-    margin-top: 3rem;
-    
+    margin-top: 1rem;
 }
 
 .inputContainer{
@@ -200,8 +200,6 @@
     flex-direction: column;
     width: 90%;
     max-width: 500px;
-    margin-top: 4rem;
-    margin-bottom: 1.5rem;
     padding: 1.5rem;
 
     background-color: var(--bg-surface);
@@ -262,7 +260,6 @@
 
 
 .calculationDetails {
-    margin-top: 1rem;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     background: transparent;
@@ -454,6 +451,12 @@
 
     .geometryDivTop{
         flex-direction: column;
+        gap: 0.2rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .geometryLeftInputContainer{
+        gap: 0.5rem;
     }
 
     .geometrySettingsContainer{
