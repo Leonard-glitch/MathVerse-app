@@ -70,6 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileSidebar();
 });
 
+// Zentrales Signal aus common-login.js: feuert bei bfCache-Restore (Zurück/Vor)
+// und bei Änderungen in anderen Tabs (z.B. Währung in UserArea, während der
+// Finanzrechner offen ist – und umgekehrt).
+window.addEventListener('mv:staterestore', () => {
+    populateUserInfo();
+    refreshExtrasPanelValues();
+});
+
 // =============================================================================
 // PANEL NAVIGATION
 // =============================================================================
@@ -424,6 +432,17 @@ function initExtrasPanel() {
             });
         });
     }
+}
+
+// Hält Währung + Advanced-Mode-Schalter synchron, falls sie in einem anderen
+// Tab (oder via bfCache-Restore) geändert wurden – siehe mv:staterestore weiter unten.
+function refreshExtrasPanelValues() {
+    const currencySelect = document.getElementById('extrasCurrencySelect');
+    if (currencySelect) currencySelect.value = window.MV.getCurrency();
+
+    document.querySelectorAll('#advancedModesList input[data-advanced-key]').forEach(input => {
+        input.checked = window.MV.getAdvancedMode(input.dataset.advancedKey);
+    });
 }
 
 // =============================================================================

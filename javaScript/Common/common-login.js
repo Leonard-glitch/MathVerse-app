@@ -680,6 +680,28 @@ localStorage.removeItem("");
         sessionStorage.setItem('mv-return-url', window.location.href);
     }
 
+    // ==========================================================================
+    // ZENTRALES STATE-RESTORE-SIGNAL
+    // Feuert bei bfCache-Restore (Zurück/Vor-Navigation) und bei
+    // Storage-Änderungen aus anderen Tabs (Login/Logout, Theme, Währung, ...).
+    // Einzelne Tools/Seiten brauchen dafür KEINE eigenen pageshow/storage-
+    // Listener mehr zu bauen, sondern hören nur noch auf dieses eine Event:
+    //   window.addEventListener('mv:staterestore', meineRefreshFunktion)
+    // ==========================================================================
+    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize'];
+
+    function dispatchStateRestore() {
+        window.dispatchEvent(new CustomEvent('mv:staterestore'));
+    }
+
+    window.addEventListener('storage', (e) => {
+        if (!RESTORE_STORAGE_KEYS.includes(e.key)) return;
+        applyTheme(getTheme());
+        applyFontSize(getFontSize());
+        applyDesign(getDesign());
+        dispatchStateRestore();
+    });
+
     window.addEventListener('pageshow', function (e) {
         if (!e.persisted) return;
 
@@ -708,6 +730,8 @@ localStorage.removeItem("");
             `;
             if (isLoggedIn()) changeNavUserArea();
         }
+
+        dispatchStateRestore();
     });
 
 })();

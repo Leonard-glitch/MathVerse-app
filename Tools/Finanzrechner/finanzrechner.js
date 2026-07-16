@@ -167,15 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
         berechneFinanzen();
     }
 
-    window.addEventListener("pageshow", (e) => {
-        if (e.persisted) refreshCurrencyFromStorage();
-    });
-
-    window.addEventListener("storage", (e) => {
-        if (e.key === "currentUser" || e.key === "isLoggedIn" || e.key === "mv-currency") {
-            refreshCurrencyFromStorage();
-        }
-    });
+    window.addEventListener("mv:staterestore", refreshCurrencyFromStorage);
 
     // Tab-Wechsel-Eventhandler
     tabs.forEach(tab => {
@@ -420,10 +412,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 chartEingezahlt.push(K0 + R * nJ);
             }
 
+            // Exakten Endpunkt ergänzen, falls die Laufzeit nicht ganzzahlig ist
+            // (z.B. 10.5 Jahre) – sonst würde die Kurve am letzten vollen Jahr
+            // enden und den tatsächlichen Endwert nie erreichen.
+            if (!Number.isInteger(jahre)) {
+                chartJahre.push(jahre);
+                chartKapital.push(gesamtEndkapital);
+                chartEingezahlt.push(eingezahltesKapital);
+            }
+
             renderChart({
                 primary: chartKapital,
                 secondary: chartEingezahlt,
-                xLabels: chartJahre.map(j => `${j}J`),
+                xLabels: chartJahre.map(j => `${Number.isInteger(j) ? j : j.toFixed(1)}J`),
                 primaryLabel: "Gesamtkapital",
                 secondaryLabel: "Einzahlungen",
                 title: "Kapitalentwicklung",
@@ -477,10 +478,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 chartNominal.push(betrag);
             }
 
+            // Exakten Endpunkt ergänzen, falls die Laufzeit nicht ganzzahlig ist
+            if (!Number.isInteger(jahre)) {
+                chartJahre.push(jahre);
+                chartKaufkraft.push(kaufkraft);
+                chartNominal.push(betrag);
+            }
+
             renderChart({
                 primary: chartKaufkraft,
                 secondary: chartNominal,
-                xLabels: chartJahre.map(j => `${j}J`),
+                xLabels: chartJahre.map(j => `${Number.isInteger(j) ? j : j.toFixed(1)}J`),
                 primaryLabel: "Reale Kaufkraft",
                 secondaryLabel: "Nomineller Betrag",
                 title: "Kaufkraftentwicklung",
@@ -543,10 +551,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 chartStart.push(invest);
             }
 
+            // Exakten Endpunkt ergänzen, falls die Laufzeit nicht ganzzahlig ist
+            if (!Number.isInteger(jahre)) {
+                chartJahre.push(jahre);
+                chartWert.push(endwert);
+                chartStart.push(invest);
+            }
+
             renderChart({
                 primary: chartWert,
                 secondary: chartStart,
-                xLabels: chartJahre.map(j => `${j}J`),
+                xLabels: chartJahre.map(j => `${Number.isInteger(j) ? j : j.toFixed(1)}J`),
                 primaryLabel: "Angenommene Wertentwicklung",
                 secondaryLabel: "Startkapital",
                 title: "Wertentwicklung",
