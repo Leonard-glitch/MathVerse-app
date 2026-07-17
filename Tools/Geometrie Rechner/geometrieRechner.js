@@ -322,14 +322,16 @@ function refreshSelectOptions(shape) {
 // ── Skizze / Formvorschau ────────────────────────────────────────────────
 function sketchCircle(given) {
     const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    const perimeterOn = given.has('u') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-    <circle class="sketchOutline" cx="120" cy="120" r="80" />
+    <circle class="sketchOutline ${areaOn} ${perimeterOn}" cx="120" cy="120" r="80" />
     <circle class="sketchCenter" cx="120" cy="120" r="2.5" />
 
     <line class="sketchDim ${on('r')}" x1="120" y1="120" x2="177" y2="63" />
     <circle class="sketchHandle ${on('r')}" cx="177" cy="63" r="4" />
-    <text class="sketchLabel ${on('r')}" x="156" y="82">r</text>
+    <text class="sketchLabel ${on('r')}" x="156" y="76">r</text>
 
     <line class="sketchDim ${on('d')}" x1="40" y1="120" x2="200" y2="120" />
     <circle class="sketchHandle ${on('d')}" cx="40" cy="120" r="4" />
@@ -343,9 +345,11 @@ function sketchCircle(given) {
 
 function sketchSquare(given) {
     const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    const perimeterOn = given.has('u') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-    <rect class="sketchOutline" x="60" y="60" width="120" height="120" />
+    <rect class="sketchOutline ${areaOn} ${perimeterOn}" x="60" y="60" width="120" height="120" />
 
     <line class="sketchDim ${on('a')}" x1="60" y1="192" x2="180" y2="192" />
     <circle class="sketchHandle ${on('a')}" cx="60" cy="192" r="4" />
@@ -364,9 +368,11 @@ function sketchSquare(given) {
 
 function sketchRectangle(given) {
     const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    const perimeterOn = given.has('u') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-    <rect class="sketchOutline" x="40" y="70" width="160" height="100" />
+    <rect class="sketchOutline ${areaOn} ${perimeterOn}" x="40" y="70" width="160" height="100" />
 
     <line class="sketchDim ${on('a')}" x1="40" y1="184" x2="200" y2="184" />
     <circle class="sketchHandle ${on('a')}" cx="40" cy="184" r="4" />

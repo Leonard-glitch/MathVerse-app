@@ -153,12 +153,26 @@ export const tools = [
             big:   `${BASE}/pictures/Finanzrechner.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
+    },
+    {
+        id:       "card12",
+        title:    "Geometrie Rechner",
+        group:    "geometrie",
+        filename: "GeometrieRechner.html",
+        url:      `${BASE}/Tools/Geometrie Rechner/GeometrieRechner.html`,
+        tags:     ["geometrie", "2d", "3d", "kreis", "rechteck", "quadrat", "dreieck", "rechtwinkliges dreieck", "trapez", "parallelogramm", "raute","würfel", "quader", "kugel", "zylinder", "kegel", "quadratische pyramide", "rechteckige pyramide"],
+        info:      "Geometrie Rechner welcher mit 2D und 3D Figuren rechnet - inklusive Rechenweg und live Form-Vorschau",
+        image: {
+            big:   `${BASE}/pictures/Geometrierechner.jpg`,
+            small: `${BASE}/pictures/icons/meinTool-icon.png`
+        }
     }
+
 
     // -----------------------------------------------------------------------
     // Neues Tool hinzufügen? Schema:
     // {
-    //     id:       "card11",
+    //     id:       "card13",
     //     title:    "Tool Titel",
     //     group:    "eine-der-gruppen-ids",
     //     filename: "meinTool.html",

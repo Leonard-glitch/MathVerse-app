@@ -417,9 +417,9 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 320px;
+    max-width: 16rem;
     padding: 1.5rem;
-    background-color: var(--bg-input);
+    background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-main);
@@ -441,40 +441,58 @@
     stroke: var(--border-color);
     stroke-width: 2;
     vector-effect: non-scaling-stroke;
-    transition: stroke var(--transition-speed) ease;
+    transition: stroke var(--transition-speed) ease, fill var(--transition-speed) ease,
+                stroke-width var(--transition-speed) ease, filter var(--transition-speed) ease;
+}
+
+/* Gesetzt, wenn "A" (Fläche) einem Dropdown zugeordnet ist -> gesamte Form
+   bekommt eine deutliche Flächenfüllung statt nur das Label zu färben */
+.shapeSketch .sketchOutline.area-active {
+    fill: color-mix(in srgb, var(--accent-live) 20%, transparent);
+}
+
+/* Gesetzt, wenn "u"/"U" (Umfang) einem Dropdown zugeordnet ist -> die
+   komplette Kontur wird hervorgehoben statt nur eine einzelne Maßlinie */
+.shapeSketch .sketchOutline.perimeter-active {
+    stroke: var(--accent-live);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 5px var(--glow-live));
 }
 
 .shapeSketch .sketchCenter {
-    fill: var(--text-muted);
+    fill: var(--text-secondary);
 }
 
 .shapeSketch .sketchDim {
-    stroke: var(--text-muted);
-    stroke-width: 1.5;
+    stroke: var(--text-secondary);
+    stroke-width: 1.75;
     stroke-linecap: round;
-    stroke-dasharray: 5 4;
+    stroke-dasharray: 4 3;
     vector-effect: non-scaling-stroke;
-    transition: stroke var(--transition-speed) ease, filter var(--transition-speed) ease;
+    transition: stroke var(--transition-speed) ease, filter var(--transition-speed) ease,
+                stroke-width var(--transition-speed) ease;
 }
 
 .shapeSketch .sketchDim.is-active {
     stroke: var(--accent-live);
-    stroke-width: 2;
+    stroke-width: 3;
     stroke-dasharray: none;
-    filter: drop-shadow(0 0 4px var(--glow-live));
+    filter: drop-shadow(0 0 5px var(--glow-live));
 }
 
 .shapeSketch .sketchHandle {
     fill: var(--bg-input);
-    stroke: var(--text-muted);
-    stroke-width: 1.5;
+    stroke: var(--text-secondary);
+    stroke-width: 1.75;
     vector-effect: non-scaling-stroke;
-    transition: stroke var(--transition-speed) ease, filter var(--transition-speed) ease;
+    transition: stroke var(--transition-speed) ease, fill var(--transition-speed) ease,
+                filter var(--transition-speed) ease;
 }
 
 .shapeSketch .sketchHandle.is-active {
+    fill: var(--accent-live);
     stroke: var(--accent-live);
-    filter: drop-shadow(0 0 3px var(--glow-live));
+    filter: drop-shadow(0 0 4px var(--glow-live));
 }
 
 .shapeSketch .sketchLabel {

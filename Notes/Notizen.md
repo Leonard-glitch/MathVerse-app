@@ -70,9 +70,9 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 
 ----Finanzrechner----
 
-+ Auswahl zwischen Dollar und Euro da es eine weltumfassende Website werden soll!
-+ Alles prüfen (vorallem Rechenlogik und Diagramm!)
 + Auf irgendwas Rechtliches prüfen
++ !!Mobile fixen!!
+
 
 
 ----Geometrie Rechner----
@@ -89,5 +89,14 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 
 -, Bilder sind zu hochwärtig... Ladne zu lange
 -, Links maybe
+
+
+
+
+
+-------======To-Dos für Claude=====-------------
+
+# ToolCollection--> Titel, Info, Tags 
+
 
 
