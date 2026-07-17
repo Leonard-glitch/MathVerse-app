@@ -526,6 +526,29 @@
     font-size: 1.6rem;
 }
 
+.shapeSketch .sketchDecor {
+    fill: none;
+    stroke: var(--border-color);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+}
+
+.shapeSketch .sketchPart {
+    transition: fill var(--transition-speed) ease, stroke var(--transition-speed) ease,
+                stroke-width var(--transition-speed) ease, filter var(--transition-speed) ease;
+}
+
+/* Hebt gezielt nur EIN Teilelement hervor (z.B. Grundfläche oder Mantelfläche),
+   unabhängig davon ob gleichzeitig O/V (ganze Form) aktiv ist – die höhere
+   Spezifität (3 Klassen) gewinnt automatisch gegen .sketchOutline.area-active
+   bzw. .perimeter-active, kein !important nötig. */
+.shapeSketch .sketchPart.is-active {
+    fill: color-mix(in srgb, var(--accent-live) 24%, transparent);
+    stroke: var(--accent-live);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 5px var(--glow-live));
+}
+
 @media (max-width: 1440px) {
     .geometryContainer{
         width: 90%;

@@ -394,10 +394,399 @@ function sketchRectangle(given) {
 </svg>`;
 }
 
+// ── 2D: restliche Formen ──────────────────────────────────────────────────
+
+function sketchTriangle(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline ${areaOn}" points="40,195 200,195 130,45" />
+
+    <line class="sketchDim ${on('c')}" x1="40" y1="211" x2="200" y2="211" />
+    <circle class="sketchHandle ${on('c')}" cx="40" cy="211" r="4" />
+    <circle class="sketchHandle ${on('c')}" cx="200" cy="211" r="4" />
+    <text class="sketchLabel ${on('c')}" x="120" y="225">c</text>
+
+    <line class="sketchDim ${on('a')}" x1="200" y1="195" x2="130" y2="45" />
+    <circle class="sketchHandle ${on('a')}" cx="200" cy="195" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="130" cy="45" r="4" />
+    <text class="sketchLabel ${on('a')}" x="190" y="118">a</text>
+
+    <line class="sketchDim ${on('b')}" x1="40" y1="195" x2="130" y2="45" />
+    <circle class="sketchHandle ${on('b')}" cx="40" cy="195" r="4" />
+    <circle class="sketchHandle ${on('b')}" cx="130" cy="45" r="4" />
+    <text class="sketchLabel ${on('b')}" x="60" y="118">b</text>
+
+    <path class="sketchDecor" d="M 60,195 A 20,20 0 0 1 51,177" />
+    <text class="sketchLabel ${on('alpha')}" x="63" y="180">α</text>
+
+    <path class="sketchDecor" d="M 180,195 A 20,20 0 0 0 189,177" />
+    <text class="sketchLabel ${on('beta')}" x="177" y="180">β</text>
+
+    <path class="sketchDecor" d="M 121,62 A 18,18 0 0 1 139,62" />
+    <text class="sketchLabel ${on('gamma')}" x="130" y="72">γ</text>
+
+    <line class="sketchDim ${on('ha')}" x1="40" y1="195" x2="171" y2="134" />
+    <circle class="sketchHandle ${on('ha')}" cx="171" cy="134" r="4" />
+    <text class="sketchLabel ${on('ha')}" x="98" y="181">ha</text>
+
+    <line class="sketchDim ${on('hb')}" x1="200" y1="195" x2="82" y2="124" />
+    <circle class="sketchHandle ${on('hb')}" cx="82" cy="124" r="4" />
+    <text class="sketchLabel ${on('hb')}" x="158" y="181">hb</text>
+
+    <line class="sketchDim ${on('hc')}" x1="130" y1="45" x2="130" y2="195" />
+    <circle class="sketchHandle ${on('hc')}" cx="130" cy="195" r="4" />
+    <text class="sketchLabel ${on('hc')}" x="143" y="115">hc</text>
+
+    <text class="sketchLabel ${on('A')}" x="123" y="160">A</text>
+</svg>`;
+}
+
+function sketchRightTriangle(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline ${areaOn}" points="50,195 195,195 50,60" />
+    <path class="sketchDecor" d="M 50,183 L 62,183 L 62,195" />
+
+    <line class="sketchDim ${on('b')}" x1="50" y1="211" x2="195" y2="211" />
+    <circle class="sketchHandle ${on('b')}" cx="50" cy="211" r="4" />
+    <circle class="sketchHandle ${on('b')}" cx="195" cy="211" r="4" />
+    <text class="sketchLabel ${on('b')}" x="122" y="225">b</text>
+
+    <line class="sketchDim ${on('a')}" x1="34" y1="195" x2="34" y2="60" />
+    <circle class="sketchHandle ${on('a')}" cx="34" cy="195" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="34" cy="60" r="4" />
+    <text class="sketchLabel ${on('a')}" x="20" y="128">a</text>
+
+    <line class="sketchDim ${on('c')}" x1="50" y1="60" x2="195" y2="195" />
+    <circle class="sketchHandle ${on('c')}" cx="50" cy="60" r="4" />
+    <circle class="sketchHandle ${on('c')}" cx="195" cy="195" r="4" />
+    <text class="sketchLabel ${on('c')}" x="140" y="118">c</text>
+
+    <path class="sketchDecor" d="M 175,195 A 20,20 0 0 0 183,178" />
+    <text class="sketchLabel ${on('alpha')}" x="172" y="180">α</text>
+
+    <path class="sketchDecor" d="M 50,80 A 20,20 0 0 1 67,89" />
+    <text class="sketchLabel ${on('beta')}" x="68" y="78">β</text>
+
+    <text class="sketchLabel ${on('A')}" x="90" y="165">A</text>
+</svg>`;
+}
+
+function sketchTrapezoid(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline ${areaOn}" points="40,180 200,180 160,80 80,80" />
+
+    <line class="sketchDim ${on('a')}" x1="40" y1="196" x2="200" y2="196" />
+    <circle class="sketchHandle ${on('a')}" cx="40" cy="196" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="200" cy="196" r="4" />
+    <text class="sketchLabel ${on('a')}" x="120" y="210">a</text>
+
+    <line class="sketchDim ${on('c')}" x1="80" y1="64" x2="160" y2="64" />
+    <circle class="sketchHandle ${on('c')}" cx="80" cy="64" r="4" />
+    <circle class="sketchHandle ${on('c')}" cx="160" cy="64" r="4" />
+    <text class="sketchLabel ${on('c')}" x="120" y="50">c</text>
+
+    <line class="sketchDim ${on('h')}" x1="25" y1="180" x2="25" y2="80" />
+    <circle class="sketchHandle ${on('h')}" cx="25" cy="180" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="25" cy="80" r="4" />
+    <text class="sketchLabel ${on('h')}" x="14" y="130">h</text>
+
+    <text class="sketchLabel ${on('A')}" x="120" y="140">A</text>
+</svg>`;
+}
+
+function sketchParallelogram(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline ${areaOn}" points="60,180 200,180 170,70 30,70" />
+
+    <line class="sketchDim ${on('a')}" x1="60" y1="196" x2="200" y2="196" />
+    <circle class="sketchHandle ${on('a')}" cx="60" cy="196" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="200" cy="196" r="4" />
+    <text class="sketchLabel ${on('a')}" x="130" y="210">a</text>
+
+    <line class="sketchDim ${on('b')}" x1="60" y1="180" x2="30" y2="70" />
+    <circle class="sketchHandle ${on('b')}" cx="60" cy="180" r="4" />
+    <circle class="sketchHandle ${on('b')}" cx="30" cy="70" r="4" />
+    <text class="sketchLabel ${on('b')}" x="30" y="128">b</text>
+
+    <line class="sketchDim ${on('h')}" x1="215" y1="180" x2="215" y2="70" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="180" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="70" r="4" />
+    <text class="sketchLabel ${on('h')}" x="228" y="128">h</text>
+
+    <text class="sketchLabel ${on('A')}" x="115" y="128">A</text>
+</svg>`;
+}
+
+function sketchRhombus(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const areaOn = given.has('A') ? "area-active" : "";
+    const perimeterOn = given.has('u') ? "perimeter-active" : "";
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline ${areaOn} ${perimeterOn}" points="120,55 195,130 120,205 45,130" />
+
+    <line class="sketchDim ${on('a')}" x1="120" y1="55" x2="195" y2="130" />
+    <circle class="sketchHandle ${on('a')}" cx="120" cy="55" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="195" cy="130" r="4" />
+    <text class="sketchLabel ${on('a')}" x="178" y="82">a</text>
+
+    <line class="sketchDim ${on('e')}" x1="45" y1="130" x2="195" y2="130" />
+    <circle class="sketchHandle ${on('e')}" cx="45" cy="130" r="4" />
+    <circle class="sketchHandle ${on('e')}" cx="195" cy="130" r="4" />
+    <text class="sketchLabel ${on('e')}" x="80" y="146">e</text>
+
+    <line class="sketchDim ${on('f')}" x1="120" y1="55" x2="120" y2="205" />
+    <circle class="sketchHandle ${on('f')}" cx="120" cy="55" r="4" />
+    <circle class="sketchHandle ${on('f')}" cx="120" cy="205" r="4" />
+    <text class="sketchLabel ${on('f')}" x="136" y="105">f</text>
+
+    <line class="sketchDim ${on('h')}" x1="215" y1="92" x2="215" y2="168" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="92" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="168" r="4" />
+    <text class="sketchLabel ${on('h')}" x="228" y="130">h</text>
+
+    <text class="sketchLabel ${on('A')}" x="150" y="165">A</text>
+    <text class="sketchLabel ${on('u')}" x="120" y="222">U</text>
+</svg>`;
+}
+
+// ── 3D: Körper ───────────────────────────────────────────────────────────
+
+function sketchCube(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline ${wholeOn}" points="60,100 160,100 160,200 60,200" />
+    <polygon class="sketchOutline ${wholeOn}" points="60,100 100,60 200,60 160,100" />
+    <polygon class="sketchOutline ${wholeOn}" points="160,100 200,60 200,160 160,200" />
+
+    <line class="sketchDim ${on('a')}" x1="60" y1="215" x2="160" y2="215" />
+    <circle class="sketchHandle ${on('a')}" cx="60" cy="215" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="160" cy="215" r="4" />
+    <text class="sketchLabel ${on('a')}" x="110" y="229">a</text>
+
+    <line class="sketchDim ${on('d')}" x1="60" y1="200" x2="200" y2="60" />
+    <circle class="sketchHandle ${on('d')}" cx="60" cy="200" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="200" cy="60" r="4" />
+    <text class="sketchLabel ${on('d')}" x="150" y="115">d</text>
+</svg>`;
+}
+
+function sketchCuboid(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline ${wholeOn}" points="50,90 170,90 170,180 50,180" />
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('G')}" points="50,90 170,90 205,55 85,55" />
+    <polygon class="sketchOutline ${wholeOn}" points="170,90 205,55 205,145 170,180" />
+
+    <line class="sketchDim ${on('a')}" x1="50" y1="195" x2="170" y2="195" />
+    <circle class="sketchHandle ${on('a')}" cx="50" cy="195" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="170" cy="195" r="4" />
+    <text class="sketchLabel ${on('a')}" x="110" y="209">a</text>
+
+    <line class="sketchDim ${on('c')}" x1="35" y1="90" x2="35" y2="180" />
+    <circle class="sketchHandle ${on('c')}" cx="35" cy="90" r="4" />
+    <circle class="sketchHandle ${on('c')}" cx="35" cy="180" r="4" />
+    <text class="sketchLabel ${on('c')}" x="20" y="135">c</text>
+
+    <line class="sketchDim ${on('b')}" x1="170" y1="90" x2="205" y2="55" />
+    <circle class="sketchHandle ${on('b')}" cx="170" cy="90" r="4" />
+    <circle class="sketchHandle ${on('b')}" cx="205" cy="55" r="4" />
+    <text class="sketchLabel ${on('b')}" x="200" y="65">b</text>
+
+    <line class="sketchDim ${on('d')}" x1="50" y1="180" x2="205" y2="55" />
+    <circle class="sketchHandle ${on('d')}" cx="50" cy="180" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="205" cy="55" r="4" />
+    <text class="sketchLabel ${on('d')}" x="140" y="128">d</text>
+</svg>`;
+}
+
+function sketchSphere(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <circle class="sketchOutline ${wholeOn}" cx="120" cy="130" r="75" />
+    <ellipse class="sketchDecor" cx="120" cy="130" rx="75" ry="18" />
+    <circle class="sketchCenter" cx="120" cy="130" r="2.5" />
+
+    <line class="sketchDim ${on('r')}" x1="120" y1="130" x2="173" y2="88" />
+    <circle class="sketchHandle ${on('r')}" cx="173" cy="88" r="4" />
+    <text class="sketchLabel ${on('r')}" x="155" y="100">r</text>
+
+    <line class="sketchDim ${on('d')}" x1="45" y1="130" x2="195" y2="130" />
+    <circle class="sketchHandle ${on('d')}" cx="45" cy="130" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="195" cy="130" r="4" />
+    <text class="sketchLabel ${on('d')}" x="120" y="150">d</text>
+</svg>`;
+}
+
+function sketchCylinder(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <path class="sketchOutline sketchPart ${wholeOn} ${on('M')}" d="M 50,70 A 70,22 0 0 0 190,70 L 190,190 A 70,22 0 0 1 50,190 Z" />
+    <ellipse class="sketchOutline sketchPart ${wholeOn} ${on('G')}" cx="120" cy="190" rx="70" ry="22" />
+    <ellipse class="sketchOutline ${wholeOn}" cx="120" cy="70" rx="70" ry="22" />
+
+    <line class="sketchDim ${on('r')}" x1="120" y1="190" x2="120" y2="212" />
+    <circle class="sketchHandle ${on('r')}" cx="120" cy="212" r="4" />
+    <text class="sketchLabel ${on('r')}" x="138" y="203">r</text>
+
+    <line class="sketchDim ${on('d')}" x1="50" y1="70" x2="190" y2="70" />
+    <circle class="sketchHandle ${on('d')}" cx="50" cy="70" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="190" cy="70" r="4" />
+    <text class="sketchLabel ${on('d')}" x="120" y="52">d</text>
+
+    <line class="sketchDim ${on('h')}" x1="215" y1="70" x2="215" y2="190" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="70" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="190" r="4" />
+    <text class="sketchLabel ${on('h')}" x="228" y="130">h</text>
+
+    <text class="sketchLabel ${on('G')}" x="120" y="192">G</text>
+    <text class="sketchLabel ${on('V')}" x="120" y="115">V</text>
+    <text class="sketchLabel ${on('M')}" x="120" y="145">M</text>
+    <text class="sketchLabel ${on('O')}" x="75" y="218">O</text>
+</svg>`;
+}
+
+function sketchCone(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="120,50 190,190 50,190" />
+    <ellipse class="sketchOutline sketchPart ${wholeOn} ${on('G')}" cx="120" cy="190" rx="70" ry="20" />
+
+    <line class="sketchDim ${on('s')}" x1="120" y1="50" x2="190" y2="190" />
+    <circle class="sketchHandle ${on('s')}" cx="190" cy="190" r="4" />
+    <text class="sketchLabel ${on('s')}" x="168" y="115">s</text>
+
+    <line class="sketchDim ${on('r')}" x1="120" y1="190" x2="120" y2="210" />
+    <circle class="sketchHandle ${on('r')}" cx="120" cy="210" r="4" />
+    <text class="sketchLabel ${on('r')}" x="136" y="203">r</text>
+
+    <line class="sketchDim ${on('d')}" x1="50" y1="190" x2="190" y2="190" />
+    <circle class="sketchHandle ${on('d')}" cx="50" cy="190" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="190" cy="190" r="4" />
+    <text class="sketchLabel ${on('d')}" x="120" y="223">d</text>
+
+    <line class="sketchDim ${on('h')}" x1="35" y1="50" x2="35" y2="190" />
+    <circle class="sketchHandle ${on('h')}" cx="35" cy="50" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="35" cy="190" r="4" />
+    <text class="sketchLabel ${on('h')}" x="20" y="120">h</text>
+
+    <text class="sketchLabel ${on('G')}" x="120" y="192">G</text>
+    <text class="sketchLabel ${on('V')}" x="120" y="130">V</text>
+    <text class="sketchLabel ${on('M')}" x="120" y="155">M</text>
+    <text class="sketchLabel ${on('O')}" x="75" y="145">O</text>
+</svg>`;
+}
+
+function sketchQuadrangularPyramid(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="105,45 50,175 190,175" />
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="105,45 190,175 160,120" />
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('G')}" points="50,175 190,175 160,120 20,120" />
+    <line class="sketchDecor" x1="105" y1="45" x2="20" y2="120" stroke-dasharray="3 3" />
+    <line class="sketchDecor" x1="20" y1="120" x2="160" y2="120" stroke-dasharray="3 3" />
+
+    <line class="sketchDim ${on('a')}" x1="50" y1="191" x2="190" y2="191" />
+    <circle class="sketchHandle ${on('a')}" cx="50" cy="191" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="190" cy="191" r="4" />
+    <text class="sketchLabel ${on('a')}" x="120" y="205">a</text>
+
+    <line class="sketchDim ${on('h')}" x1="215" y1="45" x2="215" y2="175" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="45" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="215" cy="175" r="4" />
+    <text class="sketchLabel ${on('h')}" x="228" y="112">h</text>
+
+    <line class="sketchDim ${on('ha')}" x1="105" y1="45" x2="120" y2="175" />
+    <circle class="sketchHandle ${on('ha')}" cx="120" cy="175" r="4" />
+    <text class="sketchLabel ${on('ha')}" x="95" y="120">ha</text>
+
+    <text class="sketchLabel ${on('G')}" x="105" y="150">G</text>
+    <text class="sketchLabel ${on('V')}" x="105" y="100">V</text>
+    <text class="sketchLabel ${on('M')}" x="140" y="145">M</text>
+    <text class="sketchLabel ${on('O')}" x="60" y="145">O</text>
+</svg>`;
+}
+
+function sketchRectangularPyramid(given) {
+    const on = id => given.has(id) ? "is-active" : "";
+    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    return `
+<svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="115,45 60,175 200,175" />
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="115,45 200,175 170,125" />
+    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('G')}" points="60,175 200,175 170,125 30,125" />
+    <line class="sketchDecor" x1="115" y1="45" x2="30" y2="125" stroke-dasharray="3 3" />
+    <line class="sketchDecor" x1="30" y1="125" x2="170" y2="125" stroke-dasharray="3 3" />
+
+    <line class="sketchDim ${on('a')}" x1="60" y1="191" x2="200" y2="191" />
+    <circle class="sketchHandle ${on('a')}" cx="60" cy="191" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="200" cy="191" r="4" />
+    <text class="sketchLabel ${on('a')}" x="130" y="205">a</text>
+
+    <line class="sketchDim ${on('b')}" x1="60" y1="175" x2="30" y2="125" />
+    <circle class="sketchHandle ${on('b')}" cx="60" cy="175" r="4" />
+    <circle class="sketchHandle ${on('b')}" cx="30" cy="125" r="4" />
+    <text class="sketchLabel ${on('b')}" x="24" y="153">b</text>
+
+    <line class="sketchDim ${on('h')}" x1="222" y1="45" x2="222" y2="175" />
+    <circle class="sketchHandle ${on('h')}" cx="222" cy="45" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="222" cy="175" r="4" />
+    <text class="sketchLabel ${on('h')}" x="232" y="112">h</text>
+
+    <line class="sketchDim ${on('ha')}" x1="115" y1="45" x2="130" y2="175" />
+    <circle class="sketchHandle ${on('ha')}" cx="130" cy="175" r="4" />
+    <text class="sketchLabel ${on('ha')}" x="98" y="118">ha</text>
+
+    <line class="sketchDim ${on('hb')}" x1="115" y1="45" x2="45" y2="150" />
+    <circle class="sketchHandle ${on('hb')}" cx="45" cy="150" r="4" />
+    <text class="sketchLabel ${on('hb')}" x="60" y="95">hb</text>
+
+    <text class="sketchLabel ${on('G')}" x="115" y="152">G</text>
+    <text class="sketchLabel ${on('V')}" x="115" y="100">V</text>
+    <text class="sketchLabel ${on('M')}" x="150" y="145">M</text>
+    <text class="sketchLabel ${on('O')}" x="65" y="145">O</text>
+</svg>`;
+}
+
 const shapeSketches = {
     circle: sketchCircle,
     square: sketchSquare,
-    rectangle: sketchRectangle
+    rectangle: sketchRectangle,
+    triangle: sketchTriangle,
+    rightTriangle: sketchRightTriangle,
+    trapezoid: sketchTrapezoid,
+    parallelogram: sketchParallelogram,
+    rhombus: sketchRhombus,
+    cube: sketchCube,
+    cuboid: sketchCuboid,
+    sphere: sketchSphere,
+    cylinder: sketchCylinder,
+    cone: sketchCone,
+    quadrangularpyramid: sketchQuadrangularPyramid,
+    rectangularpyramid: sketchRectangularPyramid
 };
 
 function renderSketch(shapeKey, given) {
