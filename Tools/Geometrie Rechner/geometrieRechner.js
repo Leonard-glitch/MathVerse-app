@@ -51,7 +51,8 @@ const shapeConfig = {
             { id: 'hb', label: 'Höhe hb' },
             { id: 'hc', label: 'Höhe hc' },
             { id: 'A', label: 'Fläche (A)' }
-        ]
+        ],
+        redundantGroups: [['alpha', 'beta', 'gamma']]
     },
     rightTriangle: {
         name: 'Rechtwinkliges Dreieck',
@@ -64,7 +65,8 @@ const shapeConfig = {
             { id: 'alpha', label: 'Winkel α' },
             { id: 'beta', label: 'Winkel β' },
             { id: 'A', label: 'Fläche (A)' }
-        ]
+        ],
+        redundantGroups: [['alpha', 'beta']]
     },
     trapezoid: {
         name: 'Trapez',
@@ -99,7 +101,8 @@ const shapeConfig = {
             { id: 'h', label: 'Höhe (h)' },
             { id: 'u', label: 'Umfang (U)' },
             { id: 'A', label: 'Fläche (A)' }
-        ]
+        ],
+        redundantGroups: [['a', 'u']]
     },
 
     // --- 3D KÖRPER ---
@@ -151,7 +154,8 @@ const shapeConfig = {
             { id: 'O', label: 'Oberfläche (O)' },
             { id: 'M', label: 'Mantelfläche (M)' },
             { id: 'G', label: 'Grundfläche (G)' }
-        ]
+        ],
+        redundantGroups: [['r', 'd']]
     },
     cone: {
         name: 'Kegel',
@@ -166,7 +170,8 @@ const shapeConfig = {
             { id: 'O', label: 'Oberfläche (O)' },
             { id: 'M', label: 'Mantelfläche (M)' },
             { id: 'G', label: 'Grundfläche (G)' }
-        ]
+        ],
+        redundantGroups: [['r', 'd']]
     },
     quadrangularpyramid: {
         name: 'Quadratische Pyramide',
@@ -280,8 +285,23 @@ function getAllActiveSelects() {
     return Array.from(inputsContainer.querySelectorAll(".inputContainer .selection"));
 }
 
+// Prüft, ob ein Eigenschaftswert durch bereits belegte Werte einer
+// geschlossenen Gruppe redundant geworden ist (z.B. Winkelsumme, Radius/
+// Durchmesser, Seite/Umfang) – er würde dann keine neue, unabhängige
+// Information mehr liefern. Formel-Beziehungen zwischen zwei UNABHÄNGIGEN
+// Größen (z.B. Fläche = Seite × Höhe) fallen bewusst NICHT hierunter, da
+// deren Ausschluss vom noch zu bauenden Rechenkern abhängt (siehe unten).
+function isRedundantGiven(inputId, usedIds, groups) {
+    return groups.some(group => {
+        if (!group.includes(inputId)) return false;
+        const usedInGroup = group.filter(id => usedIds.has(id));
+        return usedInGroup.length >= group.length - 1;
+    });
+}
+
 function refreshSelectOptions(shape) {
     const selects = getAllActiveSelects();
+    const groups = shape.redundantGroups || [];
 
     selects.forEach(select => {
         const usedByOthers = new Set(
@@ -290,7 +310,8 @@ function refreshSelectOptions(shape) {
         const currentValue = select.value;
 
         select.innerHTML = shape.inputs
-            .filter(input => input.id === currentValue || !usedByOthers.has(input.id))
+            .filter(input => input.id === currentValue ||
+                (!usedByOthers.has(input.id) && !isRedundantGiven(input.id, usedByOthers, groups)))
             .map(input => `<option value="${input.id}">${input.label}</option>`)
             .join("");
 
@@ -300,16 +321,19 @@ function refreshSelectOptions(shape) {
 
 // ── Skizze / Formvorschau ────────────────────────────────────────────────
 function sketchCircle(given) {
-    const on = id => given[id] !== undefined ? "is-active" : "";
+    const on = id => given.has(id) ? "is-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
     <circle class="sketchOutline" cx="120" cy="120" r="80" />
     <circle class="sketchCenter" cx="120" cy="120" r="2.5" />
 
     <line class="sketchDim ${on('r')}" x1="120" y1="120" x2="177" y2="63" />
+    <circle class="sketchHandle ${on('r')}" cx="177" cy="63" r="4" />
     <text class="sketchLabel ${on('r')}" x="156" y="82">r</text>
 
     <line class="sketchDim ${on('d')}" x1="40" y1="120" x2="200" y2="120" />
+    <circle class="sketchHandle ${on('d')}" cx="40" cy="120" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="200" cy="120" r="4" />
     <text class="sketchLabel ${on('d')}" x="120" y="138">d</text>
 
     <text class="sketchLabel ${on('A')}" x="95" y="150">A</text>
@@ -318,15 +342,19 @@ function sketchCircle(given) {
 }
 
 function sketchSquare(given) {
-    const on = id => given[id] !== undefined ? "is-active" : "";
+    const on = id => given.has(id) ? "is-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
     <rect class="sketchOutline" x="60" y="60" width="120" height="120" />
 
     <line class="sketchDim ${on('a')}" x1="60" y1="192" x2="180" y2="192" />
+    <circle class="sketchHandle ${on('a')}" cx="60" cy="192" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="180" cy="192" r="4" />
     <text class="sketchLabel ${on('a')}" x="120" y="208">a</text>
 
     <line class="sketchDim ${on('d')}" x1="60" y1="60" x2="180" y2="180" />
+    <circle class="sketchHandle ${on('d')}" cx="60" cy="60" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="180" cy="180" r="4" />
     <text class="sketchLabel ${on('d')}" x="152" y="98">d</text>
 
     <text class="sketchLabel ${on('A')}" x="95" y="145">A</text>
@@ -335,18 +363,24 @@ function sketchSquare(given) {
 }
 
 function sketchRectangle(given) {
-    const on = id => given[id] !== undefined ? "is-active" : "";
+    const on = id => given.has(id) ? "is-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
     <rect class="sketchOutline" x="40" y="70" width="160" height="100" />
 
     <line class="sketchDim ${on('a')}" x1="40" y1="184" x2="200" y2="184" />
+    <circle class="sketchHandle ${on('a')}" cx="40" cy="184" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="200" cy="184" r="4" />
     <text class="sketchLabel ${on('a')}" x="120" y="200">a</text>
 
     <line class="sketchDim ${on('b')}" x1="214" y1="70" x2="214" y2="170" />
+    <circle class="sketchHandle ${on('b')}" cx="214" cy="70" r="4" />
+    <circle class="sketchHandle ${on('b')}" cx="214" cy="170" r="4" />
     <text class="sketchLabel ${on('b')}" x="228" y="120">b</text>
 
     <line class="sketchDim ${on('d')}" x1="40" y1="70" x2="200" y2="170" />
+    <circle class="sketchHandle ${on('d')}" cx="40" cy="70" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="200" cy="170" r="4" />
     <text class="sketchLabel ${on('d')}" x="165" y="100">d</text>
 
     <text class="sketchLabel ${on('A')}" x="90" y="140">A</text>
@@ -354,7 +388,6 @@ function sketchRectangle(given) {
 </svg>`;
 }
 
-// Formkey -> Zeichenfunktion. Formen ohne Eintrag zeigen einen Platzhalter,
 const shapeSketches = {
     circle: sketchCircle,
     square: sketchSquare,
@@ -366,36 +399,34 @@ function renderSketch(shapeKey, given) {
 
     const sketchFn = shapeSketches[shapeKey];
     if (sketchFn) {
-        sketchContainer.innerHTML = sketchFn(given);
+        sketchContainer.innerHTML = `<div class="sketchCard">${sketchFn(given)}</div>`;
         return;
     }
 
     const shape = shapeConfig[shapeKey];
     sketchContainer.innerHTML = `
-        <div class="sketchPlaceholder">
-            <i class="fa fa-square-o" aria-hidden="true"></i>
-            <span>Skizze für „${shape ? shape.name : ""}" folgt in Kürze.</span>
+        <div class="sketchCard">
+            <div class="sketchPlaceholder">
+                <i class="fa fa-square-o" aria-hidden="true"></i>
+                <span>Skizze für „${shape ? shape.name : ""}" folgt in Kürze.</span>
+            </div>
         </div>`;
 }
 
-// Liest, welche Werte aktuell einem Dropdown zugeordnet UND bereits
-// eingetippt sind -> steuert die Hervorhebung in der Skizze.
-function getGivenValues() {
-    const given = {};
+// Liest, welche Eigenschaften den aktuell aktiven Dropdowns zugeordnet sind
+// -> steuert, welche Elemente in der Skizze hervorgehoben werden.
+function getSelectedInputIds() {
+    const ids = new Set();
     getAllActiveSelects().forEach(select => {
-        const row = select.closest(".inputContainer, .inputRow");
-        const numberInput = row ? row.querySelector(".zahlenInputfeld") : null;
-        if (numberInput && numberInput.value.trim() !== "") {
-            given[select.value] = parseFloat(numberInput.value.replace(",", "."));
-        }
+        if (select.value) ids.add(select.value);
     });
-    return given;
+    return ids;
 }
 
 function refreshSketch() {
     const shape = shapeConfig[formSelectContainer.value];
-    if (shape) renderSketch(formSelectContainer.value, getGivenValues());
-} 
+    if (shape) renderSketch(formSelectContainer.value, getSelectedInputIds());
+}
 
 typeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -468,9 +499,11 @@ function addThirdInput(){
         .map(input => `<option value="${input.id}">${input.label}</option>`)
         .join("");
 
-    // Ersten noch freien Wert vorauswählen (üblicherweise der 3. Input der Form)
+    // Ersten noch sinnvollen freien Wert vorauswählen: weder bereits von den
+    // anderen Dropdowns belegt, noch durch eine geschlossene Gruppe redundant.
     const used = new Set(getAllActiveSelects().filter(s => s !== select3 && s.value).map(s => s.value));
-    const free = shape.inputs.find(input => !used.has(input.id));
+    const groups = shape.redundantGroups || [];
+    const free = shape.inputs.find(input => !used.has(input.id) && !isRedundantGiven(input.id, used, groups));
     if (free) select3.value = free.id;
 
     refreshSelectOptions(shape);
@@ -520,11 +553,6 @@ inputsContainer.addEventListener("change", (e) => {
     refreshSketch();
 });
 
-inputsContainer.addEventListener("input", (e) => {
-    if (!e.target.classList.contains("zahlenInputfeld")) return;
-    refreshSketch();
-});
-
 function setCurrentInputType(type){
     const currentType = shapeConfig[type].type;
     
@@ -551,14 +579,25 @@ function populateDropdowns(shapeKey) {
     if (!shape) return;
 
     const selects = getAllActiveSelects();
+    const groups = shape.redundantGroups || [];
+    const chosen = new Set();
 
-    selects.forEach((select, index) => {
+    selects.forEach(select => {
         select.innerHTML = shape.inputs
             .map(input => `<option value="${input.id}">${input.label}</option>`)
             .join("");
 
-        // Sinnvolle Default-Zuordnung: 1. Dropdown -> 1. Input, 2. -> 2. usw.
-        if (index < shape.inputs.length) select.selectedIndex = index;
+        // Sinnvolle Default-Zuordnung: der Reihe nach die nächste Eigenschaft
+        // wählen, die noch nicht vergeben UND nicht redundant geworden ist
+        // (z.B. h statt d bei Zylinder/Kegel, sobald r schon gewählt wurde).
+        const next = shape.inputs.find(input =>
+            !chosen.has(input.id) && !isRedundantGiven(input.id, chosen, groups)
+        );
+
+        if (next) {
+            select.value = next.id;
+            chosen.add(next.id);
+        }
     });
 
     refreshSelectOptions(shape);

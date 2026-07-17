@@ -155,7 +155,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 
@@ -412,18 +412,36 @@
 
 /* ── Skizze / Formvorschau ────────────────────────────────────────────── */
 
-.shapeSketch {
+.sketchCard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     max-width: 320px;
+    padding: 1.5rem;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    transition: border-color var(--transition-speed);
+}
+
+.sketchCard:hover {
+    border-color: color-mix(in srgb, var(--border-glow) 35%, transparent);
+}
+
+.shapeSketch {
+    width: 100%;
     height: auto;
     overflow: visible;
 }
 
 .shapeSketch .sketchOutline {
-    fill: none;
+    fill: color-mix(in srgb, var(--border-glow) 5%, transparent);
     stroke: var(--border-color);
     stroke-width: 2;
     vector-effect: non-scaling-stroke;
+    transition: stroke var(--transition-speed) ease;
 }
 
 .shapeSketch .sketchCenter {
@@ -432,20 +450,41 @@
 
 .shapeSketch .sketchDim {
     stroke: var(--text-muted);
-    stroke-width: 1;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 5 4;
     vector-effect: non-scaling-stroke;
+    transition: stroke var(--transition-speed) ease, filter var(--transition-speed) ease;
 }
 
 .shapeSketch .sketchDim.is-active {
     stroke: var(--accent-live);
+    stroke-width: 2;
+    stroke-dasharray: none;
+    filter: drop-shadow(0 0 4px var(--glow-live));
+}
+
+.shapeSketch .sketchHandle {
+    fill: var(--bg-input);
+    stroke: var(--text-muted);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    transition: stroke var(--transition-speed) ease, filter var(--transition-speed) ease;
+}
+
+.shapeSketch .sketchHandle.is-active {
+    stroke: var(--accent-live);
+    filter: drop-shadow(0 0 3px var(--glow-live));
 }
 
 .shapeSketch .sketchLabel {
     fill: var(--text-secondary);
     font-family: var(--font-main);
     font-size: 13px;
+    font-weight: 600;
     text-anchor: middle;
     dominant-baseline: middle;
+    transition: fill var(--transition-speed) ease, filter var(--transition-speed) ease;
 }
 
 .shapeSketch .sketchLabel.is-active {
