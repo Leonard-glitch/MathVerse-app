@@ -531,6 +531,14 @@
     stroke: var(--border-color);
     stroke-width: 1.5;
     vector-effect: non-scaling-stroke;
+    transition: stroke var(--transition-speed) ease, stroke-width var(--transition-speed) ease,
+                filter var(--transition-speed) ease;
+}
+
+.shapeSketch .sketchDecor.is-active {
+    stroke: var(--accent-live);
+    stroke-width: 2.25;
+    filter: drop-shadow(0 0 4px var(--glow-live));
 }
 
 .shapeSketch .sketchPart {
@@ -544,6 +552,41 @@
    bzw. .perimeter-active, kein !important nötig. */
 .shapeSketch .sketchPart.is-active {
     fill: color-mix(in srgb, var(--accent-live) 24%, transparent);
+    stroke: var(--accent-live);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 5px var(--glow-live));
+}
+
+.shapeSketch .sketchFace {
+    stroke: none;
+    fill: color-mix(in srgb, var(--border-glow) 5%, transparent);
+    transition: fill var(--transition-speed) ease;
+}
+
+.shapeSketch .sketchFace.area-active {
+    fill: color-mix(in srgb, var(--accent-live) 20%, transparent);
+}
+
+.shapeSketch .sketchFace.sketchPart.is-active {
+    fill: color-mix(in srgb, var(--accent-live) 24%, transparent);
+}
+
+.shapeSketch .sketchEdges {
+    fill: none;
+    stroke: var(--border-color);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    transition: stroke var(--transition-speed) ease, stroke-width var(--transition-speed) ease,
+                filter var(--transition-speed) ease;
+}
+
+.shapeSketch .sketchEdges.perimeter-active {
+    stroke: var(--accent-live);
+    stroke-width: 3;
+    filter: drop-shadow(0 0 5px var(--glow-live));
+}
+
+.shapeSketch .sketchEdges.sketchPart.is-active {
     stroke: var(--accent-live);
     stroke-width: 2.5;
     filter: drop-shadow(0 0 5px var(--glow-live));

@@ -331,7 +331,7 @@ function sketchCircle(given) {
 
     <line class="sketchDim ${on('r')}" x1="120" y1="120" x2="177" y2="63" />
     <circle class="sketchHandle ${on('r')}" cx="177" cy="63" r="4" />
-    <text class="sketchLabel ${on('r')}" x="156" y="76">r</text>
+    <text class="sketchLabel ${on('r')}" x="164" y="90">r</text>
 
     <line class="sketchDim ${on('d')}" x1="40" y1="120" x2="200" y2="120" />
     <circle class="sketchHandle ${on('d')}" cx="40" cy="120" r="4" />
@@ -418,22 +418,22 @@ function sketchTriangle(given) {
     <circle class="sketchHandle ${on('b')}" cx="130" cy="45" r="4" />
     <text class="sketchLabel ${on('b')}" x="60" y="118">b</text>
 
-    <path class="sketchDecor" d="M 60,195 A 20,20 0 0 1 51,177" />
-    <text class="sketchLabel ${on('alpha')}" x="63" y="180">α</text>
+    <path class="sketchDecor ${on('alpha')}" d="M 60,195 Q 63,182 50,178" />
+    <text class="sketchLabel ${on('alpha')}" x="64" y="182">α</text>
 
-    <path class="sketchDecor" d="M 180,195 A 20,20 0 0 0 189,177" />
-    <text class="sketchLabel ${on('beta')}" x="177" y="180">β</text>
+    <path class="sketchDecor ${on('beta')}" d="M 180,195 Q 178,181 192,177" />
+    <text class="sketchLabel ${on('beta')}" x="176" y="180">β</text>
 
-    <path class="sketchDecor" d="M 121,62 A 18,18 0 0 1 139,62" />
-    <text class="sketchLabel ${on('gamma')}" x="130" y="72">γ</text>
+    <path class="sketchDecor ${on('gamma')}" d="M 121,60 Q 129,69 138,61" />
+    <text class="sketchLabel ${on('gamma')}" x="129" y="73">γ</text>
 
     <line class="sketchDim ${on('ha')}" x1="40" y1="195" x2="171" y2="134" />
     <circle class="sketchHandle ${on('ha')}" cx="171" cy="134" r="4" />
-    <text class="sketchLabel ${on('ha')}" x="98" y="181">ha</text>
+    <text class="sketchLabel ${on('ha')}" x="101" y="187">ha</text>
 
     <line class="sketchDim ${on('hb')}" x1="200" y1="195" x2="82" y2="124" />
     <circle class="sketchHandle ${on('hb')}" cx="82" cy="124" r="4" />
-    <text class="sketchLabel ${on('hb')}" x="158" y="181">hb</text>
+    <text class="sketchLabel ${on('hb')}" x="154" y="188">hb</text>
 
     <line class="sketchDim ${on('hc')}" x1="130" y1="45" x2="130" y2="195" />
     <circle class="sketchHandle ${on('hc')}" cx="130" cy="195" r="4" />
@@ -466,11 +466,11 @@ function sketchRightTriangle(given) {
     <circle class="sketchHandle ${on('c')}" cx="195" cy="195" r="4" />
     <text class="sketchLabel ${on('c')}" x="140" y="118">c</text>
 
-    <path class="sketchDecor" d="M 175,195 A 20,20 0 0 0 183,178" />
-    <text class="sketchLabel ${on('alpha')}" x="172" y="180">α</text>
+    <path class="sketchDecor ${on('alpha')}" d="M 175,195 Q 170,185 180,181" />
+    <text class="sketchLabel ${on('alpha')}" x="169" y="183">α</text>
 
-    <path class="sketchDecor" d="M 50,80 A 20,20 0 0 1 67,89" />
-    <text class="sketchLabel ${on('beta')}" x="68" y="78">β</text>
+    <path class="sketchDecor ${on('beta')}" d="M 50,80 Q 61,84 65,74" />
+    <text class="sketchLabel ${on('beta')}" x="63" y="85">β</text>
 
     <text class="sketchLabel ${on('A')}" x="90" y="165">A</text>
 </svg>`;
@@ -534,30 +534,32 @@ function sketchRhombus(given) {
     const perimeterOn = given.has('u') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-    <polygon class="sketchOutline ${areaOn} ${perimeterOn}" points="120,55 195,130 120,205 45,130" />
+    <polygon class="sketchOutline ${areaOn} ${perimeterOn}" points="120,70 202,128 120,186 38,128" />
 
-    <line class="sketchDim ${on('a')}" x1="120" y1="55" x2="195" y2="130" />
-    <circle class="sketchHandle ${on('a')}" cx="120" cy="55" r="4" />
-    <circle class="sketchHandle ${on('a')}" cx="195" cy="130" r="4" />
-    <text class="sketchLabel ${on('a')}" x="178" y="82">a</text>
+    <line class="sketchDim ${on('a')}" x1="120" y1="70" x2="202" y2="128" />
+    <circle class="sketchHandle ${on('a')}" cx="120" cy="70" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="202" cy="128" r="4" />
+    <text class="sketchLabel ${on('a')}" x="182" y="90">a</text>
 
-    <line class="sketchDim ${on('e')}" x1="45" y1="130" x2="195" y2="130" />
-    <circle class="sketchHandle ${on('e')}" cx="45" cy="130" r="4" />
-    <circle class="sketchHandle ${on('e')}" cx="195" cy="130" r="4" />
-    <text class="sketchLabel ${on('e')}" x="80" y="146">e</text>
+    <line class="sketchDim ${on('e')}" x1="38" y1="128" x2="202" y2="128" />
+    <circle class="sketchHandle ${on('e')}" cx="38" cy="128" r="4" />
+    <circle class="sketchHandle ${on('e')}" cx="202" cy="128" r="4" />
+    <text class="sketchLabel ${on('e')}" x="152" y="115">e</text>
 
-    <line class="sketchDim ${on('f')}" x1="120" y1="55" x2="120" y2="205" />
-    <circle class="sketchHandle ${on('f')}" cx="120" cy="55" r="4" />
-    <circle class="sketchHandle ${on('f')}" cx="120" cy="205" r="4" />
-    <text class="sketchLabel ${on('f')}" x="136" y="105">f</text>
+    <line class="sketchDim ${on('f')}" x1="120" y1="70" x2="120" y2="186" />
+    <circle class="sketchHandle ${on('f')}" cx="120" cy="70" r="4" />
+    <circle class="sketchHandle ${on('f')}" cx="120" cy="186" r="4" />
+    <text class="sketchLabel ${on('f')}" x="133" y="100">f</text>
 
-    <line class="sketchDim ${on('h')}" x1="215" y1="92" x2="215" y2="168" />
-    <circle class="sketchHandle ${on('h')}" cx="215" cy="92" r="4" />
-    <circle class="sketchHandle ${on('h')}" cx="215" cy="168" r="4" />
-    <text class="sketchLabel ${on('h')}" x="228" y="130">h</text>
+    <line class="sketchDecor" x1="120" y1="186" x2="147" y2="205" stroke-dasharray="3 3" />
+    <path class="sketchDecor" d="M 155,211 L 161,203 L 153,197" />
+    <line class="sketchDim ${on('h')}" x1="202" y1="128" x2="147" y2="205" />
+    <circle class="sketchHandle ${on('h')}" cx="202" cy="128" r="4" />
+    <circle class="sketchHandle ${on('h')}" cx="147" cy="205" r="4" />
+    <text class="sketchLabel ${on('h')}" x="192" y="168">h</text>
 
-    <text class="sketchLabel ${on('A')}" x="150" y="165">A</text>
-    <text class="sketchLabel ${on('u')}" x="120" y="222">U</text>
+    <text class="sketchLabel ${on('A')}" x="100" y="145">A</text>
+    <text class="sketchLabel ${on('u')}" x="65" y="180">U</text>
 </svg>`;
 }
 
@@ -565,33 +567,49 @@ function sketchRhombus(given) {
 
 function sketchCube(given) {
     const on = id => given.has(id) ? "is-active" : "";
-    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    const areaOn = given.has('V') ? "area-active" : "";
+    const perimeterOn = given.has('O') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-    <polygon class="sketchOutline ${wholeOn}" points="60,100 160,100 160,200 60,200" />
-    <polygon class="sketchOutline ${wholeOn}" points="60,100 100,60 200,60 160,100" />
-    <polygon class="sketchOutline ${wholeOn}" points="160,100 200,60 200,160 160,200" />
-
-    <line class="sketchDim ${on('a')}" x1="60" y1="215" x2="160" y2="215" />
-    <circle class="sketchHandle ${on('a')}" cx="60" cy="215" r="4" />
-    <circle class="sketchHandle ${on('a')}" cx="160" cy="215" r="4" />
-    <text class="sketchLabel ${on('a')}" x="110" y="229">a</text>
+    <polygon class="sketchFace ${areaOn}" points="60,100 160,100 160,200 60,200" />
+    <polygon class="sketchFace ${areaOn}" points="60,100 100,60 200,60 160,100" />
+    <polygon class="sketchFace ${areaOn}" points="160,100 200,60 200,160 160,200" />
 
     <line class="sketchDim ${on('d')}" x1="60" y1="200" x2="200" y2="60" />
     <circle class="sketchHandle ${on('d')}" cx="60" cy="200" r="4" />
     <circle class="sketchHandle ${on('d')}" cx="200" cy="60" r="4" />
     <text class="sketchLabel ${on('d')}" x="150" y="115">d</text>
+
+    <polygon class="sketchEdges ${perimeterOn}" points="60,100 160,100 160,200 60,200" />
+    <polygon class="sketchEdges ${perimeterOn}" points="60,100 100,60 200,60 160,100" />
+    <polygon class="sketchEdges ${perimeterOn}" points="160,100 200,60 200,160 160,200" />
+
+    <line class="sketchDim ${on('a')}" x1="60" y1="215" x2="160" y2="215" />
+    <circle class="sketchHandle ${on('a')}" cx="60" cy="215" r="4" />
+    <circle class="sketchHandle ${on('a')}" cx="160" cy="215" r="4" />
+    <text class="sketchLabel ${on('a')}" x="110" y="229">a</text>
 </svg>`;
 }
 
 function sketchCuboid(given) {
     const on = id => given.has(id) ? "is-active" : "";
-    const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
+    const areaOn = given.has('V') ? "area-active" : "";
+    const perimeterOn = given.has('O') ? "perimeter-active" : "";
+    const gOn = on('G');
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-    <polygon class="sketchOutline ${wholeOn}" points="50,90 170,90 170,180 50,180" />
-    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('G')}" points="50,90 170,90 205,55 85,55" />
-    <polygon class="sketchOutline ${wholeOn}" points="170,90 205,55 205,145 170,180" />
+    <polygon class="sketchFace ${areaOn}" points="50,90 170,90 170,180 50,180" />
+    <polygon class="sketchFace sketchPart ${areaOn} ${gOn}" points="50,90 170,90 205,55 85,55" />
+    <polygon class="sketchFace ${areaOn}" points="170,90 205,55 205,145 170,180" />
+
+    <line class="sketchDim ${on('d')}" x1="50" y1="180" x2="205" y2="55" />
+    <circle class="sketchHandle ${on('d')}" cx="50" cy="180" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="205" cy="55" r="4" />
+    <text class="sketchLabel ${on('d')}" x="140" y="128">d</text>
+
+    <polygon class="sketchEdges ${perimeterOn}" points="50,90 170,90 170,180 50,180" />
+    <polygon class="sketchEdges sketchPart ${perimeterOn} ${gOn}" points="50,90 170,90 205,55 85,55" />
+    <polygon class="sketchEdges ${perimeterOn}" points="170,90 205,55 205,145 170,180" />
 
     <line class="sketchDim ${on('a')}" x1="50" y1="195" x2="170" y2="195" />
     <circle class="sketchHandle ${on('a')}" cx="50" cy="195" r="4" />
@@ -603,15 +621,10 @@ function sketchCuboid(given) {
     <circle class="sketchHandle ${on('c')}" cx="35" cy="180" r="4" />
     <text class="sketchLabel ${on('c')}" x="20" y="135">c</text>
 
-    <line class="sketchDim ${on('b')}" x1="170" y1="90" x2="205" y2="55" />
-    <circle class="sketchHandle ${on('b')}" cx="170" cy="90" r="4" />
-    <circle class="sketchHandle ${on('b')}" cx="205" cy="55" r="4" />
-    <text class="sketchLabel ${on('b')}" x="200" y="65">b</text>
-
-    <line class="sketchDim ${on('d')}" x1="50" y1="180" x2="205" y2="55" />
-    <circle class="sketchHandle ${on('d')}" cx="50" cy="180" r="4" />
-    <circle class="sketchHandle ${on('d')}" cx="205" cy="55" r="4" />
-    <text class="sketchLabel ${on('d')}" x="140" y="128">d</text>
+    <line class="sketchDim ${on('b')}" x1="39" y1="79" x2="74" y2="44" />
+    <circle class="sketchHandle ${on('b')}" cx="39" cy="79" r="4" />
+    <circle class="sketchHandle ${on('b')}" cx="74" cy="44" r="4" />
+    <text class="sketchLabel ${on('b')}" x="46" y="53">b</text>
 </svg>`;
 }
 
@@ -626,7 +639,7 @@ function sketchSphere(given) {
 
     <line class="sketchDim ${on('r')}" x1="120" y1="130" x2="173" y2="88" />
     <circle class="sketchHandle ${on('r')}" cx="173" cy="88" r="4" />
-    <text class="sketchLabel ${on('r')}" x="155" y="100">r</text>
+    <text class="sketchLabel ${on('r')}" x="155" y="90">r</text>
 
     <line class="sketchDim ${on('d')}" x1="45" y1="130" x2="195" y2="130" />
     <circle class="sketchHandle ${on('d')}" cx="45" cy="130" r="4" />
@@ -644,14 +657,14 @@ function sketchCylinder(given) {
     <ellipse class="sketchOutline sketchPart ${wholeOn} ${on('G')}" cx="120" cy="190" rx="70" ry="22" />
     <ellipse class="sketchOutline ${wholeOn}" cx="120" cy="70" rx="70" ry="22" />
 
-    <line class="sketchDim ${on('r')}" x1="120" y1="190" x2="120" y2="212" />
-    <circle class="sketchHandle ${on('r')}" cx="120" cy="212" r="4" />
-    <text class="sketchLabel ${on('r')}" x="138" y="203">r</text>
-
     <line class="sketchDim ${on('d')}" x1="50" y1="70" x2="190" y2="70" />
     <circle class="sketchHandle ${on('d')}" cx="50" cy="70" r="4" />
     <circle class="sketchHandle ${on('d')}" cx="190" cy="70" r="4" />
-    <text class="sketchLabel ${on('d')}" x="120" y="52">d</text>
+    <text class="sketchLabel ${on('d')}" x="120" y="50">d</text>
+
+    <line class="sketchDim ${on('r')}" x1="120" y1="70" x2="165" y2="53" />
+    <circle class="sketchHandle ${on('r')}" cx="165" cy="53" r="4" />
+    <text class="sketchLabel ${on('r')}" x="152" y="43">r</text>
 
     <line class="sketchDim ${on('h')}" x1="215" y1="70" x2="215" y2="190" />
     <circle class="sketchHandle ${on('h')}" cx="215" cy="70" r="4" />
@@ -670,7 +683,7 @@ function sketchCone(given) {
     const wholeOn = `${given.has('V') ? "area-active" : ""} ${given.has('O') ? "perimeter-active" : ""}`;
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
-    <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="120,50 190,190 50,190" />
+    <path class="sketchOutline sketchPart ${wholeOn} ${on('M')}" d="M 120,50 L 190,190 A 70,20 0 0 1 50,190 Z" />
     <ellipse class="sketchOutline sketchPart ${wholeOn} ${on('G')}" cx="120" cy="190" rx="70" ry="20" />
 
     <line class="sketchDim ${on('s')}" x1="120" y1="50" x2="190" y2="190" />
@@ -679,22 +692,22 @@ function sketchCone(given) {
 
     <line class="sketchDim ${on('r')}" x1="120" y1="190" x2="120" y2="210" />
     <circle class="sketchHandle ${on('r')}" cx="120" cy="210" r="4" />
-    <text class="sketchLabel ${on('r')}" x="136" y="203">r</text>
+    <text class="sketchLabel ${on('r')}" x="138" y="203">r</text>
 
-    <line class="sketchDim ${on('d')}" x1="50" y1="190" x2="190" y2="190" />
-    <circle class="sketchHandle ${on('d')}" cx="50" cy="190" r="4" />
-    <circle class="sketchHandle ${on('d')}" cx="190" cy="190" r="4" />
-    <text class="sketchLabel ${on('d')}" x="120" y="223">d</text>
+    <line class="sketchDim ${on('d')}" x1="50" y1="222" x2="190" y2="222" />
+    <circle class="sketchHandle ${on('d')}" cx="50" cy="222" r="4" />
+    <circle class="sketchHandle ${on('d')}" cx="190" cy="222" r="4" />
+    <text class="sketchLabel ${on('d')}" x="120" y="236">d</text>
 
     <line class="sketchDim ${on('h')}" x1="35" y1="50" x2="35" y2="190" />
     <circle class="sketchHandle ${on('h')}" cx="35" cy="50" r="4" />
     <circle class="sketchHandle ${on('h')}" cx="35" cy="190" r="4" />
     <text class="sketchLabel ${on('h')}" x="20" y="120">h</text>
 
-    <text class="sketchLabel ${on('G')}" x="120" y="192">G</text>
-    <text class="sketchLabel ${on('V')}" x="120" y="130">V</text>
-    <text class="sketchLabel ${on('M')}" x="120" y="155">M</text>
-    <text class="sketchLabel ${on('O')}" x="75" y="145">O</text>
+    <text class="sketchLabel ${on('G')}" x="120" y="180">G</text>
+    <text class="sketchLabel ${on('V')}" x="120" y="110">V</text>
+    <text class="sketchLabel ${on('M')}" x="120" y="140">M</text>
+    <text class="sketchLabel ${on('O')}" x="59" y="145">O</text>
 </svg>`;
 }
 
@@ -707,7 +720,6 @@ function sketchQuadrangularPyramid(given) {
     <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="105,45 190,175 160,120" />
     <polygon class="sketchOutline sketchPart ${wholeOn} ${on('G')}" points="50,175 190,175 160,120 20,120" />
     <line class="sketchDecor" x1="105" y1="45" x2="20" y2="120" stroke-dasharray="3 3" />
-    <line class="sketchDecor" x1="20" y1="120" x2="160" y2="120" stroke-dasharray="3 3" />
 
     <line class="sketchDim ${on('a')}" x1="50" y1="191" x2="190" y2="191" />
     <circle class="sketchHandle ${on('a')}" cx="50" cy="191" r="4" />
@@ -739,7 +751,6 @@ function sketchRectangularPyramid(given) {
     <polygon class="sketchOutline sketchPart ${wholeOn} ${on('M')}" points="115,45 200,175 170,125" />
     <polygon class="sketchOutline sketchPart ${wholeOn} ${on('G')}" points="60,175 200,175 170,125 30,125" />
     <line class="sketchDecor" x1="115" y1="45" x2="30" y2="125" stroke-dasharray="3 3" />
-    <line class="sketchDecor" x1="30" y1="125" x2="170" y2="125" stroke-dasharray="3 3" />
 
     <line class="sketchDim ${on('a')}" x1="60" y1="191" x2="200" y2="191" />
     <circle class="sketchHandle ${on('a')}" cx="60" cy="191" r="4" />
