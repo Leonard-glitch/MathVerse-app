@@ -150,7 +150,7 @@ export const tools = [
         tags:     ["finanzen", "rechner", "investition", "sparplan", "rendite", "inflation", "zinseszins"],
         info:      "All-in-One-Finanzrechner mit drei spezialisierten Tools: Berechnet den langfristigen Vermögensaufbau per Sparplan (Zinseszins), ermittelt den realen Kaufkraftverlust durch Inflation oder analysiert die genaue Performance (ROI & CAGR) von Investments – inklusive Live-Diagrammen und transparentem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Finanzrechner.png`,
+            big:   `${BASE}/pictures/Finanzrechner2.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
