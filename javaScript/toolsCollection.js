@@ -59,7 +59,7 @@ export const tools = [
         tags:     ["umrechner", "einheiten", "länge", "gewicht", "temperatur", "zeit"],
         info:     "Vielseitiger Umrechner für verschiedenste Maßeinheiten – inklusive Advanced Mode für internationale und spezialisierte Messsysteme.",
         image: {
-            big:   `${BASE}/pictures/hqdefault.jpg`,
+            big:   `${BASE}/pictures/einheitenUmrechner1.png`,
             small: `${BASE}/pictures/icons/einheitenUmrechner-icon.png`
         }
     },
@@ -72,7 +72,7 @@ export const tools = [
         tags:     ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner", "anteil", "prozentsatz", "grundwert", "veränderung", "erhöhung", "verminderung", "netto", "brutto", "skonto", "rechenweg", "advanced"],
         info:     "Umfassender Prozentrechner mit Advanced Mode: Berechnet Anteil, Prozentsatz, Grundwert, prozentuale Veränderungen, Erhöhungen/Verminderungen, MwSt (Netto/Brutto) sowie Rabatte inklusive detailliertem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Prozentrechnung_Thumbnail.png`,
+            big:   `${BASE}/pictures/Prozentrechnung_Thumbnail3.png`,
             small: `${BASE}/pictures/icons/prozentrechner-icon.png`
         }
     },
@@ -85,7 +85,7 @@ export const tools = [
         tags:     ["bruch", "bruchrechner", "addieren", "subtrahieren", "multiplizieren", "dividieren", "kürzen", "erweitern", "gemischte zahlen"],
         info:     "Führt alle Grundrechenarten mit Brüchen durch – inklusive Kürzen, Erweitern, gemischten Zahlen und vollständigem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/bruchrechner-big.png`,
+            big:   `${BASE}/pictures/bruchrechner-big2.png`,
             small: `${BASE}/pictures/icons/bruchrechner-icon.png`
         }
     },
