@@ -230,6 +230,7 @@
     align-items: center;
     gap: 0.3rem;
     text-align: center;
+    min-width: 0; /* erlaubt Grid-Items zu schrumpfen statt zu überlaufen */
 }
 
 .ergebnisLabel {
@@ -246,6 +247,24 @@
     color: var(--accent-live);
     text-shadow: 0 0 5px var(--glow-live);
     min-height: 1.4rem;
+    overflow-wrap: anywhere; /* lange Zahlen brechen um statt aus der Box zu laufen */
+}
+
+/* Gegebene (eingegebene) Werte: neutral statt grün, damit klar erkennbar
+   ist, was der Nutzer selbst eingegeben hat vs. was berechnet wurde. */
+.ergebnisItem.is-given .ergebnisLabel {
+    color: var(--border-glow);
+}
+
+.ergebnisItem.is-given .ergebnisValue {
+    color: var(--text-primary);
+    text-shadow: none;
+}
+
+.ergebnisGivenIcon {
+    font-size: 0.62rem;
+    margin-left: 0.15rem;
+    opacity: 0.85;
 }
 
 /* ── Ergebnis-Gruppen (thematische Blöcke innerhalb der Ausgabe) ─────────── */
@@ -312,6 +331,103 @@
     flex-direction: column;
     gap: 1rem;
     padding: 0 1rem 1rem;
+}
+
+.step-container {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color var(--transition-speed);
+}
+
+.step-container:hover {
+    border-color: rgba(138, 22, 255, 0.15);
+}
+
+.step-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--border-glow);
+}
+
+.step-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.step-formula-box {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.2rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 2; /* mehr Luft für eingebettete Brüche/Wurzeln */
+    white-space: pre-wrap;
+}
+
+.step-sub-solution {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.step-container.final-step {
+    border-color: rgba(0, 255, 204, 0.15);
+    background: rgba(0, 255, 204, 0.01);
+}
+
+.step-container.final-step .step-title {
+    color: var(--accent-live);
+}
+
+.step-container.final-step .step-formula-box {
+    border-color: rgba(0, 255, 204, 0.2);
+}
+
+.step-container.final-step .step-sub-solution {
+    color: var(--accent-live);
+    font-weight: 600;
+    text-shadow: 0 0 8px var(--glow-live);
+}
+
+/* MATHE-BAUSTEINE (Bruch, Wurzel) – für schulähnliche Formeldarstellung
+   im Rechenweg, analog zu .fu-frac/.fu-sqrt bei Formel Umformer/Gleichungslöser */
+.geo-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    padding: 0 0.25rem;
+    line-height: 1.2;
+}
+.geo-frac-num, .geo-frac-den {
+    padding: 0 0.2rem;
+}
+.geo-frac-bar {
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    margin: 2px 0;
+}
+
+.geo-sqrt {
+    display: inline-flex;
+    align-items: flex-start;
+    vertical-align: middle;
+}
+.geo-sqrt-symbol {
+    font-size: 1.1em;
+    margin-right: 0.05em;
+}
+.geo-sqrt-radicand {
+    border-top: 1.5px solid currentColor;
+    padding: 0 0.15em;
 }
 
 
@@ -623,6 +739,15 @@
     .geometryContainer{
         width: 100%;
     }
+
+    .ergebnisGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .ergebnisValue {
+        font-size: 1rem;
+    }
 }
 
 @media (max-width: 520px) {
@@ -654,5 +779,17 @@
     border-bottom-left-radius: var(--radius-md);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    }
+
+    .ergebnisGrid {
+        gap: 0.5rem;
+    }
+
+    .ergebnisValue {
+        font-size: 0.9rem;
+    }
+
+    .ergebnisLabel {
+        font-size: 0.62rem;
     }
 }

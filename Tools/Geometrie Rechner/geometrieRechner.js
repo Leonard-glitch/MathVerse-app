@@ -275,6 +275,8 @@ const errorMessages=document.getElementById("errorMessages");
 const typeButtons=document.querySelectorAll(".dimensionTypeBtn");
 const formSelectContainer=document.getElementById("selectForm");
 const sketchContainer=document.querySelector(".geometryRightFormContainer");
+const ausgabeContainer=document.getElementById("ausgabeContainer");
+const rechenwegOutput=document.getElementById("rechenwegOutput");
 
 let currentType = "2d";
 
@@ -588,6 +590,9 @@ function sketchCube(given) {
     <circle class="sketchHandle ${on('a')}" cx="60" cy="215" r="4" />
     <circle class="sketchHandle ${on('a')}" cx="160" cy="215" r="4" />
     <text class="sketchLabel ${on('a')}" x="110" y="229">a</text>
+
+    <text class="sketchLabel ${on('V')}" x="80" y="150">V</text>
+    <text class="sketchLabel ${on('O')}" x="185" y="110">O</text>
 </svg>`;
 }
 
@@ -625,6 +630,10 @@ function sketchCuboid(given) {
     <circle class="sketchHandle ${on('b')}" cx="39" cy="79" r="4" />
     <circle class="sketchHandle ${on('b')}" cx="74" cy="44" r="4" />
     <text class="sketchLabel ${on('b')}" x="46" y="53">b</text>
+
+    <text class="sketchLabel ${gOn}" x="127" y="75">G</text>
+    <text class="sketchLabel ${on('V')}" x="75" y="168">V</text>
+    <text class="sketchLabel ${on('O')}" x="188" y="118">O</text>
 </svg>`;
 }
 
@@ -645,6 +654,9 @@ function sketchSphere(given) {
     <circle class="sketchHandle ${on('d')}" cx="45" cy="130" r="4" />
     <circle class="sketchHandle ${on('d')}" cx="195" cy="130" r="4" />
     <text class="sketchLabel ${on('d')}" x="120" y="150">d</text>
+
+    <text class="sketchLabel ${on('V')}" x="75" y="168">V</text>
+    <text class="sketchLabel ${on('O')}" x="130" y="80">O</text>
 </svg>`;
 }
 
@@ -834,6 +846,304 @@ function refreshSketch() {
     if (shape) renderSketch(formSelectContainer.value, getSelectedInputIds());
 }
 
+// ── Rechen-Engine ──────────────────────────────────────────────────────────
+// Jeder Resolver bekommt eine Map { inputId: Zahlenwert } mit genau den vom
+// Nutzer gewählten und ausgefüllten Werten und liefert entweder
+// { values, steps } (alle berechenbaren Werte + Rechenweg) oder { error }.
+
+function formatNum(n) {
+    return n.toLocaleString('de-DE', {
+        minimumFractionDigits: window.MV.getDecimalPlaces(),
+        maximumFractionDigits: window.MV.getDecimalPlaces()
+    });
+}
+
+// Schulähnliche Notation: echter Bruchstrich statt "/", Wurzelstrich statt "√(...)"
+function frac(num, den) {
+    return `<span class="geo-frac"><span class="geo-frac-num">${num}</span><span class="geo-frac-bar"></span><span class="geo-frac-den">${den}</span></span>`;
+}
+
+function sqrt(content) {
+    return `<span class="geo-sqrt"><span class="geo-sqrt-symbol">√</span><span class="geo-sqrt-radicand">${content}</span></span>`;
+}
+
+// isGiven = true, wenn dieser Schritt nur einen vom Nutzer eingegebenen Wert
+// wiedergibt (keine Berechnung) -> bleibt im Rechenweg neutral statt grün.
+function step(title, text, formula, solution, isGiven = false) {
+    return { title, text, formula, solution, isGiven };
+}
+
+function resolveCircle(given) {
+    const [knownId, knownVal] = Object.entries(given)[0];
+    const steps = [];
+    let r;
+
+    if (knownId === 'r') {
+        r = knownVal;
+        steps.push(step("Radius", "Der Radius ist der gegebene Wert.", `r = ${formatNum(r)}`, null, true));
+    } else if (knownId === 'd') {
+        r = knownVal / 2;
+        steps.push(step("Radius aus Durchmesser", "Der Radius ist die Hälfte des Durchmessers:", `r = ${frac('d', '2')} = ${frac(formatNum(knownVal), '2')} = ${formatNum(r)}`));
+    } else if (knownId === 'u') {
+        r = knownVal / (2 * Math.PI);
+        steps.push(step("Radius aus Umfang", "Der Umfang ist U = 2 · π · r, umgestellt nach r:", `r = ${frac('U', '2π')} = ${frac(formatNum(knownVal), '2π')} = ${formatNum(r)}`));
+    } else {
+        r = Math.sqrt(knownVal / Math.PI);
+        steps.push(step("Radius aus Fläche", "Die Fläche ist A = π · r², umgestellt nach r:", `r = ${sqrt(frac('A', 'π'))} = ${sqrt(frac(formatNum(knownVal), 'π'))} = ${formatNum(r)}`));
+    }
+
+    const d = 2 * r;
+    const u = 2 * Math.PI * r;
+    const A = Math.PI * r * r;
+
+    if (knownId !== 'd') steps.push(step("Durchmesser", "Der Durchmesser ist doppelt so groß wie der Radius:", `d = 2 · r = 2 · ${formatNum(r)} = ${formatNum(d)}`));
+    if (knownId !== 'u') steps.push(step("Umfang", "Formel für den Kreisumfang:", `U = 2π · r = 2π · ${formatNum(r)} = ${formatNum(u)}`));
+    if (knownId !== 'A') steps.push(step("Fläche", "Formel für die Kreisfläche:", `A = π · r² = π · ${formatNum(r)}² = ${formatNum(A)}`));
+
+    return { values: { r, d, u, A }, steps };
+}
+
+function resolveSquare(given) {
+    const [knownId, knownVal] = Object.entries(given)[0];
+    const steps = [];
+    let a;
+
+    if (knownId === 'a') {
+        a = knownVal;
+        steps.push(step("Seitenlänge", "Die Seitenlänge ist der gegebene Wert.", `a = ${formatNum(a)}`, null, true));
+    } else if (knownId === 'u') {
+        a = knownVal / 4;
+        steps.push(step("Seitenlänge aus Umfang", "Ein Quadrat hat 4 gleich lange Seiten:", `a = ${frac('U', '4')} = ${frac(formatNum(knownVal), '4')} = ${formatNum(a)}`));
+    } else if (knownId === 'A') {
+        a = Math.sqrt(knownVal);
+        steps.push(step("Seitenlänge aus Fläche", "Die Fläche ist A = a², umgestellt nach a:", `a = ${sqrt('A')} = ${sqrt(formatNum(knownVal))} = ${formatNum(a)}`));
+    } else {
+        a = knownVal / Math.SQRT2;
+        steps.push(step("Seitenlänge aus Diagonale", "Die Diagonale ist d = a√2, umgestellt nach a:", `a = ${frac('d', '√2')} = ${frac(formatNum(knownVal), '√2')} = ${formatNum(a)}`));
+    }
+
+    const u = 4 * a;
+    const A = a * a;
+    const d = a * Math.SQRT2;
+
+    if (knownId !== 'u') steps.push(step("Umfang", "Vier gleich lange Seiten addiert:", `U = 4 · a = 4 · ${formatNum(a)} = ${formatNum(u)}`));
+    if (knownId !== 'A') steps.push(step("Fläche", "Seitenlänge im Quadrat:", `A = a² = ${formatNum(a)}² = ${formatNum(A)}`));
+    if (knownId !== 'd') steps.push(step("Diagonale", "Aus dem Satz des Pythagoras (die Diagonale teilt das Quadrat in zwei rechtwinklige Dreiecke):", `d = a · √2 = ${formatNum(a)} · √2 = ${formatNum(d)}`));
+
+    return { values: { a, u, A, d }, steps };
+}
+
+function resolveRectangle(given) {
+    const order = ['a', 'b', 'A', 'u', 'd'];
+    const ids = Object.keys(given).sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const key = ids.join(',');
+    const v = given;
+    const steps = [];
+    let a, b;
+
+    switch (key) {
+        case 'a,b':
+            a = v.a; b = v.b;
+            steps.push(step("Seiten", "Beide Seiten sind bereits gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}`, null, true));
+            break;
+
+        case 'a,A':
+            a = v.a; b = v.A / v.a;
+            steps.push(step("Seite b aus der Fläche", "Die Fläche ist A = a · b, umgestellt nach b:", `b = ${frac('A', 'a')} = ${frac(formatNum(v.A), formatNum(a))} = ${formatNum(b)}`));
+            break;
+
+        case 'A,b':
+            b = v.b; a = v.A / v.b;
+            steps.push(step("Seite a aus der Fläche", "Die Fläche ist A = a · b, umgestellt nach a:", `a = ${frac('A', 'b')} = ${frac(formatNum(v.A), formatNum(b))} = ${formatNum(a)}`));
+            break;
+
+        case 'a,u':
+            a = v.a; b = v.u / 2 - v.a;
+            if (b <= 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – die zweite Seite wäre 0 oder negativ." };
+            steps.push(step("Seite b aus dem Umfang", "Der Umfang ist U = 2 · (a + b), umgestellt nach b:", `b = ${frac('U', '2')} − a = ${frac(formatNum(v.u), '2')} − ${formatNum(a)} = ${formatNum(b)}`));
+            break;
+
+        case 'b,u':
+            b = v.b; a = v.u / 2 - v.b;
+            if (a <= 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – die zweite Seite wäre 0 oder negativ." };
+            steps.push(step("Seite a aus dem Umfang", "Der Umfang ist U = 2 · (a + b), umgestellt nach a:", `a = ${frac('U', '2')} − b = ${frac(formatNum(v.u), '2')} − ${formatNum(b)} = ${formatNum(a)}`));
+            break;
+
+        case 'a,d':
+            a = v.a;
+            if (v.d <= v.a) return { error: "Diese Kombination ergibt kein gültiges Rechteck – die Diagonale muss größer als Seite a sein." };
+            b = Math.sqrt(v.d * v.d - v.a * v.a);
+            steps.push(step("Seite b aus der Diagonale", "Nach dem Satz des Pythagoras gilt d² = a² + b², umgestellt nach b:", `b = ${sqrt('d² − a²')} = ${sqrt(`${formatNum(v.d)}² − ${formatNum(a)}²`)} = ${formatNum(b)}`));
+            break;
+
+        case 'b,d':
+            b = v.b;
+            if (v.d <= v.b) return { error: "Diese Kombination ergibt kein gültiges Rechteck – die Diagonale muss größer als Seite b sein." };
+            a = Math.sqrt(v.d * v.d - v.b * v.b);
+            steps.push(step("Seite a aus der Diagonale", "Nach dem Satz des Pythagoras gilt d² = a² + b², umgestellt nach a:", `a = ${sqrt('d² − b²')} = ${sqrt(`${formatNum(v.d)}² − ${formatNum(b)}²`)} = ${formatNum(a)}`));
+            break;
+
+        case 'A,u': {
+            const s = v.u / 2;
+            const disc = s * s - 4 * v.A;
+            if (disc < 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – bei diesem Umfang ist die Fläche zu groß." };
+            const root = Math.sqrt(disc);
+            a = (s + root) / 2;
+            b = (s - root) / 2;
+            steps.push(step("Halber Umfang", "Aus dem Umfang folgt die Summe der Seiten:", `a + b = ${frac('U', '2')} = ${frac(formatNum(v.u), '2')} = ${formatNum(s)}`));
+            steps.push(step("Seiten aus Summe und Produkt", "a und b sind die beiden Lösungen von t² − (a+b) · t + A = 0. Da beide Seiten gleichwertig sind, wird der größere Wert a und der kleinere b zugeordnet:", `t² − ${formatNum(s)} · t + ${formatNum(v.A)} = 0\nt₁ = ${formatNum(a)},  t₂ = ${formatNum(b)}`));
+            break;
+        }
+
+        case 'A,d': {
+            if (v.d * v.d < 2 * v.A) return { error: "Diese Kombination ergibt kein gültiges Rechteck – bei dieser Diagonale ist die Fläche zu groß." };
+            const s = Math.sqrt(v.d * v.d + 2 * v.A);
+            const diff = Math.sqrt(v.d * v.d - 2 * v.A);
+            a = (s + diff) / 2;
+            b = (s - diff) / 2;
+            steps.push(step("Summe der Seiten", "Aus (a+b)² = d² + 2A folgt:", `a + b = ${sqrt('d² + 2A')} = ${sqrt(`${formatNum(v.d)}² + 2 · ${formatNum(v.A)}`)} = ${formatNum(s)}`));
+            steps.push(step("Differenz der Seiten", "Aus (a−b)² = d² − 2A folgt:", `a − b = ${sqrt('d² − 2A')} = ${sqrt(`${formatNum(v.d)}² − 2 · ${formatNum(v.A)}`)} = ${formatNum(diff)}`));
+            steps.push(step("Seiten a und b", "Summe und Differenz zusammen ergeben beide Seiten:", `a = ${frac(`${formatNum(s)} + ${formatNum(diff)}`, '2')} = ${formatNum(a)}\nb = ${frac(`${formatNum(s)} − ${formatNum(diff)}`, '2')} = ${formatNum(b)}`));
+            break;
+        }
+
+        case 'u,d': {
+            const s = v.u / 2;
+            const disc = 2 * v.d * v.d - s * s;
+            if (disc < 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – Umfang und Diagonale passen nicht zusammen." };
+            const diff = Math.sqrt(disc);
+            a = (s + diff) / 2;
+            b = (s - diff) / 2;
+            steps.push(step("Halber Umfang", "Aus dem Umfang folgt die Seitensumme:", `a + b = ${frac('U', '2')} = ${frac(formatNum(v.u), '2')} = ${formatNum(s)}`));
+            steps.push(step("Differenz der Seiten", "Kombiniert mit d² = a² + b² ergibt sich die Differenz:", `a − b = ${sqrt('2d² − (a+b)²')} = ${sqrt(`2 · ${formatNum(v.d)}² − ${formatNum(s)}²`)} = ${formatNum(diff)}`));
+            steps.push(step("Seiten a und b", "Summe und Differenz zusammen ergeben beide Seiten:", `a = ${frac(`${formatNum(s)} + ${formatNum(diff)}`, '2')} = ${formatNum(a)}\nb = ${frac(`${formatNum(s)} − ${formatNum(diff)}`, '2')} = ${formatNum(b)}`));
+            break;
+        }
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    const A = a * b;
+    const u = 2 * (a + b);
+    const d = Math.sqrt(a * a + b * b);
+
+    if (!ids.includes('A')) steps.push(step("Fläche", "Seite mal Seite:", `A = a · b = ${formatNum(a)} · ${formatNum(b)} = ${formatNum(A)}`));
+    if (!ids.includes('u')) steps.push(step("Umfang", "Zweimal die Summe beider Seiten:", `U = 2 · (a + b) = 2 · (${formatNum(a)} + ${formatNum(b)}) = ${formatNum(u)}`));
+    if (!ids.includes('d')) steps.push(step("Diagonale", "Nach dem Satz des Pythagoras:", `d = ${sqrt('a² + b²')} = ${sqrt(`${formatNum(a)}² + ${formatNum(b)}²`)} = ${formatNum(d)}`));
+
+    return { values: { a, b, A, u, d }, steps };
+}
+
+const shapeResolvers = {
+    circle: resolveCircle,
+    square: resolveSquare,
+    rectangle: resolveRectangle
+    // weitere Formen folgen in den nächsten Schritten
+};
+
+function renderRechenwegSteps(steps) {
+    // Die CSS-Klasse "final-step" (Name historisch aus den anderen Tools
+    // übernommen) wird hier auf JEDEN Schritt angewandt, der etwas berechnet –
+    // nicht nur auf den letzten. Nur Schritte, die einen eingegebenen Wert
+    // unverändert wiedergeben (isGiven), bleiben neutral.
+    rechenwegOutput.innerHTML = steps.map(s => `
+            <div class="step-container ${s.isGiven ? "" : "final-step"}">
+                <div class="step-title">${s.title}</div>
+                ${s.text ? `<div class="step-text">${s.text}</div>` : ""}
+                ${s.formula ? `<div class="step-formula-box">${s.formula}</div>` : ""}
+                ${s.solution ? `<div class="step-sub-solution">${s.solution}</div>` : ""}
+            </div>`).join("");
+}
+
+function renderResultsGrid(shape, values, given) {
+    const grid = document.querySelector(".ergebnisGrid");
+    if (!grid) return;
+
+    grid.innerHTML = shape.inputs.map(input => {
+        const isGiven = input.id in given;
+        return `
+        <div class="ergebnisItem ${isGiven ? "is-given" : ""}">
+            <p class="ergebnisLabel">${input.id}${isGiven ? ' <i class="fa fa-pencil ergebnisGivenIcon" title="Eingegebener Wert"></i>' : ''}</p>
+            <p class="ergebnisValue">${formatNum(values[input.id])}</p>
+        </div>`;
+    }).join("");
+}
+
+function readGivenValues() {
+    const given = {};
+    let hasInvalid = false;
+
+    getAllActiveSelects().forEach(select => {
+        const row = select.closest(".inputContainer, .inputRow");
+        const numberInput = row ? row.querySelector(".zahlenInputfeld") : null;
+        if (!numberInput) return;
+
+        const raw = numberInput.value.trim();
+        if (raw === "") return;
+
+        const num = parseFloat(raw.replace(",", "."));
+        if (isNaN(num) || num <= 0) { hasInvalid = true; return; }
+
+        given[select.value] = num;
+    });
+
+    return { given, hasInvalid };
+}
+
+function setResultsVisible(visible) {
+    // Nutzt Opacity statt display:none, damit die Box ihre Höhe behält
+    // (siehe Kommentar an .zahlenAusgabestyle in geometrieRechner.css)
+    ausgabeContainer.style.opacity = visible ? "1" : "0";
+    ausgabeContainer.style.pointerEvents = visible ? "auto" : "none";
+}
+
+function calculate() {
+    const shapeKey = formSelectContainer.value;
+    const shape = shapeConfig[shapeKey];
+    if (!shape) return;
+
+    const { given, hasInvalid } = readGivenValues();
+    const requiredCount = document.querySelectorAll("#variousInputContainer .zahlenInputfeld").length;
+    const givenCount = Object.keys(given).length;
+
+    if (hasInvalid) {
+        showError("Bitte nur positive Zahlen eingeben.");
+        setResultsVisible(false);
+        rechenwegOutput.innerHTML = "";
+        return;
+    }
+
+    if (givenCount < requiredCount) {
+        hideError();
+        setResultsVisible(false);
+        rechenwegOutput.innerHTML = "";
+        return;
+    }
+
+    const resolver = shapeResolvers[shapeKey];
+    if (!resolver) {
+        hideError();
+        setResultsVisible(false);
+        rechenwegOutput.innerHTML = `<div class="step-container"><div class="step-title">Bald verfügbar</div><div class="step-text">Die Berechnung für „${shape.name}" wird als Nächstes ergänzt.</div></div>`;
+        return;
+    }
+
+    const result = resolver(given);
+
+    if (result.error) {
+        showError(result.error);
+        setResultsVisible(false);
+        rechenwegOutput.innerHTML = "";
+        return;
+    }
+
+    hideError();
+    setResultsVisible(true);
+    renderResultsGrid(shape, result.values, given);
+    renderRechenwegSteps(result.steps);
+}
+
 typeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         typeButtons.forEach(b => b.classList.remove("active"));
@@ -914,6 +1224,7 @@ function addThirdInput(){
 
     refreshSelectOptions(shape);
     refreshSketch();
+    calculate();
 }
 
 function deleteThirdInput(){
@@ -923,6 +1234,7 @@ function deleteThirdInput(){
     const shape = shapeConfig[formSelectContainer.value];
     if (shape) refreshSelectOptions(shape);
     refreshSketch();
+    calculate();
 }
 
 // Delegiert auf inputTypeThree selbst (persistenter Node, wird nur ein-/ausgehängt,
@@ -957,6 +1269,12 @@ inputsContainer.addEventListener("change", (e) => {
     const shape = shapeConfig[formSelectContainer.value];
     if (shape) refreshSelectOptions(shape);
     refreshSketch();
+    calculate();
+});
+
+inputsContainer.addEventListener("input", (e) => {
+    if (!e.target.classList.contains("zahlenInputfeld")) return;
+    calculate();
 });
 
 function setCurrentInputType(type){
@@ -978,6 +1296,7 @@ function setCurrentInputType(type){
 
     populateDropdowns(type);
     refreshSketch();
+    calculate();
 }
 
 function populateDropdowns(shapeKey) {
