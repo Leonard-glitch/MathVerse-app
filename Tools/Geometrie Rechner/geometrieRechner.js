@@ -88,12 +88,13 @@ const shapeConfig = {
             { id: 'b', label: 'Seite b' },
             { id: 'h', label: 'Höhe (h)' },
             { id: 'A', label: 'Fläche (A)' }
-        ]
+        ],
+        redundantGroups: [['a', 'h', 'A']]
     },
-    rhombus: {
+     rhombus: {
         name: 'Raute',
         dimension: '2d',
-        type: 3,
+        type: 2,
         inputs: [
             { id: 'a', label: 'Seitenlänge (a)' },
             { id: 'e', label: 'Diagonale e' },
@@ -873,6 +874,14 @@ function step(title, text, formula, solution, isGiven = false) {
     return { title, text, formula, solution, isGiven };
 }
 
+const DISPLAY_SYMBOLS = { alpha: 'α', beta: 'β', gamma: 'γ' };
+function displaySymbol(id) {
+    return DISPLAY_SYMBOLS[id] || id;
+}
+
+function toRad(deg) { return deg * Math.PI / 180; }
+function toDeg(rad) { return rad * 180 / Math.PI; }
+
 function resolveCircle(given) {
     const [knownId, knownVal] = Object.entries(given)[0];
     const steps = [];
@@ -1035,11 +1044,428 @@ function resolveRectangle(given) {
     return { values: { a, b, A, U, d }, steps };
 }
 
+function resolveRightTriangle(given) {
+    if (('alpha' in given && (given.alpha <= 0 || given.alpha >= 90)) ||
+        ('beta' in given && (given.beta <= 0 || given.beta >= 90))) {
+        return { error: "Winkel müssen im rechtwinkligen Dreieck zwischen 0° und 90° liegen." };
+    }
+
+    const order = ['a', 'b', 'c', 'alpha', 'beta', 'A'];
+    const ids = Object.keys(given).sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const key = ids.join(',');
+    const v = given;
+    const steps = [];
+    let a, b, c, alpha, beta;
+
+    switch (key) {
+        case 'a,b':
+            a = v.a; b = v.b;
+            c = Math.sqrt(a * a + b * b);
+            alpha = toDeg(Math.atan(a / b));
+            beta = 90 - alpha;
+            steps.push(step("Katheten", "Beide Katheten sind bereits gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}`, null, true));
+            steps.push(step("Hypotenuse", "Nach dem Satz des Pythagoras:", `c = ${sqrt('a² + b²')} = ${sqrt(`${formatNum(a)}² + ${formatNum(b)}²`)} = ${formatNum(c)}`));
+            steps.push(step("Winkel α", "Über die Tangensfunktion (Gegenkathete durch Ankathete):", `tan(α) = ${frac('a', 'b')} = ${frac(formatNum(a), formatNum(b))}\nα = tan⁻¹(${formatNum(a / b)}) = ${formatNum(alpha)}°`));
+            steps.push(step("Winkel β", "Die Winkelsumme im rechtwinkligen Dreieck ergibt β:", `β = 90° − α = 90° − ${formatNum(alpha)}° = ${formatNum(beta)}°`));
+            break;
+
+        case 'a,c':
+            a = v.a; c = v.c;
+            if (c <= a) return { error: "Diese Kombination ergibt kein gültiges Dreieck – die Hypotenuse muss größer als Kathete a sein." };
+            b = Math.sqrt(c * c - a * a);
+            alpha = toDeg(Math.asin(a / c));
+            beta = 90 - alpha;
+            steps.push(step("Kathete b", "Nach dem Satz des Pythagoras, umgestellt nach b:", `b = ${sqrt('c² − a²')} = ${sqrt(`${formatNum(c)}² − ${formatNum(a)}²`)} = ${formatNum(b)}`));
+            steps.push(step("Winkel α", "Über die Sinusfunktion (Gegenkathete durch Hypotenuse):", `sin(α) = ${frac('a', 'c')} = ${frac(formatNum(a), formatNum(c))}\nα = sin⁻¹(${formatNum(a / c)}) = ${formatNum(alpha)}°`));
+            steps.push(step("Winkel β", "Die Winkelsumme im rechtwinkligen Dreieck ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            break;
+
+        case 'b,c':
+            b = v.b; c = v.c;
+            if (c <= b) return { error: "Diese Kombination ergibt kein gültiges Dreieck – die Hypotenuse muss größer als Kathete b sein." };
+            a = Math.sqrt(c * c - b * b);
+            beta = toDeg(Math.asin(b / c));
+            alpha = 90 - beta;
+            steps.push(step("Kathete a", "Nach dem Satz des Pythagoras, umgestellt nach a:", `a = ${sqrt('c² − b²')} = ${sqrt(`${formatNum(c)}² − ${formatNum(b)}²`)} = ${formatNum(a)}`));
+            steps.push(step("Winkel β", "Über die Sinusfunktion (Gegenkathete durch Hypotenuse):", `sin(β) = ${frac('b', 'c')} = ${frac(formatNum(b), formatNum(c))}\nβ = sin⁻¹(${formatNum(b / c)}) = ${formatNum(beta)}°`));
+            steps.push(step("Winkel α", "Die Winkelsumme im rechtwinkligen Dreieck ergibt α:", `α = 90° − β = ${formatNum(alpha)}°`));
+            break;
+
+        case 'c,alpha':
+            c = v.c; alpha = v.alpha;
+            beta = 90 - alpha;
+            a = c * Math.sin(toRad(alpha));
+            b = c * Math.cos(toRad(alpha));
+            steps.push(step("Winkel β", "Die Winkelsumme im rechtwinkligen Dreieck ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            steps.push(step("Kathete a", "Über die Sinusfunktion:", `a = c · sin(α) = ${formatNum(c)} · sin(${formatNum(alpha)}°) = ${formatNum(a)}`));
+            steps.push(step("Kathete b", "Über die Kosinusfunktion:", `b = c · cos(α) = ${formatNum(c)} · cos(${formatNum(alpha)}°) = ${formatNum(b)}`));
+            break;
+
+        case 'c,beta':
+            c = v.c; beta = v.beta;
+            alpha = 90 - beta;
+            b = c * Math.sin(toRad(beta));
+            a = c * Math.cos(toRad(beta));
+            steps.push(step("Winkel α", "Die Winkelsumme im rechtwinkligen Dreieck ergibt α:", `α = 90° − β = ${formatNum(alpha)}°`));
+            steps.push(step("Kathete b", "Über die Sinusfunktion:", `b = c · sin(β) = ${formatNum(c)} · sin(${formatNum(beta)}°) = ${formatNum(b)}`));
+            steps.push(step("Kathete a", "Über die Kosinusfunktion:", `a = c · cos(β) = ${formatNum(c)} · cos(${formatNum(beta)}°) = ${formatNum(a)}`));
+            break;
+
+        case 'a,alpha':
+            a = v.a; alpha = v.alpha;
+            beta = 90 - alpha;
+            c = a / Math.sin(toRad(alpha));
+            b = a / Math.tan(toRad(alpha));
+            steps.push(step("Winkel β", "Die Winkelsumme im rechtwinkligen Dreieck ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            steps.push(step("Hypotenuse", "Über die Sinusfunktion, umgestellt nach c:", `c = ${frac('a', 'sin(α)')} = ${frac(formatNum(a), `sin(${formatNum(alpha)}°)`)} = ${formatNum(c)}`));
+            steps.push(step("Kathete b", "Über die Tangensfunktion, umgestellt nach b:", `b = ${frac('a', 'tan(α)')} = ${frac(formatNum(a), `tan(${formatNum(alpha)}°)`)} = ${formatNum(b)}`));
+            break;
+
+        case 'b,alpha':
+            b = v.b; alpha = v.alpha;
+            beta = 90 - alpha;
+            a = b * Math.tan(toRad(alpha));
+            c = b / Math.cos(toRad(alpha));
+            steps.push(step("Winkel β", "Die Winkelsumme im rechtwinkligen Dreieck ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            steps.push(step("Kathete a", "Über die Tangensfunktion:", `a = b · tan(α) = ${formatNum(b)} · tan(${formatNum(alpha)}°) = ${formatNum(a)}`));
+            steps.push(step("Hypotenuse", "Über die Kosinusfunktion, umgestellt nach c:", `c = ${frac('b', 'cos(α)')} = ${frac(formatNum(b), `cos(${formatNum(alpha)}°)`)} = ${formatNum(c)}`));
+            break;
+
+        case 'a,beta':
+            a = v.a; beta = v.beta;
+            alpha = 90 - beta;
+            b = a * Math.tan(toRad(beta));
+            c = a / Math.cos(toRad(beta));
+            steps.push(step("Winkel α", "Die Winkelsumme im rechtwinkligen Dreieck ergibt α:", `α = 90° − β = ${formatNum(alpha)}°`));
+            steps.push(step("Kathete b", "Über die Tangensfunktion:", `b = a · tan(β) = ${formatNum(a)} · tan(${formatNum(beta)}°) = ${formatNum(b)}`));
+            steps.push(step("Hypotenuse", "Über die Kosinusfunktion, umgestellt nach c:", `c = ${frac('a', 'cos(β)')} = ${frac(formatNum(a), `cos(${formatNum(beta)}°)`)} = ${formatNum(c)}`));
+            break;
+
+        case 'b,beta':
+            b = v.b; beta = v.beta;
+            alpha = 90 - beta;
+            c = b / Math.sin(toRad(beta));
+            a = b / Math.tan(toRad(beta));
+            steps.push(step("Winkel α", "Die Winkelsumme im rechtwinkligen Dreieck ergibt α:", `α = 90° − β = ${formatNum(alpha)}°`));
+            steps.push(step("Hypotenuse", "Über die Sinusfunktion, umgestellt nach c:", `c = ${frac('b', 'sin(β)')} = ${frac(formatNum(b), `sin(${formatNum(beta)}°)`)} = ${formatNum(c)}`));
+            steps.push(step("Kathete a", "Über die Tangensfunktion, umgestellt nach a:", `a = ${frac('b', 'tan(β)')} = ${frac(formatNum(b), `tan(${formatNum(beta)}°)`)} = ${formatNum(a)}`));
+            break;
+
+        case 'a,A':
+            a = v.a;
+            b = 2 * v.A / a;
+            c = Math.sqrt(a * a + b * b);
+            alpha = toDeg(Math.atan(a / b));
+            beta = 90 - alpha;
+            steps.push(step("Kathete b aus der Fläche", "Die Fläche ist A = (a · b) / 2, umgestellt nach b:", `b = ${frac('2A', 'a')} = ${frac(`2 · ${formatNum(v.A)}`, formatNum(a))} = ${formatNum(b)}`));
+            steps.push(step("Hypotenuse", "Nach dem Satz des Pythagoras:", `c = ${sqrt('a² + b²')} = ${formatNum(c)}`));
+            steps.push(step("Winkel α", "Über die Tangensfunktion:", `α = tan⁻¹(${frac('a', 'b')}) = tan⁻¹(${formatNum(a / b)}) = ${formatNum(alpha)}°`));
+            steps.push(step("Winkel β", "Die Winkelsumme ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            break;
+
+        case 'b,A':
+            b = v.b;
+            a = 2 * v.A / b;
+            c = Math.sqrt(a * a + b * b);
+            alpha = toDeg(Math.atan(a / b));
+            beta = 90 - alpha;
+            steps.push(step("Kathete a aus der Fläche", "Die Fläche ist A = (a · b) / 2, umgestellt nach a:", `a = ${frac('2A', 'b')} = ${frac(`2 · ${formatNum(v.A)}`, formatNum(b))} = ${formatNum(a)}`));
+            steps.push(step("Hypotenuse", "Nach dem Satz des Pythagoras:", `c = ${sqrt('a² + b²')} = ${formatNum(c)}`));
+            steps.push(step("Winkel α", "Über die Tangensfunktion:", `α = tan⁻¹(${frac('a', 'b')}) = ${formatNum(alpha)}°`));
+            steps.push(step("Winkel β", "Die Winkelsumme ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            break;
+
+        case 'c,A': {
+            c = v.c;
+            if (c * c < 4 * v.A) return { error: "Diese Kombination ergibt kein gültiges Dreieck – bei dieser Hypotenuse ist die Fläche zu groß." };
+            const sum = Math.sqrt(c * c + 4 * v.A);
+            const dif = Math.sqrt(c * c - 4 * v.A);
+            a = (sum + dif) / 2;
+            b = (sum - dif) / 2;
+            alpha = toDeg(Math.atan(a / b));
+            beta = 90 - alpha;
+            steps.push(step("Summe der Katheten", "Aus a² + b² = c² und a · b = 2A folgt (a+b)² = c² + 4A:", `a + b = ${sqrt('c² + 4A')} = ${sqrt(`${formatNum(c)}² + 4 · ${formatNum(v.A)}`)} = ${formatNum(sum)}`));
+            steps.push(step("Differenz der Katheten", "Ebenso folgt (a−b)² = c² − 4A:", `a − b = ${sqrt('c² − 4A')} = ${sqrt(`${formatNum(c)}² − 4 · ${formatNum(v.A)}`)} = ${formatNum(dif)}`));
+            steps.push(step("Katheten a und b", "Summe und Differenz zusammen ergeben beide Katheten:", `a = ${frac(`${formatNum(sum)} + ${formatNum(dif)}`, '2')} = ${formatNum(a)}\nb = ${frac(`${formatNum(sum)} − ${formatNum(dif)}`, '2')} = ${formatNum(b)}`));
+            steps.push(step("Winkel α", "Über die Tangensfunktion:", `α = tan⁻¹(${frac('a', 'b')}) = ${formatNum(alpha)}°`));
+            steps.push(step("Winkel β", "Die Winkelsumme ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            break;
+        }
+
+        case 'alpha,A':
+            alpha = v.alpha; beta = 90 - alpha;
+            c = Math.sqrt(4 * v.A / Math.sin(2 * toRad(alpha)));
+            a = c * Math.sin(toRad(alpha));
+            b = c * Math.cos(toRad(alpha));
+            steps.push(step("Winkel β", "Die Winkelsumme im rechtwinkligen Dreieck ergibt β:", `β = 90° − α = ${formatNum(beta)}°`));
+            steps.push(step("Hypotenuse aus der Fläche", "Mit a = c·sin(α) und b = c·cos(α) folgt A = c² · sin(2α) / 4, umgestellt nach c:", `c = ${sqrt(frac('4A', 'sin(2α)'))} = ${sqrt(frac(`4 · ${formatNum(v.A)}`, `sin(${formatNum(2 * alpha)}°)`))} = ${formatNum(c)}`));
+            steps.push(step("Kathete a", "Über die Sinusfunktion:", `a = c · sin(α) = ${formatNum(c)} · sin(${formatNum(alpha)}°) = ${formatNum(a)}`));
+            steps.push(step("Kathete b", "Über die Kosinusfunktion:", `b = c · cos(α) = ${formatNum(c)} · cos(${formatNum(alpha)}°) = ${formatNum(b)}`));
+            break;
+
+        case 'beta,A':
+            beta = v.beta; alpha = 90 - beta;
+            c = Math.sqrt(4 * v.A / Math.sin(2 * toRad(beta)));
+            b = c * Math.sin(toRad(beta));
+            a = c * Math.cos(toRad(beta));
+            steps.push(step("Winkel α", "Die Winkelsumme im rechtwinkligen Dreieck ergibt α:", `α = 90° − β = ${formatNum(alpha)}°`));
+            steps.push(step("Hypotenuse aus der Fläche", "Analog zur Herleitung über α, mit β statt α:", `c = ${sqrt(frac('4A', 'sin(2β)'))} = ${sqrt(frac(`4 · ${formatNum(v.A)}`, `sin(${formatNum(2 * beta)}°)`))} = ${formatNum(c)}`));
+            steps.push(step("Kathete b", "Über die Sinusfunktion:", `b = c · sin(β) = ${formatNum(c)} · sin(${formatNum(beta)}°) = ${formatNum(b)}`));
+            steps.push(step("Kathete a", "Über die Kosinusfunktion:", `a = c · cos(β) = ${formatNum(c)} · cos(${formatNum(beta)}°) = ${formatNum(a)}`));
+            break;
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    const A = a * b / 2;
+    if (!ids.includes('A')) steps.push(step("Fläche", "Halbes Produkt der beiden Katheten:", `A = ${frac('a · b', '2')} = ${frac(`${formatNum(a)} · ${formatNum(b)}`, '2')} = ${formatNum(A)}`));
+
+    return { values: { a, b, c, alpha, beta, A }, steps };
+}
+
+function resolveTrapezoid(given) {
+    const order = ['a', 'c', 'h', 'A'];
+    const ids = Object.keys(given).sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const key = ids.join(',');
+    const v = given;
+    const steps = [];
+    let a, c, h, A;
+
+    switch (key) {
+        case 'a,c,h':
+            a = v.a; c = v.c; h = v.h;
+            A = (a + c) / 2 * h;
+            steps.push(step("Grundseiten und Höhe", "Alle drei Werte sind bereits gegeben.", `a = ${formatNum(a)}, c = ${formatNum(c)}, h = ${formatNum(h)}`, null, true));
+            steps.push(step("Fläche", "Die Trapezfläche ist das Mittel der beiden parallelen Seiten mal der Höhe:", `A = ${frac('a + c', '2')} · h = ${frac(`${formatNum(a)} + ${formatNum(c)}`, '2')} · ${formatNum(h)} = ${formatNum(A)}`));
+            break;
+
+        case 'a,c,A':
+            a = v.a; c = v.c; A = v.A;
+            if (a + c === 0) return { error: "Diese Kombination ergibt kein gültiges Trapez." };
+            h = 2 * A / (a + c);
+            steps.push(step("Grundseiten und Fläche", "Alle drei Werte sind bereits gegeben.", `a = ${formatNum(a)}, c = ${formatNum(c)}, A = ${formatNum(A)}`, null, true));
+            steps.push(step("Höhe", "Die Flächenformel A = (a+c)/2 · h nach h umgestellt:", `h = ${frac('2A', 'a + c')} = ${frac(`2 · ${formatNum(A)}`, `${formatNum(a)} + ${formatNum(c)}`)} = ${formatNum(h)}`));
+            break;
+
+        case 'a,h,A':
+            a = v.a; h = v.h; A = v.A;
+            if (h === 0) return { error: "Diese Kombination ergibt kein gültiges Trapez – die Höhe darf nicht 0 sein." };
+            c = 2 * A / h - a;
+            if (c <= 0) return { error: "Diese Kombination ergibt kein gültiges Trapez – die zweite Grundseite wäre 0 oder negativ." };
+            steps.push(step("Grundseite und Höhe", "Beide Werte sind bereits gegeben.", `a = ${formatNum(a)}, h = ${formatNum(h)}`, null, true));
+            steps.push(step("Parallele Seite c", "Die Flächenformel A = (a+c)/2 · h nach c umgestellt:", `c = ${frac('2A', 'h')} − a = ${frac(`2 · ${formatNum(A)}`, formatNum(h))} − ${formatNum(a)} = ${formatNum(c)}`));
+            break;
+
+        case 'c,h,A':
+            c = v.c; h = v.h; A = v.A;
+            if (h === 0) return { error: "Diese Kombination ergibt kein gültiges Trapez – die Höhe darf nicht 0 sein." };
+            a = 2 * A / h - c;
+            if (a <= 0) return { error: "Diese Kombination ergibt kein gültiges Trapez – die Grundseite a wäre 0 oder negativ." };
+            steps.push(step("Parallele Seite und Höhe", "Beide Werte sind bereits gegeben.", `c = ${formatNum(c)}, h = ${formatNum(h)}`, null, true));
+            steps.push(step("Grundseite a", "Die Flächenformel A = (a+c)/2 · h nach a umgestellt:", `a = ${frac('2A', 'h')} − c = ${frac(`2 · ${formatNum(A)}`, formatNum(h))} − ${formatNum(c)} = ${formatNum(a)}`));
+            break;
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    return { values: { a, c, h, A }, steps };
+}
+
+function resolveParallelogram(given) {
+    const order = ['a', 'b', 'h', 'A'];
+    const ids = Object.keys(given).sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const key = ids.join(',');
+    const v = given;
+    const steps = [];
+    let a, b, h, A;
+
+    switch (key) {
+        case 'a,b,h':
+            a = v.a; b = v.b; h = v.h;
+            A = a * h;
+            steps.push(step("Seiten und Höhe", "Alle drei Werte sind bereits gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, h = ${formatNum(h)}`, null, true));
+            steps.push(step("Fläche", "Grundseite a mal zugehöriger Höhe h:", `A = a · h = ${formatNum(a)} · ${formatNum(h)} = ${formatNum(A)}`));
+            break;
+
+        case 'a,b,A':
+            a = v.a; b = v.b; A = v.A;
+            if (a === 0) return { error: "Diese Kombination ergibt kein gültiges Parallelogramm – Seite a darf nicht 0 sein." };
+            h = A / a;
+            steps.push(step("Seiten und Fläche", "Alle drei Werte sind bereits gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, A = ${formatNum(A)}`, null, true));
+            steps.push(step("Höhe", "Die Flächenformel A = a · h nach h umgestellt:", `h = ${frac('A', 'a')} = ${frac(formatNum(A), formatNum(a))} = ${formatNum(h)}`));
+            break;
+
+        case 'b,h,A':
+            b = v.b; h = v.h; A = v.A;
+            if (h === 0) return { error: "Diese Kombination ergibt kein gültiges Parallelogramm – die Höhe darf nicht 0 sein." };
+            a = A / h;
+            if (b < h) return { error: "Diese Kombination ergibt kein gültiges Parallelogramm – Seite b kann nicht kürzer als die Höhe h sein." };
+            steps.push(step("Seite und Höhe", "Beide Werte sind bereits gegeben.", `b = ${formatNum(b)}, h = ${formatNum(h)}`, null, true));
+            steps.push(step("Seite a", "Die Flächenformel A = a · h nach a umgestellt:", `a = ${frac('A', 'h')} = ${frac(formatNum(A), formatNum(h))} = ${formatNum(a)}`));
+            break;
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    return { values: { a, b, h, A }, steps };
+}
+
+function resolveRhombus(given) {
+    const v = { ...given };
+    const preSteps = [];
+    const steps = [];
+
+    const rawIds = Object.keys(given);
+    preSteps.push(step("Gegebene Werte", "Diese Werte sind bereits bekannt.",
+        rawIds.map(id => `${id} = ${formatNum(given[id])}`).join(',  '), null, true));
+
+    if ('U' in v && !('a' in v)) {
+        v.a = v.U / 4;
+        preSteps.push(step("Seitenlänge aus Umfang", "Eine Raute hat 4 gleich lange Seiten:", `a = ${frac('U', '4')} = ${frac(formatNum(v.U), '4')} = ${formatNum(v.a)}`));
+    }
+
+    let a, e, f, h, A, U;
+    const order = ['a', 'e', 'f', 'h', 'A'];
+    const ids = Object.keys(v).filter(id => order.includes(id)).sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const key = ids.join(',');
+
+    switch (key) {
+        case 'a,e':
+            a = v.a; e = v.e;
+            if (e >= 2 * a) return { error: "Diese Kombination ergibt keine gültige Raute – die Diagonale ist zu lang für diese Seitenlänge." };
+            f = 2 * Math.sqrt(a * a - (e / 2) * (e / 2));
+            A = e * f / 2;
+            h = A / a;
+            steps.push(step("Diagonale f", "Die Diagonalen halbieren sich rechtwinklig; nach dem Satz des Pythagoras im Teildreieck:", `f = 2 · ${sqrt(`a² − ${frac('e', '2')}²`)} = 2 · ${sqrt(`${formatNum(a)}² − ${frac(formatNum(e), '2')}²`)} = ${formatNum(f)}`));
+            steps.push(step("Fläche", "Halbes Produkt der Diagonalen:", `A = ${frac('e · f', '2')} = ${frac(`${formatNum(e)} · ${formatNum(f)}`, '2')} = ${formatNum(A)}`));
+            steps.push(step("Höhe", "Aus der Flächenformel A = a · h umgestellt:", `h = ${frac('A', 'a')} = ${frac(formatNum(A), formatNum(a))} = ${formatNum(h)}`));
+            break;
+
+        case 'a,f':
+            a = v.a; f = v.f;
+            if (f >= 2 * a) return { error: "Diese Kombination ergibt keine gültige Raute – die Diagonale ist zu lang für diese Seitenlänge." };
+            e = 2 * Math.sqrt(a * a - (f / 2) * (f / 2));
+            A = e * f / 2;
+            h = A / a;
+            steps.push(step("Diagonale e", "Die Diagonalen halbieren sich rechtwinklig; nach dem Satz des Pythagoras im Teildreieck:", `e = 2 · ${sqrt(`a² − ${frac('f', '2')}²`)} = 2 · ${sqrt(`${formatNum(a)}² − ${frac(formatNum(f), '2')}²`)} = ${formatNum(e)}`));
+            steps.push(step("Fläche", "Halbes Produkt der Diagonalen:", `A = ${frac('e · f', '2')} = ${frac(`${formatNum(e)} · ${formatNum(f)}`, '2')} = ${formatNum(A)}`));
+            steps.push(step("Höhe", "Aus der Flächenformel A = a · h umgestellt:", `h = ${frac('A', 'a')} = ${frac(formatNum(A), formatNum(a))} = ${formatNum(h)}`));
+            break;
+
+        case 'e,f':
+            e = v.e; f = v.f;
+            a = Math.sqrt((e / 2) * (e / 2) + (f / 2) * (f / 2));
+            A = e * f / 2;
+            h = A / a;
+            steps.push(step("Seitenlänge", "Die Diagonalen halbieren sich rechtwinklig; nach dem Satz des Pythagoras im Teildreieck:", `a = ${sqrt(`${frac('e', '2')}² + ${frac('f', '2')}²`)} = ${sqrt(`${frac(formatNum(e), '2')}² + ${frac(formatNum(f), '2')}²`)} = ${formatNum(a)}`));
+            steps.push(step("Fläche", "Halbes Produkt der Diagonalen:", `A = ${frac('e · f', '2')} = ${frac(`${formatNum(e)} · ${formatNum(f)}`, '2')} = ${formatNum(A)}`));
+            steps.push(step("Höhe", "Aus der Flächenformel A = a · h umgestellt:", `h = ${frac('A', 'a')} = ${frac(formatNum(A), formatNum(a))} = ${formatNum(h)}`));
+            break;
+
+        case 'a,h':
+            a = v.a; h = v.h;
+            if (h > a) return { error: "Diese Kombination ergibt keine gültige Raute – die Höhe kann nicht größer als die Seitenlänge sein." };
+            A = a * h;
+            {
+                const disc = 4 * Math.pow(a, 4) - 4 * A * A;
+                if (disc < 0) return { error: "Diese Kombination ergibt keine gültige Raute." };
+                e = Math.sqrt(2 * a * a + Math.sqrt(disc));
+                f = Math.sqrt(2 * a * a - Math.sqrt(disc));
+            }
+            steps.push(step("Fläche", "Seitenlänge mal zugehöriger Höhe:", `A = a · h = ${formatNum(a)} · ${formatNum(h)} = ${formatNum(A)}`));
+            steps.push(step("Diagonalen aus a und A", "Aus e² + f² = 4a² und e · f = 2A ergeben sich e² und f² als Lösungen einer quadratischen Gleichung:", `t² − 4a² · t + 4A² = 0\ne = ${formatNum(e)},  f = ${formatNum(f)}`));
+            break;
+
+        case 'a,A':
+            a = v.a; A = v.A;
+            h = A / a;
+            {
+                const disc = 4 * Math.pow(a, 4) - 4 * A * A;
+                if (disc < 0) return { error: "Diese Kombination ergibt keine gültige Raute – bei dieser Seitenlänge ist die Fläche zu groß." };
+                e = Math.sqrt(2 * a * a + Math.sqrt(disc));
+                f = Math.sqrt(2 * a * a - Math.sqrt(disc));
+            }
+            steps.push(step("Höhe", "Aus der Flächenformel A = a · h umgestellt:", `h = ${frac('A', 'a')} = ${frac(formatNum(A), formatNum(a))} = ${formatNum(h)}`));
+            steps.push(step("Diagonalen aus a und A", "Aus e² + f² = 4a² und e · f = 2A ergeben sich e² und f² als Lösungen einer quadratischen Gleichung:", `t² − 4a² · t + 4A² = 0\ne = ${formatNum(e)},  f = ${formatNum(f)}`));
+            break;
+
+        case 'e,h':
+            e = v.e; h = v.h;
+            if (h >= e) return { error: "Diese Kombination ergibt keine gültige Raute – die Höhe muss kleiner als die Diagonale e sein." };
+            a = (e * e) / (2 * Math.sqrt(e * e - h * h));
+            A = a * h;
+            f = 2 * A / e;
+            steps.push(step("Seitenlänge aus e und h", "Kombiniert man a² = (e/2)² + (f/2)² mit A = a·h = e·f/2, ergibt sich nach Auflösen:", `a = ${frac('e²', `2 · ${sqrt('e² − h²')}`)} = ${frac(`${formatNum(e)}²`, `2 · ${sqrt(`${formatNum(e)}² − ${formatNum(h)}²`)}`)} = ${formatNum(a)}`));
+            steps.push(step("Fläche", "Seitenlänge mal Höhe:", `A = a · h = ${formatNum(a)} · ${formatNum(h)} = ${formatNum(A)}`));
+            steps.push(step("Diagonale f", "Aus der Flächenformel A = e · f / 2 umgestellt:", `f = ${frac('2A', 'e')} = ${frac(`2 · ${formatNum(A)}`, formatNum(e))} = ${formatNum(f)}`));
+            break;
+
+        case 'f,h':
+            f = v.f; h = v.h;
+            if (h >= f) return { error: "Diese Kombination ergibt keine gültige Raute – die Höhe muss kleiner als die Diagonale f sein." };
+            a = (f * f) / (2 * Math.sqrt(f * f - h * h));
+            A = a * h;
+            e = 2 * A / f;
+            steps.push(step("Seitenlänge aus f und h", "Kombiniert man a² = (e/2)² + (f/2)² mit A = a·h = e·f/2, ergibt sich nach Auflösen:", `a = ${frac('f²', `2 · ${sqrt('f² − h²')}`)} = ${frac(`${formatNum(f)}²`, `2 · ${sqrt(`${formatNum(f)}² − ${formatNum(h)}²`)}`)} = ${formatNum(a)}`));
+            steps.push(step("Fläche", "Seitenlänge mal Höhe:", `A = a · h = ${formatNum(a)} · ${formatNum(h)} = ${formatNum(A)}`));
+            steps.push(step("Diagonale e", "Aus der Flächenformel A = e · f / 2 umgestellt:", `e = ${frac('2A', 'f')} = ${frac(`2 · ${formatNum(A)}`, formatNum(f))} = ${formatNum(e)}`));
+            break;
+
+        case 'e,A':
+            e = v.e; A = v.A;
+            f = 2 * A / e;
+            a = Math.sqrt((e / 2) * (e / 2) + (f / 2) * (f / 2));
+            h = A / a;
+            steps.push(step("Diagonale f", "Aus der Flächenformel A = e · f / 2 umgestellt:", `f = ${frac('2A', 'e')} = ${frac(`2 · ${formatNum(A)}`, formatNum(e))} = ${formatNum(f)}`));
+            steps.push(step("Seitenlänge", "Nach dem Satz des Pythagoras im Teildreieck der Diagonalen:", `a = ${sqrt(`${frac('e', '2')}² + ${frac('f', '2')}²`)} = ${formatNum(a)}`));
+            steps.push(step("Höhe", "Aus der Flächenformel A = a · h umgestellt:", `h = ${frac('A', 'a')} = ${frac(formatNum(A), formatNum(a))} = ${formatNum(h)}`));
+            break;
+
+        case 'f,A':
+            f = v.f; A = v.A;
+            e = 2 * A / f;
+            a = Math.sqrt((e / 2) * (e / 2) + (f / 2) * (f / 2));
+            h = A / a;
+            steps.push(step("Diagonale e", "Aus der Flächenformel A = e · f / 2 umgestellt:", `e = ${frac('2A', 'f')} = ${frac(`2 · ${formatNum(A)}`, formatNum(f))} = ${formatNum(e)}`));
+            steps.push(step("Seitenlänge", "Nach dem Satz des Pythagoras im Teildreieck der Diagonalen:", `a = ${sqrt(`${frac('e', '2')}² + ${frac('f', '2')}²`)} = ${formatNum(a)}`));
+            steps.push(step("Höhe", "Aus der Flächenformel A = a · h umgestellt:", `h = ${frac('A', 'a')} = ${frac(formatNum(A), formatNum(a))} = ${formatNum(h)}`));
+            break;
+
+        case 'h,A':
+            h = v.h; A = v.A;
+            if (h === 0) return { error: "Diese Kombination ergibt keine gültige Raute – die Höhe darf nicht 0 sein." };
+            a = A / h;
+            {
+                const disc = 4 * Math.pow(a, 4) - 4 * A * A;
+                if (disc < 0) return { error: "Diese Kombination ergibt keine gültige Raute." };
+                e = Math.sqrt(2 * a * a + Math.sqrt(disc));
+                f = Math.sqrt(2 * a * a - Math.sqrt(disc));
+            }
+            steps.push(step("Seitenlänge", "Aus der Flächenformel A = a · h umgestellt:", `a = ${frac('A', 'h')} = ${frac(formatNum(A), formatNum(h))} = ${formatNum(a)}`));
+            steps.push(step("Diagonalen aus a und A", "Aus e² + f² = 4a² und e · f = 2A ergeben sich e² und f² als Lösungen einer quadratischen Gleichung:", `t² − 4a² · t + 4A² = 0\ne = ${formatNum(e)},  f = ${formatNum(f)}`));
+            break;
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    U = 4 * a;
+    if (!('U' in given)) steps.push(step("Umfang", "Vier gleich lange Seiten addiert:", `U = 4 · a = 4 · ${formatNum(a)} = ${formatNum(U)}`));
+
+    return { values: { a, e, f, h, U, A }, steps: [...preSteps, ...steps] };
+}
 const shapeResolvers = {
     circle: resolveCircle,
     square: resolveSquare,
-    rectangle: resolveRectangle
-    // weitere Formen folgen in den nächsten Schritten
+    rectangle: resolveRectangle,
+    rightTriangle: resolveRightTriangle,
+    trapezoid: resolveTrapezoid,
+    parallelogram: resolveParallelogram,
+    rhombus: resolveRhombus
+    // triangle folgt als nächstes
 };
 
 function renderRechenwegSteps(steps) {
@@ -1062,9 +1488,10 @@ function renderResultsGrid(shape, values, given) {
 
     grid.innerHTML = shape.inputs.map(input => {
         const isGiven = input.id in given;
+        const label = displaySymbol(input.id);
         return `
         <div class="ergebnisItem ${isGiven ? "is-given" : ""}">
-            <p class="ergebnisLabel">${input.id}${isGiven ? ' <i class="fa fa-pencil ergebnisGivenIcon" title="Eingegebener Wert"></i>' : ''}</p>
+            <p class="ergebnisLabel">${label}${isGiven ? ' <i class="fa fa-pencil ergebnisGivenIcon" title="Eingegebener Wert"></i>' : ''}</p>
             <p class="ergebnisValue">${formatNum(values[input.id])}</p>
         </div>`;
     }).join("");
