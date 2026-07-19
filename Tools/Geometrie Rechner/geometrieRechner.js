@@ -9,7 +9,7 @@ const shapeConfig = {
         inputs: [
             { id: 'r', label: 'Radius (r)' },
             { id: 'd', label: 'Durchmesser (d)' },
-            { id: 'u', label: 'Umfang (U)' },
+            { id: 'U', label: 'Umfang (U)' },
             { id: 'A', label: 'Fläche (A)' }
         ]
     },
@@ -21,7 +21,7 @@ const shapeConfig = {
             { id: 'a', label: 'Seite a' },
             { id: 'b', label: 'Seite b' },
             { id: 'A', label: 'Fläche (A)' },
-            { id: 'u', label: 'Umfang (U)' },
+            { id: 'U', label: 'Umfang (U)' },
             { id: 'd', label: 'Diagonale (d)' }
         ]
     },
@@ -31,7 +31,7 @@ const shapeConfig = {
         type: 1,
         inputs: [
             { id: 'a', label: 'Seitenlänge (a)' },
-            { id: 'u', label: 'Umfang (U)' },
+            { id: 'U', label: 'Umfang (U)' },
             { id: 'A', label: 'Fläche (A)' },
             { id: 'd', label: 'Diagonale (d)' }
         ]
@@ -99,10 +99,10 @@ const shapeConfig = {
             { id: 'e', label: 'Diagonale e' },
             { id: 'f', label: 'Diagonale f' },
             { id: 'h', label: 'Höhe (h)' },
-            { id: 'u', label: 'Umfang (U)' },
+            { id: 'U', label: 'Umfang (U)' },
             { id: 'A', label: 'Fläche (A)' }
         ],
-        redundantGroups: [['a', 'u']]
+        redundantGroups: [['a', 'U']]
     },
 
     // --- 3D KÖRPER ---
@@ -325,7 +325,7 @@ function refreshSelectOptions(shape) {
 function sketchCircle(given) {
     const on = id => given.has(id) ? "is-active" : "";
     const areaOn = given.has('A') ? "area-active" : "";
-    const perimeterOn = given.has('u') ? "perimeter-active" : "";
+    const perimeterOn = given.has('U') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
     <circle class="sketchOutline ${areaOn} ${perimeterOn}" cx="120" cy="120" r="80" />
@@ -341,14 +341,14 @@ function sketchCircle(given) {
     <text class="sketchLabel ${on('d')}" x="120" y="138">d</text>
 
     <text class="sketchLabel ${on('A')}" x="95" y="150">A</text>
-    <text class="sketchLabel ${on('u')}" x="120" y="214">U</text>
+    <text class="sketchLabel ${on('U')}" x="120" y="214">U</text>
 </svg>`;
 }
 
 function sketchSquare(given) {
     const on = id => given.has(id) ? "is-active" : "";
     const areaOn = given.has('A') ? "area-active" : "";
-    const perimeterOn = given.has('u') ? "perimeter-active" : "";
+    const perimeterOn = given.has('U') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
     <rect class="sketchOutline ${areaOn} ${perimeterOn}" x="60" y="60" width="120" height="120" />
@@ -364,14 +364,14 @@ function sketchSquare(given) {
     <text class="sketchLabel ${on('d')}" x="152" y="98">d</text>
 
     <text class="sketchLabel ${on('A')}" x="95" y="145">A</text>
-    <text class="sketchLabel ${on('u')}" x="45" y="45">U</text>
+    <text class="sketchLabel ${on('U')}" x="45" y="45">U</text>
 </svg>`;
 }
 
 function sketchRectangle(given) {
     const on = id => given.has(id) ? "is-active" : "";
     const areaOn = given.has('A') ? "area-active" : "";
-    const perimeterOn = given.has('u') ? "perimeter-active" : "";
+    const perimeterOn = given.has('U') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
     <rect class="sketchOutline ${areaOn} ${perimeterOn}" x="40" y="70" width="160" height="100" />
@@ -392,7 +392,7 @@ function sketchRectangle(given) {
     <text class="sketchLabel ${on('d')}" x="165" y="100">d</text>
 
     <text class="sketchLabel ${on('A')}" x="90" y="140">A</text>
-    <text class="sketchLabel ${on('u')}" x="40" y="55">U</text>
+    <text class="sketchLabel ${on('U')}" x="40" y="55">U</text>
 </svg>`;
 }
 
@@ -533,7 +533,7 @@ function sketchParallelogram(given) {
 function sketchRhombus(given) {
     const on = id => given.has(id) ? "is-active" : "";
     const areaOn = given.has('A') ? "area-active" : "";
-    const perimeterOn = given.has('u') ? "perimeter-active" : "";
+    const perimeterOn = given.has('U') ? "perimeter-active" : "";
     return `
 <svg class="shapeSketch" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
     <polygon class="sketchOutline ${areaOn} ${perimeterOn}" points="120,70 202,128 120,186 38,128" />
@@ -561,7 +561,7 @@ function sketchRhombus(given) {
     <text class="sketchLabel ${on('h')}" x="192" y="168">h</text>
 
     <text class="sketchLabel ${on('A')}" x="100" y="145">A</text>
-    <text class="sketchLabel ${on('u')}" x="65" y="180">U</text>
+    <text class="sketchLabel ${on('U')}" x="65" y="180">U</text>
 </svg>`;
 }
 
@@ -884,7 +884,7 @@ function resolveCircle(given) {
     } else if (knownId === 'd') {
         r = knownVal / 2;
         steps.push(step("Radius aus Durchmesser", "Der Radius ist die Hälfte des Durchmessers:", `r = ${frac('d', '2')} = ${frac(formatNum(knownVal), '2')} = ${formatNum(r)}`));
-    } else if (knownId === 'u') {
+    } else if (knownId === 'U') {
         r = knownVal / (2 * Math.PI);
         steps.push(step("Radius aus Umfang", "Der Umfang ist U = 2 · π · r, umgestellt nach r:", `r = ${frac('U', '2π')} = ${frac(formatNum(knownVal), '2π')} = ${formatNum(r)}`));
     } else {
@@ -893,14 +893,14 @@ function resolveCircle(given) {
     }
 
     const d = 2 * r;
-    const u = 2 * Math.PI * r;
+    const U = 2 * Math.PI * r;
     const A = Math.PI * r * r;
 
     if (knownId !== 'd') steps.push(step("Durchmesser", "Der Durchmesser ist doppelt so groß wie der Radius:", `d = 2 · r = 2 · ${formatNum(r)} = ${formatNum(d)}`));
-    if (knownId !== 'u') steps.push(step("Umfang", "Formel für den Kreisumfang:", `U = 2π · r = 2π · ${formatNum(r)} = ${formatNum(u)}`));
+    if (knownId !== 'U') steps.push(step("Umfang", "Formel für den Kreisumfang:", `U = 2π · r = 2π · ${formatNum(r)} = ${formatNum(U)}`));
     if (knownId !== 'A') steps.push(step("Fläche", "Formel für die Kreisfläche:", `A = π · r² = π · ${formatNum(r)}² = ${formatNum(A)}`));
 
-    return { values: { r, d, u, A }, steps };
+    return { values: { r, d, U, A }, steps };
 }
 
 function resolveSquare(given) {
@@ -911,7 +911,7 @@ function resolveSquare(given) {
     if (knownId === 'a') {
         a = knownVal;
         steps.push(step("Seitenlänge", "Die Seitenlänge ist der gegebene Wert.", `a = ${formatNum(a)}`, null, true));
-    } else if (knownId === 'u') {
+    } else if (knownId === 'U') {
         a = knownVal / 4;
         steps.push(step("Seitenlänge aus Umfang", "Ein Quadrat hat 4 gleich lange Seiten:", `a = ${frac('U', '4')} = ${frac(formatNum(knownVal), '4')} = ${formatNum(a)}`));
     } else if (knownId === 'A') {
@@ -922,19 +922,19 @@ function resolveSquare(given) {
         steps.push(step("Seitenlänge aus Diagonale", "Die Diagonale ist d = a√2, umgestellt nach a:", `a = ${frac('d', '√2')} = ${frac(formatNum(knownVal), '√2')} = ${formatNum(a)}`));
     }
 
-    const u = 4 * a;
+    const U = 4 * a;
     const A = a * a;
     const d = a * Math.SQRT2;
 
-    if (knownId !== 'u') steps.push(step("Umfang", "Vier gleich lange Seiten addiert:", `U = 4 · a = 4 · ${formatNum(a)} = ${formatNum(u)}`));
+    if (knownId !== 'U') steps.push(step("Umfang", "Vier gleich lange Seiten addiert:", `U = 4 · a = 4 · ${formatNum(a)} = ${formatNum(U)}`));
     if (knownId !== 'A') steps.push(step("Fläche", "Seitenlänge im Quadrat:", `A = a² = ${formatNum(a)}² = ${formatNum(A)}`));
     if (knownId !== 'd') steps.push(step("Diagonale", "Aus dem Satz des Pythagoras (die Diagonale teilt das Quadrat in zwei rechtwinklige Dreiecke):", `d = a · √2 = ${formatNum(a)} · √2 = ${formatNum(d)}`));
 
-    return { values: { a, u, A, d }, steps };
+    return { values: { a, U, A, d }, steps };
 }
 
 function resolveRectangle(given) {
-    const order = ['a', 'b', 'A', 'u', 'd'];
+    const order = ['a', 'b', 'A', 'U', 'd'];
     const ids = Object.keys(given).sort((x, y) => order.indexOf(x) - order.indexOf(y));
     const key = ids.join(',');
     const v = given;
@@ -957,16 +957,16 @@ function resolveRectangle(given) {
             steps.push(step("Seite a aus der Fläche", "Die Fläche ist A = a · b, umgestellt nach a:", `a = ${frac('A', 'b')} = ${frac(formatNum(v.A), formatNum(b))} = ${formatNum(a)}`));
             break;
 
-        case 'a,u':
-            a = v.a; b = v.u / 2 - v.a;
+        case 'a,U':
+            a = v.a; b = v.U / 2 - v.a;
             if (b <= 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – die zweite Seite wäre 0 oder negativ." };
-            steps.push(step("Seite b aus dem Umfang", "Der Umfang ist U = 2 · (a + b), umgestellt nach b:", `b = ${frac('U', '2')} − a = ${frac(formatNum(v.u), '2')} − ${formatNum(a)} = ${formatNum(b)}`));
+            steps.push(step("Seite b aus dem Umfang", "Der Umfang ist U = 2 · (a + b), umgestellt nach b:", `b = ${frac('U', '2')} − a = ${frac(formatNum(v.U), '2')} − ${formatNum(a)} = ${formatNum(b)}`));
             break;
 
-        case 'b,u':
-            b = v.b; a = v.u / 2 - v.b;
+        case 'b,U':
+            b = v.b; a = v.U / 2 - v.b;
             if (a <= 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – die zweite Seite wäre 0 oder negativ." };
-            steps.push(step("Seite a aus dem Umfang", "Der Umfang ist U = 2 · (a + b), umgestellt nach a:", `a = ${frac('U', '2')} − b = ${frac(formatNum(v.u), '2')} − ${formatNum(b)} = ${formatNum(a)}`));
+            steps.push(step("Seite a aus dem Umfang", "Der Umfang ist U = 2 · (a + b), umgestellt nach a:", `a = ${frac('U', '2')} − b = ${frac(formatNum(v.U), '2')} − ${formatNum(b)} = ${formatNum(a)}`));
             break;
 
         case 'a,d':
@@ -983,14 +983,14 @@ function resolveRectangle(given) {
             steps.push(step("Seite a aus der Diagonale", "Nach dem Satz des Pythagoras gilt d² = a² + b², umgestellt nach a:", `a = ${sqrt('d² − b²')} = ${sqrt(`${formatNum(v.d)}² − ${formatNum(b)}²`)} = ${formatNum(a)}`));
             break;
 
-        case 'A,u': {
-            const s = v.u / 2;
+        case 'A,U': {
+            const s = v.U / 2;
             const disc = s * s - 4 * v.A;
             if (disc < 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – bei diesem Umfang ist die Fläche zu groß." };
             const root = Math.sqrt(disc);
             a = (s + root) / 2;
             b = (s - root) / 2;
-            steps.push(step("Halber Umfang", "Aus dem Umfang folgt die Summe der Seiten:", `a + b = ${frac('U', '2')} = ${frac(formatNum(v.u), '2')} = ${formatNum(s)}`));
+            steps.push(step("Halber Umfang", "Aus dem Umfang folgt die Summe der Seiten:", `a + b = ${frac('U', '2')} = ${frac(formatNum(v.U), '2')} = ${formatNum(s)}`));
             steps.push(step("Seiten aus Summe und Produkt", "a und b sind die beiden Lösungen von t² − (a+b) · t + A = 0. Da beide Seiten gleichwertig sind, wird der größere Wert a und der kleinere b zugeordnet:", `t² − ${formatNum(s)} · t + ${formatNum(v.A)} = 0\nt₁ = ${formatNum(a)},  t₂ = ${formatNum(b)}`));
             break;
         }
@@ -1007,14 +1007,14 @@ function resolveRectangle(given) {
             break;
         }
 
-        case 'u,d': {
-            const s = v.u / 2;
+        case 'U,d': {
+            const s = v.U / 2;
             const disc = 2 * v.d * v.d - s * s;
             if (disc < 0) return { error: "Diese Kombination ergibt kein gültiges Rechteck – Umfang und Diagonale passen nicht zusammen." };
             const diff = Math.sqrt(disc);
             a = (s + diff) / 2;
             b = (s - diff) / 2;
-            steps.push(step("Halber Umfang", "Aus dem Umfang folgt die Seitensumme:", `a + b = ${frac('U', '2')} = ${frac(formatNum(v.u), '2')} = ${formatNum(s)}`));
+            steps.push(step("Halber Umfang", "Aus dem Umfang folgt die Seitensumme:", `a + b = ${frac('U', '2')} = ${frac(formatNum(v.U), '2')} = ${formatNum(s)}`));
             steps.push(step("Differenz der Seiten", "Kombiniert mit d² = a² + b² ergibt sich die Differenz:", `a − b = ${sqrt('2d² − (a+b)²')} = ${sqrt(`2 · ${formatNum(v.d)}² − ${formatNum(s)}²`)} = ${formatNum(diff)}`));
             steps.push(step("Seiten a und b", "Summe und Differenz zusammen ergeben beide Seiten:", `a = ${frac(`${formatNum(s)} + ${formatNum(diff)}`, '2')} = ${formatNum(a)}\nb = ${frac(`${formatNum(s)} − ${formatNum(diff)}`, '2')} = ${formatNum(b)}`));
             break;
@@ -1025,14 +1025,14 @@ function resolveRectangle(given) {
     }
 
     const A = a * b;
-    const u = 2 * (a + b);
+    const U = 2 * (a + b);
     const d = Math.sqrt(a * a + b * b);
 
     if (!ids.includes('A')) steps.push(step("Fläche", "Seite mal Seite:", `A = a · b = ${formatNum(a)} · ${formatNum(b)} = ${formatNum(A)}`));
-    if (!ids.includes('u')) steps.push(step("Umfang", "Zweimal die Summe beider Seiten:", `U = 2 · (a + b) = 2 · (${formatNum(a)} + ${formatNum(b)}) = ${formatNum(u)}`));
+    if (!ids.includes('U')) steps.push(step("Umfang", "Zweimal die Summe beider Seiten:", `U = 2 · (a + b) = 2 · (${formatNum(a)} + ${formatNum(b)}) = ${formatNum(U)}`));
     if (!ids.includes('d')) steps.push(step("Diagonale", "Nach dem Satz des Pythagoras:", `d = ${sqrt('a² + b²')} = ${sqrt(`${formatNum(a)}² + ${formatNum(b)}²`)} = ${formatNum(d)}`));
 
-    return { values: { a, b, A, u, d }, steps };
+    return { values: { a, b, A, U, d }, steps };
 }
 
 const shapeResolvers = {
@@ -1189,12 +1189,14 @@ document.addEventListener('DOMContentLoaded', () => {
         currentDecimalPlaces = parseInt(decimalPlacesSelect.value, 10);
         window.MV.setDecimalPlaces(currentDecimalPlaces);
         settingsModal.classList.remove('show');
+        calculate(); // Bereits angezeigtes Ergebnis mit neuer Rundung neu berechnen
     });
 
     // Cross-Tab/bfcache-Sync, gleiche Logik wie im Finanzrechner
     window.addEventListener('mv:staterestore', () => {
         currentDecimalPlaces = window.MV.getDecimalPlaces();
         decimalPlacesSelect.value = currentDecimalPlaces;
+        calculate(); // Bereits angezeigtes Ergebnis mit neuer Rundung neu berechnen
     });
 });
 

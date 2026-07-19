@@ -158,8 +158,8 @@ export const tools = [
         id:       "card12",
         title:    "Geometrie Rechner",
         group:    "geometrie",
-        filename: "GeometrieRechner.html",
-        url:      `${BASE}/Tools/Geometrie Rechner/GeometrieRechner.html`,
+        filename: "geometrieRechner.html",
+        url:      `${BASE}/Tools/Geometrie Rechner/geometrieRechner.html`,
         tags:     ["geometrie", "2d", "3d", "kreis", "rechteck", "quadrat", "dreieck", "rechtwinkliges dreieck", "trapez", "parallelogramm", "raute","würfel", "quader", "kugel", "zylinder", "kegel", "quadratische pyramide", "rechteckige pyramide"],
         info:      "Geometrie Rechner welcher mit 2D und 3D Figuren rechnet - inklusive Rechenweg und live Form-Vorschau",
         image: {

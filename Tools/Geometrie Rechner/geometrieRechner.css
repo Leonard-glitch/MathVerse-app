@@ -237,7 +237,6 @@
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: var(--text-secondary);
 }
 
@@ -367,8 +366,9 @@
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9rem;
     color: var(--text-primary);
-    line-height: 2; /* mehr Luft für eingebettete Brüche/Wurzeln */
+    line-height: 2;
     white-space: pre-wrap;
+    overflow-x: auto;
 }
 
 .step-sub-solution {
