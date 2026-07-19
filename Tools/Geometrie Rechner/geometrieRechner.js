@@ -71,7 +71,7 @@ const shapeConfig = {
     trapezoid: {
         name: 'Trapez',
         dimension: '2d',
-        type: 3,
+        type: 4,
         inputs: [
             { id: 'a', label: 'Grundseite a' },
             { id: 'c', label: 'Parallele Seite c' },
@@ -82,7 +82,7 @@ const shapeConfig = {
     parallelogram: {
         name: 'Parallelogramm',
         dimension: '2d',
-        type: 3,
+        type: 4,
         inputs: [
             { id: 'a', label: 'Seite a' },
             { id: 'b', label: 'Seite b' },
@@ -269,6 +269,35 @@ inputTypeThree.innerHTML =`
             </select>
         </div>
         <input type="number" id="zahlenInputRow2" placeholder="Zahl" class="zahlenInputfeld">
+    </div>
+`;
+
+let inputTypeFour=document.createElement('div');
+inputTypeFour.classList.add('inputContainer');
+inputTypeFour.innerHTML = `
+    <div class="inputRow">
+        <div class="inputSelectDiv">
+            <select name="selectInput" id="selectInputRow1" class="selection">
+
+            </select>
+        </div>
+        <input type="number" id="zahlenInputRow1" placeholder="Zahl" class="zahlenInputfeld">
+    </div>
+    <div class="inputRow">
+        <div class="inputSelectDiv">
+            <select name="selectInput" id="selectInputRow2" class="selection">
+
+            </select>
+        </div>
+        <input type="number" id="zahlenInputRow2" placeholder="Zahl" class="zahlenInputfeld">
+    </div>
+    <div class="inputRow">
+        <div class="inputSelectDiv">
+            <select name="selectInput" id="selectInputRow3" class="selection">
+
+            </select>
+        </div>
+        <input type="number" id="zahlenInputRow3" placeholder="Zahl" class="zahlenInputfeld">
     </div>
 `;
 
@@ -1720,6 +1749,9 @@ function setCurrentInputType(type){
             break;
         case 3: 
             inputsContainer.appendChild(inputTypeThree); 
+            break;
+        case 4:
+            inputsContainer.appendChild(inputTypeFour);
             break;
     }
 
