@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funktionsrechner</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../../css/feedback.css">
+    <link rel="stylesheet" href="../../css/Common/common.css">
+    <link rel="stylesheet" href="./funktionsrechner.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+        <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+        <div>
+            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+            <div id="searchResults"></div>
+        </div>
+
+        <div id="navUserArea"><a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
+            <a href="../../html/register.html" target="_self" class="navTextBorder">Register</a>
+        </div>
+    </nav>
+    </header>
+    <main>
+
+        <section class="functionsSecFull">
+            <h1 class="zahlenHeader">Funktionsrechner</h1>
+
+            <div class="functionsContainer">
+                <div class="topNavlistContainer">
+                    <div class="secondNavList">
+                        <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+                        <div>
+                            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+                            <div id="searchResults"></div>
+                        </div>
+                        <div id="navUserArea"><a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
+                            <a href="../../html/register.html" target="_self" class="navTextBorder">Register</a>
+                        </div>
+                        <div id="boxForFavoriteHeart"></div>
+                    </div>
+                    <button class="button" type="button" id="buttonForSecondNavList"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Menü<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button>
+                </div>
+
+                <div class="functionsMainContainer">
+                    <div class="functionContainer">
+                        <div class="addFunctionContainer"><button type="button" class="button" id="addFunctionButton"><i class="fa fa-plus" aria-hidden="true"></i>Funktion hinzufügen</button></div>
+                        <div class="allFunctionsContainer"><span class="functionexample">f(x)=2x+d</span><span class="functionexample">f(x)=2x+d</span></div>
+                    </div>
+                    <div class="cordSystemContainer">
+                        
+                    </div>
+                </div>
+
+                <div class="zahlenAusgabestyle" id="ausgabeContainer">
+                    <div class="loesungsDiv">
+                        <button class="loesungText button" type="button"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Ergebnisse<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button>
+                        <p id="loesungOutput"></p>
+
+                        <div class="rechenwegDiv">
+                        <button class="rechenwegText button" type="button"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Rechenweg<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button>
+                        <div id="rechenwegOutput"></div>
+                        </div>
+                        <span id="tipp"></span>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <footer>
+        <div class="footerNav">
+
+            <div class="footerSocial">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+            </div>
+
+            <div class="linksFooterect">
+                <a href="../../html/datenSchutz.html">Datenschutz</a>
+
+                <button id="openFeedbackBtn">Feedback senden</button>
+
+                <a href="../../html/impressum.html">Impressum</a>
+            </div>
+
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
+        </div>
+    </footer>
+    <script src="../../javaScript/Common/common-login.js"></script>
+    <script src="./funktionsrechner.js"></script>
+    <script src="../../javaScript/feedback.js"></script>
+    <script type="module" src="../../javaScript/toolFavorite.js"></script>
+    <script type="module" src="../../javaScript/search.js"></script>
+</body>
+</html>

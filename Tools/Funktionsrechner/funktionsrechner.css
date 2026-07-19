@@ -1,0 +1,151 @@
+.functionsSecFull{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.2rem 1.4rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    outline: none;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.functionsContainer{
+    width: 90%;
+    margin-top: 2rem;
+
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-main);
+}
+
+.topNavlistContainer{
+    display: none;
+    flex-direction: column;
+}
+
+.secondNavList{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+
+    padding: 0.5rem 0;
+}
+
+#buttonForSecondNavList{
+    border-radius: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+}
+
+
+
+.functionsMainContainer{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.functionContainer{
+    width:35%;
+    
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+}
+
+.addFunctionContainer{
+    display: flex;
+    flex-direction: row;
+
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#addFunctionButton{
+    font-size: 1.05rem;
+}
+
+.allFunctionsContainer{
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1rem;
+    font-size: 1.2rem;
+    height: 100%;
+
+    overflow-x: auto;
+    overflow-y: auto;
+    gap: 0.2rem;
+}
+
+
+
+
+.cordSystemContainer{
+    width: 65%;
+    height: 35rem;
+}
+
+
+
+
+.zahlenAusgabestyle{
+    width: 100%;
+}
+
+.loesungsDiv{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    padding: 0.5rem 0;
+}
+
+.loesungText{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-primary);
+    text-align: center;
+    border: none;
+
+    width: 100%;
+    background:transparent;
+}
+
+
+.rechenwegDiv{
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+}
+
+.rechenwegText{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-primary);
+    text-align: center;
+    border: none;
+    border-radius: 0;
+
+    width: 100%;
+    background:transparent;
+}
