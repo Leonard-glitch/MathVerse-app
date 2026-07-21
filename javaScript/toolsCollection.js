@@ -98,7 +98,7 @@ export const tools = [
         tags:     ["dreisatz", "verhältnis", "proportional", "antiproportional", "mathematik"],
         info:      "Berechnet den Dreisatz bei proportionalen und antiproportionalen Zuordnungen – inklusive Schritt-für-Schritt-Lösungsweg.",
         image: {
-            big:   `${BASE}/pictures/dreisatz.jpg`,
+            big:   `${BASE}/pictures/Dreisatzrechner1.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -124,7 +124,7 @@ export const tools = [
         tags:     ["formel", "umformer", "algebra"],
         info:      "Formt mathematische Formeln um – inklusive Schritt-für-Schritt-Lösungsweg.",
         image: {
-            big:   `${BASE}/pictures/FormelUmformer.jpg`,
+            big:   `${BASE}/pictures/Formel Umformer1.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -137,7 +137,7 @@ export const tools = [
         tags:     ["gleichung", "linear", "lösen", "algebra", "lineare-gleichungen", "verfahren"],
         info:      "Löst allgemeine und lineare Gleichungssysteme – inklusive automatischer Auswahl des besten Lösungsverfahrens.",
         image: {
-            big:   `${BASE}/pictures/Gleichungslöser.jpg`,
+            big:   `${BASE}/pictures/Gleichungslöser1.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
