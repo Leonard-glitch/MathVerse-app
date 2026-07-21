@@ -39,7 +39,7 @@ const shapeConfig = {
     triangle: {
         name: 'Allgemeines Dreieck',
         dimension: '2d',
-        type: 3,
+        type: 4,
         inputs: [
             { id: 'a', label: 'Seite a' },
             { id: 'b', label: 'Seite b' },
@@ -121,7 +121,7 @@ const shapeConfig = {
     cuboid: {
         name: 'Quader',
         dimension: '3d',
-        type: 3,
+        type: 4, // 3 Freiheitsgrade (a,b,c) – 2 Werte reichen nie aus
         inputs: [
             { id: 'a', label: 'Länge (a)' },
             { id: 'b', label: 'Breite (b)' },
@@ -130,7 +130,8 @@ const shapeConfig = {
             { id: 'O', label: 'Oberfläche (O)' },
             { id: 'd', label: 'Raumdiagonale (d)' },
             { id: 'G', label: 'Grundfläche (G)' }
-        ]
+        ],
+        redundantGroups: [['a', 'b', 'G'], ['c', 'G', 'V']]
     },
     sphere: {
         name: 'Kugel',
@@ -147,6 +148,7 @@ const shapeConfig = {
         name: 'Zylinder',
         dimension: '3d',
         type: 2,
+        redundantGroups: [['r', 'd'], ['r', 'G'], ['d', 'G']],
         inputs: [
             { id: 'r', label: 'Radius (r)' },
             { id: 'd', label: 'Durchmesser (d)' },
@@ -162,6 +164,7 @@ const shapeConfig = {
         name: 'Kegel',
         dimension: '3d',
         type: 2,
+        redundantGroups: [['r', 'd'], ['r', 'G'], ['d', 'G']],
         inputs: [
             { id: 'r', label: 'Radius (r)' },
             { id: 'd', label: 'Durchmesser (d)' },
@@ -186,12 +189,13 @@ const shapeConfig = {
             { id: 'O', label: 'Oberfläche (O)' },
             { id: 'M', label: 'Mantelfläche (M)' },
             { id: 'G', label: 'Grundfläche (G)' }
-        ]
+        ],
+        redundantGroups: [['a', 'G']]
     },
     rectangularpyramid: {
         name: 'Rechteckige Pyramide',
         dimension: '3d',
-        type: 3,
+        type: 4,
         inputs: [
             { id: 'a', label: 'Grundkante a' },
             { id: 'b', label: 'Grundkante b' },
@@ -202,7 +206,8 @@ const shapeConfig = {
             { id: 'O', label: 'Oberfläche (O)' },
             { id: 'M', label: 'Mantelfläche (M)' },
             { id: 'G', label: 'Grundfläche (G)' }
-        ]
+        ],
+        redundantGroups: [['a', 'b', 'G']]
     }
 };
 
@@ -425,8 +430,6 @@ function sketchRectangle(given) {
     <text class="sketchLabel ${on('U')}" x="40" y="55">U</text>
 </svg>`;
 }
-
-// ── 2D: restliche Formen ──────────────────────────────────────────────────
 
 function sketchTriangle(given) {
     const on = id => given.has(id) ? "is-active" : "";
@@ -897,6 +900,17 @@ function sqrt(content) {
     return `<span class="geo-sqrt"><span class="geo-sqrt-symbol">√</span><span class="geo-sqrt-radicand">${content}</span></span>`;
 }
 
+function nthroot(index, content) {
+    return `<span class="geo-sqrt"><sup class="geo-sqrt-index">${index}</sup><span class="geo-sqrt-symbol">√</span><span class="geo-sqrt-radicand">${content}</span></span>`;
+}
+
+function solveSumProduct(s, p) {
+    const disc = s * s - 4 * p;
+    if (disc < 0) return null;
+    const diff = Math.sqrt(disc);
+    return [(s + diff) / 2, (s - diff) / 2];
+}
+
 // isGiven = true, wenn dieser Schritt nur einen vom Nutzer eingegebenen Wert
 // wiedergibt (keine Berechnung) -> bleibt im Rechenweg neutral statt grün.
 function step(title, text, formula, solution, isGiven = false) {
@@ -910,6 +924,59 @@ function displaySymbol(id) {
 
 function toRad(deg) { return deg * Math.PI / 180; }
 function toDeg(rad) { return rad * 180 / Math.PI; }
+
+// ── Dreieck: trigonometrische Hilfsfunktionen ──────────────────────────────
+function triSideFromSAS(p, q, includedAngleDeg) {
+    return Math.sqrt(p * p + q * q - 2 * p * q * Math.cos(toRad(includedAngleDeg)));
+}
+function triAngleFromSSS(oppositeSide, p, q) {
+    const cosVal = (p * p + q * q - oppositeSide * oppositeSide) / (2 * p * q);
+    return toDeg(Math.acos(Math.max(-1, Math.min(1, cosVal))));
+}
+
+// Löst den SSW-Fall: bekannt sind eine Seite mit ihrem Gegenwinkel (pVal/PDeg)
+// sowie eine zweite Seite (qVal); gesucht ist deren Gegenwinkel. Da arcsin
+// zwei mögliche Lösungen liefert, werden beide auf Gültigkeit geprüft.
+function triSolveSSA(pVal, PDeg, qVal) {
+    const sinOther = qVal * Math.sin(toRad(PDeg)) / pVal;
+    if (sinOther > 1 + 1e-9) return { error: "none" };
+    const clamped = Math.min(1, sinOther);
+    const sol1 = toDeg(Math.asin(clamped));
+    const sol2 = 180 - sol1;
+    const valid1 = sol1 + PDeg < 180;
+    const valid2 = sol2 + PDeg < 180 && Math.abs(sol2 - sol1) > 1e-6;
+    if (valid1 && valid2) return { error: "ambiguous" };
+    if (valid1) return { angle: sol1 };
+    if (valid2) return { angle: sol2 };
+    return { error: "none" };
+}
+
+function triSSAResult(pVal, PDeg, qVal, QName) {
+    const result = triSolveSSA(pVal, PDeg, qVal);
+    if (result.error === "none") {
+        return { error: `Diese Kombination ergibt kein gültiges Dreieck – mit diesen Werten lässt sich kein passender Winkel ${displaySymbol(QName)} finden.` };
+    }
+    if (result.error === "ambiguous") {
+        return { error: "Diese Kombination ist nicht eindeutig lösbar: Zwei Seiten und ein nicht eingeschlossener Winkel (SSW-Fall) können zu zwei unterschiedlichen, aber jeweils gültigen Dreiecken führen. Bitte gib stattdessen den eingeschlossenen Winkel oder eine dritte Seite an." };
+    }
+    return { angle: result.angle };
+}
+
+// Gemeinsamer Abschluss für alle Fälle: sobald a, b, c, α, β, γ bekannt sind,
+// werden Fläche und alle drei Höhen berechnet und die Schritte ergänzt.
+function finishTriangle(a, b, c, alpha, beta, gamma, steps) {
+    const A = (a * b * Math.sin(toRad(gamma))) / 2;
+    const ha = 2 * A / a;
+    const hb = 2 * A / b;
+    const hc = 2 * A / c;
+
+    steps.push(step("Fläche", "Über zwei Seiten und den eingeschlossenen Winkel:", `A = ${frac('a · b · sin(γ)', '2')} = ${frac(`${formatNum(a)} · ${formatNum(b)} · sin(${formatNum(gamma)}°)`, '2')} = ${formatNum(A)}`));
+    steps.push(step("Höhe ha", "Aus der Flächenformel A = (a · ha) / 2 umgestellt:", `ha = ${frac('2A', 'a')} = ${frac(`2 · ${formatNum(A)}`, formatNum(a))} = ${formatNum(ha)}`));
+    steps.push(step("Höhe hb", "Analog für die Höhe auf Seite b:", `hb = ${frac('2A', 'b')} = ${frac(`2 · ${formatNum(A)}`, formatNum(b))} = ${formatNum(hb)}`));
+    steps.push(step("Höhe hc", "Analog für die Höhe auf Seite c:", `hc = ${frac('2A', 'c')} = ${frac(`2 · ${formatNum(A)}`, formatNum(c))} = ${formatNum(hc)}`));
+
+    return { values: { a, b, c, alpha, beta, gamma, ha, hb, hc, A }, steps };
+}
 
 function resolveCircle(given) {
     const [knownId, knownVal] = Object.entries(given)[0];
@@ -1071,6 +1138,223 @@ function resolveRectangle(given) {
     if (!ids.includes('d')) steps.push(step("Diagonale", "Nach dem Satz des Pythagoras:", `d = ${sqrt('a² + b²')} = ${sqrt(`${formatNum(a)}² + ${formatNum(b)}²`)} = ${formatNum(d)}`));
 
     return { values: { a, b, A, U, d }, steps };
+}
+
+function resolveTriangle(given) {
+    const sides = ['a', 'b', 'c'].filter(id => id in given);
+    const angles = ['alpha', 'beta', 'gamma'].filter(id => id in given);
+    const others = Object.keys(given).filter(id => !sides.includes(id) && !angles.includes(id));
+
+    if (others.length > 0) {
+        return { error: "Diese Kombination wird aktuell nicht unterstützt – aktuell lassen sich nur Kombinationen aus drei der Größen a, b, c, α, β oder γ berechnen (z. B. SSS, SWS, WSW oder SSW)." };
+    }
+
+    for (const id of angles) {
+        if (given[id] <= 0 || given[id] >= 180) {
+            return { error: "Winkel müssen zwischen 0° und 180° liegen." };
+        }
+    }
+
+    // ── SSS: drei Seiten ─────────────────────────────────────────────────
+    if (sides.length === 3) {
+        const a = given.a, b = given.b, c = given.c;
+        if (a + b <= c || a + c <= b || b + c <= a) {
+            return { error: "Diese Kombination ergibt kein gültiges Dreieck – die Dreiecksungleichung ist verletzt (jede Seite muss kürzer sein als die Summe der beiden anderen)." };
+        }
+        const alpha = triAngleFromSSS(a, b, c);
+        const beta = triAngleFromSSS(b, a, c);
+        const gamma = 180 - alpha - beta;
+        const steps = [
+            step("Seiten", "Alle drei Seiten sind bereits gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, c = ${formatNum(c)}`, null, true),
+            step("Winkel α (Kosinussatz)", "Der Kosinussatz verknüpft alle drei Seiten mit dem Winkel gegenüber a:", `cos(α) = ${frac('b² + c² − a²', '2 · b · c')} = ${frac(`${formatNum(b)}² + ${formatNum(c)}² − ${formatNum(a)}²`, `2 · ${formatNum(b)} · ${formatNum(c)}`)}\nα = ${formatNum(alpha)}°`),
+            step("Winkel β (Kosinussatz)", "Ebenso für den Winkel gegenüber b:", `cos(β) = ${frac('a² + c² − b²', '2 · a · c')} = ${frac(`${formatNum(a)}² + ${formatNum(c)}² − ${formatNum(b)}²`, `2 · ${formatNum(a)} · ${formatNum(c)}`)}\nβ = ${formatNum(beta)}°`),
+            step("Winkel γ", "Die Winkelsumme im Dreieck ergibt den dritten Winkel:", `γ = 180° − α − β = 180° − ${formatNum(alpha)}° − ${formatNum(beta)}° = ${formatNum(gamma)}°`)
+        ];
+        return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+    }
+
+    // ── SWS (eingeschlossener Winkel) oder SSW (nicht eingeschlossen) ──────
+    if (sides.length === 2 && angles.length === 1) {
+        const pair = sides.join(',');
+        const knownAngleId = angles[0];
+
+        if (pair === 'a,b' && knownAngleId === 'gamma') {
+            const a = given.a, b = given.b, gamma = given.gamma;
+            const c = triSideFromSAS(a, b, gamma);
+            const alpha = triAngleFromSSS(a, b, c);
+            const beta = 180 - alpha - gamma;
+            const steps = [
+                step("Seiten und eingeschlossener Winkel", "Die Seiten a, b und der zwischen ihnen liegende Winkel γ sind gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, γ = ${formatNum(gamma)}°`, null, true),
+                step("Seite c (Kosinussatz)", "Der Kosinussatz berechnet die dritte Seite aus den beiden anderen und dem eingeschlossenen Winkel:", `c = ${sqrt('a² + b² − 2 · a · b · cos(γ)')} = ${sqrt(`${formatNum(a)}² + ${formatNum(b)}² − 2 · ${formatNum(a)} · ${formatNum(b)} · cos(${formatNum(gamma)}°)`)} = ${formatNum(c)}`),
+                step("Winkel α (Kosinussatz)", "Mit allen drei Seiten bekannt, liefert der Kosinussatz den Winkel gegenüber a:", `cos(α) = ${frac('b² + c² − a²', '2 · b · c')}\nα = ${formatNum(alpha)}°`),
+                step("Winkel β", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `β = 180° − α − γ = ${formatNum(beta)}°`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        if (pair === 'b,c' && knownAngleId === 'alpha') {
+            const b = given.b, c = given.c, alpha = given.alpha;
+            const a = triSideFromSAS(b, c, alpha);
+            const beta = triAngleFromSSS(b, a, c);
+            const gamma = 180 - alpha - beta;
+            const steps = [
+                step("Seiten und eingeschlossener Winkel", "Die Seiten b, c und der zwischen ihnen liegende Winkel α sind gegeben.", `b = ${formatNum(b)}, c = ${formatNum(c)}, α = ${formatNum(alpha)}°`, null, true),
+                step("Seite a (Kosinussatz)", "Der Kosinussatz berechnet die dritte Seite aus den beiden anderen und dem eingeschlossenen Winkel:", `a = ${sqrt('b² + c² − 2 · b · c · cos(α)')} = ${sqrt(`${formatNum(b)}² + ${formatNum(c)}² − 2 · ${formatNum(b)} · ${formatNum(c)} · cos(${formatNum(alpha)}°)`)} = ${formatNum(a)}`),
+                step("Winkel β (Kosinussatz)", "Mit allen drei Seiten bekannt, liefert der Kosinussatz den Winkel gegenüber b:", `cos(β) = ${frac('a² + c² − b²', '2 · a · c')}\nβ = ${formatNum(beta)}°`),
+                step("Winkel γ", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `γ = 180° − α − β = ${formatNum(gamma)}°`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        if (pair === 'a,c' && knownAngleId === 'beta') {
+            const a = given.a, c = given.c, beta = given.beta;
+            const b = triSideFromSAS(a, c, beta);
+            const alpha = triAngleFromSSS(a, b, c);
+            const gamma = 180 - alpha - beta;
+            const steps = [
+                step("Seiten und eingeschlossener Winkel", "Die Seiten a, c und der zwischen ihnen liegende Winkel β sind gegeben.", `a = ${formatNum(a)}, c = ${formatNum(c)}, β = ${formatNum(beta)}°`, null, true),
+                step("Seite b (Kosinussatz)", "Der Kosinussatz berechnet die dritte Seite aus den beiden anderen und dem eingeschlossenen Winkel:", `b = ${sqrt('a² + c² − 2 · a · c · cos(β)')} = ${sqrt(`${formatNum(a)}² + ${formatNum(c)}² − 2 · ${formatNum(a)} · ${formatNum(c)} · cos(${formatNum(beta)}°)`)} = ${formatNum(b)}`),
+                step("Winkel α (Kosinussatz)", "Mit allen drei Seiten bekannt, liefert der Kosinussatz den Winkel gegenüber a:", `cos(α) = ${frac('b² + c² − a²', '2 · b · c')}\nα = ${formatNum(alpha)}°`),
+                step("Winkel γ", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `γ = 180° − α − β = ${formatNum(gamma)}°`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        // ── SSW: bekannter Winkel liegt NICHT zwischen den beiden Seiten ───
+        if (pair === 'a,b' && knownAngleId === 'alpha') {
+            const a = given.a, b = given.b, alpha = given.alpha;
+            const res = triSSAResult(a, alpha, b, 'beta');
+            if (res.error) return { error: res.error };
+            const beta = res.angle;
+            const gamma = 180 - alpha - beta;
+            const c = a * Math.sin(toRad(gamma)) / Math.sin(toRad(alpha));
+            const steps = [
+                step("Zwei Seiten und ein nicht eingeschlossener Winkel", "Die Seiten a, b sind gegeben, sowie der Winkel α gegenüber a.", `a = ${formatNum(a)}, b = ${formatNum(b)}, α = ${formatNum(alpha)}°`, null, true),
+                step("Winkel β (Sinussatz)", "Der Sinussatz verknüpft Seiten mit ihren Gegenwinkeln:", `sin(β) = ${frac('b · sin(α)', 'a')} = ${frac(`${formatNum(b)} · sin(${formatNum(alpha)}°)`, formatNum(a))}\nβ = ${formatNum(beta)}°`),
+                step("Winkel γ", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `γ = 180° − α − β = ${formatNum(gamma)}°`),
+                step("Seite c (Sinussatz)", "Der Sinussatz liefert auch die letzte Seite:", `c = ${frac('a · sin(γ)', 'sin(α)')} = ${frac(`${formatNum(a)} · sin(${formatNum(gamma)}°)`, `sin(${formatNum(alpha)}°)`)} = ${formatNum(c)}`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        if (pair === 'a,b' && knownAngleId === 'beta') {
+            const a = given.a, b = given.b, beta = given.beta;
+            const res = triSSAResult(b, beta, a, 'alpha');
+            if (res.error) return { error: res.error };
+            const alpha = res.angle;
+            const gamma = 180 - alpha - beta;
+            const c = a * Math.sin(toRad(gamma)) / Math.sin(toRad(alpha));
+            const steps = [
+                step("Zwei Seiten und ein nicht eingeschlossener Winkel", "Die Seiten a, b sind gegeben, sowie der Winkel β gegenüber b.", `a = ${formatNum(a)}, b = ${formatNum(b)}, β = ${formatNum(beta)}°`, null, true),
+                step("Winkel α (Sinussatz)", "Der Sinussatz verknüpft Seiten mit ihren Gegenwinkeln:", `sin(α) = ${frac('a · sin(β)', 'b')} = ${frac(`${formatNum(a)} · sin(${formatNum(beta)}°)`, formatNum(b))}\nα = ${formatNum(alpha)}°`),
+                step("Winkel γ", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `γ = 180° − α − β = ${formatNum(gamma)}°`),
+                step("Seite c (Sinussatz)", "Der Sinussatz liefert auch die letzte Seite:", `c = ${frac('a · sin(γ)', 'sin(α)')} = ${frac(`${formatNum(a)} · sin(${formatNum(gamma)}°)`, `sin(${formatNum(alpha)}°)`)} = ${formatNum(c)}`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        if (pair === 'b,c' && knownAngleId === 'beta') {
+            const b = given.b, c = given.c, beta = given.beta;
+            const res = triSSAResult(b, beta, c, 'gamma');
+            if (res.error) return { error: res.error };
+            const gamma = res.angle;
+            const alpha = 180 - beta - gamma;
+            const a = b * Math.sin(toRad(alpha)) / Math.sin(toRad(beta));
+            const steps = [
+                step("Zwei Seiten und ein nicht eingeschlossener Winkel", "Die Seiten b, c sind gegeben, sowie der Winkel β gegenüber b.", `b = ${formatNum(b)}, c = ${formatNum(c)}, β = ${formatNum(beta)}°`, null, true),
+                step("Winkel γ (Sinussatz)", "Der Sinussatz verknüpft Seiten mit ihren Gegenwinkeln:", `sin(γ) = ${frac('c · sin(β)', 'b')} = ${frac(`${formatNum(c)} · sin(${formatNum(beta)}°)`, formatNum(b))}\nγ = ${formatNum(gamma)}°`),
+                step("Winkel α", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `α = 180° − β − γ = ${formatNum(alpha)}°`),
+                step("Seite a (Sinussatz)", "Der Sinussatz liefert auch die letzte Seite:", `a = ${frac('b · sin(α)', 'sin(β)')} = ${frac(`${formatNum(b)} · sin(${formatNum(alpha)}°)`, `sin(${formatNum(beta)}°)`)} = ${formatNum(a)}`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        if (pair === 'b,c' && knownAngleId === 'gamma') {
+            const b = given.b, c = given.c, gamma = given.gamma;
+            const res = triSSAResult(c, gamma, b, 'beta');
+            if (res.error) return { error: res.error };
+            const beta = res.angle;
+            const alpha = 180 - beta - gamma;
+            const a = b * Math.sin(toRad(alpha)) / Math.sin(toRad(beta));
+            const steps = [
+                step("Zwei Seiten und ein nicht eingeschlossener Winkel", "Die Seiten b, c sind gegeben, sowie der Winkel γ gegenüber c.", `b = ${formatNum(b)}, c = ${formatNum(c)}, γ = ${formatNum(gamma)}°`, null, true),
+                step("Winkel β (Sinussatz)", "Der Sinussatz verknüpft Seiten mit ihren Gegenwinkeln:", `sin(β) = ${frac('b · sin(γ)', 'c')} = ${frac(`${formatNum(b)} · sin(${formatNum(gamma)}°)`, formatNum(c))}\nβ = ${formatNum(beta)}°`),
+                step("Winkel α", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `α = 180° − β − γ = ${formatNum(alpha)}°`),
+                step("Seite a (Sinussatz)", "Der Sinussatz liefert auch die letzte Seite:", `a = ${frac('b · sin(α)', 'sin(β)')} = ${frac(`${formatNum(b)} · sin(${formatNum(alpha)}°)`, `sin(${formatNum(beta)}°)`)} = ${formatNum(a)}`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        if (pair === 'a,c' && knownAngleId === 'alpha') {
+            const a = given.a, c = given.c, alpha = given.alpha;
+            const res = triSSAResult(a, alpha, c, 'gamma');
+            if (res.error) return { error: res.error };
+            const gamma = res.angle;
+            const beta = 180 - alpha - gamma;
+            const b = a * Math.sin(toRad(beta)) / Math.sin(toRad(alpha));
+            const steps = [
+                step("Zwei Seiten und ein nicht eingeschlossener Winkel", "Die Seiten a, c sind gegeben, sowie der Winkel α gegenüber a.", `a = ${formatNum(a)}, c = ${formatNum(c)}, α = ${formatNum(alpha)}°`, null, true),
+                step("Winkel γ (Sinussatz)", "Der Sinussatz verknüpft Seiten mit ihren Gegenwinkeln:", `sin(γ) = ${frac('c · sin(α)', 'a')} = ${frac(`${formatNum(c)} · sin(${formatNum(alpha)}°)`, formatNum(a))}\nγ = ${formatNum(gamma)}°`),
+                step("Winkel β", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `β = 180° − α − γ = ${formatNum(beta)}°`),
+                step("Seite b (Sinussatz)", "Der Sinussatz liefert auch die letzte Seite:", `b = ${frac('a · sin(β)', 'sin(α)')} = ${frac(`${formatNum(a)} · sin(${formatNum(beta)}°)`, `sin(${formatNum(alpha)}°)`)} = ${formatNum(b)}`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+
+        if (pair === 'a,c' && knownAngleId === 'gamma') {
+            const a = given.a, c = given.c, gamma = given.gamma;
+            const res = triSSAResult(c, gamma, a, 'alpha');
+            if (res.error) return { error: res.error };
+            const alpha = res.angle;
+            const beta = 180 - alpha - gamma;
+            const b = a * Math.sin(toRad(beta)) / Math.sin(toRad(alpha));
+            const steps = [
+                step("Zwei Seiten und ein nicht eingeschlossener Winkel", "Die Seiten a, c sind gegeben, sowie der Winkel γ gegenüber c.", `a = ${formatNum(a)}, c = ${formatNum(c)}, γ = ${formatNum(gamma)}°`, null, true),
+                step("Winkel α (Sinussatz)", "Der Sinussatz verknüpft Seiten mit ihren Gegenwinkeln:", `sin(α) = ${frac('a · sin(γ)', 'c')} = ${frac(`${formatNum(a)} · sin(${formatNum(gamma)}°)`, formatNum(c))}\nα = ${formatNum(alpha)}°`),
+                step("Winkel β", "Die Winkelsumme im Dreieck ergibt den letzten Winkel:", `β = 180° − α − γ = ${formatNum(beta)}°`),
+                step("Seite b (Sinussatz)", "Der Sinussatz liefert auch die letzte Seite:", `b = ${frac('a · sin(β)', 'sin(α)')} = ${frac(`${formatNum(a)} · sin(${formatNum(beta)}°)`, `sin(${formatNum(alpha)}°)`)} = ${formatNum(b)}`)
+            ];
+            return finishTriangle(a, b, c, alpha, beta, gamma, steps);
+        }
+    }
+
+    // ── WSW / SWW: zwei Winkel und eine Seite ──────────────────────────────
+    if (angles.length === 2 && sides.length === 1) {
+        const angleSum = angles.reduce((sum, id) => sum + given[id], 0);
+        if (angleSum >= 180) {
+            return { error: "Diese Kombination ergibt kein gültiges Dreieck – die Summe zweier Winkel darf 180° nicht erreichen oder überschreiten." };
+        }
+
+        const angleVals = { alpha: given.alpha, beta: given.beta, gamma: given.gamma };
+        const missingAngle = ['alpha', 'beta', 'gamma'].find(id => !(id in given));
+        angleVals[missingAngle] = 180 - angleSum;
+        const { alpha, beta, gamma } = angleVals;
+
+        const sideId = sides[0];
+        const sideVal = given[sideId];
+        const oppAngleOf = { a: 'alpha', b: 'beta', c: 'gamma' };
+        const sideVals = { [sideId]: sideVal };
+        const missingSides = ['a', 'b', 'c'].filter(id => id !== sideId);
+
+        missingSides.forEach(id => {
+            sideVals[id] = sideVal * Math.sin(toRad(angleVals[oppAngleOf[id]])) / Math.sin(toRad(angleVals[oppAngleOf[sideId]]));
+        });
+
+        const knownLabel = angles.map(id => displaySymbol(id)).join(', ');
+        const steps = [
+            step("Zwei Winkel und eine Seite", `Die Winkel ${knownLabel} und die Seite ${sideId} sind gegeben.`,
+                angles.map(id => `${displaySymbol(id)} = ${formatNum(given[id])}°`).concat(`${sideId} = ${formatNum(sideVal)}`).join(',  '), null, true),
+            step(`Winkel ${displaySymbol(missingAngle)}`, "Die Winkelsumme im Dreieck ergibt den dritten Winkel:", `${displaySymbol(missingAngle)} = 180° − ${angles.map(id => displaySymbol(id)).join(' − ')} = ${formatNum(angleVals[missingAngle])}°`)
+        ];
+        missingSides.forEach(id => {
+            steps.push(step(`Seite ${id}`, "Der Sinussatz verknüpft jede Seite mit ihrem Gegenwinkel:",
+                `${id} = ${frac(`${sideId} · sin(${displaySymbol(oppAngleOf[id])})`, `sin(${displaySymbol(oppAngleOf[sideId])})`)} = ${frac(`${formatNum(sideVal)} · sin(${formatNum(angleVals[oppAngleOf[id]])}°)`, `sin(${formatNum(angleVals[oppAngleOf[sideId]])}°)`)} = ${formatNum(sideVals[id])}`));
+        });
+
+        return finishTriangle(sideVals.a, sideVals.b, sideVals.c, alpha, beta, gamma, steps);
+    }
+
+    return { error: "Diese Kombination wird aktuell nicht unterstützt." };
 }
 
 function resolveRightTriangle(given) {
@@ -1486,15 +1770,788 @@ function resolveRhombus(given) {
 
     return { values: { a, e, f, h, U, A }, steps: [...preSteps, ...steps] };
 }
+
+function resolveCube(given) {
+    const [knownId, knownVal] = Object.entries(given)[0];
+    const steps = [];
+    let a;
+
+    if (knownId === 'a') {
+        a = knownVal;
+        steps.push(step("Kantenlänge", "Die Kantenlänge ist der gegebene Wert.", `a = ${formatNum(a)}`, null, true));
+    } else if (knownId === 'O') {
+        a = Math.sqrt(knownVal / 6);
+        steps.push(step("Kantenlänge aus der Oberfläche", "Die Oberfläche besteht aus 6 gleich großen Quadraten: O = 6a², umgestellt nach a:", `a = ${sqrt(frac('O', '6'))} = ${sqrt(frac(formatNum(knownVal), '6'))} = ${formatNum(a)}`));
+    } else if (knownId === 'V') {
+        a = Math.cbrt(knownVal);
+        steps.push(step("Kantenlänge aus dem Volumen", "Das Volumen ist V = a³, umgestellt nach a:", `a = ${nthroot(3, 'V')} = ${nthroot(3, formatNum(knownVal))} = ${formatNum(a)}`));
+    } else {
+        a = knownVal / Math.sqrt(3);
+        steps.push(step("Kantenlänge aus der Raumdiagonale", "Die Raumdiagonale ist d = a√3, umgestellt nach a:", `a = ${frac('d', '√3')} = ${frac(formatNum(knownVal), '√3')} = ${formatNum(a)}`));
+    }
+
+    const O = 6 * a * a, V = a * a * a, d = a * Math.sqrt(3);
+
+    if (knownId !== 'O') steps.push(step("Oberfläche", "Sechs quadratische Seitenflächen:", `O = 6 · a² = 6 · ${formatNum(a)}² = ${formatNum(O)}`));
+    if (knownId !== 'V') steps.push(step("Volumen", "Kantenlänge hoch drei:", `V = a³ = ${formatNum(a)}³ = ${formatNum(V)}`));
+    if (knownId !== 'd') steps.push(step("Raumdiagonale", "Über den räumlichen Satz des Pythagoras:", `d = a · √3 = ${formatNum(a)} · √3 = ${formatNum(d)}`));
+
+    return { values: { a, O, V, d }, steps };
+}
+
+function resolveSphere(given) {
+    const [knownId, knownVal] = Object.entries(given)[0];
+    const steps = [];
+    let r;
+
+    if (knownId === 'r') {
+        r = knownVal;
+        steps.push(step("Radius", "Der Radius ist der gegebene Wert.", `r = ${formatNum(r)}`, null, true));
+    } else if (knownId === 'd') {
+        r = knownVal / 2;
+        steps.push(step("Radius aus Durchmesser", "Der Radius ist die Hälfte des Durchmessers:", `r = ${frac('d', '2')} = ${frac(formatNum(knownVal), '2')} = ${formatNum(r)}`));
+    } else if (knownId === 'O') {
+        r = Math.sqrt(knownVal / (4 * Math.PI));
+        steps.push(step("Radius aus der Oberfläche", "Die Kugeloberfläche ist O = 4π · r², umgestellt nach r:", `r = ${sqrt(frac('O', '4π'))} = ${sqrt(frac(formatNum(knownVal), '4π'))} = ${formatNum(r)}`));
+    } else {
+        r = Math.cbrt((3 * knownVal) / (4 * Math.PI));
+        steps.push(step("Radius aus dem Volumen", "Das Kugelvolumen ist V = (4/3)π · r³, umgestellt nach r:", `r = ${nthroot(3, frac('3V', '4π'))} = ${nthroot(3, frac(`3 · ${formatNum(knownVal)}`, '4π'))} = ${formatNum(r)}`));
+    }
+
+    const d = 2 * r, O = 4 * Math.PI * r * r, V = (4 / 3) * Math.PI * r * r * r;
+
+    if (knownId !== 'd') steps.push(step("Durchmesser", "Doppelter Radius:", `d = 2 · r = 2 · ${formatNum(r)} = ${formatNum(d)}`));
+    if (knownId !== 'O') steps.push(step("Oberfläche", "Formel für die Kugeloberfläche:", `O = 4π · r² = 4π · ${formatNum(r)}² = ${formatNum(O)}`));
+    if (knownId !== 'V') steps.push(step("Volumen", "Formel für das Kugelvolumen:", `V = ${frac('4', '3')}π · r³ = ${frac('4', '3')}π · ${formatNum(r)}³ = ${formatNum(V)}`));
+
+    return { values: { r, d, O, V }, steps };
+}
+
+function resolveCylinder(given) {
+    const v = { ...given };
+    const rawIds = Object.keys(given);
+    const preSteps = [step("Gegebene Werte", "Diese Werte sind bereits bekannt.", rawIds.map(id => `${id} = ${formatNum(given[id])}`).join(',  '), null, true)];
+
+    if ('d' in v && !('r' in v)) {
+        v.r = v.d / 2;
+        preSteps.push(step("Radius aus Durchmesser", "Der Radius ist die Hälfte des Durchmessers:", `r = ${frac('d', '2')} = ${frac(formatNum(v.d), '2')} = ${formatNum(v.r)}`));
+    } else if ('G' in v && !('r' in v)) {
+        v.r = Math.sqrt(v.G / Math.PI);
+        preSteps.push(step("Radius aus der Grundfläche", "Die Grundfläche ist G = π · r², umgestellt nach r:", `r = ${sqrt(frac('G', 'π'))} = ${sqrt(frac(formatNum(v.G), 'π'))} = ${formatNum(v.r)}`));
+    }
+
+    const steps = [];
+    const order = ['r', 'h', 'V', 'O', 'M'];
+    const key = Object.keys(v).filter(id => order.includes(id)).sort((x, y) => order.indexOf(x) - order.indexOf(y)).join(',');
+    let r, h;
+
+    switch (key) {
+        case 'r,h': r = v.r; h = v.h; break;
+
+        case 'r,V':
+            r = v.r; h = v.V / (Math.PI * r * r);
+            steps.push(step("Höhe aus dem Volumen", "Das Volumen ist V = π · r² · h, umgestellt nach h:", `h = ${frac('V', 'π · r²')} = ${frac(formatNum(v.V), `π · ${formatNum(r)}²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'r,O':
+            r = v.r; h = v.O / (2 * Math.PI * r) - r;
+            if (h <= 0) return { error: "Diese Kombination ergibt keinen gültigen Zylinder – die Höhe wäre 0 oder negativ." };
+            steps.push(step("Höhe aus der Oberfläche", "Die Oberfläche ist O = 2π · r² + 2π · r · h, umgestellt nach h:", `h = ${frac('O', '2π · r')} − r = ${frac(formatNum(v.O), `2π · ${formatNum(r)}`)} − ${formatNum(r)} = ${formatNum(h)}`));
+            break;
+
+        case 'r,M':
+            r = v.r; h = v.M / (2 * Math.PI * r);
+            steps.push(step("Höhe aus der Mantelfläche", "Die Mantelfläche ist M = 2π · r · h, umgestellt nach h:", `h = ${frac('M', '2π · r')} = ${frac(formatNum(v.M), `2π · ${formatNum(r)}`)} = ${formatNum(h)}`));
+            break;
+
+        case 'h,V':
+            h = v.h; r = Math.sqrt(v.V / (Math.PI * h));
+            steps.push(step("Radius aus dem Volumen", "Das Volumen ist V = π · r² · h, umgestellt nach r:", `r = ${sqrt(frac('V', 'π · h'))} = ${sqrt(frac(formatNum(v.V), `π · ${formatNum(h)}`))} = ${formatNum(r)}`));
+            break;
+
+        case 'h,O': {
+            h = v.h;
+            r = (-h + Math.sqrt(h * h + (2 * v.O) / Math.PI)) / 2;
+            if (r <= 0) return { error: "Diese Kombination ergibt keinen gültigen Zylinder." };
+            steps.push(step("Radius aus der Oberfläche", "Aus O = 2π · r² + 2π · r · h ergibt sich eine quadratische Gleichung für r:", `2π · r² + 2π · h · r − O = 0\nr = ${frac(`−h + ${sqrt('h² + 2O/π')}`, '2')} = ${formatNum(r)}`));
+            break;
+        }
+
+        case 'h,M':
+            h = v.h; r = v.M / (2 * Math.PI * h);
+            steps.push(step("Radius aus der Mantelfläche", "Die Mantelfläche ist M = 2π · r · h, umgestellt nach r:", `r = ${frac('M', '2π · h')} = ${frac(formatNum(v.M), `2π · ${formatNum(h)}`)} = ${formatNum(r)}`));
+            break;
+
+        case 'V,M':
+            r = 2 * v.V / v.M; h = v.M / (2 * Math.PI * r);
+            steps.push(step("Radius aus Volumen und Mantelfläche", "Aus V = π · r² · h und M = 2π · r · h folgt V/M = r/2:", `r = ${frac('2V', 'M')} = ${frac(`2 · ${formatNum(v.V)}`, formatNum(v.M))} = ${formatNum(r)}`));
+            steps.push(step("Höhe aus der Mantelfläche", "Die Mantelfläche ist M = 2π · r · h, umgestellt nach h:", `h = ${frac('M', '2π · r')} = ${frac(formatNum(v.M), `2π · ${formatNum(r)}`)} = ${formatNum(h)}`));
+            break;
+
+        case 'O,M':
+            r = Math.sqrt((v.O - v.M) / (2 * Math.PI)); h = v.M / (2 * Math.PI * r);
+            steps.push(step("Radius aus Oberfläche und Mantelfläche", "Da O = 2π · r² + M ist, ergibt sich nach r umgestellt:", `r = ${sqrt(frac('O − M', '2π'))} = ${sqrt(frac(`${formatNum(v.O)} − ${formatNum(v.M)}`, '2π'))} = ${formatNum(r)}`));
+            steps.push(step("Höhe aus der Mantelfläche", "Die Mantelfläche ist M = 2π · r · h, umgestellt nach h:", `h = ${frac('M', '2π · r')} = ${frac(formatNum(v.M), `2π · ${formatNum(r)}`)} = ${formatNum(h)}`));
+            break;
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    const G = Math.PI * r * r, M = 2 * Math.PI * r * h, O = 2 * G + M, V = G * h, d = 2 * r;
+
+    if (!('G' in given)) steps.push(step("Grundfläche", "Kreisfläche der Grund- und Deckfläche:", `G = π · r² = π · ${formatNum(r)}² = ${formatNum(G)}`));
+    if (!('M' in given)) steps.push(step("Mantelfläche", "Abgerolltes Rechteck rund um den Zylinder:", `M = 2π · r · h = 2π · ${formatNum(r)} · ${formatNum(h)} = ${formatNum(M)}`));
+    if (!('O' in given)) steps.push(step("Oberfläche", "Grund- und Deckfläche plus Mantelfläche:", `O = 2G + M = 2 · ${formatNum(G)} + ${formatNum(M)} = ${formatNum(O)}`));
+    if (!('V' in given)) steps.push(step("Volumen", "Grundfläche mal Höhe:", `V = G · h = ${formatNum(G)} · ${formatNum(h)} = ${formatNum(V)}`));
+    if (!('d' in given)) steps.push(step("Durchmesser", "Doppelter Radius:", `d = 2 · r = 2 · ${formatNum(r)} = ${formatNum(d)}`));
+
+    return { values: { r, d, h, V, O, M, G }, steps: [...preSteps, ...steps] };
+}
+
+function resolveCone(given) {
+    const v = { ...given };
+    const rawIds = Object.keys(given);
+    const preSteps = [step("Gegebene Werte", "Diese Werte sind bereits bekannt.", rawIds.map(id => `${id} = ${formatNum(given[id])}`).join(',  '), null, true)];
+
+    if ('d' in v && !('r' in v)) {
+        v.r = v.d / 2;
+        preSteps.push(step("Radius aus Durchmesser", "Der Radius ist die Hälfte des Durchmessers:", `r = ${frac('d', '2')} = ${frac(formatNum(v.d), '2')} = ${formatNum(v.r)}`));
+    } else if ('G' in v && !('r' in v)) {
+        v.r = Math.sqrt(v.G / Math.PI);
+        preSteps.push(step("Radius aus der Grundfläche", "Die Grundfläche ist G = π · r², umgestellt nach r:", `r = ${sqrt(frac('G', 'π'))} = ${sqrt(frac(formatNum(v.G), 'π'))} = ${formatNum(v.r)}`));
+    }
+
+    const steps = [];
+    const order = ['r', 'h', 's', 'V', 'O', 'M'];
+    const key = Object.keys(v).filter(id => order.includes(id)).sort((x, y) => order.indexOf(x) - order.indexOf(y)).join(',');
+    let r, h, s;
+
+    switch (key) {
+        case 'r,h':
+            r = v.r; h = v.h; s = Math.sqrt(r * r + h * h);
+            steps.push(step("Mantellinie", "Nach dem Satz des Pythagoras aus Radius und Höhe:", `s = ${sqrt('r² + h²')} = ${sqrt(`${formatNum(r)}² + ${formatNum(h)}²`)} = ${formatNum(s)}`));
+            break;
+
+        case 'r,s':
+            r = v.r; s = v.s;
+            if (s <= r) return { error: "Diese Kombination ergibt keinen gültigen Kegel – die Mantellinie muss größer als der Radius sein." };
+            h = Math.sqrt(s * s - r * r);
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras, umgestellt nach h:", `h = ${sqrt('s² − r²')} = ${sqrt(`${formatNum(s)}² − ${formatNum(r)}²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'r,V':
+            r = v.r; h = 3 * v.V / (Math.PI * r * r); s = Math.sqrt(r * r + h * h);
+            steps.push(step("Höhe aus dem Volumen", "Das Volumen ist V = (1/3)π · r² · h, umgestellt nach h:", `h = ${frac('3V', 'π · r²')} = ${frac(`3 · ${formatNum(v.V)}`, `π · ${formatNum(r)}²`)} = ${formatNum(h)}`));
+            steps.push(step("Mantellinie", "Nach dem Satz des Pythagoras:", `s = ${sqrt('r² + h²')} = ${formatNum(s)}`));
+            break;
+
+        case 'r,O':
+            r = v.r; s = v.O / (Math.PI * r) - r;
+            if (s <= r) return { error: "Diese Kombination ergibt keinen gültigen Kegel." };
+            h = Math.sqrt(s * s - r * r);
+            steps.push(step("Mantellinie aus der Oberfläche", "Die Oberfläche ist O = π · r² + π · r · s, umgestellt nach s:", `s = ${frac('O', 'π · r')} − r = ${frac(formatNum(v.O), `π · ${formatNum(r)}`)} − ${formatNum(r)} = ${formatNum(s)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt('s² − r²')} = ${formatNum(h)}`));
+            break;
+
+        case 'r,M':
+            r = v.r; s = v.M / (Math.PI * r);
+            if (s <= r) return { error: "Diese Kombination ergibt keinen gültigen Kegel." };
+            h = Math.sqrt(s * s - r * r);
+            steps.push(step("Mantellinie aus der Mantelfläche", "Die Mantelfläche ist M = π · r · s, umgestellt nach s:", `s = ${frac('M', 'π · r')} = ${frac(formatNum(v.M), `π · ${formatNum(r)}`)} = ${formatNum(s)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt('s² − r²')} = ${formatNum(h)}`));
+            break;
+
+        case 'h,s':
+            h = v.h; s = v.s;
+            if (s <= h) return { error: "Diese Kombination ergibt keinen gültigen Kegel – die Mantellinie muss größer als die Höhe sein." };
+            r = Math.sqrt(s * s - h * h);
+            steps.push(step("Radius", "Nach dem Satz des Pythagoras, umgestellt nach r:", `r = ${sqrt('s² − h²')} = ${sqrt(`${formatNum(s)}² − ${formatNum(h)}²`)} = ${formatNum(r)}`));
+            break;
+
+        case 'h,V':
+            h = v.h; r = Math.sqrt(3 * v.V / (Math.PI * h)); s = Math.sqrt(r * r + h * h);
+            steps.push(step("Radius aus dem Volumen", "Das Volumen ist V = (1/3)π · r² · h, umgestellt nach r:", `r = ${sqrt(frac('3V', 'π · h'))} = ${sqrt(frac(`3 · ${formatNum(v.V)}`, `π · ${formatNum(h)}`))} = ${formatNum(r)}`));
+            steps.push(step("Mantellinie", "Nach dem Satz des Pythagoras:", `s = ${sqrt('r² + h²')} = ${formatNum(s)}`));
+            break;
+
+        case 's,O':
+            s = v.s; r = (-s + Math.sqrt(s * s + (4 * v.O) / Math.PI)) / 2;
+            if (r <= 0) return { error: "Diese Kombination ergibt keinen gültigen Kegel." };
+            h = Math.sqrt(s * s - r * r);
+            steps.push(step("Radius aus der Oberfläche", "Aus O = π · r² + π · r · s ergibt sich eine quadratische Gleichung für r:", `π · r² + π · s · r − O = 0\nr = ${frac(`−s + ${sqrt('s² + 4O/π')}`, '2')} = ${formatNum(r)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt('s² − r²')} = ${formatNum(h)}`));
+            break;
+
+        case 's,M':
+            s = v.s; r = v.M / (Math.PI * s);
+            if (s <= r) return { error: "Diese Kombination ergibt keinen gültigen Kegel." };
+            h = Math.sqrt(s * s - r * r);
+            steps.push(step("Radius aus der Mantelfläche", "Die Mantelfläche ist M = π · r · s, umgestellt nach r:", `r = ${frac('M', 'π · s')} = ${frac(formatNum(v.M), `π · ${formatNum(s)}`)} = ${formatNum(r)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt('s² − r²')} = ${formatNum(h)}`));
+            break;
+
+        case 'O,M':
+            r = Math.sqrt((v.O - v.M) / Math.PI); s = v.M / (Math.PI * r);
+            if (s <= r) return { error: "Diese Kombination ergibt keinen gültigen Kegel." };
+            h = Math.sqrt(s * s - r * r);
+            steps.push(step("Radius aus Oberfläche und Mantelfläche", "Da O = π · r² + M ist, ergibt sich nach r umgestellt:", `r = ${sqrt(frac('O − M', 'π'))} = ${sqrt(frac(`${formatNum(v.O)} − ${formatNum(v.M)}`, 'π'))} = ${formatNum(r)}`));
+            steps.push(step("Mantellinie aus der Mantelfläche", "Die Mantelfläche ist M = π · r · s, umgestellt nach s:", `s = ${frac('M', 'π · r')} = ${formatNum(s)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt('s² − r²')} = ${formatNum(h)}`));
+            break;
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    const G = Math.PI * r * r, M = Math.PI * r * s, O = G + M, V = (1 / 3) * G * h, d = 2 * r;
+
+    if (!('G' in given)) steps.push(step("Grundfläche", "Kreisfläche der Grundfläche:", `G = π · r² = π · ${formatNum(r)}² = ${formatNum(G)}`));
+    if (!('M' in given)) steps.push(step("Mantelfläche", "Aufgerollter Kreissektor um den Kegel:", `M = π · r · s = π · ${formatNum(r)} · ${formatNum(s)} = ${formatNum(M)}`));
+    if (!('O' in given)) steps.push(step("Oberfläche", "Grundfläche plus Mantelfläche:", `O = G + M = ${formatNum(G)} + ${formatNum(M)} = ${formatNum(O)}`));
+    if (!('V' in given)) steps.push(step("Volumen", "Ein Drittel der Grundfläche mal Höhe:", `V = ${frac('1', '3')} · G · h = ${frac('1', '3')} · ${formatNum(G)} · ${formatNum(h)} = ${formatNum(V)}`));
+    if (!('d' in given)) steps.push(step("Durchmesser", "Doppelter Radius:", `d = 2 · r = 2 · ${formatNum(r)} = ${formatNum(d)}`));
+
+    return { values: { r, d, h, s, V, O, M, G }, steps: [...preSteps, ...steps] };
+}
+
+function resolveQuadPyramid(given) {
+    const v = { ...given };
+    const rawIds = Object.keys(given);
+    const preSteps = [step("Gegebene Werte", "Diese Werte sind bereits bekannt.", rawIds.map(id => `${id} = ${formatNum(given[id])}`).join(',  '), null, true)];
+
+    if ('G' in v && !('a' in v)) {
+        v.a = Math.sqrt(v.G);
+        preSteps.push(step("Grundkante aus der Grundfläche", "Die quadratische Grundfläche ist G = a², umgestellt nach a:", `a = ${sqrt('G')} = ${sqrt(formatNum(v.G))} = ${formatNum(v.a)}`));
+    }
+
+    const steps = [];
+    const order = ['a', 'h', 'ha', 'V', 'O', 'M'];
+    const key = Object.keys(v).filter(id => order.includes(id)).sort((x, y) => order.indexOf(x) - order.indexOf(y)).join(',');
+    let a, h, ha;
+
+    switch (key) {
+        case 'a,h':
+            a = v.a; h = v.h; ha = Math.sqrt(h * h + (a / 2) * (a / 2));
+            steps.push(step("Seitenhöhe", "Nach dem Satz des Pythagoras (Höhe und der halbe Grundkanten-Abstand zur Kantenmitte):", `ha = ${sqrt(`h² + (${frac('a', '2')})²`)} = ${sqrt(`${formatNum(h)}² + (${frac(formatNum(a), '2')})²`)} = ${formatNum(ha)}`));
+            break;
+
+        case 'a,ha':
+            a = v.a; ha = v.ha;
+            if (ha <= a / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide – die Seitenhöhe muss größer als der halbe Grundkanten-Abstand sein." };
+            h = Math.sqrt(ha * ha - (a / 2) * (a / 2));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras, umgestellt nach h:", `h = ${sqrt(`ha² − (${frac('a', '2')})²`)} = ${sqrt(`${formatNum(ha)}² − (${frac(formatNum(a), '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'a,V':
+            a = v.a; h = 3 * v.V / (a * a); ha = Math.sqrt(h * h + (a / 2) * (a / 2));
+            steps.push(step("Höhe aus dem Volumen", "Das Volumen ist V = (1/3) · a² · h, umgestellt nach h:", `h = ${frac('3V', 'a²')} = ${frac(`3 · ${formatNum(v.V)}`, `${formatNum(a)}²`)} = ${formatNum(h)}`));
+            steps.push(step("Seitenhöhe", "Nach dem Satz des Pythagoras:", `ha = ${sqrt(`h² + (${frac('a', '2')})²`)} = ${formatNum(ha)}`));
+            break;
+
+        case 'a,O':
+            a = v.a; ha = (v.O - a * a) / (2 * a);
+            if (ha <= a / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            h = Math.sqrt(ha * ha - (a / 2) * (a / 2));
+            steps.push(step("Seitenhöhe aus der Oberfläche", "Die Oberfläche ist O = a² + 2a · ha, umgestellt nach ha:", `ha = ${frac('O − a²', '2a')} = ${frac(`${formatNum(v.O)} − ${formatNum(a)}²`, `2 · ${formatNum(a)}`)} = ${formatNum(ha)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt(`ha² − (${frac('a', '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'a,M':
+            a = v.a; ha = v.M / (2 * a);
+            if (ha <= a / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            h = Math.sqrt(ha * ha - (a / 2) * (a / 2));
+            steps.push(step("Seitenhöhe aus der Mantelfläche", "Die Mantelfläche ist M = 2a · ha, umgestellt nach ha:", `ha = ${frac('M', '2a')} = ${frac(formatNum(v.M), `2 · ${formatNum(a)}`)} = ${formatNum(ha)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt(`ha² − (${frac('a', '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'h,ha':
+            h = v.h; ha = v.ha;
+            if (ha <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide – die Seitenhöhe muss größer als die Höhe sein." };
+            a = 2 * Math.sqrt(ha * ha - h * h);
+            steps.push(step("Grundkante", "Nach dem Satz des Pythagoras, umgestellt nach a:", `a = 2 · ${sqrt('ha² − h²')} = 2 · ${sqrt(`${formatNum(ha)}² − ${formatNum(h)}²`)} = ${formatNum(a)}`));
+            break;
+
+        case 'h,V':
+            h = v.h; a = Math.sqrt(3 * v.V / h); ha = Math.sqrt(h * h + (a / 2) * (a / 2));
+            steps.push(step("Grundkante aus dem Volumen", "Das Volumen ist V = (1/3) · a² · h, umgestellt nach a:", `a = ${sqrt(frac('3V', 'h'))} = ${sqrt(frac(`3 · ${formatNum(v.V)}`, formatNum(h)))} = ${formatNum(a)}`));
+            steps.push(step("Seitenhöhe", "Nach dem Satz des Pythagoras:", `ha = ${sqrt(`h² + (${frac('a', '2')})²`)} = ${formatNum(ha)}`));
+            break;
+
+        case 'h,O': {
+            h = v.h;
+            a = v.O / Math.sqrt(2 * v.O + 4 * h * h);
+            ha = Math.sqrt(h * h + (a / 2) * (a / 2));
+            steps.push(step("Grundkante aus der Oberfläche", "Aus O = a² + 2a · ha und ha = √(h²+(a/2)²) ergibt sich nach Quadrieren und Umstellen:", `a = ${frac('O', sqrt('2O + 4h²'))} = ${frac(formatNum(v.O), sqrt(`2 · ${formatNum(v.O)} + 4 · ${formatNum(h)}²`))} = ${formatNum(a)}`));
+            steps.push(step("Seitenhöhe", "Nach dem Satz des Pythagoras:", `ha = ${sqrt(`h² + (${frac('a', '2')})²`)} = ${formatNum(ha)}`));
+            break;
+        }
+
+        case 'h,M': {
+            h = v.h;
+            const u = -2 * h * h + Math.sqrt(4 * Math.pow(h, 4) + v.M * v.M);
+            a = Math.sqrt(u);
+            ha = Math.sqrt(h * h + (a / 2) * (a / 2));
+            steps.push(step("Grundkante aus der Mantelfläche", "Aus M = 2a · ha und ha = √(h²+(a/2)²) ergibt sich mit x = a² eine quadratische Gleichung:", `x² + 4h² · x − M² = 0\nx = a² = ${formatNum(u)}\na = √x = ${formatNum(a)}`));
+            steps.push(step("Seitenhöhe", "Nach dem Satz des Pythagoras:", `ha = ${sqrt(`h² + (${frac('a', '2')})²`)} = ${formatNum(ha)}`));
+            break;
+        }
+
+        case 'ha,O':
+            ha = v.ha; a = -ha + Math.sqrt(ha * ha + v.O);
+            if (a <= 0) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            h = Math.sqrt(ha * ha - (a / 2) * (a / 2));
+            steps.push(step("Grundkante aus der Oberfläche", "Aus O = a² + 2ha · a ergibt sich eine quadratische Gleichung für a:", `a² + 2ha · a − O = 0\na = −ha + ${sqrt('ha² + O')} = ${formatNum(a)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt(`ha² − (${frac('a', '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'ha,M':
+            ha = v.ha; a = v.M / (2 * ha);
+            if (ha <= a / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            h = Math.sqrt(ha * ha - (a / 2) * (a / 2));
+            steps.push(step("Grundkante aus der Mantelfläche", "Die Mantelfläche ist M = 2a · ha, umgestellt nach a:", `a = ${frac('M', '2 · ha')} = ${frac(formatNum(v.M), `2 · ${formatNum(ha)}`)} = ${formatNum(a)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt(`ha² − (${frac('a', '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'O,M':
+            a = Math.sqrt(v.O - v.M);
+            if (a <= 0) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            ha = v.M / (2 * a);
+            h = Math.sqrt(ha * ha - (a / 2) * (a / 2));
+            steps.push(step("Grundkante", "Da O = a² + M ist, ergibt sich nach a umgestellt:", `a = ${sqrt('O − M')} = ${sqrt(`${formatNum(v.O)} − ${formatNum(v.M)}`)} = ${formatNum(a)}`));
+            steps.push(step("Seitenhöhe aus der Mantelfläche", "Die Mantelfläche ist M = 2a · ha, umgestellt nach ha:", `ha = ${frac('M', '2a')} = ${formatNum(ha)}`));
+            steps.push(step("Höhe", "Nach dem Satz des Pythagoras:", `h = ${sqrt(`ha² − (${frac('a', '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    const G = a * a, M = 2 * a * ha, O = G + M, V = (1 / 3) * G * h;
+
+    if (!('G' in given)) steps.push(step("Grundfläche", "Grundkante im Quadrat:", `G = a² = ${formatNum(a)}² = ${formatNum(G)}`));
+    if (!('M' in given)) steps.push(step("Mantelfläche", "Vier gleichschenklige Dreiecke:", `M = 2a · ha = 2 · ${formatNum(a)} · ${formatNum(ha)} = ${formatNum(M)}`));
+    if (!('O' in given)) steps.push(step("Oberfläche", "Grundfläche plus Mantelfläche:", `O = G + M = ${formatNum(G)} + ${formatNum(M)} = ${formatNum(O)}`));
+    if (!('V' in given)) steps.push(step("Volumen", "Ein Drittel der Grundfläche mal Höhe:", `V = ${frac('1', '3')} · G · h = ${frac('1', '3')} · ${formatNum(G)} · ${formatNum(h)} = ${formatNum(V)}`));
+
+    return { values: { a, h, ha, V, O, M, G }, steps: [...preSteps, ...steps] };
+}
+
+function resolveRectPyramid(given) {
+    const order = ['a', 'b', 'h', 'ha', 'hb', 'V', 'G', 'O', 'M'];
+    const ids = Object.keys(given).filter(id => order.includes(id)).sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const key = ids.join(',');
+    const v = given;
+    const steps = [];
+    let a, b, h;
+
+    switch (key) {
+        case 'a,b,h':
+            a = v.a; b = v.b; h = v.h;
+            steps.push(step("Grundkanten und Höhe", "Alle drei Werte sind bereits gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, h = ${formatNum(h)}`, null, true));
+            break;
+
+        case 'a,b,V':
+            a = v.a; b = v.b; h = 3 * v.V / (a * b);
+            steps.push(step("Grundkanten und Volumen", "Beide Grundkanten sowie das Volumen sind gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Höhe", "Das Volumen ist V = (1/3) · a · b · h, umgestellt nach h:", `h = ${frac('3V', 'a · b')} = ${frac(`3 · ${formatNum(v.V)}`, `${formatNum(a)} · ${formatNum(b)}`)} = ${formatNum(h)}`));
+            break;
+
+        case 'a,b,ha':
+            a = v.a; b = v.b;
+            if (v.ha <= b / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            h = Math.sqrt(v.ha * v.ha - (b / 2) * (b / 2));
+            steps.push(step("Grundkanten und Seitenhöhe ha", "a, b sowie die Seitenhöhe ha (der Seitenfläche über a) sind gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, ha = ${formatNum(v.ha)}`, null, true));
+            steps.push(step("Höhe", "ha = √(h² + (b/2)²), umgestellt nach h:", `h = ${sqrt(`ha² − (${frac('b', '2')})²`)} = ${sqrt(`${formatNum(v.ha)}² − (${frac(formatNum(b), '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'a,b,hb':
+            a = v.a; b = v.b;
+            if (v.hb <= a / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            h = Math.sqrt(v.hb * v.hb - (a / 2) * (a / 2));
+            steps.push(step("Grundkanten und Seitenhöhe hb", "a, b sowie die Seitenhöhe hb (der Seitenfläche über b) sind gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, hb = ${formatNum(v.hb)}`, null, true));
+            steps.push(step("Höhe", "hb = √(h² + (a/2)²), umgestellt nach h:", `h = ${sqrt(`hb² − (${frac('a', '2')})²`)} = ${sqrt(`${formatNum(v.hb)}² − (${frac(formatNum(a), '2')})²`)} = ${formatNum(h)}`));
+            break;
+
+        case 'a,h,V':
+            a = v.a; h = v.h; b = 3 * v.V / (a * h);
+            steps.push(step("Grundkante a, Höhe und Volumen", "a, h sowie das Volumen sind gegeben.", `a = ${formatNum(a)}, h = ${formatNum(h)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Grundkante b", "Das Volumen ist V = (1/3) · a · b · h, umgestellt nach b:", `b = ${frac('3V', 'a · h')} = ${frac(`3 · ${formatNum(v.V)}`, `${formatNum(a)} · ${formatNum(h)}`)} = ${formatNum(b)}`));
+            break;
+
+        case 'a,h,G':
+            a = v.a; h = v.h; b = v.G / a;
+            steps.push(step("Grundkante a, Höhe und Grundfläche", "a, h sowie die Grundfläche sind gegeben.", `a = ${formatNum(a)}, h = ${formatNum(h)}, G = ${formatNum(v.G)}`, null, true));
+            steps.push(step("Grundkante b", "Die Grundfläche ist G = a · b, umgestellt nach b:", `b = ${frac('G', 'a')} = ${frac(formatNum(v.G), formatNum(a))} = ${formatNum(b)}`));
+            break;
+
+        case 'a,h,ha':
+            a = v.a; h = v.h;
+            if (v.ha <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            b = 2 * Math.sqrt(v.ha * v.ha - h * h);
+            steps.push(step("Grundkante a, Höhe und Seitenhöhe ha", "a, h sowie ha (Seitenhöhe der Fläche über a) sind gegeben.", `a = ${formatNum(a)}, h = ${formatNum(h)}, ha = ${formatNum(v.ha)}`, null, true));
+            steps.push(step("Grundkante b", "ha = √(h² + (b/2)²), umgestellt nach b:", `b = 2 · ${sqrt('ha² − h²')} = 2 · ${sqrt(`${formatNum(v.ha)}² − ${formatNum(h)}²`)} = ${formatNum(b)}`));
+            break;
+
+        case 'b,h,V':
+            b = v.b; h = v.h; a = 3 * v.V / (b * h);
+            steps.push(step("Grundkante b, Höhe und Volumen", "b, h sowie das Volumen sind gegeben.", `b = ${formatNum(b)}, h = ${formatNum(h)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Grundkante a", "Das Volumen ist V = (1/3) · a · b · h, umgestellt nach a:", `a = ${frac('3V', 'b · h')} = ${frac(`3 · ${formatNum(v.V)}`, `${formatNum(b)} · ${formatNum(h)}`)} = ${formatNum(a)}`));
+            break;
+
+        case 'b,h,G':
+            b = v.b; h = v.h; a = v.G / b;
+            steps.push(step("Grundkante b, Höhe und Grundfläche", "b, h sowie die Grundfläche sind gegeben.", `b = ${formatNum(b)}, h = ${formatNum(h)}, G = ${formatNum(v.G)}`, null, true));
+            steps.push(step("Grundkante a", "Die Grundfläche ist G = a · b, umgestellt nach a:", `a = ${frac('G', 'b')} = ${frac(formatNum(v.G), formatNum(b))} = ${formatNum(a)}`));
+            break;
+
+        case 'b,h,hb':
+            b = v.b; h = v.h;
+            if (v.hb <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            a = 2 * Math.sqrt(v.hb * v.hb - h * h);
+            steps.push(step("Grundkante b, Höhe und Seitenhöhe hb", "b, h sowie hb (Seitenhöhe der Fläche über b) sind gegeben.", `b = ${formatNum(b)}, h = ${formatNum(h)}, hb = ${formatNum(v.hb)}`, null, true));
+            steps.push(step("Grundkante a", "hb = √(h² + (a/2)²), umgestellt nach a:", `a = 2 · ${sqrt('hb² − h²')} = 2 · ${sqrt(`${formatNum(v.hb)}² − ${formatNum(h)}²`)} = ${formatNum(a)}`));
+            break;
+
+        case 'h,ha,hb': {
+            h = v.h;
+            if (v.ha <= h || v.hb <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide – beide Seitenhöhen müssen größer als die Höhe sein." };
+            b = 2 * Math.sqrt(v.ha * v.ha - h * h);
+            a = 2 * Math.sqrt(v.hb * v.hb - h * h);
+            steps.push(step("Höhe und beide Seitenhöhen", "Die Höhe h sowie die Seitenhöhen ha und hb sind gegeben.", `h = ${formatNum(h)}, ha = ${formatNum(v.ha)}, hb = ${formatNum(v.hb)}`, null, true));
+            steps.push(step("Grundkante b", "Aus ha = √(h² + (b/2)²), umgestellt nach b:", `b = 2 · ${sqrt('ha² − h²')} = 2 · ${sqrt(`${formatNum(v.ha)}² − ${formatNum(h)}²`)} = ${formatNum(b)}`));
+            steps.push(step("Grundkante a", "Aus hb = √(h² + (a/2)²), umgestellt nach a:", `a = 2 · ${sqrt('hb² − h²')} = 2 · ${sqrt(`${formatNum(v.hb)}² − ${formatNum(h)}²`)} = ${formatNum(a)}`));
+            break;
+        }
+
+        case 'a,ha,hb': {
+            a = v.a;
+            if (v.hb <= a / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide – die Seitenhöhe hb ist zu klein für diese Grundkante." };
+            h = Math.sqrt(v.hb * v.hb - (a / 2) * (a / 2));
+            if (v.ha <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            b = 2 * Math.sqrt(v.ha * v.ha - h * h);
+            steps.push(step("Grundkante a und beide Seitenhöhen", "Die Grundkante a sowie die Seitenhöhen ha und hb sind gegeben.", `a = ${formatNum(a)}, ha = ${formatNum(v.ha)}, hb = ${formatNum(v.hb)}`, null, true));
+            steps.push(step("Höhe", "Aus hb = √(h² + (a/2)²), umgestellt nach h:", `h = ${sqrt(`hb² − (${frac('a', '2')})²`)} = ${sqrt(`${formatNum(v.hb)}² − (${frac(formatNum(a), '2')})²`)} = ${formatNum(h)}`));
+            steps.push(step("Grundkante b", "Aus ha = √(h² + (b/2)²), umgestellt nach b:", `b = 2 · ${sqrt('ha² − h²')} = ${formatNum(b)}`));
+            break;
+        }
+
+        case 'b,ha,hb': {
+            b = v.b;
+            if (v.ha <= b / 2) return { error: "Diese Kombination ergibt keine gültige Pyramide – die Seitenhöhe ha ist zu klein für diese Grundkante." };
+            h = Math.sqrt(v.ha * v.ha - (b / 2) * (b / 2));
+            if (v.hb <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            a = 2 * Math.sqrt(v.hb * v.hb - h * h);
+            steps.push(step("Grundkante b und beide Seitenhöhen", "Die Grundkante b sowie die Seitenhöhen ha und hb sind gegeben.", `b = ${formatNum(b)}, ha = ${formatNum(v.ha)}, hb = ${formatNum(v.hb)}`, null, true));
+            steps.push(step("Höhe", "Aus ha = √(h² + (b/2)²), umgestellt nach h:", `h = ${sqrt(`ha² − (${frac('b', '2')})²`)} = ${sqrt(`${formatNum(v.ha)}² − (${frac(formatNum(b), '2')})²`)} = ${formatNum(h)}`));
+            steps.push(step("Grundkante a", "Aus hb = √(h² + (a/2)²), umgestellt nach a:", `a = 2 · ${sqrt('hb² − h²')} = ${formatNum(a)}`));
+            break;
+        }
+
+        case 'h,ha,V':
+            h = v.h;
+            if (v.ha <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            b = 2 * Math.sqrt(v.ha * v.ha - h * h);
+            a = 3 * v.V / (b * h);
+            steps.push(step("Höhe, Seitenhöhe ha und Volumen", "h, ha sowie das Volumen sind gegeben.", `h = ${formatNum(h)}, ha = ${formatNum(v.ha)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Grundkante b", "Aus ha = √(h² + (b/2)²), umgestellt nach b:", `b = 2 · ${sqrt('ha² − h²')} = ${formatNum(b)}`));
+            steps.push(step("Grundkante a", "Das Volumen ist V = (1/3) · a · b · h, umgestellt nach a:", `a = ${frac('3V', 'b · h')} = ${frac(`3 · ${formatNum(v.V)}`, `${formatNum(b)} · ${formatNum(h)}`)} = ${formatNum(a)}`));
+            break;
+
+        case 'h,hb,V':
+            h = v.h;
+            if (v.hb <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            a = 2 * Math.sqrt(v.hb * v.hb - h * h);
+            b = 3 * v.V / (a * h);
+            steps.push(step("Höhe, Seitenhöhe hb und Volumen", "h, hb sowie das Volumen sind gegeben.", `h = ${formatNum(h)}, hb = ${formatNum(v.hb)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Grundkante a", "Aus hb = √(h² + (a/2)²), umgestellt nach a:", `a = 2 · ${sqrt('hb² − h²')} = ${formatNum(a)}`));
+            steps.push(step("Grundkante b", "Das Volumen ist V = (1/3) · a · b · h, umgestellt nach b:", `b = ${frac('3V', 'a · h')} = ${frac(`3 · ${formatNum(v.V)}`, `${formatNum(a)} · ${formatNum(h)}`)} = ${formatNum(b)}`));
+            break;
+
+        case 'h,ha,G':
+            h = v.h;
+            if (v.ha <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            b = 2 * Math.sqrt(v.ha * v.ha - h * h);
+            a = v.G / b;
+            steps.push(step("Höhe, Seitenhöhe ha und Grundfläche", "h, ha sowie die Grundfläche sind gegeben.", `h = ${formatNum(h)}, ha = ${formatNum(v.ha)}, G = ${formatNum(v.G)}`, null, true));
+            steps.push(step("Grundkante b", "Aus ha = √(h² + (b/2)²), umgestellt nach b:", `b = 2 · ${sqrt('ha² − h²')} = ${formatNum(b)}`));
+            steps.push(step("Grundkante a", "Die Grundfläche ist G = a · b, umgestellt nach a:", `a = ${frac('G', 'b')} = ${frac(formatNum(v.G), formatNum(b))} = ${formatNum(a)}`));
+            break;
+
+        case 'h,hb,G':
+            h = v.h;
+            if (v.hb <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            a = 2 * Math.sqrt(v.hb * v.hb - h * h);
+            b = v.G / a;
+            steps.push(step("Höhe, Seitenhöhe hb und Grundfläche", "h, hb sowie die Grundfläche sind gegeben.", `h = ${formatNum(h)}, hb = ${formatNum(v.hb)}, G = ${formatNum(v.G)}`, null, true));
+            steps.push(step("Grundkante a", "Aus hb = √(h² + (a/2)²), umgestellt nach a:", `a = 2 · ${sqrt('hb² − h²')} = ${formatNum(a)}`));
+            steps.push(step("Grundkante b", "Die Grundfläche ist G = a · b, umgestellt nach b:", `b = ${frac('G', 'a')} = ${frac(formatNum(v.G), formatNum(a))} = ${formatNum(b)}`));
+            break;
+
+        case 'h,ha,M': {
+            h = v.h;
+            if (v.ha <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            b = 2 * Math.sqrt(v.ha * v.ha - h * h);
+            // Quadratische Gleichung für a (aus M = a·ha + b·√(h²+(a/2)²) nach Quadrieren).
+            // Beide möglichen Lösungen werden gegen die ursprüngliche Gleichung geprüft,
+            // um die durchs Quadrieren entstandene Scheinlösung sicher auszuschließen.
+            const discRoot = b * Math.sqrt(v.M * v.M + 4 * Math.pow(h, 4));
+            const candidates = [(2 * v.M * v.ha + discRoot) / (2 * h * h), (2 * v.M * v.ha - discRoot) / (2 * h * h)];
+            const valid = candidates.find(cand => {
+                if (cand <= 0) return false;
+                const hbCheck = Math.sqrt(h * h + (cand / 2) * (cand / 2));
+                return Math.abs(cand * v.ha + b * hbCheck - v.M) < 1e-6 * v.M;
+            });
+            if (valid === undefined) return { error: "Diese Kombination ergibt keine gültige Pyramide – die Werte passen nicht zusammen." };
+            a = valid;
+            steps.push(step("Höhe, Seitenhöhe ha und Mantelfläche", "h, ha sowie die Mantelfläche sind gegeben.", `h = ${formatNum(h)}, ha = ${formatNum(v.ha)}, M = ${formatNum(v.M)}`, null, true));
+            steps.push(step("Grundkante b", "Aus ha = √(h² + (b/2)²), umgestellt nach b:", `b = 2 · ${sqrt('ha² − h²')} = ${formatNum(b)}`));
+            steps.push(step("Grundkante a", "Aus M = a · ha + b · √(h² + (a/2)²) ergibt sich nach Quadrieren eine quadratische Gleichung für a:", `h² · a² − 2M·ha · a + (M² − b²h²) = 0\na = ${formatNum(a)}`));
+            break;
+        }
+
+        case 'h,hb,M': {
+            h = v.h;
+            if (v.hb <= h) return { error: "Diese Kombination ergibt keine gültige Pyramide." };
+            a = 2 * Math.sqrt(v.hb * v.hb - h * h);
+            const discRoot = a * Math.sqrt(v.M * v.M + 4 * Math.pow(h, 4));
+            const candidates = [(2 * v.M * v.hb + discRoot) / (2 * h * h), (2 * v.M * v.hb - discRoot) / (2 * h * h)];
+            const valid = candidates.find(cand => {
+                if (cand <= 0) return false;
+                const haCheck = Math.sqrt(h * h + (cand / 2) * (cand / 2));
+                return Math.abs(a * haCheck + cand * v.hb - v.M) < 1e-6 * v.M;
+            });
+            if (valid === undefined) return { error: "Diese Kombination ergibt keine gültige Pyramide – die Werte passen nicht zusammen." };
+            b = valid;
+            steps.push(step("Höhe, Seitenhöhe hb und Mantelfläche", "h, hb sowie die Mantelfläche sind gegeben.", `h = ${formatNum(h)}, hb = ${formatNum(v.hb)}, M = ${formatNum(v.M)}`, null, true));
+            steps.push(step("Grundkante a", "Aus hb = √(h² + (a/2)²), umgestellt nach a:", `a = 2 · ${sqrt('hb² − h²')} = ${formatNum(a)}`));
+            steps.push(step("Grundkante b", "Aus M = a · √(h² + (b/2)²) + b · hb ergibt sich nach Quadrieren eine quadratische Gleichung für b:", `h² · b² − 2M·hb · b + (M² − a²h²) = 0\nb = ${formatNum(b)}`));
+            break;
+        }
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    const ha = Math.sqrt(h * h + (b / 2) * (b / 2));
+    const hb = Math.sqrt(h * h + (a / 2) * (a / 2));
+    const G = a * b, M = a * ha + b * hb, O = G + M, V = (1 / 3) * G * h;
+
+    if (!ids.includes('ha')) steps.push(step("Seitenhöhe ha", "Höhe der Seitenfläche über der Grundkante a:", `ha = ${sqrt(`h² + (${frac('b', '2')})²`)} = ${formatNum(ha)}`));
+    if (!ids.includes('hb')) steps.push(step("Seitenhöhe hb", "Höhe der Seitenfläche über der Grundkante b:", `hb = ${sqrt(`h² + (${frac('a', '2')})²`)} = ${formatNum(hb)}`));
+    if (!ids.includes('G')) steps.push(step("Grundfläche", "Länge mal Breite:", `G = a · b = ${formatNum(a)} · ${formatNum(b)} = ${formatNum(G)}`));
+    steps.push(step("Mantelfläche", "Zwei Paare gleichschenkliger Dreiecke:", `M = a · ha + b · hb = ${formatNum(a)} · ${formatNum(ha)} + ${formatNum(b)} · ${formatNum(hb)} = ${formatNum(M)}`));
+    steps.push(step("Oberfläche", "Grundfläche plus Mantelfläche:", `O = G + M = ${formatNum(G)} + ${formatNum(M)} = ${formatNum(O)}`));
+    if (!ids.includes('V')) steps.push(step("Volumen", "Ein Drittel der Grundfläche mal Höhe:", `V = ${frac('1', '3')} · G · h = ${formatNum(V)}`));
+
+    return { values: { a, b, h, ha, hb, V, O, M, G }, steps };
+}
+
+function resolveCuboid(given) {
+    const order = ['a', 'b', 'c', 'V', 'O', 'd', 'G'];
+    const ids = Object.keys(given).filter(id => order.includes(id)).sort((x, y) => order.indexOf(x) - order.indexOf(y));
+    const key = ids.join(',');
+    const v = given;
+    const steps = [];
+    let a, b, c;
+
+    switch (key) {
+        case 'a,b,c':
+            a = v.a; b = v.b; c = v.c;
+            steps.push(step("Kanten", "Alle drei Kantenlängen sind bereits gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, c = ${formatNum(c)}`, null, true));
+            break;
+
+        case 'a,b,V':
+            a = v.a; b = v.b; c = v.V / (a * b);
+            steps.push(step("Kanten a, b und Volumen", "a, b sowie das Volumen sind gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Kante c", "Das Volumen ist V = a · b · c, umgestellt nach c:", `c = ${frac('V', 'a · b')} = ${frac(formatNum(v.V), `${formatNum(a)} · ${formatNum(b)}`)} = ${formatNum(c)}`));
+            break;
+
+        case 'a,b,O':
+            a = v.a; b = v.b; c = (v.O - 2 * a * b) / (2 * (a + b));
+            if (c <= 0) return { error: "Diese Kombination ergibt keinen gültigen Quader." };
+            steps.push(step("Kanten a, b und Oberfläche", "a, b sowie die Oberfläche sind gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, O = ${formatNum(v.O)}`, null, true));
+            steps.push(step("Kante c", "Die Oberfläche ist O = 2(ab + ac + bc), umgestellt nach c:", `c = ${frac('O − 2ab', '2(a + b)')} = ${frac(`${formatNum(v.O)} − 2 · ${formatNum(a)} · ${formatNum(b)}`, `2 · (${formatNum(a)} + ${formatNum(b)})`)} = ${formatNum(c)}`));
+            break;
+
+        case 'a,b,d':
+            a = v.a; b = v.b;
+            if (v.d * v.d <= a * a + b * b) return { error: "Diese Kombination ergibt keinen gültigen Quader – die Raumdiagonale ist zu kurz." };
+            c = Math.sqrt(v.d * v.d - a * a - b * b);
+            steps.push(step("Kanten a, b und Raumdiagonale", "a, b sowie die Raumdiagonale sind gegeben.", `a = ${formatNum(a)}, b = ${formatNum(b)}, d = ${formatNum(v.d)}`, null, true));
+            steps.push(step("Kante c", "Nach dem räumlichen Satz des Pythagoras d² = a² + b² + c², umgestellt nach c:", `c = ${sqrt('d² − a² − b²')} = ${sqrt(`${formatNum(v.d)}² − ${formatNum(a)}² − ${formatNum(b)}²`)} = ${formatNum(c)}`));
+            break;
+
+        case 'a,c,V':
+            a = v.a; c = v.c; b = v.V / (a * c);
+            steps.push(step("Kanten a, c und Volumen", "a, c sowie das Volumen sind gegeben.", `a = ${formatNum(a)}, c = ${formatNum(c)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Kante b", "Das Volumen ist V = a · b · c, umgestellt nach b:", `b = ${frac('V', 'a · c')} = ${frac(formatNum(v.V), `${formatNum(a)} · ${formatNum(c)}`)} = ${formatNum(b)}`));
+            break;
+
+        case 'a,c,O':
+            a = v.a; c = v.c; b = (v.O - 2 * a * c) / (2 * (a + c));
+            if (b <= 0) return { error: "Diese Kombination ergibt keinen gültigen Quader." };
+            steps.push(step("Kanten a, c und Oberfläche", "a, c sowie die Oberfläche sind gegeben.", `a = ${formatNum(a)}, c = ${formatNum(c)}, O = ${formatNum(v.O)}`, null, true));
+            steps.push(step("Kante b", "Die Oberfläche ist O = 2(ab + ac + bc), umgestellt nach b:", `b = ${frac('O − 2ac', '2(a + c)')} = ${frac(`${formatNum(v.O)} − 2 · ${formatNum(a)} · ${formatNum(c)}`, `2 · (${formatNum(a)} + ${formatNum(c)})`)} = ${formatNum(b)}`));
+            break;
+
+        case 'a,c,d':
+            a = v.a; c = v.c;
+            if (v.d * v.d <= a * a + c * c) return { error: "Diese Kombination ergibt keinen gültigen Quader – die Raumdiagonale ist zu kurz." };
+            b = Math.sqrt(v.d * v.d - a * a - c * c);
+            steps.push(step("Kanten a, c und Raumdiagonale", "a, c sowie die Raumdiagonale sind gegeben.", `a = ${formatNum(a)}, c = ${formatNum(c)}, d = ${formatNum(v.d)}`, null, true));
+            steps.push(step("Kante b", "Nach dem räumlichen Satz des Pythagoras, umgestellt nach b:", `b = ${sqrt('d² − a² − c²')} = ${sqrt(`${formatNum(v.d)}² − ${formatNum(a)}² − ${formatNum(c)}²`)} = ${formatNum(b)}`));
+            break;
+
+        case 'a,c,G':
+            a = v.a; c = v.c; b = v.G / a;
+            steps.push(step("Kante a, c und Grundfläche", "a, c sowie die Grundfläche sind gegeben.", `a = ${formatNum(a)}, c = ${formatNum(c)}, G = ${formatNum(v.G)}`, null, true));
+            steps.push(step("Kante b", "Die Grundfläche ist G = a · b, umgestellt nach b:", `b = ${frac('G', 'a')} = ${frac(formatNum(v.G), formatNum(a))} = ${formatNum(b)}`));
+            break;
+
+        case 'b,c,V':
+            b = v.b; c = v.c; a = v.V / (b * c);
+            steps.push(step("Kanten b, c und Volumen", "b, c sowie das Volumen sind gegeben.", `b = ${formatNum(b)}, c = ${formatNum(c)}, V = ${formatNum(v.V)}`, null, true));
+            steps.push(step("Kante a", "Das Volumen ist V = a · b · c, umgestellt nach a:", `a = ${frac('V', 'b · c')} = ${frac(formatNum(v.V), `${formatNum(b)} · ${formatNum(c)}`)} = ${formatNum(a)}`));
+            break;
+
+        case 'b,c,O':
+            b = v.b; c = v.c; a = (v.O - 2 * b * c) / (2 * (b + c));
+            if (a <= 0) return { error: "Diese Kombination ergibt keinen gültigen Quader." };
+            steps.push(step("Kanten b, c und Oberfläche", "b, c sowie die Oberfläche sind gegeben.", `b = ${formatNum(b)}, c = ${formatNum(c)}, O = ${formatNum(v.O)}`, null, true));
+            steps.push(step("Kante a", "Die Oberfläche ist O = 2(ab + ac + bc), umgestellt nach a:", `a = ${frac('O − 2bc', '2(b + c)')} = ${frac(`${formatNum(v.O)} − 2 · ${formatNum(b)} · ${formatNum(c)}`, `2 · (${formatNum(b)} + ${formatNum(c)})`)} = ${formatNum(a)}`));
+            break;
+
+        case 'b,c,d':
+            b = v.b; c = v.c;
+            if (v.d * v.d <= b * b + c * c) return { error: "Diese Kombination ergibt keinen gültigen Quader – die Raumdiagonale ist zu kurz." };
+            a = Math.sqrt(v.d * v.d - b * b - c * c);
+            steps.push(step("Kanten b, c und Raumdiagonale", "b, c sowie die Raumdiagonale sind gegeben.", `b = ${formatNum(b)}, c = ${formatNum(c)}, d = ${formatNum(v.d)}`, null, true));
+            steps.push(step("Kante a", "Nach dem räumlichen Satz des Pythagoras, umgestellt nach a:", `a = ${sqrt('d² − b² − c²')} = ${sqrt(`${formatNum(v.d)}² − ${formatNum(b)}² − ${formatNum(c)}²`)} = ${formatNum(a)}`));
+            break;
+
+        case 'b,c,G':
+            b = v.b; c = v.c; a = v.G / b;
+            steps.push(step("Kanten b, c und Grundfläche", "b, c sowie die Grundfläche sind gegeben.", `b = ${formatNum(b)}, c = ${formatNum(c)}, G = ${formatNum(v.G)}`, null, true));
+            steps.push(step("Kante a", "Die Grundfläche ist G = a · b, umgestellt nach a:", `a = ${frac('G', 'b')} = ${frac(formatNum(v.G), formatNum(b))} = ${formatNum(a)}`));
+            break;
+
+        // ── Nur eine Kante direkt gegeben + zwei abgeleitete Größen ─────────
+        case 'a,V,O': case 'b,V,O': case 'c,V,O':
+        case 'a,V,d': case 'b,V,d': case 'c,V,d':
+        case 'a,O,d': case 'b,O,d': case 'c,O,d': {
+            const edgeId = ids[0]; // a, b oder c – steht durch die Sortierung immer zuerst
+            const [otherX, otherY] = ['a', 'b', 'c'].filter(id => id !== edgeId);
+            const known = v[edgeId];
+            const pairKey = ids.slice(1).join(',');
+
+            let s, p, extraSteps;
+
+            if (pairKey === 'V,O') {
+                p = v.V / known;
+                s = (v.O / 2 - p) / known;
+                extraSteps = [
+                    step(`Produkt von ${otherX} und ${otherY}`, `Aus dem Volumen V = ${edgeId} · ${otherX} · ${otherY} folgt:`,
+                        `${otherX} · ${otherY} = ${frac('V', edgeId)} = ${frac(formatNum(v.V), formatNum(known))} = ${formatNum(p)}`),
+                    step(`Summe von ${otherX} und ${otherY}`, `Aus der Oberfläche O = 2 · (${edgeId}·${otherX} + ${edgeId}·${otherY} + ${otherX}·${otherY}) folgt:`,
+                        `${otherX} + ${otherY} = ${frac(`O/2 − ${otherX}·${otherY}`, edgeId)} = ${frac(`${formatNum(v.O)}/2 − ${formatNum(p)}`, formatNum(known))} = ${formatNum(s)}`)
+                ];
+            } else if (pairKey === 'V,d') {
+                p = v.V / known;
+                const q = v.d * v.d - known * known;
+                if (q < 2 * p) return { error: "Diese Kombination ergibt keinen gültigen Quader." };
+                s = Math.sqrt(q + 2 * p);
+                extraSteps = [
+                    step(`Produkt von ${otherX} und ${otherY}`, `Aus dem Volumen folgt:`,
+                        `${otherX} · ${otherY} = ${frac('V', edgeId)} = ${formatNum(p)}`),
+                    step(`Summe von ${otherX} und ${otherY}`, `Aus d² = ${edgeId}² + ${otherX}² + ${otherY}² und (${otherX}+${otherY})² = ${otherX}² + ${otherY}² + 2·${otherX}${otherY} folgt:`,
+                        `${otherX} + ${otherY} = ${sqrt(`(d² − ${edgeId}²) + 2 · ${otherX}·${otherY}`)} = ${formatNum(s)}`)
+                ];
+            } else { // 'O,d'
+                const sumSq = v.O + v.d * v.d;
+                if (sumSq < known * known) return { error: "Diese Kombination ergibt keinen gültigen Quader." };
+                s = -known + Math.sqrt(sumSq);
+                if (s <= 0) return { error: "Diese Kombination ergibt keinen gültigen Quader." };
+                p = v.O / 2 - known * s;
+                extraSteps = [
+                    step(`Summe von ${otherX} und ${otherY}`, `Kombiniert man O = 2 · (${edgeId}·(${otherX}+${otherY}) + ${otherX}·${otherY}) mit d² = ${edgeId}² + ${otherX}² + ${otherY}², ergibt sich:`,
+                        `${otherX} + ${otherY} = −${edgeId} + ${sqrt('O + d²')} = −${formatNum(known)} + ${sqrt(`${formatNum(v.O)} + ${formatNum(v.d)}²`)} = ${formatNum(s)}`),
+                    step(`Produkt von ${otherX} und ${otherY}`, `Aus der Oberflächenformel folgt:`,
+                        `${otherX} · ${otherY} = ${frac('O', '2')} − ${edgeId} · (${otherX}+${otherY}) = ${frac(formatNum(v.O), '2')} − ${formatNum(known)} · ${formatNum(s)} = ${formatNum(p)}`)
+                ];
+            }
+
+            const roots = solveSumProduct(s, p);
+            if (!roots) return { error: "Diese Kombination ergibt keinen gültigen Quader – die Werte passen nicht zusammen." };
+
+            const resultMap = { [edgeId]: known, [otherX]: roots[0], [otherY]: roots[1] };
+            a = resultMap.a; b = resultMap.b; c = resultMap.c;
+
+            steps.push(step(`Kante ${edgeId} und zwei abgeleitete Größen`, "Diese Werte sind bereits gegeben.",
+                ids.map(id => `${id} = ${formatNum(v[id])}`).join(',  '), null, true));
+            steps.push(...extraSteps);
+            steps.push(step(`Kanten ${otherX} und ${otherY}`, `Sie sind die Lösungen von t² − (Summe) · t + (Produkt) = 0:`,
+                `t² − ${formatNum(s)} · t + ${formatNum(p)} = 0\n${otherX} = ${formatNum(roots[0])},  ${otherY} = ${formatNum(roots[1])}`));
+            break;
+        }
+
+        case 'V,O,G': {
+            const cKnown = v.V / v.G;
+            const s = (v.O / 2 - v.G) / cKnown;
+            const roots = solveSumProduct(s, v.G);
+            if (!roots) return { error: "Diese Kombination ergibt keinen gültigen Quader – die Werte passen nicht zusammen." };
+            a = roots[0]; b = roots[1]; c = cKnown;
+            steps.push(step("Grundfläche, Volumen und Oberfläche", "Diese Werte sind bereits gegeben.", `G = ${formatNum(v.G)}, V = ${formatNum(v.V)}, O = ${formatNum(v.O)}`, null, true));
+            steps.push(step("Kante c", "Das Volumen ist V = G · c, umgestellt nach c:", `c = ${frac('V', 'G')} = ${frac(formatNum(v.V), formatNum(v.G))} = ${formatNum(c)}`));
+            steps.push(step("Summe der Kanten a und b", "Aus der Oberfläche O = 2 · (G + c·(a+b)) folgt:", `a + b = ${frac('O/2 − G', 'c')} = ${frac(`${formatNum(v.O)}/2 − ${formatNum(v.G)}`, formatNum(c))} = ${formatNum(s)}`));
+            steps.push(step("Kanten a und b", "Sie sind die Lösungen von t² − (Summe) · t + G = 0 (die Grundfläche ist bereits ihr Produkt):", `t² − ${formatNum(s)} · t + ${formatNum(v.G)} = 0\na = ${formatNum(a)},  b = ${formatNum(b)}`));
+            break;
+        }
+
+        case 'V,d,G': {
+            const cKnown = v.V / v.G;
+            const q = v.d * v.d - cKnown * cKnown;
+            if (q < 2 * v.G) return { error: "Diese Kombination ergibt keinen gültigen Quader." };
+            const s = Math.sqrt(q + 2 * v.G);
+            const roots = solveSumProduct(s, v.G);
+            if (!roots) return { error: "Diese Kombination ergibt keinen gültigen Quader – die Werte passen nicht zusammen." };
+            a = roots[0]; b = roots[1]; c = cKnown;
+            steps.push(step("Grundfläche, Volumen und Raumdiagonale", "Diese Werte sind bereits gegeben.", `G = ${formatNum(v.G)}, V = ${formatNum(v.V)}, d = ${formatNum(v.d)}`, null, true));
+            steps.push(step("Kante c", "Das Volumen ist V = G · c, umgestellt nach c:", `c = ${frac('V', 'G')} = ${formatNum(c)}`));
+            steps.push(step("Summe der Kanten a und b", "Aus d² = a² + b² + c² und (a+b)² = a² + b² + 2G folgt:", `a + b = ${sqrt('(d² − c²) + 2G')} = ${sqrt(`(${formatNum(v.d)}² − ${formatNum(c)}²) + 2 · ${formatNum(v.G)}`)} = ${formatNum(s)}`));
+            steps.push(step("Kanten a und b", "Sie sind die Lösungen von t² − (Summe) · t + G = 0:", `t² − ${formatNum(s)} · t + ${formatNum(v.G)} = 0\na = ${formatNum(a)},  b = ${formatNum(b)}`));
+            break;
+        }
+
+        default:
+            return { error: "Diese Kombination wird aktuell nicht unterstützt." };
+    }
+
+    const G = a * b, V = a * b * c, O = 2 * (a * b + b * c + a * c), d = Math.sqrt(a * a + b * b + c * c);
+
+    if (!ids.includes('G')) steps.push(step("Grundfläche", "Länge mal Breite:", `G = a · b = ${formatNum(a)} · ${formatNum(b)} = ${formatNum(G)}`));
+    if (!ids.includes('V')) steps.push(step("Volumen", "Länge mal Breite mal Höhe:", `V = a · b · c = ${formatNum(a)} · ${formatNum(b)} · ${formatNum(c)} = ${formatNum(V)}`));
+    if (!ids.includes('O')) steps.push(step("Oberfläche", "Zweimal die Summe aller drei Seitenflächen:", `O = 2 · (ab + bc + ac) = ${formatNum(O)}`));
+    if (!ids.includes('d')) steps.push(step("Raumdiagonale", "Räumlicher Satz des Pythagoras:", `d = ${sqrt('a² + b² + c²')} = ${formatNum(d)}`));
+
+    return { values: { a, b, c, V, O, d, G }, steps };
+}
 const shapeResolvers = {
     circle: resolveCircle,
     square: resolveSquare,
     rectangle: resolveRectangle,
+    triangle: resolveTriangle,
     rightTriangle: resolveRightTriangle,
     trapezoid: resolveTrapezoid,
     parallelogram: resolveParallelogram,
-    rhombus: resolveRhombus
-    // triangle folgt als nächstes
+    rhombus: resolveRhombus,
+    cube: resolveCube,
+    sphere: resolveSphere,
+    cylinder: resolveCylinder,
+    cone: resolveCone,
+    quadrangularpyramid: resolveQuadPyramid,
+    rectangularpyramid: resolveRectPyramid,
+    cuboid: resolveCuboid
 };
 
 function renderRechenwegSteps(steps) {
@@ -1639,6 +2696,11 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalBtn.addEventListener('click', () => { settingsModal.classList.remove('show'); });
     window.addEventListener('click', (event) => {
         if (event.target === settingsModal) settingsModal.classList.remove('show');
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && settingsModal.classList.contains('show')) {
+            settingsModal.classList.remove('show');
+        }
     });
 
     saveSettingsBtn.addEventListener('click', () => {
