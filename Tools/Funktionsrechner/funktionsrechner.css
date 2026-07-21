@@ -19,8 +19,10 @@
     transition: all var(--transition-speed) ease;
 }
 
-.functionsContainer{
+.functionsContainer {
     width: 90%;
+    min-height: 35rem; /* Stellt sicher, dass er anfangs groß genug ist */
+    height: auto;      /* WICHTIG: Lässt den Container beim Ausklappen nach unten wachsen! */
     margin-top: 2rem;
 
     display: flex;
@@ -35,13 +37,37 @@
     flex-direction: column;
 }
 
-.secondNavList{
+/* Klasse, die beim Klick hinzugefügt wird */
+.topNavlistContainer.is-visible {
+    display: flex;
+}
+
+.secondNavList {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
 
+    /* Startzustand: Unsichtbar & Höhe 0 */
+    max-height: 0;
+    opacity: 0;
+    padding: 0;
+    overflow: hidden;
+    
+    /* Sanfter Übergang für das Aufklappen */
+    transition: max-height 0.35s ease-in-out, opacity 0.3s ease-in-out, padding 0.35s ease-in-out;
+}
+/* Zustand wenn AUSGEKLAPPT */
+.secondNavList.is-open {
+    max-height: 100px; /* Ausreichende Höhe für den Inhalt */
+    opacity: 1;
     padding: 0.5rem 0;
+}
+.detailsChevron {
+    transition: transform 0.35s ease;
+}
+#buttonForSecondNavList.is-open .detailsChevron {
+    transform: rotate(180deg);
 }
 
 #buttonForSecondNavList{
@@ -54,10 +80,13 @@
 
 
 
-.functionsMainContainer{
+.functionsMainContainer {
     display: flex;
     flex-direction: row;
+    align-items: stretch;
     width: 100%;
+    min-height: 35rem; 
+    flex: 1 0 auto;
 }
 
 .functionContainer{
@@ -66,6 +95,20 @@
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--border-color);
+}
+
+/* Fullscreen-Modus für den Container */
+.functionsContainer.is-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999; /* Schiebt das Element über alle anderen Inhalte */
+    margin: 0;
+    border-radius: 0;
+    background-color: var(--bg-surface, #ffffff); /* Verhindert Transparenz */
+    overflow-y: auto; /* Falls der Inhalt zu lang ist */
 }
 
 .addFunctionContainer{
@@ -96,8 +139,30 @@
 
 
 .cordSystemContainer{
+    position: relative;
     width: 65%;
-    height: 35rem;
+    display: flex;
+    flex: 1 1 auto;
+}
+
+.coord-btn {
+    position: absolute;
+    z-index: 10; /* Garantiert, dass die Buttons ÜBER dem Feld liegen */
+    cursor: pointer;
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.2rem 1.4rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    outline: none;
+    transition: all var(--transition-speed) ease;
+}
+
+.coord-btn:hover {
+    text-shadow: none;
 }
 
 
@@ -148,4 +213,335 @@
 
     width: 100%;
     background:transparent;
+}
+
+
+/* --- AKKORDEON AUSKLAPP-ANIMATION --- */
+#loesungOutput,
+#rechenwegOutput {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 1rem;
+    
+    /* Sanfter Übergang beim Aus- und Einklappen */
+    transition: max-height 0.35s ease-in-out, opacity 0.3s ease-in-out, padding 0.35s ease-in-out;
+}
+
+/* Zustand wenn AUSGEKLAPPT */
+#loesungOutput.is-open,
+#rechenwegOutput.is-open {
+    max-height: 500px; /* Genügend Platz für den Inhalt */
+    opacity: 1;
+    padding: 0.5rem 1rem;
+}
+
+/* Rechenweg-Container einblenden, wenn Ergebnisse aktiv sind */
+.rechenwegDiv.is-visible {
+    display: flex;
+}
+
+/* Pfeil-Rotation für beide Buttons */
+.loesungText.is-open .detailsChevron,
+.rechenwegText.is-open .detailsChevron {
+    transform: rotate(180deg);
+}
+
+
+
+/* --- MODAL OVERLAY (POPUP) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Dunkler, leicht transparenter Hintergrund */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    
+    /* Standardmäßig unsichtbar */
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Zustand wenn aktiv */
+.modal-overlay.is-visible {
+    display: flex;
+    pointer-events: auto;
+}
+
+/* Popup Box */
+.modal-content {
+    background-color: var(--bg-surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-main);
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-content h3 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.modal-content input {
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* Stile für dynamisch erstellte Funktions-Divs */
+.function-item {
+    color: var(--text-primary);
+    padding: 0.4rem 0.6rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.function-item math-field {
+    color: var(--text-primary) !important;
+}
+
+.function-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Styling für das Eingabefeld im Modal */
+#functionInput {
+    margin: 0;
+    width: 100%;
+    max-width: 500px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.4rem;
+    color: var(--text-primary);
+
+    /* Deine custom MathLive Styles */
+    --caret-color: var(--border-glow);
+    --selection-background-color: var(--glow-soft);
+    --selection-color: var(--text-primary);
+    --contains-highlight-background-color: var(--glow-soft);
+}
+
+/* Schreibgeschützte Math-Fields in der Funktionsliste nahtlos stylen */
+.function-item math-field[read-only] {
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    pointer-events: none; /* Verhindert, dass man im Read-only Feld den Cursor setzen kann */
+}
+
+
+/* --- SETTINGS MODAL SPECIALS --- */
+.settings-modal {
+    max-width: 450px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-scroll-area {
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    max-height: 60vh;
+}
+
+.modal-divider {
+    border: 0;
+    height: 1px;
+    background: var(--border-color);
+    margin: 0.8rem 0;
+}
+
+.settings-group h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    opacity: 0.8;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+/* --- TOGGLE SWITCH (SCHIEBEREGLER) --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* Unsichtbares Standard-Checkbox-Input */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Schienen-Design */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s ease;
+    border-radius: 24px;
+}
+
+/* Die bewegliche Kugel */
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s ease;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Aktiv-Zustand (Eingeschaltet) */
+.switch input:checked + .slider {
+    background-color: #4caf50; /* Grün – oder nutze eine deiner CSS-Variablen */
+}
+
+/* Kugel nach rechts schieben */
+.switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+/* --- LIVE-VORSCHAU EINSTELLUNGEN (SIDE-PANEL LINKS) --- */
+#settingsModal {
+    background-color: transparent; /* Entfernt die Abdunklung/Verblassung */
+    justify-content: flex-start;   /* Schiebt den Inhalt nach links */
+    align-items: center;           /* Vertikal zentriert */
+    padding-left: 2rem;            /* Abstand zum linken Bildschirmrand */
+    pointer-events: none;          /* Klicks gehen durch das unsichtbare Overlay durch zum Koordinatensystem */
+}
+
+/* Das Fenster selbst muss wieder klickbar sein */
+#settingsModal .settings-modal {
+    pointer-events: auto;          /* Macht die Regler im Modal wieder klickbar */
+    margin: 0;
+    /* Etwas deutlicherer Schatten, damit es sich ohne Abdunklung gut vom Hintergrund abhebt */
+    box-shadow: var(--shadow-main), 0 8px 32px rgba(0, 0, 0, 0.2); 
+}
+
+
+
+/* --- ERGEBNISSE RESPONSIVE TABELLE --- */
+.results-container {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.results-table th, 
+.results-table td {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.results-table th {
+    background-color: rgba(0, 0, 0, 0.05);
+    font-weight: bold;
+}
+
+/* --- MOBILE ANSICHT (unter 650px) --- */
+@media (max-width: 650px) {
+    /* Tabelle auflösen */
+    .results-table, 
+    .results-table tbody, 
+    .results-table tr, 
+    .results-table td {
+        display: block;
+        width: 100%;
+    }
+
+    /* Tabellenkopf auf Mobile verstecken */
+    .results-table thead {
+        display: none;
+    }
+
+    /* Jede Funktion wird zu einer eigenen Karte */
+    .results-table tr {
+        margin-bottom: 1rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 0.8rem;
+        box-shadow: var(--shadow-main);
+    }
+
+    /* Erste Zeile (Funktionsname) als Karten-Titel hervorheben */
+    .results-table td.mobile-card-header {
+        font-weight: bold;
+        font-size: 1.05rem;
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.4rem;
+        color: var(--text-primary);
+    }
+
+    /* Einzelne Kennwert-Zeilen innerhalb der Karte */
+    .results-table td:not(.mobile-card-header) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border: none;
+        border-bottom: 1px dashed var(--border-color);
+    }
+
+    .results-table td:last-child {
+        border-bottom: none;
+    }
+
+    /* Generiert das Label (z. B. "Nullstellen:") automatisch davor */
+    .results-table td:not(.mobile-card-header)::before {
+        content: attr(data-label);
+        font-weight: 600;
+        opacity: 0.8;
+        padding-right: 0.5rem;
+    }
 }

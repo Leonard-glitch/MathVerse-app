@@ -108,6 +108,7 @@
     justify-content: center;
     gap: 0.55rem;
     padding: 0.65rem 1rem;
+    min-width: 0;                 /* ← NEU */
     color: var(--finance-muted);
     font: inherit;
     font-size: 0.86rem;

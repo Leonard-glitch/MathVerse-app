@@ -20,7 +20,7 @@ export const tools = [
         tags:     ["zahlen", "analyse", "algebra", "mathematik", "summe", "max", "maximum", "min", "minimum", "durchschnitt", "ggT", "kgV", "median", "modus", "spannweite", "varianz", "standardabweichung", "statistik"],
         info:     "Analysiert eine Zahlenliste und liefert umfassende statistische Kennzahlen wie Summe, Mittelwerte (Durchschnitt, Median, Modus), Streuungsmaße (Varianz, Standardabweichung, Spannweite) sowie ggT und kgV.",
         image: {
-            big:   `${BASE}/pictures/51R9beEdSfL.jpg`,
+            big:   `${BASE}/pictures/Zahlen Analyse2.png`,
             small: `${BASE}/pictures/icons/zahlenAnalyse-icon.png`
         }
     },
@@ -33,7 +33,7 @@ export const tools = [
         tags:     ["zahlensystem", "umrechner", "dual", "binär", "hex", "oktal", "dezimal"],
         info:     "Rechnet Zahlen zwischen Zahlensystemen (Basis 2–20) um – inklusive Nachkommastellen und vollem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/ZahlensystemeUmwandeln Temp1.jpg`,
+            big:   `${BASE}/pictures/Zahlensystem Umrechner1.png`,
             small: `${BASE}/pictures/icons/zsystUmrechner-icon.png`
         }
     },
@@ -46,7 +46,7 @@ export const tools = [
         tags:     ["zahlensystem", "rechner", "addition", "subtraktion", "multiplikation", "division", "dual"],
         info:     "Führt Grundrechenarten (+, −, ×, ÷) direkt in einem beliebigen Zahlensystem durch und zeigt den schriftlichen Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/beispiel-addition.png`,
+            big:   `${BASE}/pictures/Zahlensystem Rechner1.png`,
             small: `${BASE}/pictures/icons/zsystRechner-icon.png`
         }
     },
@@ -111,7 +111,7 @@ export const tools = [
         tags:     ["dezimal", "bruch", "umrechner"],
         info:      "Wandelt Brüche in Dezimalzahlen und Dezimalzahlen in Brüche um – inklusive Schritt-für-Schritt-Lösungsweg.",
         image: {
-            big:   `${BASE}/pictures/DezimalBruchConverter.png`,
+            big:   `${BASE}/pictures/DezBruchConverter1.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -163,7 +163,7 @@ export const tools = [
         tags:     ["geometrie", "2d", "3d", "kreis", "rechteck", "quadrat", "dreieck", "rechtwinkliges dreieck", "trapez", "parallelogramm", "raute","würfel", "quader", "kugel", "zylinder", "kegel", "quadratische pyramide", "rechteckige pyramide"],
         info:      "Geometrie Rechner welcher mit 2D und 3D Figuren rechnet - inklusive Rechenweg und live Form-Vorschau",
         image: {
-            big:   `${BASE}/pictures/Geometrierechner.jpg`,
+            big:   `${BASE}/pictures/Geometrie Rechner1.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     }

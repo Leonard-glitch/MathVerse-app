@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
     <link rel="stylesheet" href="./funktionsrechner.css">
+
+    <script type="module">
+        import "https://esm.run/mathlive";
+    </script>
 </head>
 <body>
     <header>
@@ -51,7 +55,7 @@
                 <div class="functionsMainContainer">
                     <div class="functionContainer">
                         <div class="addFunctionContainer"><button type="button" class="button" id="addFunctionButton"><i class="fa fa-plus" aria-hidden="true"></i>Funktion hinzufügen</button></div>
-                        <div class="allFunctionsContainer"><span class="functionexample">f(x)=2x+d</span><span class="functionexample">f(x)=2x+d</span></div>
+                        <div class="allFunctionsContainer"></div>
                     </div>
                     <div class="cordSystemContainer">
                         
@@ -61,7 +65,12 @@
                 <div class="zahlenAusgabestyle" id="ausgabeContainer">
                     <div class="loesungsDiv">
                         <button class="loesungText button" type="button"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Ergebnisse<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button>
-                        <p id="loesungOutput"></p>
+                        <div id="loesungOutput">
+                            <div class="results-container">
+                                <table class="results-table" id="resultsTable">
+                                    </table>
+                            </div>
+                        </div>
 
                         <div class="rechenwegDiv">
                         <button class="rechenwegText button" type="button"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Rechenweg<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button>
@@ -101,5 +110,130 @@
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>
+
+    <div class="modal-overlay" id="functionModal">
+        <div class="modal-content">
+            <h3>Neue Funktion hinzufügen</h3>
+            <math-field id="functionInput" class="zahlenInputfeld" placeholder="z.B.: $$a^2+b^2=c^2 $$"></math-field>
+
+            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+            
+            <div class="modal-buttons">
+                <button type="button" class="button" id="saveFunctionBtn">Funktion hinzufügen</button>
+                <button type="button" class="button" id="cancelFunctionBtn">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content settings-modal">
+        <h3><i class="fa fa-cog"></i> Einstellungen</h3>
+        <hr class="modal-divider">
+
+        <div class="settings-scroll-area">
+            <div class="settings-group">
+                <h4>Ansicht</h4>
+                <div class="setting-row">
+                    <span>Raster anzeigen</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-showGrid" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span>Achsen anzeigen</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-showAxes" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span>Achsenbeschriftung</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-showLabels" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span>Legende anzeigen</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-showLegend" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <hr class="modal-divider">
+
+            <div class="settings-group">
+                <h4>Markierungen</h4>
+                <div class="setting-row">
+                    <span>Nullstellen markieren</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-markRoots" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span>Schnittpunkte markieren</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-markIntersects" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span>y-Achsenabschnitt markieren</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-markYIntercept" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <hr class="modal-divider">
+
+            <div class="settings-group">
+                <h4>Koordinatensystem</h4>
+                <div class="setting-row">
+                    <span>Automatische Skalierung</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-autoScale" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span>Seitenverhältnis 1:1</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-aspectRatio">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <hr class="modal-divider">
+
+            <div class="settings-group">
+                <h4>Bedienung</h4>
+                <div class="setting-row">
+                    <span>Zoomen mit Mausrad</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-zoomMouseWheel" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span>Verschieben aktiviert</span>
+                    <label class="switch">
+                        <input type="checkbox" id="set-panEnabled" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button type="button" class="button" id="closeSettingsBtn">Schließen</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
