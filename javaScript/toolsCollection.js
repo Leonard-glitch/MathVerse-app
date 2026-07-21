@@ -166,13 +166,26 @@ export const tools = [
             big:   `${BASE}/pictures/Geometrie Rechner1.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
-    }
+    },
+    {
+        id:       "card13",
+        title:    "Funktionsrechner",
+        group:    "algebra",
+        filename: "funktionsrechner.html",
+        url:      `${BASE}/Tools/Funktionsrechner/funktionsrechner.html`,
+        tags:     ["funktionen", "koordinatensystem", "graph", "nullstelle", "schnittpunkte"],
+        info:     "Erstelle und analysiere mathematische Funktionen mit interaktivem Koordinatensystem.",
+        image: {
+            big:   `${BASE}/pictures/Funktionsrechner1.png`,
+            small: `${BASE}/pictures/icons/meinTool-icon.png`
+        }
+     }
 
 
     // -----------------------------------------------------------------------
     // Neues Tool hinzufügen? Schema:
     // {
-    //     id:       "card13",
+    //     id:       "card14",
     //     title:    "Tool Titel",
     //     group:    "eine-der-gruppen-ids",
     //     filename: "meinTool.html",
