@@ -10,14 +10,16 @@ function initSearchInstance(searchInput) {
     const searchResults = wrapper ? wrapper.querySelector('[id^="searchResults"]') : null;
     if (!wrapper || !searchResults) return;
 
-    // Breite/Position richten sich nach dem Eingabefeld-Wrapper selbst,
-    // nicht nach der ganzen Nav-Zeile – sonst reicht das Dropdown über
-    // Logo/Login statt exakt unter dem Suchfeld zu sitzen.
+    // Breite/Position richten sich nach der ganzen Nav-Zeile (Logo bis
+    // Login) – exakt wie im ursprünglichen "width: 100%"-Verhalten, nicht
+    // nach dem schmaleren Eingabefeld-Wrapper.
+    const navRow = searchInput.closest(".navbar, .secondNavList") || wrapper;
+
     function positionResults() {
-        const rect = wrapper.getBoundingClientRect();
-        searchResults.style.top   = `${rect.bottom + 8}px`;
-        searchResults.style.left  = `${rect.left}px`;
-        searchResults.style.width = `${rect.width}px`;
+        const rect = navRow.getBoundingClientRect();
+        searchResults.style.top   = `${Math.round(rect.bottom + 8)}px`;
+        searchResults.style.left  = `${Math.round(rect.left)}px`;
+        searchResults.style.width = `${Math.round(rect.width)}px`;
     }
 
     function showResultsForCurrentQuery() {
@@ -35,15 +37,13 @@ function initSearchInstance(searchInput) {
             return titleMatch || tagMatch;
         });
 
-        positionResults();
+        // Erst rendern, DANACH positionieren: verhindert eine Berechnung auf
+        // Basis eines Layouts, das sich durch den neuen Inhalt noch ändert.
         renderResults(searchResults, matches);
+        positionResults();
     }
 
-    // Tippen -> Ergebnisse neu berechnen
     searchInput.addEventListener("input", showResultsForCurrentQuery);
-
-    // Erneuter Fokus (z.B. nach Klick weg und zurück) -> bereits getippte
-    // Query sofort wieder anzeigen, ohne erneut tippen zu müssen
     searchInput.addEventListener("focus", showResultsForCurrentQuery);
 
     document.addEventListener("click", e => {
@@ -52,9 +52,6 @@ function initSearchInstance(searchInput) {
         }
     });
 
-    // position:fixed folgt der Seite nicht automatisch -> bei Scroll/Resize
-    // (inkl. Tab-bedingtem Auto-Scroll) neu positionieren statt zu schließen,
-    // damit das Dropdown am Eingabefeld "kleben" bleibt.
     window.addEventListener("scroll", () => {
         if (searchResults.style.display === "block") positionResults();
     }, { capture: true, passive: true });

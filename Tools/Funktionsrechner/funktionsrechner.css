@@ -202,6 +202,7 @@
     width: 65%;
     display: flex;
     flex: 1 1 auto;
+    overflow: hidden;
 }
 
 .coord-btn {
@@ -222,6 +223,42 @@
 
 .coord-btn:hover {
     text-shadow: none;
+}
+
+/* ── Koordinatensystem: SVG-Viewport (Grid, Achsen, Pan & Zoom) ─────────── */
+.functionGraphSvg {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none; /* verhindert Browser-Scroll/Pinch-Zoom der Seite beim Bedienen des Graphen */
+    cursor: grab;
+    user-select: none;
+}
+
+.functionGraphSvg.is-panning {
+    cursor: grabbing;
+}
+
+.graphGridLine {
+    stroke: var(--border-color);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.6;
+}
+
+.graphAxisLine {
+    stroke: var(--text-secondary);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+}
+
+.graphAxisLabel {
+    fill: var(--text-muted);
+    font-family: var(--font-main);
+    font-size: 11px;
+    user-select: none;
 }
 
 
