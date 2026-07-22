@@ -89,6 +89,7 @@ function toggleFullscreen() {
     if (container) {
         // Fullscreen toggeln
         container.classList.toggle('is-fullscreen');
+        const isFullscreen = container.classList.contains('is-fullscreen');
 
         // Icon toggeln
         if (fullscreenBtnIcon) {
@@ -99,6 +100,19 @@ function toggleFullscreen() {
         // Klasse toggeln (schaltet display: flex an/aus)
         if (targetElement) {
             targetElement.classList.toggle('is-visible');
+        }
+
+        // Favoriten-Herz in den zweiten Header verschieben, solange der
+        // Hauptheader durch den Vollbild-Modus verdeckt ist – zurück an
+        // seinen Ursprungsort (body), sobald Fullscreen verlassen wird.
+        const heartBtn = document.querySelector('.tool-page-heart');
+        const heartSlot = document.getElementById('boxForFavoriteHeart');
+        if (heartBtn && heartSlot) {
+            if (isFullscreen) {
+                heartSlot.appendChild(heartBtn);
+            } else {
+                document.body.appendChild(heartBtn);
+            }
         }
     }
 }

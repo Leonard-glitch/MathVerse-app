@@ -604,27 +604,29 @@ localStorage.removeItem("");
     // ==========================================================================
     // NAVBAR: Login/Register -> Useraccount-Link, wenn eingeloggt
     // ==========================================================================
-    const navUserArea = document.getElementById('navUserArea');
+    const navUserAreas = document.querySelectorAll('[id^="navUserArea"]');
 
     function changeNavUserArea() {
-        if (!navUserArea) return;
+        if (!navUserAreas.length) return;
         const name = window.MV.getUsername();
         const displayName = name.length > 10 ? name.substring(0, 10) + '...' : name;
 
-        const userAccount = document.createElement('a');
-        userAccount.href = `${window.MV_BASE}/html/userArea.html`;
-        userAccount.target = '_self';
-        userAccount.classList.add('userAccount');
-        userAccount.innerHTML = `
-            <span class="userName">${displayName}</span>
-            <i class="fa fa-cog settings-icon"></i>
-        `;
+        navUserAreas.forEach(area => {
+            const userAccount = document.createElement('a');
+            userAccount.href = `${window.MV_BASE}/html/userArea.html`;
+            userAccount.target = '_self';
+            userAccount.classList.add('userAccount');
+            userAccount.innerHTML = `
+                <span class="userName">${displayName}</span>
+                <i class="fa fa-cog settings-icon"></i>
+            `;
 
-        navUserArea.innerHTML = '';
-        navUserArea.appendChild(userAccount);
+            area.innerHTML = '';
+            area.appendChild(userAccount);
+        });
     }
 
-    if (isLoggedIn() && navUserArea) {
+    if (isLoggedIn() && navUserAreas.length) {
         changeNavUserArea();
     }
 
@@ -634,17 +636,21 @@ localStorage.removeItem("");
 
     // Auto-fix: searchContainer-Klasse setzen falls nicht vorhanden
     (function fixSearchContainer() {
-        const input = document.getElementById('searchInput');
-        if (input && !input.parentElement.classList.contains('searchContainer')) {
-            input.parentElement.classList.add('searchContainer');
-        }
+        document.querySelectorAll('[id^="searchInput"]').forEach(input => {
+            if (!input.parentElement.classList.contains('searchContainer')) {
+                input.parentElement.classList.add('searchContainer');
+            }
+        });
     })();
 
     function initNavBurger() {
-        const navbar = document.querySelector('.navbar');
         // Nicht auf der UserArea-Seite (hat eigenes Layout)
-        if (!navbar || document.querySelector('.settingsLayout')) return;
+        if (document.querySelector('.settingsLayout')) return;
 
+        document.querySelectorAll('.navbar, .secondNavList').forEach(setupNavBurgerFor);
+    }
+
+    function setupNavBurgerFor(navRow) {
         // Burger-Button erstellen und anhängen
         const burger = document.createElement('button');
         burger.className = 'navBurger';
@@ -655,17 +661,17 @@ localStorage.removeItem("");
             <span class="burgerLine"></span>
             <span class="burgerLine"></span>
         `;
-        navbar.appendChild(burger);
+        navRow.appendChild(burger);
 
         function openMenu() {
-            navbar.classList.add('nav-open');
+            navRow.classList.add('nav-open');
             burger.classList.add('is-open');
             burger.setAttribute('aria-expanded', 'true');
             burger.setAttribute('aria-label', 'Menü schließen');
         }
 
         function closeMenu() {
-            navbar.classList.remove('nav-open');
+            navRow.classList.remove('nav-open');
             burger.classList.remove('is-open');
             burger.setAttribute('aria-expanded', 'false');
             burger.setAttribute('aria-label', 'Menü öffnen');
@@ -673,12 +679,12 @@ localStorage.removeItem("");
 
         burger.addEventListener('click', (e) => {
             e.stopPropagation();
-            navbar.classList.contains('nav-open') ? closeMenu() : openMenu();
+            navRow.classList.contains('nav-open') ? closeMenu() : openMenu();
         });
 
         // Schließen bei Klick außerhalb
         document.addEventListener('click', (e) => {
-            if (!navbar.contains(e.target)) closeMenu();
+            if (!navRow.contains(e.target)) closeMenu();
         });
 
         // Schließen bei Escape
@@ -687,10 +693,10 @@ localStorage.removeItem("");
         });
 
         // Schließen wenn Nav-Link oder Suchergebnis geklickt
-        document.getElementById('navUserArea')?.addEventListener('click', (e) => {
+        navRow.querySelector('[id^="navUserArea"]')?.addEventListener('click', (e) => {
             if (e.target.closest('a')) closeMenu();
         });
-        document.getElementById('searchResults')?.addEventListener('click', closeMenu);
+        navRow.querySelector('[id^="searchResults"]')?.addEventListener('click', closeMenu);
     }
 
     initNavBurger();
@@ -743,11 +749,13 @@ localStorage.removeItem("");
             return;
         }
 
-        if (navUserArea) {
-            navUserArea.innerHTML = `
-                <a href="${window.MV_BASE}/html/login.html" class="navTextBorder">Login</a>
-                <a href="${window.MV_BASE}/html/register.html" class="navTextBorder">Register</a>
-            `;
+        if (navUserAreas.length) {
+            navUserAreas.forEach(area => {
+                area.innerHTML = `
+                    <a href="${window.MV_BASE}/html/login.html" class="navTextBorder">Login</a>
+                    <a href="${window.MV_BASE}/html/register.html" class="navTextBorder">Register</a>
+                `;
+            });
             if (isLoggedIn()) changeNavUserArea();
         }
 

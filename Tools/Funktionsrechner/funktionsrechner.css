@@ -78,6 +78,65 @@
     gap: 1rem;
 }
 
+/* ── Zweiter Header: Mobile-Verhalten (analog zum Hauptheader) ──────────── */
+@media (max-width: 768px) {
+    .secondNavList {
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .secondNavList.is-open {
+        padding: 0.5rem 1rem;
+    }
+
+    .secondNavList.is-open.nav-open {
+        max-height: 320px; /* genug Platz für gestapeltes Such-/Login-Menü */
+    }
+
+    .secondNavList .searchContainer,
+    .secondNavList [id^="navUserArea"] {
+        display: none;
+        width: 100%;
+        order: 3;
+    }
+
+    .secondNavList.nav-open .searchContainer {
+        display: block;
+        margin-top: 0.6rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+        animation: navFadeSlide 0.2s ease;
+    }
+
+    .secondNavList.nav-open .searchContainer #searchInputSecondary {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .secondNavList.nav-open [id^="navUserArea"] {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0 0.4rem;
+        border-top: 1px solid var(--border-color);
+        animation: navFadeSlide 0.22s ease;
+    }
+
+    .secondNavList.nav-open .navTextBorder {
+        flex: 1;
+        text-align: center;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .secondNavList.nav-open .userAccount {
+        width: 100%;
+        justify-content: center;
+        display: flex;
+        gap: 0.5rem;
+    }
+}
+
 
 
 .functionsMainContainer {
@@ -485,6 +544,25 @@
 .results-table th {
     background-color: rgba(0, 0, 0, 0.05);
     font-weight: bold;
+}
+
+
+/* Favoriten-Herz im zweiten Header (Expand-Modus) – siehe toggleFullscreen() */
+#boxForFavoriteHeart .tool-page-heart {
+    position: static;
+    width: auto;
+    flex-direction: row;
+    padding: 0.4rem 0.8rem;
+    box-shadow: none;
+}
+
+#boxForFavoriteHeart .tool-page-heart:hover {
+    box-shadow: none;
+    transform: none;
+}
+
+#boxForFavoriteHeart .tool-page-heart .heart-tooltip-label {
+    display: none;
 }
 
 /* --- MOBILE ANSICHT (unter 650px) --- */

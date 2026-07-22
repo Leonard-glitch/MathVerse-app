@@ -107,7 +107,8 @@ main {
     transform: scale(1.03);
 }
 
-#searchInput {
+#searchInput,
+#searchInputSecondary {
     font-size: 0.8rem;
     background-color: var(--bg-input);
     color: var(--text-primary);
@@ -119,7 +120,8 @@ main {
     transition: var(--transition-speed) ease;
 }
 
-#searchInput:focus {
+#searchInput:focus,
+#searchInputSecondary:focus {
     border-color: var(--border-glow);
     box-shadow: 0 0 12px var(--glow-soft);
 }
@@ -321,11 +323,9 @@ input:-webkit-autofill:focus {
     position: static;
 }
 
-#searchResults {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    width: 100%;
+#searchResults,
+#searchResultsSecondary {
+    position: fixed;
 
     max-height: 320px; /* einfach anpassbar */
 
