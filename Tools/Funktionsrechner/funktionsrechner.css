@@ -19,6 +19,15 @@
     transition: all var(--transition-speed) ease;
 }
 
+.button:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 0 15px var(--glow-soft);
+}
+
+.button:active {
+    transform: translateY(1px);
+}
+
 .functionsContainer {
     width: 90%;
     min-height: 35rem; /* Stellt sicher, dass er anfangs groß genug ist */
@@ -378,6 +387,8 @@
     box-shadow: var(--shadow-main);
     width: 90%;
     max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -406,13 +417,15 @@
 
 /* Stile für dynamisch erstellte Funktions-Divs */
 .function-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     color: var(--text-primary);
-    padding: 0.4rem 0.6rem;
+    padding: 0.5rem 0.7rem;
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background 0.2s;
+    transition: border-color 0.2s, background 0.2s;
 }
 
 .function-item math-field {
@@ -420,7 +433,122 @@
 }
 
 .function-item:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    border-color: var(--border-glow);
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.function-item.is-hidden {
+    opacity: 0.5;
+}
+
+.functionLetter {
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 0.95rem;
+    min-width: 1.8rem;
+    text-align: center;
+}
+
+.functionColorDot {
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+}
+
+.functionFormula {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.functionFormula::-webkit-scrollbar {
+    display: none;
+}
+
+.functionVisibilityBtn,
+.functionMenuBtn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+}
+
+.functionVisibilityBtn:hover,
+.functionMenuBtn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.functionVisibilityBtn.is-hidden-state {
+    color: var(--text-muted);
+}
+
+.functionMenuWrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.functionMenuDropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 150px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glow);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 20px var(--glow-soft), var(--shadow-main);
+    overflow: hidden;
+    z-index: 30;
+}
+
+.functionMenuDropdown.is-open {
+    display: block;
+}
+
+.functionMenuItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.functionMenuItem:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.functionMenuItem--danger {
+    color: var(--accent-error);
+}
+
+.functionMenuItem--danger:hover {
+    background: rgba(255, 42, 95, 0.08);
+}
+
+.functionListEmpty {
+    padding: 1rem 0.6rem;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    text-align: center;
 }
 
 /* Styling für das Eingabefeld im Modal */
@@ -429,10 +557,14 @@
     width: 100%;
     max-width: 500px;
     background: transparent;
-    border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 0.4rem;
     color: var(--text-primary);
+
+    /* Border kommt bewusst NICHT von hier, sondern von der geteilten
+       .zahlenInputfeld-Klasse (common.css) – nur so greifen deren
+       :hover/:focus-Zustände (vorher überschrieb die ID-Regel die
+       Randfarbe dauerhaft, der Fokus-Glow blieb unsichtbar). */
 
     /* Deine custom MathLive Styles */
     --caret-color: var(--border-glow);
@@ -658,5 +790,37 @@
         font-weight: 600;
         opacity: 0.8;
         padding-right: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .functionsMainContainer {
+        flex-direction: column-reverse;
+        min-height: auto;
+    }
+
+    .functionsContainer{
+        width: 99%;
+    }
+
+    .functionContainer {
+        width: 100%;
+        max-height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .cordSystemContainer {
+        width: 100%;
+        min-height: 50vh;
+    }
+
+    .function-item {
+        padding: 0.5rem 0.5rem;
+        gap: 0.4rem;
+    }
+
+    .functionLetter {
+        font-size: 0.85rem;
     }
 }

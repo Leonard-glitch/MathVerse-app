@@ -191,71 +191,259 @@ document.addEventListener('DOMContentLoaded', initAccordionOutput);
 
 
 
+// ==========================================================================
+// FUNKTIONSLISTE – Zustand, Buchstaben-/Farbvergabe, Rendering
+// ==========================================================================
+
+const FUNCTION_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+// Gleiche 6 Akzentfarben wie die Theme-Auswahl in der UserArea (siehe
+// THEMES in common-login.js) – konsistent mit dem Rest der Website statt
+// neue, beliebige Farben einzuführen. Ab der 7. Funktion wiederholt sich
+// der Zyklus.
+const FUNCTION_COLORS = ["#8a16ff", "#00ffcc", "#1e90ff", "#ff2d78", "#ff6a00", "#f5c518"];
+
+let functionsState = [];
+let nextFunctionId = 1;
+let editingFunctionId = null;
+let openFunctionMenuId = null;
+let openFunctionModalForEdit = () => {}; // wird in initAddFunctionModal() gesetzt
+
+// Buchstabe nach Listenposition: A, B, ... Z, A1, B1, ... Z1, A2, ...
+// Buchstabe UND Farbe werden aus der Position berechnet, nicht fest pro
+// Funktion gespeichert – beim Löschen rücken nachfolgende Funktionen nach.
+function letterForIndex(index) {
+    const cycle = Math.floor(index / FUNCTION_LETTERS.length);
+    const base = FUNCTION_LETTERS[index % FUNCTION_LETTERS.length];
+    return cycle === 0 ? base : `${base}${cycle}`;
+}
+
+function colorForIndex(index) {
+    return FUNCTION_COLORS[index % FUNCTION_COLORS.length];
+}
+
+// Leichte Eingabe-Hygiene für die Modal-Validierung. Eine vollständige
+// mathematische Prüfung (lässt sich die Formel auswerten?) folgt mit der
+// Funktionsdarstellung im Koordinatensystem – dafür wird der bestehende
+// Parser aus Formel Umformer/Gleichungslöser wiederverwendet statt hier
+// ein drittes Mal nachgebaut zu werden.
+function validateFunctionInput(latex) {
+    if (!latex || !latex.trim()) {
+        return "Bitte gib eine Funktion ein.";
+    }
+
+    const openers = { "{": "}", "(": ")", "[": "]" };
+    const closers = { "}": "{", ")": "(", "]": "[" };
+    const stack = [];
+
+    for (const ch of latex) {
+        if (openers[ch]) stack.push(ch);
+        else if (closers[ch] && stack.pop() !== closers[ch]) {
+            return "Die Klammern in deiner Funktion sind nicht korrekt geschlossen.";
+        }
+    }
+    if (stack.length > 0) {
+        return "Die Klammern in deiner Funktion sind nicht korrekt geschlossen.";
+    }
+
+    return null; // gültig
+}
+
+function renderFunctionsList() {
+    const container = document.querySelector('.allFunctionsContainer');
+    if (!container) return;
+
+    if (functionsState.length === 0) {
+        container.innerHTML = `<p class="functionListEmpty">Noch keine Funktion hinzugefügt.</p>`;
+        return;
+    }
+
+    container.innerHTML = functionsState.map((fn, index) => {
+        const letter = letterForIndex(index);
+        const color = colorForIndex(index);
+        const visibilityIcon = fn.visible ? "fa-eye" : "fa-eye-slash";
+        const visibilityLabel = fn.visible ? "Ausblenden" : "Einblenden";
+        const menuOpen = openFunctionMenuId === fn.id;
+
+        return `
+            <div class="function-item ${fn.visible ? "" : "is-hidden"}" data-id="${fn.id}">
+                <span class="functionLetter">${letter}</span>
+                <span class="functionColorDot" style="background-color:${color}; color:${color};"></span>
+                <div class="functionFormula"><math-field read-only>${fn.latex}</math-field></div>
+                <button type="button" class="functionVisibilityBtn ${fn.visible ? "" : "is-hidden-state"}" data-action="toggle-visibility" aria-label="${visibilityLabel}">
+                    <i class="fa ${visibilityIcon}"></i>
+                </button>
+                <div class="functionMenuWrapper">
+                    <button type="button" class="functionMenuBtn" data-action="toggle-menu" aria-haspopup="true" aria-expanded="${menuOpen}" aria-label="Menü öffnen">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="functionMenuDropdown ${menuOpen ? "is-open" : ""}">
+                        <button type="button" class="functionMenuItem" data-action="edit"><i class="fa fa-pencil"></i> Bearbeiten</button>
+                        <button type="button" class="functionMenuItem functionMenuItem--danger" data-action="delete"><i class="fa fa-trash"></i> Löschen</button>
+                    </div>
+                </div>
+            </div>`;
+    }).join("");
+}
+
+function closeFunctionMenu() {
+    if (openFunctionMenuId === null) return;
+    openFunctionMenuId = null;
+    renderFunctionsList();
+}
+
+// Event-Delegation: ein Listener für Sichtbarkeit, Menü, Bearbeiten, Löschen
+// statt pro Zeile einzeln zu binden (Liste wird bei jeder Änderung neu gerendert).
+function initFunctionListEvents() {
+    const container = document.querySelector('.allFunctionsContainer');
+    if (!container) return;
+
+    container.addEventListener('click', (event) => {
+        const actionBtn = event.target.closest('[data-action]');
+        if (!actionBtn) return;
+
+        const item = actionBtn.closest('.function-item');
+        const id = item ? parseInt(item.dataset.id, 10) : null;
+        const action = actionBtn.dataset.action;
+
+        event.stopPropagation();
+
+        if (action === 'toggle-visibility' && id !== null) {
+            const fn = functionsState.find(f => f.id === id);
+            if (fn) fn.visible = !fn.visible;
+            openFunctionMenuId = null;
+        } else if (action === 'toggle-menu' && id !== null) {
+            openFunctionMenuId = (openFunctionMenuId === id) ? null : id;
+        } else if (action === 'edit' && id !== null) {
+            openFunctionMenuId = null;
+            openFunctionModalForEdit(id);
+        } else if (action === 'delete' && id !== null) {
+            functionsState = functionsState.filter(f => f.id !== id);
+            openFunctionMenuId = null;
+        }
+
+        renderFunctionsList();
+    });
+
+    // Menü schließen bei Klick außerhalb oder Escape
+    document.addEventListener('click', closeFunctionMenu);
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeFunctionMenu();
+    });
+}
+
+// ==========================================================================
+// MODAL "FUNKTION HINZUFÜGEN" / "BEARBEITEN"
+// ==========================================================================
 function initAddFunctionModal() {
     const addBtn = document.querySelector('#addFunctionButton');
     const modal = document.querySelector('#functionModal');
+    const modalTitle = document.querySelector('#functionModalTitle');
     const cancelBtn = document.querySelector('#cancelFunctionBtn');
     const saveBtn = document.querySelector('#saveFunctionBtn');
     const input = document.querySelector('#functionInput'); // math-field Element
-    const container = document.querySelector('.allFunctionsContainer');
+    const errorBox = document.getElementById('errorMessages');
 
-    if (!addBtn || !modal || !cancelBtn || !saveBtn || !input || !container) return;
+    if (!addBtn || !modal || !modalTitle || !cancelBtn || !saveBtn || !input || !errorBox) return;
 
-    // 1. Popup öffnen
-    addBtn.addEventListener('click', () => {
-        input.value = ''; // Formelfeld leeren
+    function showModalError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = 'block';
+    }
+
+    function hideModalError() {
+        errorBox.style.display = 'none';
+    }
+
+    function openModal() {
+        hideModalError();
         modal.classList.add('is-visible');
-        
-        // Kleines Timeout, damit der Fokus nach dem Einblenden zuverlässig greift
-        setTimeout(() => input.focus(), 50); 
+        setTimeout(() => input.focus(), 50);
+    }
+
+    // 1. Popup öffnen (Neu)
+    addBtn.addEventListener('click', () => {
+        editingFunctionId = null;
+        modalTitle.textContent = 'Neue Funktion hinzufügen';
+        saveBtn.textContent = 'Funktion hinzufügen';
+        input.value = '';
+        openModal();
     });
+
+    // 1b. Popup öffnen (Bearbeiten) – von initFunctionListEvents() aufgerufen
+    openFunctionModalForEdit = (id) => {
+        const fn = functionsState.find(f => f.id === id);
+        if (!fn) return;
+        editingFunctionId = id;
+        modalTitle.textContent = 'Funktion bearbeiten';
+        saveBtn.textContent = 'Änderungen speichern';
+        input.value = fn.latex;
+        openModal();
+    };
 
     // 2. Schließen (Abbrechen)
     const closeModal = () => {
         modal.classList.remove('is-visible');
+        editingFunctionId = null;
     };
 
     cancelBtn.addEventListener('click', closeModal);
 
     // Klick außerhalb schließt Modal
     modal.addEventListener('click', (event) => {
-    // Prüfen, ob wirklich direkt das Overlay (und nicht die Tastatur) geklickt wurde
-    if (event.target === modal) {
-        closeModal();
-    }
-});
+        if (event.target === modal) closeModal();
+    });
 
-    // 3. Funktion hinzufügen
-    const addFunction = () => {
-        // .value gibt bei math-field den LaTeX-String zurück
+    // 3. Funktion speichern (Neu ODER Bearbeiten)
+    const saveFunction = () => {
         const latexValue = input.value.trim();
+        const error = validateFunctionInput(latexValue);
 
-        if (latexValue !== '') {
-            const newFuncDiv = document.createElement('div');
-            newFuncDiv.className = 'functionexample function-item';
-
-            // Erstellt ein schreibgeschütztes math-field für schönes Rendering in der Liste
-            newFuncDiv.innerHTML = `<math-field read-only>${latexValue}</math-field>`;
-
-            container.appendChild(newFuncDiv);
-            closeModal();
+        if (error) {
+            showModalError(error);
+            return;
         }
+
+        if (editingFunctionId !== null) {
+            const fn = functionsState.find(f => f.id === editingFunctionId);
+            if (fn) fn.latex = latexValue;
+        } else {
+            functionsState.push({ id: nextFunctionId++, latex: latexValue, visible: true });
+        }
+
+        renderFunctionsList();
+        closeModal();
     };
 
-    saveBtn.addEventListener('click', addFunction);
+    saveBtn.addEventListener('click', saveFunction);
 
     // 4. Tastatur-Support (Enter = Speichern, ESC = Abbrechen)
     input.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault(); // Verhindert Zeilenumbruch im Formelfeld
-            addFunction();
+            saveFunction();
         } else if (event.key === 'Escape') {
             closeModal();
         }
     });
+
+    input.addEventListener('input', hideModalError);
+
+    // ── MathLive Tastatur-Layout (bisher nicht gesetzt) ────────────────────
+    customElements.whenDefined("math-field").then(() => {
+        try {
+            if (window.mathVirtualKeyboard) {
+                window.mathVirtualKeyboard.layouts = ["numeric", "alphabetic", "greek"];
+            }
+        } catch (e) { /* Version-abhängig, kein Blocker */ }
+    });
 }
 
-document.addEventListener('DOMContentLoaded', initAddFunctionModal);
+document.addEventListener('DOMContentLoaded', () => {
+    initAddFunctionModal();
+    initFunctionListEvents();
+    renderFunctionsList();
+});
 
 
 
