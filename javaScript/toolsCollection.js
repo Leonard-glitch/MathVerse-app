@@ -124,7 +124,7 @@ export const tools = [
         tags:     ["formel", "umformer", "algebra"],
         info:      "Formt mathematische Formeln um – inklusive Schritt-für-Schritt-Lösungsweg.",
         image: {
-            big:   `${BASE}/pictures/Formel Umformer1.png`,
+            big:   `${BASE}/pictures/Formel Umformer2.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -137,7 +137,7 @@ export const tools = [
         tags:     ["gleichung", "linear", "lösen", "algebra", "lineare-gleichungen", "verfahren"],
         info:      "Löst allgemeine und lineare Gleichungssysteme – inklusive automatischer Auswahl des besten Lösungsverfahrens.",
         image: {
-            big:   `${BASE}/pictures/Gleichungslöser1.png`,
+            big:   `${BASE}/pictures/Gleichungslöser2.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -150,7 +150,7 @@ export const tools = [
         tags:     ["finanzen", "rechner", "investition", "sparplan", "rendite", "inflation", "zinseszins"],
         info:      "All-in-One-Finanzrechner mit drei spezialisierten Tools: Berechnet den langfristigen Vermögensaufbau per Sparplan (Zinseszins), ermittelt den realen Kaufkraftverlust durch Inflation oder analysiert die genaue Performance (ROI & CAGR) von Investments – inklusive Live-Diagrammen und transparentem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Finanzrechner2.png`,
+            big:   `${BASE}/pictures/Finanzrechner7.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -176,7 +176,7 @@ export const tools = [
         tags:     ["funktionen", "koordinatensystem", "graph", "nullstelle", "schnittpunkte"],
         info:     "Erstelle und analysiere mathematische Funktionen mit interaktivem Koordinatensystem.",
         image: {
-            big:   `${BASE}/pictures/Funktionsrechner1.png`,
+            big:   `${BASE}/pictures/Funktionsrechner2.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
      }
