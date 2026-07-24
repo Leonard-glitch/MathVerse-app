@@ -208,6 +208,7 @@ let nextFunctionId = 1;
 let editingFunctionId = null;
 let openFunctionMenuId = null;
 let openFunctionModalForEdit = () => {}; // wird in initAddFunctionModal() gesetzt
+let requestGraphRedraw = () => {}; // wird in initCoordinateSystem() gesetzt
 
 // Buchstabe nach Listenposition: A, B, ... Z, A1, B1, ... Z1, A2, ...
 // Buchstabe UND Farbe werden aus der Position berechnet, nicht fest pro
@@ -246,6 +247,15 @@ function validateFunctionInput(latex) {
         return "Die Klammern in deiner Funktion sind nicht korrekt geschlossen.";
     }
 
+    // Echte mathematische Prüfung: lässt sich die Formel überhaupt auswerten?
+    try {
+        compileGraphFormula(latex);
+    } catch (err) {
+        return err instanceof GraphFormulaError
+            ? err.message
+            : "Diese Funktion konnte nicht verarbeitet werden. Bitte überprüfe deine Eingabe.";
+    }
+
     return null; // gültig
 }
 
@@ -255,6 +265,7 @@ function renderFunctionsList() {
 
     if (functionsState.length === 0) {
         container.innerHTML = `<p class="functionListEmpty">Noch keine Funktion hinzugefügt.</p>`;
+        requestGraphRedraw();
         return;
     }
 
@@ -284,6 +295,8 @@ function renderFunctionsList() {
                 </div>
             </div>`;
     }).join("");
+
+    requestGraphRedraw();
 }
 
 function closeFunctionMenu() {
@@ -346,13 +359,17 @@ function initAddFunctionModal() {
 
     if (!addBtn || !modal || !modalTitle || !cancelBtn || !saveBtn || !input || !errorBox) return;
 
-    function showModalError(msg) {
+    let modalErrorValue = null; // Wert, der zum aktuell angezeigten Fehler geführt hat
+
+    function showModalError(msg, value) {
         errorBox.textContent = msg;
         errorBox.style.display = 'block';
+        modalErrorValue = value;
     }
 
     function hideModalError() {
         errorBox.style.display = 'none';
+        modalErrorValue = null;
     }
 
     function openModal() {
@@ -400,15 +417,21 @@ function initAddFunctionModal() {
         const error = validateFunctionInput(latexValue);
 
         if (error) {
-            showModalError(error);
+            showModalError(error, latexValue);
             return;
         }
 
+        // Kompilierung kann hier praktisch nicht mehr fehlschlagen (validateFunctionInput
+        // hat das bereits geprüft) – try/catch bleibt trotzdem als Sicherheitsnetz,
+        // damit ein unvorhergesehener Fall die Funktion nicht zeichnet statt abzustürzen.
+        let ast = null;
+        try { ast = compileGraphFormula(latexValue); } catch (err) { /* siehe Kommentar oben */ }
+
         if (editingFunctionId !== null) {
             const fn = functionsState.find(f => f.id === editingFunctionId);
-            if (fn) fn.latex = latexValue;
+            if (fn) { fn.latex = latexValue; fn.ast = ast; }
         } else {
-            functionsState.push({ id: nextFunctionId++, latex: latexValue, visible: true });
+            functionsState.push({ id: nextFunctionId++, latex: latexValue, visible: true, ast });
         }
 
         renderFunctionsList();
@@ -427,7 +450,14 @@ function initAddFunctionModal() {
         }
     });
 
-    input.addEventListener('input', hideModalError);
+    input.addEventListener('input', () => {
+        // MathLive feuert bei Enter intern zusätzlich ein "input"-Event mit
+        // demselben (weiterhin ungültigen) Wert – dieses Echo würde die
+        // gerade erst gezeigte Fehlermeldung sofort wieder verstecken.
+        // Nur bei einer TATSÄCHLICHEN Wertänderung ausblenden.
+        if (modalErrorValue !== null && input.value.trim() === modalErrorValue) return;
+        hideModalError();
+    });
 
     // ── MathLive Tastatur-Layout (bisher nicht gesetzt) ────────────────────
     customElements.whenDefined("math-field").then(() => {
@@ -445,6 +475,248 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFunctionsList();
 });
 
+
+// ==========================================================================
+// FUNKTIONSAUSWERTUNG – schlanker Parser NUR für numerische Auswertung an
+// einer x-Stelle (kein Gleichungen-Lösen nötig, daher bewusst NICHT die
+// große Engine aus Formel Umformer/Gleichungslöser wiederverwendet)
+// ==========================================================================
+
+class GraphFormulaError extends Error {}
+
+function tokenizeGraphFormula(latex) {
+    const tokens = [];
+    let i = 0;
+    const n = latex.length;
+
+    while (i < n) {
+        const ch = latex[i];
+        if (/\s/.test(ch)) { i++; continue; }
+
+        if (ch === "\\") {
+            let j = i + 1;
+            while (j < n && /[a-zA-Z]/.test(latex[j])) j++;
+            const cmd = latex.slice(i + 1, j);
+            i = j;
+            switch (cmd) {
+                case "left": case "right": continue;
+                case "cdot": case "times": tokens.push({ type: "MUL" }); continue;
+                case "div": tokens.push({ type: "DIV" }); continue;
+                case "frac": tokens.push({ type: "FRAC" }); continue;
+                case "sqrt": tokens.push({ type: "SQRT" }); continue;
+                case "pi": tokens.push({ type: "CONST", name: "pi" }); continue;
+                case "sin": case "cos": case "tan": case "ln":
+                    tokens.push({ type: "FUNC", name: cmd }); continue;
+                default:
+                    throw new GraphFormulaError(`Der Befehl „${cmd}" wird hier nicht unterstützt.`);
+            }
+        }
+
+        if (ch === "{") { tokens.push({ type: "LBRACE" }); i++; continue; }
+        if (ch === "}") { tokens.push({ type: "RBRACE" }); i++; continue; }
+        if (ch === "(") { tokens.push({ type: "LPAREN" }); i++; continue; }
+        if (ch === ")") { tokens.push({ type: "RPAREN" }); i++; continue; }
+        if (ch === "|") { tokens.push({ type: "PIPE" }); i++; continue; }
+        if (ch === "^") { tokens.push({ type: "CARET" }); i++; continue; }
+        if (ch === "+") { tokens.push({ type: "PLUS" }); i++; continue; }
+        if (ch === "-") { tokens.push({ type: "MINUS" }); i++; continue; }
+        if (ch === "*") { tokens.push({ type: "MUL" }); i++; continue; }
+        if (ch === "/") { tokens.push({ type: "DIV" }); i++; continue; }
+
+        if (/[0-9]/.test(ch) || ((ch === "." || ch === ",") && /[0-9]/.test(latex[i + 1] || ""))) {
+            let raw = "";
+            while (i < n && /[0-9]/.test(latex[i])) { raw += latex[i]; i++; }
+            if (latex[i] === "." || latex[i] === ",") {
+                raw += "."; i++;
+                while (i < n && /[0-9]/.test(latex[i])) { raw += latex[i]; i++; }
+            }
+            tokens.push({ type: "NUM", value: parseFloat(raw) });
+            continue;
+        }
+
+        if (ch === "x") { tokens.push({ type: "VAR" }); i++; continue; }
+        if (ch === "e") { tokens.push({ type: "CONST", name: "e" }); i++; continue; }
+        if (/[a-zA-Z]/.test(ch)) {
+            throw new GraphFormulaError(`Nur die Variable „x" wird unterstützt (gefunden: „${ch}").`);
+        }
+
+        throw new GraphFormulaError(`Das Zeichen „${ch}" wird nicht erkannt.`);
+    }
+
+    tokens.push({ type: "EOF" });
+    return tokens;
+}
+
+function parseGraphExpression(tokens) {
+    let pos = 0;
+    let openPipes = 0;
+    const peek = () => tokens[pos];
+    const advance = () => tokens[pos++];
+    const expect = (type, msg) => {
+        if (peek().type !== type) throw new GraphFormulaError(msg || `Erwartet: ${type}`);
+        return advance();
+    };
+    const atomStartTypes = ["NUM", "VAR", "CONST", "LPAREN", "PIPE", "FRAC", "SQRT", "FUNC"];
+    const startsAtom = (t) => atomStartTypes.includes(t);
+
+    function parseExpr() {
+        let node = parseTerm();
+        while (peek().type === "PLUS" || peek().type === "MINUS") {
+            const op = advance().type;
+            node = { type: op === "PLUS" ? "add" : "sub", left: node, right: parseTerm() };
+        }
+        return node;
+    }
+
+    function parseTerm() {
+        let node = parseFactor();
+        while (true) {
+            const t = peek().type;
+            if (t === "MUL") { advance(); node = { type: "mul", left: node, right: parseFactor() }; }
+            else if (t === "DIV") { advance(); node = { type: "div", left: node, right: parseFactor() }; }
+            else if (t === "PIPE" && openPipes > 0) break;
+            else if (startsAtom(t)) { node = { type: "mul", left: node, right: parseFactor() }; }
+            else break;
+        }
+        return node;
+    }
+
+    function parseFactor() {
+        if (peek().type === "MINUS") { advance(); return { type: "neg", arg: parseFactor() }; }
+        return parsePower();
+    }
+
+    function parseExponent() {
+        if (peek().type === "LBRACE") {
+            advance();
+            const e = parseExpr();
+            expect("RBRACE", "Der Exponent wurde nicht richtig geschlossen.");
+            return e;
+        }
+        return parseFactor();
+    }
+
+    function parsePower() {
+        let base = parseAtom();
+        if (peek().type === "CARET") {
+            advance();
+            return { type: "pow", base, exp: parseExponent() };
+        }
+        return base;
+    }
+
+    function parseAtom() {
+        const t = peek();
+        switch (t.type) {
+            case "NUM": advance(); return { type: "num", value: t.value };
+            case "VAR": advance(); return { type: "var" };
+            case "CONST": advance(); return { type: "const", name: t.name };
+            case "LPAREN": {
+                advance();
+                const e = parseExpr();
+                expect("RPAREN", "Eine Klammer wurde nicht geschlossen.");
+                return e;
+            }
+            case "PIPE": {
+                openPipes++;
+                advance();
+                const e = parseExpr();
+                expect("PIPE", "Die Betragsstriche wurden nicht geschlossen.");
+                openPipes--;
+                return { type: "abs", arg: e };
+            }
+            case "FRAC": {
+                advance();
+                expect("LBRACE", "Der Bruch ist unvollständig.");
+                const num = parseExpr();
+                expect("RBRACE", "Der Zähler wurde nicht richtig geschlossen.");
+                expect("LBRACE", "Der Bruch ist unvollständig.");
+                const den = parseExpr();
+                expect("RBRACE", "Der Nenner wurde nicht richtig geschlossen.");
+                return { type: "div", left: num, right: den };
+            }
+            case "SQRT": {
+                advance();
+                expect("LBRACE", "Der Inhalt der Wurzel fehlt.");
+                const arg = parseExpr();
+                expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
+                return { type: "sqrt", arg };
+            }
+            case "FUNC": {
+                advance();
+                if (peek().type === "LPAREN") {
+                    advance();
+                    const arg = parseExpr();
+                    expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
+                    return { type: "func", name: t.name, arg };
+                }
+                return { type: "func", name: t.name, arg: parseFactor() };
+            }
+            default:
+                throw new GraphFormulaError("Die Formel enthält an dieser Stelle ein unerwartetes Element.");
+        }
+    }
+
+    const expr = parseExpr();
+    if (peek().type !== "EOF") {
+        throw new GraphFormulaError("Am Ende der Formel befinden sich überzählige Zeichen.");
+    }
+    return expr;
+}
+
+// Wertet einen AST-Knoten an einer konkreten x-Stelle aus. Gibt null zurück
+// bei Definitionslücken (Division durch 0, Wurzel aus negativer Zahl, ln von
+// nicht-positiver Zahl, ...) statt NaN/Infinity durchzureichen – so kann die
+// Rendering-Seite daraus sauber eine Lücke im Funktionsgraphen machen.
+function evaluateGraphNode(node, xValue) {
+    switch (node.type) {
+        case "num": return node.value;
+        case "var": return xValue;
+        case "const": return node.name === "pi" ? Math.PI : Math.E;
+        case "neg": { const a = evaluateGraphNode(node.arg, xValue); return a === null ? null : -a; }
+        case "add": { const a = evaluateGraphNode(node.left, xValue), b = evaluateGraphNode(node.right, xValue); return (a === null || b === null) ? null : a + b; }
+        case "sub": { const a = evaluateGraphNode(node.left, xValue), b = evaluateGraphNode(node.right, xValue); return (a === null || b === null) ? null : a - b; }
+        case "mul": { const a = evaluateGraphNode(node.left, xValue), b = evaluateGraphNode(node.right, xValue); return (a === null || b === null) ? null : a * b; }
+        case "div": {
+            const a = evaluateGraphNode(node.left, xValue), b = evaluateGraphNode(node.right, xValue);
+            return (a === null || b === null || b === 0) ? null : a / b;
+        }
+        case "pow": {
+            const a = evaluateGraphNode(node.base, xValue), b = evaluateGraphNode(node.exp, xValue);
+            if (a === null || b === null) return null;
+            if (a < 0 && !Number.isInteger(b)) return null; // nicht reell
+            return Math.pow(a, b);
+        }
+        case "sqrt": {
+            const a = evaluateGraphNode(node.arg, xValue);
+            return (a === null || a < 0) ? null : Math.sqrt(a);
+        }
+        case "abs": {
+            const a = evaluateGraphNode(node.arg, xValue);
+            return a === null ? null : Math.abs(a);
+        }
+        case "func": {
+            const a = evaluateGraphNode(node.arg, xValue);
+            if (a === null) return null;
+            switch (node.name) {
+                case "sin": return Math.sin(a);
+                case "cos": return Math.cos(a);
+                case "tan": return Math.tan(a);
+                case "ln": return a > 0 ? Math.log(a) : null;
+                default: return null;
+            }
+        }
+        default: return null;
+    }
+}
+
+// Extrahiert die rechte Seite von "f(x)=..." und übersetzt sie in einen AST.
+// Ohne "=" (z.B. reine Eingabe "2x+3") wird die ganze Eingabe ausgewertet.
+function compileGraphFormula(latex) {
+    const eqIndex = latex.indexOf("=");
+    const rhs = eqIndex === -1 ? latex : latex.slice(eqIndex + 1);
+    return parseGraphExpression(tokenizeGraphFormula(rhs));
+}
 
 
 // Globales Objekt mit allen Einstellungen
@@ -599,7 +871,8 @@ function initCoordinateSystem() {
     const gridGroup = document.getElementById("graphGrid");
     const axesGroup = document.getElementById("graphAxes");
     const labelsGroup = document.getElementById("graphLabels");
-    if (!container || !svg || !gridGroup || !axesGroup || !labelsGroup) return;
+    const functionsGroup = document.getElementById("graphFunctions");
+    if (!container || !svg || !gridGroup || !axesGroup || !labelsGroup || !functionsGroup) return;
 
     const svgNS = "http://www.w3.org/2000/svg";
 
@@ -663,6 +936,7 @@ function initCoordinateSystem() {
         gridGroup.innerHTML = "";
         labelsGroup.innerHTML = "";
         axesGroup.innerHTML = "";
+        functionsGroup.innerHTML = "";
 
         const originScreenX = toScreenX(0);
         const originScreenY = toScreenY(0);
@@ -712,6 +986,53 @@ function initCoordinateSystem() {
         if (xAxisVisible) {
             axesGroup.appendChild(el("line", { class: "graphAxisLine", x1: 0, y1: originScreenY, x2: widthPx, y2: originScreenY }));
         }
+
+        // Funktionen
+        functionsState.forEach((fn, index) => {
+            if (!fn.visible || !fn.ast) return;
+            const d = pointsToPathD(samplePoints(fn));
+            if (!d) return;
+            functionsGroup.appendChild(el("path", {
+                d,
+                fill: "none",
+                stroke: colorForIndex(index),
+                "stroke-width": 2.5,
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+            }));
+        });
+    }
+
+    // Sampling: pro sichtbarer Pixel-Spalte den zugehörigen x-Wert auswerten.
+    // Alle 2px statt jedem einzelnen Pixel – visuell nicht wahrnehmbar,
+    // halbiert aber die Auswertungen pro Redraw (siehe Performance-Hinweis).
+    // Werte außerhalb eines großzügigen Bereichs (Asymptoten, z.B. tan(x))
+    // brechen den Pfad ab, statt eine falsche Spitze durchzuziehen.
+    function samplePoints(fn) {
+        const points = [];
+        const visibleHalfHeightMath = (heightPx / 2) / viewport.pixelsPerUnit;
+        const maxAbsY = Math.abs(viewport.centerY) + visibleHalfHeightMath * 4;
+
+        for (let px = 0; px <= widthPx; px += 2) {
+            const mathY = evaluateGraphNode(fn.ast, toMathX(px));
+            if (mathY === null || !Number.isFinite(mathY) || Math.abs(mathY) > maxAbsY) {
+                points.push(null);
+            } else {
+                points.push({ x: px, y: toScreenY(mathY) });
+            }
+        }
+        return points;
+    }
+
+    function pointsToPathD(points) {
+        let d = "";
+        let penDown = false;
+        points.forEach(p => {
+            if (p === null) { penDown = false; return; }
+            d += (penDown ? "L" : "M") + p.x.toFixed(1) + "," + p.y.toFixed(1) + " ";
+            penDown = true;
+        });
+        return d.trim();
     }
 
     // ── Größenänderung (Container-Resize, inkl. Fullscreen-Toggle) ────────
@@ -722,6 +1043,19 @@ function initCoordinateSystem() {
         render();
     });
     resizeObserver.observe(container);
+
+    // Bündelt schnell aufeinanderfolgende Redraws (Pan-Drag, Pinch, Mausrad)
+    // auf maximal einen pro Frame – Grid/Achsen/Funktionen zusammen sind
+    // teurer als der reine Grid/Achsen-Redraw aus Phase 1.
+    let renderScheduled = false;
+    function scheduleRender() {
+        if (renderScheduled) return;
+        renderScheduled = true;
+        requestAnimationFrame(() => {
+            renderScheduled = false;
+            render();
+        });
+    }
 
     // ── Pointer-Interaktionen: Pan (1 Finger/Maus) & Pinch-Zoom (2 Finger) ──
     const activePointers = new Map(); // pointerId -> {x, y}
@@ -759,7 +1093,7 @@ function initCoordinateSystem() {
             const pts = Array.from(activePointers.values());
             const distance = distanceBetween(pts[0], pts[1]);
             viewport.pixelsPerUnit = clampZoom(pinchStartZoom * (distance / pinchStartDistance));
-            render();
+            scheduleRender();
             return;
         }
 
@@ -768,7 +1102,7 @@ function initCoordinateSystem() {
             const dyPx = e.clientY - panStartScreen.y;
             viewport.centerX = panStartCenter.x - dxPx / viewport.pixelsPerUnit;
             viewport.centerY = panStartCenter.y + dyPx / viewport.pixelsPerUnit;
-            render();
+            scheduleRender();
         }
     });
 
@@ -810,7 +1144,7 @@ function initCoordinateSystem() {
         viewport.centerX = cursorMathXBefore - (cursorScreenX - widthPx / 2) / viewport.pixelsPerUnit;
         viewport.centerY = cursorMathYBefore + (cursorScreenY - heightPx / 2) / viewport.pixelsPerUnit;
 
-        render();
+        scheduleRender();
     }, { passive: false });
 
     // ── Toolbar-Buttons anbinden ─────────────────────────────────────────
@@ -828,6 +1162,8 @@ function initCoordinateSystem() {
         viewport.pixelsPerUnit = 40;
         render();
     });
+
+    requestGraphRedraw = render;
 }
 
 document.addEventListener("DOMContentLoaded", initCoordinateSystem);
