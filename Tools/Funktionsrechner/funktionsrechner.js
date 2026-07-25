@@ -463,7 +463,7 @@ function initAddFunctionModal() {
     customElements.whenDefined("math-field").then(() => {
         try {
             if (window.mathVirtualKeyboard) {
-                window.mathVirtualKeyboard.layouts = ["numeric", "alphabetic", "greek"];
+                window.mathVirtualKeyboard.layouts = ["numeric", "functions", "symbols", "alphabetic", "greek"];
             }
         } catch (e) { /* Version-abhängig, kein Blocker */ }
     });
@@ -484,7 +484,94 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class GraphFormulaError extends Error {}
 
-function tokenizeGraphFormula(latex) {
+// ==========================================================================
+// BLACKLIST – identisch zu Formel Umformer/Gleichungslöser (bis auf die
+// Ungleichungs-Meldung, an den Funktions-Kontext angepasst)
+// ==========================================================================
+const GRAPH_BLACKLIST_CHECKS = [
+    { re: /\\int|\\iint|\\iiint|\\oint/, msg: "Integrale werden nicht unterstützt." },
+    { re: /\\sum/, msg: "Summenzeichen werden nicht unterstützt." },
+    { re: /\\prod/, msg: "Produktzeichen werden nicht unterstützt." },
+    { re: /\\lim/, msg: "Grenzwerte werden nicht unterstützt." },
+    { re: /\\begin\{(matrix|pmatrix|bmatrix|vmatrix|Vmatrix|cases|array)\}/, msg: "Matrizen/Fallunterscheidungen werden nicht unterstützt." },
+    { re: /\\vec|\\overrightarrow/, msg: "Vektoren werden nicht unterstützt." },
+    { re: /\\det/, msg: "Determinanten werden nicht unterstützt." },
+    { re: /\\in\b|\\notin|\\subset|\\subseteq|\\cup|\\cap|\\emptyset|\\forall|\\exists/, msg: "Mengenlehre wird nicht unterstützt." },
+    { re: /\\Rightarrow|\\Leftrightarrow|\\rightarrow|\\wedge|\\vee|\\neg/, msg: "Logikoperatoren werden nicht unterstützt." },
+    { re: /\\leq|\\geq|\\neq|\\approx|\\equiv|[<>]/, msg: "Ungleichungen werden nicht unterstützt – gib eine Funktion in der Form f(x) = ... ein." },
+    { re: /\\partial|\\nabla|\\prime/, msg: "Ableitungen werden nicht unterstützt." },
+    { re: /\\Im\b|\\Re\b|\\overline\{|\\bar\{|\\mathbb\{C\}/, msg: "Komplexe Zahlen werden nicht unterstützt." },
+    { re: /\\binom|\\choose/, msg: "Binomialkoeffizienten werden nicht unterstützt." }
+];
+
+function checkGraphBlacklist(latex) {
+    for (const { re, msg } of GRAPH_BLACKLIST_CHECKS) {
+        if (re.test(latex)) throw new GraphFormulaError(msg);
+    }
+}
+
+// Liest die Variable aus der linken Seite (z.B. "t" aus "f(t)=...", "r" aus
+// "h(r)=..."). Ohne erkennbare Klammer-Variable (z.B. "y=2x+3" oder reine
+// Eingabe ohne "=") wird "x" als Standard angenommen.
+function extractGraphVariable(latex) {
+    const eqIndex = latex.indexOf("=");
+    if (eqIndex === -1) return "x";
+    const lhs = latex.slice(0, eqIndex).replace(/\\left|\\right/g, "");
+    const match = lhs.match(/\(\s*([a-zA-Z])\s*\)/);
+    return match ? match[1] : "x";
+}
+
+// Findet das Ende einer Klammergruppe "{...}" (auch verschachtelt).
+function findMatchingBrace(latex, start) {
+    let depth = 0;
+    for (let k = start; k < latex.length; k++) {
+        if (latex[k] === "{") depth++;
+        else if (latex[k] === "}") {
+            depth--;
+            if (depth === 0) return k + 1;
+        }
+    }
+    throw new GraphFormulaError("Eine geschweifte Klammer wurde nicht richtig geschlossen.");
+}
+
+// Liest EIN Argument von \frac oder \sqrt ein – entweder eine geklammerte
+// Gruppe {...} oder (LaTeX-Kurzschreibweise für einstellige Argumente, z.B.
+// "\frac34" für 3/4) genau EIN einzelnes Zeichen bzw. "\pi". Gibt fertige
+// Tokens zurück, bereits in LBRACE/RBRACE eingebettet, damit der Parser nur
+// eine einzige Form kennen muss.
+function readBraceOrBareArgument(latex, i, contextLabel, varName) {
+    const n = latex.length;
+    while (i < n && /\s/.test(latex[i])) i++;
+
+    if (latex[i] === "{") {
+        const end = findMatchingBrace(latex, i);
+        const inner = latex.slice(i + 1, end - 1);
+        const innerTokens = tokenizeGraphFormula(inner, varName).slice(0, -1); // ohne EOF
+        return { tokens: [{ type: "LBRACE" }, ...innerTokens, { type: "RBRACE" }], nextIndex: end };
+    }
+    if (latex[i] === "\\") {
+        let j = i + 1;
+        while (j < n && /[a-zA-Z]/.test(latex[j])) j++;
+        const cmd = latex.slice(i + 1, j);
+        if (cmd !== "pi") {
+            throw new GraphFormulaError(`Nach „${contextLabel}" ohne geschweifte Klammern wird eine einzelne Ziffer, „${varName}" oder „\\pi" erwartet.`);
+        }
+        return { tokens: [{ type: "LBRACE" }, { type: "CONST", name: "pi" }, { type: "RBRACE" }], nextIndex: j };
+    }
+    if (/[0-9]/.test(latex[i])) {
+        return { tokens: [{ type: "LBRACE" }, { type: "NUM", value: parseFloat(latex[i]) }, { type: "RBRACE" }], nextIndex: i + 1 };
+    }
+    if (latex[i] === varName) {
+        return { tokens: [{ type: "LBRACE" }, { type: "VAR" }, { type: "RBRACE" }], nextIndex: i + 1 };
+    }
+    if (latex[i] === "e") {
+        return { tokens: [{ type: "LBRACE" }, { type: "CONST", name: "e" }, { type: "RBRACE" }], nextIndex: i + 1 };
+    }
+
+    throw new GraphFormulaError(`„${contextLabel}" ist unvollständig.`);
+}
+
+function tokenizeGraphFormula(latex, varName) {
     const tokens = [];
     let i = 0;
     const n = latex.length;
@@ -502,13 +589,24 @@ function tokenizeGraphFormula(latex) {
                 case "left": case "right": continue;
                 case "cdot": case "times": tokens.push({ type: "MUL" }); continue;
                 case "div": tokens.push({ type: "DIV" }); continue;
-                case "frac": tokens.push({ type: "FRAC" }); continue;
-                case "sqrt": tokens.push({ type: "SQRT" }); continue;
+                case "frac": {
+                    const numArg = readBraceOrBareArgument(latex, i, "\\frac", varName);
+                    const denArg = readBraceOrBareArgument(latex, numArg.nextIndex, "\\frac", varName);
+                    tokens.push({ type: "FRAC" }, ...numArg.tokens, ...denArg.tokens);
+                    i = denArg.nextIndex;
+                    continue;
+                }
+                case "sqrt": {
+                    const arg = readBraceOrBareArgument(latex, i, "\\sqrt", varName);
+                    tokens.push({ type: "SQRT" }, ...arg.tokens);
+                    i = arg.nextIndex;
+                    continue;
+                }
                 case "pi": tokens.push({ type: "CONST", name: "pi" }); continue;
                 case "sin": case "cos": case "tan": case "ln":
                     tokens.push({ type: "FUNC", name: cmd }); continue;
                 default:
-                    throw new GraphFormulaError(`Der Befehl „${cmd}" wird hier nicht unterstützt.`);
+                    throw new GraphFormulaError(`Der Befehl „\\${cmd}" wird für Funktionsgraphen nicht unterstützt. Unterstützt werden Zahlen, ${varName}, +, −, ×, ÷, Potenzen, Klammern sowie sin, cos, tan, √, ln, π und Beträge.`);
             }
         }
 
@@ -522,6 +620,7 @@ function tokenizeGraphFormula(latex) {
         if (ch === "-") { tokens.push({ type: "MINUS" }); i++; continue; }
         if (ch === "*") { tokens.push({ type: "MUL" }); i++; continue; }
         if (ch === "/") { tokens.push({ type: "DIV" }); i++; continue; }
+        if (ch === "π") { tokens.push({ type: "CONST", name: "pi" }); i++; continue; }
 
         if (/[0-9]/.test(ch) || ((ch === "." || ch === ",") && /[0-9]/.test(latex[i + 1] || ""))) {
             let raw = "";
@@ -534,17 +633,25 @@ function tokenizeGraphFormula(latex) {
             continue;
         }
 
-        if (ch === "x") { tokens.push({ type: "VAR" }); i++; continue; }
+        if (ch === varName) { tokens.push({ type: "VAR" }); i++; continue; }
         if (ch === "e") { tokens.push({ type: "CONST", name: "e" }); i++; continue; }
         if (/[a-zA-Z]/.test(ch)) {
-            throw new GraphFormulaError(`Nur die Variable „x" wird unterstützt (gefunden: „${ch}").`);
+            throw new GraphFormulaError(`Nur die Variable „${varName}" wird unterstützt (gefunden: „${ch}"). Achte darauf, dass die Variable in der Klammer links vom „=" mit der Variable auf der rechten Seite übereinstimmt.`);
         }
 
-        throw new GraphFormulaError(`Das Zeichen „${ch}" wird nicht erkannt.`);
+        throw new GraphFormulaError(`Das Zeichen „${ch}" wird nicht erkannt. Bitte überprüfe deine Eingabe.`);
     }
 
     tokens.push({ type: "EOF" });
     return tokens;
+}
+
+function compileGraphFormula(latex) {
+    checkGraphBlacklist(latex);
+    const varName = extractGraphVariable(latex);
+    const eqIndex = latex.indexOf("=");
+    const rhs = eqIndex === -1 ? latex : latex.slice(eqIndex + 1);
+    return parseGraphExpression(tokenizeGraphFormula(rhs, varName));
 }
 
 function parseGraphExpression(tokens) {
@@ -614,7 +721,7 @@ function parseGraphExpression(tokens) {
             case "LPAREN": {
                 advance();
                 const e = parseExpr();
-                expect("RPAREN", "Eine Klammer wurde nicht geschlossen.");
+                expect("RPAREN", "Eine runde Klammer wurde nicht geschlossen.");
                 return e;
             }
             case "PIPE": {
@@ -627,12 +734,12 @@ function parseGraphExpression(tokens) {
             }
             case "FRAC": {
                 advance();
-                expect("LBRACE", "Der Bruch ist unvollständig.");
+                expect("LBRACE", "Der Bruch ist unvollständig – der Zähler fehlt.");
                 const num = parseExpr();
-                expect("RBRACE", "Der Zähler wurde nicht richtig geschlossen.");
-                expect("LBRACE", "Der Bruch ist unvollständig.");
+                expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
+                expect("LBRACE", "Der Bruch ist unvollständig – der Nenner fehlt.");
                 const den = parseExpr();
-                expect("RBRACE", "Der Nenner wurde nicht richtig geschlossen.");
+                expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
                 return { type: "div", left: num, right: den };
             }
             case "SQRT": {
@@ -659,7 +766,7 @@ function parseGraphExpression(tokens) {
 
     const expr = parseExpr();
     if (peek().type !== "EOF") {
-        throw new GraphFormulaError("Am Ende der Formel befinden sich überzählige Zeichen.");
+        throw new GraphFormulaError("Am Ende der Formel befinden sich überzählige Zeichen. Bitte überprüfe deine Eingabe.");
     }
     return expr;
 }
@@ -710,13 +817,7 @@ function evaluateGraphNode(node, xValue) {
     }
 }
 
-// Extrahiert die rechte Seite von "f(x)=..." und übersetzt sie in einen AST.
-// Ohne "=" (z.B. reine Eingabe "2x+3") wird die ganze Eingabe ausgewertet.
-function compileGraphFormula(latex) {
-    const eqIndex = latex.indexOf("=");
-    const rhs = eqIndex === -1 ? latex : latex.slice(eqIndex + 1);
-    return parseGraphExpression(tokenizeGraphFormula(rhs));
-}
+
 
 
 // Globales Objekt mit allen Einstellungen
@@ -1010,15 +1111,33 @@ function initCoordinateSystem() {
     // brechen den Pfad ab, statt eine falsche Spitze durchzuziehen.
     function samplePoints(fn) {
         const points = [];
-        const visibleHalfHeightMath = (heightPx / 2) / viewport.pixelsPerUnit;
-        const maxAbsY = Math.abs(viewport.centerY) + visibleHalfHeightMath * 4;
+        const minY = toMathY(heightPx), maxY = toMathY(0);
+        const visibleRange = Math.max(maxY - minY, 1e-6);
+        const cutoff = visibleRange * 3; // zu weit außerhalb -> Pfad abbrechen statt riesige Koordinate zeichnen
+
+        let prevY = null;
 
         for (let px = 0; px <= widthPx; px += 2) {
             const mathY = evaluateGraphNode(fn.ast, toMathX(px));
-            if (mathY === null || !Number.isFinite(mathY) || Math.abs(mathY) > maxAbsY) {
-                points.push(null);
-            } else {
+            let isValid = mathY !== null && Number.isFinite(mathY) && Math.abs(mathY - viewport.centerY) <= cutoff;
+
+            // Polstellen-Erkennung: Springt der Wert zwischen zwei benachbarten
+            // Stützstellen stark UND wechselt dabei das Vorzeichen (z.B. 1/x bei
+            // x=0), liegt sehr wahrscheinlich eine Asymptote dazwischen – nicht
+            // verbinden, sonst entsteht eine lange, unnötige "Spitze" im Pfad,
+            // die bei jedem Redraw neu gerendert werden muss.
+            if (isValid && prevY !== null) {
+                const jump = Math.abs(mathY - prevY);
+                const signChange = (mathY > 0) !== (prevY > 0);
+                if (signChange && jump > visibleRange * 1.5) isValid = false;
+            }
+
+            if (isValid) {
                 points.push({ x: px, y: toScreenY(mathY) });
+                prevY = mathY;
+            } else {
+                points.push(null);
+                prevY = null;
             }
         }
         return points;
