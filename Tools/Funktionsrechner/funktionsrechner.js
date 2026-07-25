@@ -233,21 +233,11 @@ function validateFunctionInput(latex) {
         return "Bitte gib eine Funktion ein.";
     }
 
-    const openers = { "{": "}", "(": ")", "[": "]" };
-    const closers = { "}": "{", ")": "(", "]": "[" };
-    const stack = [];
-
-    for (const ch of latex) {
-        if (openers[ch]) stack.push(ch);
-        else if (closers[ch] && stack.pop() !== closers[ch]) {
-            return "Die Klammern in deiner Funktion sind nicht korrekt geschlossen.";
-        }
-    }
-    if (stack.length > 0) {
-        return "Die Klammern in deiner Funktion sind nicht korrekt geschlossen.";
-    }
-
-    // Echte mathematische Prüfung: lässt sich die Formel überhaupt auswerten?
+    // Der frühere separate Klammer-Vorcheck ist entfernt: compileGraphFormula()
+    // prüft Klammern jetzt selbst, mit präziseren, kontextbezogenen Meldungen
+    // (z.B. "Der Zähler des Bruchs wurde nicht richtig abgeschlossen." statt
+    // einer generischen "Klammern nicht korrekt geschlossen"-Meldung) – exakt
+    // wie bei Formel Umformer und Gleichungslöser.
     try {
         compileGraphFormula(latex);
     } catch (err) {
@@ -375,7 +365,15 @@ function initAddFunctionModal() {
     function openModal() {
         hideModalError();
         modal.classList.add('is-visible');
-        setTimeout(() => input.focus(), 50);
+        // Doppeltes requestAnimationFrame statt fester setTimeout-Wartezeit:
+        // stellt zuverlässig sicher, dass der Browser Sichtbarkeit/Layout
+        // wirklich verarbeitet hat, bevor fokussiert wird. Ein zu früher
+        // programmatischer Fokus-Aufruf ist der Grund, warum die physische
+        // Tastatur gelegentlich erst nach Interaktion mit der virtuellen
+        // Tastatur wieder reagiert hat.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => input.focus());
+        });
     }
 
     // 1. Popup öffnen (Neu)
@@ -402,6 +400,7 @@ function initAddFunctionModal() {
     const closeModal = () => {
         modal.classList.remove('is-visible');
         editingFunctionId = null;
+        input.blur(); // sauberer Fokus-Zustand, damit der nächste Öffnen-Vorgang nicht auf Altlasten trifft
     };
 
     cancelBtn.addEventListener('click', closeModal);
@@ -462,6 +461,12 @@ function initAddFunctionModal() {
     // ── MathLive Tastatur-Layout (bisher nicht gesetzt) ────────────────────
     customElements.whenDefined("math-field").then(() => {
         try {
+            // Ohne diese Zeile bleibt die virtuelle Tastatur auf Desktop-Geräten
+            // komplett deaktiviert (MathLive zeigt sie nur automatisch auf
+            // Touch-Geräten) – "onfocus" macht sie geräteunabhängig nutzbar.
+            if (window.MathfieldElement) {
+                window.MathfieldElement.mathVirtualKeyboardPolicy = "onfocus";
+            }
             if (window.mathVirtualKeyboard) {
                 window.mathVirtualKeyboard.layouts = ["numeric", "functions", "symbols", "alphabetic", "greek"];
             }
@@ -648,6 +653,12 @@ function tokenizeGraphFormula(latex, varName) {
 
 function compileGraphFormula(latex) {
     checkGraphBlacklist(latex);
+
+    const eqCount = (latex.match(/=/g) || []).length;
+    if (eqCount > 1) {
+        throw new GraphFormulaError("Es darf nur ein Gleichheitszeichen (=) vorkommen.");
+    }
+
     const varName = extractGraphVariable(latex);
     const eqIndex = latex.indexOf("=");
     const rhs = eqIndex === -1 ? latex : latex.slice(eqIndex + 1);
@@ -1111,34 +1122,33 @@ function initCoordinateSystem() {
     // brechen den Pfad ab, statt eine falsche Spitze durchzuziehen.
     function samplePoints(fn) {
         const points = [];
-        const minY = toMathY(heightPx), maxY = toMathY(0);
-        const visibleRange = Math.max(maxY - minY, 1e-6);
-        const cutoff = visibleRange * 3; // zu weit außerhalb -> Pfad abbrechen statt riesige Koordinate zeichnen
+        // Grenzen in Bildschirm-Pixeln statt Mathe-Einheiten: dadurch bleibt die
+        // Logik unabhängig vom Zoom-Level korrekt, ohne separate Kalibrierung
+        // pro Zoomstufe (das war der Grund für das "Hin- und Herspringen").
+        const farLimit = heightPx * 2;   // jenseits davon: Punkt gar nicht erst zeichnen
+        const jumpLimit = heightPx;      // Sprung zwischen zwei Nachbarpunkten größer als die
+                                          // sichtbare Höhe -> Polstelle dazwischen, nicht verbinden
 
-        let prevY = null;
+        let prevScreenY = null;
 
         for (let px = 0; px <= widthPx; px += 2) {
             const mathY = evaluateGraphNode(fn.ast, toMathX(px));
-            let isValid = mathY !== null && Number.isFinite(mathY) && Math.abs(mathY - viewport.centerY) <= cutoff;
+            let screenY = null;
 
-            // Polstellen-Erkennung: Springt der Wert zwischen zwei benachbarten
-            // Stützstellen stark UND wechselt dabei das Vorzeichen (z.B. 1/x bei
-            // x=0), liegt sehr wahrscheinlich eine Asymptote dazwischen – nicht
-            // verbinden, sonst entsteht eine lange, unnötige "Spitze" im Pfad,
-            // die bei jedem Redraw neu gerendert werden muss.
-            if (isValid && prevY !== null) {
-                const jump = Math.abs(mathY - prevY);
-                const signChange = (mathY > 0) !== (prevY > 0);
-                if (signChange && jump > visibleRange * 1.5) isValid = false;
+            if (mathY !== null && Number.isFinite(mathY)) {
+                const sy = toScreenY(mathY);
+                if (sy >= -farLimit && sy <= heightPx + farLimit) screenY = sy;
             }
 
-            if (isValid) {
-                points.push({ x: px, y: toScreenY(mathY) });
-                prevY = mathY;
-            } else {
+            if (screenY !== null && prevScreenY !== null && Math.abs(screenY - prevScreenY) > jumpLimit) {
+                // Sprung zu groß für eine glatte Kurve bei diesem Sampling-Abstand
+                // -> Polstelle dazwischen (z.B. 1/x bei x=0). Neuer Kurvenzweig
+                // statt Verbindungslinie über die Asymptote hinweg.
                 points.push(null);
-                prevY = null;
             }
+
+            points.push(screenY === null ? null : { x: px, y: screenY });
+            prevScreenY = screenY;
         }
         return points;
     }
