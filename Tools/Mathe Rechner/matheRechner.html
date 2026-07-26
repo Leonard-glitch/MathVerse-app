@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathe Rechner</title>
+    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="stylesheet" href="../../css/feedback.css">
+    <link rel="stylesheet" href="../../css/Common/common.css">
+    <link rel="stylesheet" href="./matheRechner.css">
+
+    <script type="module">
+        import "https://esm.run/mathlive";
+    </script>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
+
+            <div>
+                <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+
+                <div id="searchResults"></div>
+            </div>
+
+            <div id="navUserArea"><a href="../../html/login.html" target="_self" class="navTextBorder">Login</a>
+                <a href="../../html/register.html" target="_self" class="navTextBorder">Register</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="mathCalculatorSection">
+            <h1 class="zahlenHeader">Mathe Rechner</h1>
+
+            <div class="mathMainCard">
+                <div class="mathMainCardTop">
+                    <div class="advancedMode">
+                        <span class="advancedText">Advanced Mode</span>
+                        <label class="switch"><input type="checkbox"><span class="slider round"></span></label>
+                    </div>
+                    <div class="liveanddegSettings">
+                        <div class="liveresultbutton">
+                            <span class="advancedText">Live Result</span>
+                            <!-- Rounded switch -->
+                            <label class="switch"><input type="checkbox"><span class="slider round"></span></label>
+                        </div>
+
+                        <div>
+                            <select name="degrad" id="degradSwitch" class="selection">
+                            <option value="deg">DEG</option>
+                            <option value="rad">RAD</option>
+                        </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mathMainCardMainContainer">
+                    <math-field id="mathInput" class="zahlenInputfeld" placeholder="$$5+7$$"></math-field>
+
+                    <div class="resultAndpathDiv">
+                        <div class="resultDiv"><span class="resultLable">Ergebnis:</span><span id="resultoutput"></span></div>
+                        <div class="pathDiv">
+                            <div class="pathLable"><button class="button" id="pathDropoutBtn"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Rechenweg<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button></div>
+                            <div id="pathOutput"></div>
+                        </div>
+                    </div>
+
+                    <div class="customInputsSec">
+                        <div class="customInputContainer" id="quickAccessContainer">
+                            <div class="customInputContainerRow">
+                                <button class="padButton" id="btn-std-sq">x²</button>
+                                <button class="padButton" id="btn-std-sqrt">√</button>
+                                <button class="padButton" id="btn-std-sin">sin</button>
+                                <button class="padButton" id="btn-std-cos">cos</button>
+                            </div>
+                            
+                            <div class="customInputContainerRow">
+                                <button class="padButton" id="btn-std-tan">tan</button>
+                                <button class="padButton" id="btn-std-pi">π</button>
+                                <button class="padButton" id="btn-std-percent">%</button>
+                                <div style="flex: 1;"></div>
+                            </div>
+                        </div>
+                        <div class="customInputContainer" id="numericKeypadContainer">
+                            <div class="customInputContainerRow">
+                                <button class="padButton" id="btn-open">(</button>
+                                <button class="padButton" id="btn-close">)</button>
+                                <button class="padButton" id="btn-clear">C</button>
+                                <button class="padButton" id="btn-del">⌫</button>
+                            </div>
+                            
+                            <div class="customInputContainerRow">
+                                <button class="padButton" id="btn-7">7</button>
+                                <button class="padButton" id="btn-8">8</button>
+                                <button class="padButton" id="btn-9">9</button>
+                                <button class="padButton" id="btn-div">÷</button>
+                            </div>
+                            
+                            <div class="customInputContainerRow">
+                                <button class="padButton" id="btn-4">4</button>
+                                <button class="padButton" id="btn-5">5</button>
+                                <button class="padButton" id="btn-6">6</button>
+                                <button class="padButton" id="btn-mul">×</button>
+                            </div>
+                            
+                            <div class="customInputContainerRow">
+                                <button class="padButton" id="btn-1">1</button>
+                                <button class="padButton" id="btn-2">2</button>
+                                <button class="padButton" id="btn-3">3</button>
+                                <button class="padButton" id="btn-sub">−</button>
+                            </div>
+                            
+                            <div class="customInputContainerRow">
+                                <button class="padButton" id="btn-0">0</button>
+                                <button class="padButton" id="btn-dot">.</button>
+                                <button class="padButton" id="btn-add">+</button>
+                                <button class="padButton" id="btn-eq">=</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="historyDiv">
+                        <div class="historyLable"><button class="button" id="showHistoryBtn"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Verlauf<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button></div>
+                        <div id="historyOutput"></div>
+                        <div class="deleteHistory"><button class="button" id="deleteHistoryBtn">Verlauf löschen</button></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footerNav">
+
+            <div class="footerSocial">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+            </div>
+
+            <div class="linksFooterect">
+                <a href="../../html/datenSchutz.html">Datenschutz</a>
+
+                <button id="openFeedbackBtn">Feedback senden</button>
+
+                <a href="../../html/impressum.html">Impressum</a>
+            </div>
+
+            <div class="platzhalter">&copy; 2026 MathVerse</div>
+        </div>
+    </footer>
+    <script src="../../javaScript/Common/common-login.js"></script>
+    <script src="./matheRechner.js"></script>
+    <script src="../../javaScript/feedback.js"></script>
+    <script type="module" src="../../javaScript/toolFavorite.js"></script>
+    <script type="module" src="../../javaScript/search.js"></script>
+</body>
+</html>
