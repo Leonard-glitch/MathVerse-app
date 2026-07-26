@@ -72,7 +72,7 @@ export const tools = [
         tags:     ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner", "anteil", "prozentsatz", "grundwert", "veränderung", "erhöhung", "verminderung", "netto", "brutto", "skonto", "rechenweg", "advanced"],
         info:     "Umfassender Prozentrechner mit Advanced Mode: Berechnet Anteil, Prozentsatz, Grundwert, prozentuale Veränderungen, Erhöhungen/Verminderungen, MwSt (Netto/Brutto) sowie Rabatte inklusive detailliertem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Prozentrechnung_Thumbnail3.png`,
+            big:   `${BASE}/pictures/Prozentrechnung4.png`,
             small: `${BASE}/pictures/icons/prozentrechner-icon.png`
         }
     },
@@ -179,7 +179,20 @@ export const tools = [
             big:   `${BASE}/pictures/Funktionsrechner2.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
-     }
+    },
+    {
+        id:       "card14",
+        title:    "Mathe Rechner",
+        group:    "arithmetik",
+        filename: "matheRechner.html",
+        url:      `${BASE}/Tools/Mathe Rechner/matheRechner.html`,
+        tags:     ["taschenrechner", "arithmetik", "trigonometrie", "algebra", "fortgeschritten", "advanced"],
+        info:     "Wissenschaftlicher Taschenrechner mit Standard- und Advanced-Modus für komplexe Rechnungen.",
+        image: {
+            big:   `${BASE}/pictures/Mathe Rechner1.png`,
+            small: `${BASE}/pictures/icons/meinTool-icon.png`
+        }
+    }
 
 
     // -----------------------------------------------------------------------

@@ -34,6 +34,13 @@
     gap: 1rem;
 }
 
+.liveresultbutton{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 
 .button {
     background-color: var(--bg-surface);
@@ -100,6 +107,13 @@
 
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+}
+
+#mathInput{
+    --caret-color: var(--border-glow);
+    --selection-background-color: var(--glow-soft);
+    --selection-color: var(--text-primary);
+    --contains-highlight-background-color: var(--glow-soft);
 }
 
 .resultAndpathDiv{
@@ -197,7 +211,7 @@
 .customInputsSec {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap:wrap-reverse;
     justify-content: center;
     gap: 1.5rem;
     margin-top: 1.5rem;
@@ -328,7 +342,6 @@
 
 .historyLable{
     padding: 0;
-    border-bottom: 1px solid var(--border-color);
     width: 100%;
 }
 #showHistoryBtn{
@@ -342,5 +355,38 @@
     text-shadow: none;
 }
 
-#historyOutput{display: none;}
+#historyOutput{display: none;border-top: 1px solid var(--border-color);}
 .deleteHistory{display: none;}
+
+
+@media (max-width: 900px) {
+    .mathMainCard{
+        width: 100%;
+        margin-top: 1rem;
+    }
+    #mathInput{
+        padding: 0;
+    }
+}
+
+@media (max-width: 640px) {
+  .mathMainCardTop{
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .zahlenInputfeld{
+    width: 99%;
+  }
+
+  .resultAndpathDiv{
+    width: 99%;
+  }
+  .historyDiv{
+    width: 99%;
+  }
+}
+
