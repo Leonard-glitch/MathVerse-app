@@ -236,12 +236,17 @@
 .coord-btn {
     position: absolute;
     z-index: 10; /* Garantiert, dass die Buttons ÜBER dem Feld liegen */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
     cursor: pointer;
     background-color: var(--bg-surface);
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: 0.2rem 1.4rem;
     border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-main);
@@ -251,6 +256,12 @@
 
 .coord-btn:hover {
     text-shadow: none;
+}
+
+.coord-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 /* ── Koordinatensystem: SVG-Viewport (Grid, Achsen, Pan & Zoom) ─────────── */
@@ -287,6 +298,71 @@
     font-family: var(--font-main);
     font-size: 11px;
     user-select: none;
+}
+
+/* ── Graph-Marker (Nullstellen, y-Achsenabschnitt, Schnittpunkte) ───────── */
+.graphMarkerRoot,
+.graphMarkerYIntercept,
+.graphMarkerIntersection {
+    stroke: var(--bg-body);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+}
+
+.graphMarkerRoot {
+    fill: var(--accent-live);
+    filter: drop-shadow(0 0 3px var(--glow-live));
+}
+
+.graphMarkerYIntercept {
+    fill: var(--border-glow);
+    filter: drop-shadow(0 0 3px var(--glow-soft));
+}
+
+.graphMarkerIntersection {
+    fill: var(--accent-error);
+    filter: drop-shadow(0 0 3px var(--glow-error));
+}
+
+/* ── Legende (Settings: "Legende anzeigen") ──────────────────────────────
+   Bewusst unten links platziert: oben sind Undo/Redo (links) und
+   Einstellungen (rechts), unten rechts Reset/Zoom/Fullscreen – unten links
+   ist der einzige freie Bereich. */
+.graphLegend {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.5rem 0.7rem;
+    max-width: 160px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-main);
+    pointer-events: none;
+}
+
+.graphLegendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.graphLegendDot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px currentColor;
 }
 
 
@@ -358,11 +434,64 @@
     max-height: 500px; /* Genügend Platz für den Inhalt */
     opacity: 1;
     padding: 0.5rem 1rem;
+    overflow-y: auto; /* falls mehrere Funktionen den Inhalt über 500px hinaus wachsen lassen */
 }
 
 /* Rechenweg-Container einblenden, wenn Ergebnisse aktiv sind */
 .rechenwegDiv.is-visible {
     display: flex;
+}
+
+/* Rechenweg-Inhalt: gleiches step-container-Muster wie bei den anderen Tools
+   (Bruchrechner, Geometrie Rechner, ...) für konsistente Optik. */
+#rechenwegOutput {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.step-container {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color var(--transition-speed);
+}
+
+.step-container:hover {
+    border-color: rgba(138, 22, 255, 0.15);
+}
+
+.step-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--border-glow);
+}
+
+.step-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.step-formula-box {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.7rem 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.step-sub-solution {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-live);
 }
 
 /* Pfeil-Rotation für beide Buttons */

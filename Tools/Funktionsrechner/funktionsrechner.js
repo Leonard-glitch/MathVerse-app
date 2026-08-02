@@ -2,43 +2,43 @@ const toolbarButtons = [
     {
         id: "undo",
         icon: "fa-undo",
-        tooltip: "undo",
+        tooltip: "Rückgängig (Strg+Z)",
         position: { top: "10px", left: "10px" }
     },
     {
         id: "redo",
         icon: "fa-repeat", // In FA 4.7 heißt Redo "fa-repeat"
-        tooltip: "redo",
+        tooltip: "Wiederholen (Strg+Y)",
         position: { top: "10px", left: "80px" }
     },
     {
         id: "settings",
         icon: "fa-cog",
-        tooltip: "settings",
+        tooltip: "Einstellungen",
         position: { top: "10px", right: "10px" }
     },
     {
         id: "reset",
         icon: "fa-home",
-        tooltip: "return to center",
+        tooltip: "Ansicht zurücksetzen",
         position: { bottom: "115px", right: "10px" }
     },
     {
         id: "zoom-in",
         icon: "fa-search-plus",
-        tooltip: "zoom-in",
+        tooltip: "Vergrößern",
         position: { bottom: "80px", right: "10px" }
     },
     {
         id: "zoom-out",
         icon: "fa-search-minus",
-        tooltip: "zoom-out",
+        tooltip: "Verkleinern",
         position: { bottom: "45px", right: "10px" }
     },
     {
         id: "fullscreen",
         icon: "fa-expand",
-        tooltip: "expand",
+        tooltip: "Vollbild",
         position: { bottom: "10px", right: "10px" }
     }
     
@@ -64,7 +64,7 @@ function renderToolbarButtons() {
             });
         }
 
-        const alreadyWiredElsewhere = ['fullscreen', 'zoom-in', 'zoom-out', 'reset'];
+        const alreadyWiredElsewhere = ['fullscreen', 'zoom-in', 'zoom-out', 'reset', 'settings', 'undo', 'redo'];
         btn.addEventListener('click', () => {
             if (btnData.id === 'fullscreen') {
                 toggleFullscreen();
@@ -209,6 +209,90 @@ let editingFunctionId = null;
 let openFunctionMenuId = null;
 let openFunctionModalForEdit = () => {}; // wird in initAddFunctionModal() gesetzt
 let requestGraphRedraw = () => {}; // wird in initCoordinateSystem() gesetzt
+let requestAutoScale = () => {}; // wird in initCoordinateSystem() gesetzt
+
+// ==========================================================================
+// UNDO/REDO – wie in GeoGebra: der Verlauf erfasst nur Änderungen an der
+// Funktionsliste (Hinzufügen/Bearbeiten/Löschen/Sichtbarkeit). Pan/Zoom der
+// Ansicht sind bewusst NICHT Teil des Undo-Stacks, exakt wie in GeoGebra.
+// ==========================================================================
+
+let functionsHistory = [[]];
+let functionsHistoryIndex = 0;
+
+// Speichert nur die serialisierbaren Felder – "ast" wird beim Wiederherstellen
+// aus "latex" neu kompiliert statt als Referenz mitgespeichert zu werden.
+function snapshotFunctionsState() {
+    return functionsState.map(fn => ({ id: fn.id, latex: fn.latex, visible: fn.visible }));
+}
+
+function pushFunctionsHistory() {
+    functionsHistory = functionsHistory.slice(0, functionsHistoryIndex + 1);
+    functionsHistory.push(snapshotFunctionsState());
+    functionsHistoryIndex++;
+    updateUndoRedoButtons();
+}
+
+function restoreFunctionsSnapshot(snapshot) {
+    functionsState = snapshot.map(entry => {
+        let ast = null;
+        try { ast = compileGraphFormula(entry.latex); } catch (err) { /* war beim ursprünglichen Speichern bereits gültig */ }
+        return { id: entry.id, latex: entry.latex, visible: entry.visible, ast };
+    });
+    openFunctionMenuId = null;
+    renderFunctionsList();
+    updateUndoRedoButtons();
+}
+
+function undoFunctionsChange() {
+    if (functionsHistoryIndex <= 0) return;
+    functionsHistoryIndex--;
+    restoreFunctionsSnapshot(functionsHistory[functionsHistoryIndex]);
+}
+
+function redoFunctionsChange() {
+    if (functionsHistoryIndex >= functionsHistory.length - 1) return;
+    functionsHistoryIndex++;
+    restoreFunctionsSnapshot(functionsHistory[functionsHistoryIndex]);
+}
+
+function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById('undo');
+    const redoBtn = document.getElementById('redo');
+    if (undoBtn) undoBtn.disabled = functionsHistoryIndex <= 0;
+    if (redoBtn) redoBtn.disabled = functionsHistoryIndex >= functionsHistory.length - 1;
+}
+
+function initUndoRedoButtons() {
+    document.getElementById('undo')?.addEventListener('click', undoFunctionsChange);
+    document.getElementById('redo')?.addEventListener('click', redoFunctionsChange);
+    updateUndoRedoButtons();
+
+    // Tastenkürzel wie in GeoGebra: Strg/Cmd+Z für Rückgängig, Strg/Cmd+Y
+    // ODER Strg/Cmd+Shift+Z für Wiederholen (beide gängigen Konventionen
+    // abgedeckt). Wird ignoriert, solange der Fokus in einem Eingabefeld
+    // liegt – dort soll die native Text-Undo-Funktion des Browsers/von
+    // MathLive unangetastet bleiben (z.B. beim Tippen einer Formel).
+    function isTypingContext() {
+        const el = document.activeElement;
+        if (!el) return false;
+        if (["INPUT", "TEXTAREA", "MATH-FIELD"].includes(el.tagName)) return true;
+        return !!el.isContentEditable;
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (!(event.ctrlKey || event.metaKey) || isTypingContext()) return;
+
+        const key = event.key.toLowerCase();
+        if (key === "z" && !event.shiftKey) {
+            event.preventDefault();
+            undoFunctionsChange();
+        } else if (key === "y" || (key === "z" && event.shiftKey)) {
+            event.preventDefault();
+            redoFunctionsChange();
+        }
+    });
+}
 
 // Buchstabe nach Listenposition: A, B, ... Z, A1, B1, ... Z1, A2, ...
 // Buchstabe UND Farbe werden aus der Position berechnet, nicht fest pro
@@ -221,6 +305,24 @@ function letterForIndex(index) {
 
 function colorForIndex(index) {
     return FUNCTION_COLORS[index % FUNCTION_COLORS.length];
+}
+
+// Kleine Farblegende im Graphen (Settings: "Legende anzeigen"). Wird nur bei
+// Änderungen an der Funktionsliste neu befüllt, nicht pro Render-Frame –
+// die reine Sichtbarkeit steuert render() selbst (siehe initCoordinateSystem).
+function renderGraphLegend() {
+    const legend = document.getElementById('graphLegend');
+    if (!legend) return;
+
+    const visibleEntries = functionsState
+        .map((fn, index) => ({ fn, index }))
+        .filter(({ fn }) => fn.visible);
+
+    legend.innerHTML = visibleEntries.map(({ index }) => {
+        const letter = letterForIndex(index);
+        const color = colorForIndex(index);
+        return `<div class="graphLegendItem"><span class="graphLegendDot" style="background-color:${color};"></span>${letter}(x)</div>`;
+    }).join("");
 }
 
 // Leichte Eingabe-Hygiene für die Modal-Validierung. Eine vollständige
@@ -249,13 +351,15 @@ function validateFunctionInput(latex) {
     return null; // gültig
 }
 
-function renderFunctionsList() {
+// Baut NUR die HTML-Liste neu auf (Buchstabe, Farbe, Formel, Sichtbarkeits-/
+// Menü-Zustand) – OHNE Analyse-Neuberechnung. Für reine UI-Zustandsänderungen
+// (Menü öffnen/schließen), bei denen sich an den Funktionen nichts ändert.
+function renderFunctionListHTML() {
     const container = document.querySelector('.allFunctionsContainer');
     if (!container) return;
 
     if (functionsState.length === 0) {
         container.innerHTML = `<p class="functionListEmpty">Noch keine Funktion hinzugefügt.</p>`;
-        requestGraphRedraw();
         return;
     }
 
@@ -285,14 +389,32 @@ function renderFunctionsList() {
                 </div>
             </div>`;
     }).join("");
-
-    requestGraphRedraw();
 }
 
+// Voller Zyklus: Analyse neu berechnen (Nullstellen/Extrema/Symmetrie/Marker),
+// Tabelle/Rechenweg/Legende/Liste aktualisieren, Graph neu zeichnen. NUR bei
+// tatsächlichen Datenänderungen aufrufen (Hinzufügen/Bearbeiten/Löschen/
+// Sichtbarkeit) – für reine Menü-Interaktionen renderFunctionListHTML()
+// direkt verwenden (siehe closeFunctionMenu() und initFunctionListEvents()).
+function renderFunctionsList(options = {}) {
+    const analysisData = computeAnalysisData();
+    renderResultsTable(analysisData);
+    updateFunctionMarkersCache(analysisData);
+    renderRechenweg(analysisData);
+    renderGraphLegend();
+
+    if (options.autoScale) {
+        const bounds = computeAutoScaleBounds(analysisData);
+        if (bounds) requestAutoScale(bounds);
+    }
+
+    renderFunctionListHTML();
+    requestGraphRedraw();
+}
 function closeFunctionMenu() {
     if (openFunctionMenuId === null) return;
     openFunctionMenuId = null;
-    renderFunctionsList();
+    renderFunctionListHTML();
 }
 
 // Event-Delegation: ein Listener für Sichtbarkeit, Menü, Bearbeiten, Löschen
@@ -315,17 +437,22 @@ function initFunctionListEvents() {
             const fn = functionsState.find(f => f.id === id);
             if (fn) fn.visible = !fn.visible;
             openFunctionMenuId = null;
+            pushFunctionsHistory();
+            renderFunctionsList();
         } else if (action === 'toggle-menu' && id !== null) {
+            // Reine UI-Zustandsänderung – keine Analyse-Neuberechnung nötig.
             openFunctionMenuId = (openFunctionMenuId === id) ? null : id;
+            renderFunctionListHTML();
         } else if (action === 'edit' && id !== null) {
             openFunctionMenuId = null;
+            renderFunctionListHTML();
             openFunctionModalForEdit(id);
         } else if (action === 'delete' && id !== null) {
             functionsState = functionsState.filter(f => f.id !== id);
             openFunctionMenuId = null;
+            pushFunctionsHistory();
+            renderFunctionsList();
         }
-
-        renderFunctionsList();
     });
 
     // Menü schließen bei Klick außerhalb oder Escape
@@ -426,14 +553,21 @@ function initAddFunctionModal() {
         let ast = null;
         try { ast = compileGraphFormula(latexValue); } catch (err) { /* siehe Kommentar oben */ }
 
-        if (editingFunctionId !== null) {
+        const isNewFunction = editingFunctionId === null;
+
+        if (!isNewFunction) {
             const fn = functionsState.find(f => f.id === editingFunctionId);
             if (fn) { fn.latex = latexValue; fn.ast = ast; }
         } else {
             functionsState.push({ id: nextFunctionId++, latex: latexValue, visible: true, ast });
         }
 
-        renderFunctionsList();
+        pushFunctionsHistory();
+        // Automatische Skalierung (falls aktiviert) nur beim Hinzufügen einer
+        // NEUEN Funktion – beim Bearbeiten/Löschen/Toggle bliebe der Viewport
+        // sonst unerwartet in Bewegung, während der Nutzer gerade manuell
+        // navigiert hat.
+        renderFunctionsList({ autoScale: isNewFunction });
         closeModal();
     };
 
@@ -458,19 +592,23 @@ function initAddFunctionModal() {
         hideModalError();
     });
 
-    // ── MathLive Tastatur-Layout (bisher nicht gesetzt) ────────────────────
+    // ── MathLive Tastatur-Layout ────────────────────────────────────────────
     customElements.whenDefined("math-field").then(() => {
         try {
-            // Ohne diese Zeile bleibt die virtuelle Tastatur auf Desktop-Geräten
-            // komplett deaktiviert (MathLive zeigt sie nur automatisch auf
-            // Touch-Geräten) – "onfocus" macht sie geräteunabhängig nutzbar.
+            // "onfocus" war ein Wert der ALTEN Property virtualKeyboardMode.
+            // mathVirtualKeyboardPolicy kennt nur "auto" | "manual" | "sandboxed" –
+            // der ungültige Wert machte den Toggle-Button wirkungslos.
+            // "manual": Tastatur erscheint nicht automatisch, ist aber über den
+            // eingebauten Toggle-Button steuerbar.
             if (window.MathfieldElement) {
-                window.MathfieldElement.mathVirtualKeyboardPolicy = "onfocus";
+                window.MathfieldElement.mathVirtualKeyboardPolicy = "manual";
             }
             if (window.mathVirtualKeyboard) {
                 window.mathVirtualKeyboard.layouts = ["numeric", "functions", "symbols", "alphabetic", "greek"];
             }
-        } catch (e) { /* Version-abhängig, kein Blocker */ }
+        } catch (e) {
+            console.warn("MathLive-Tastatur-Setup fehlgeschlagen:", e);
+        }
     });
 }
 
@@ -478,6 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAddFunctionModal();
     initFunctionListEvents();
     renderFunctionsList();
+    initUndoRedoButtons();
 });
 
 
@@ -610,8 +749,12 @@ function tokenizeGraphFormula(latex, varName) {
                 case "pi": tokens.push({ type: "CONST", name: "pi" }); continue;
                 case "sin": case "cos": case "tan": case "ln":
                     tokens.push({ type: "FUNC", name: cmd }); continue;
+                case "log": tokens.push({ type: "FUNC", name: "log" }); continue;
+                case "arcsin": tokens.push({ type: "FUNC", name: "asin" }); continue;
+                case "arccos": tokens.push({ type: "FUNC", name: "acos" }); continue;
+                case "arctan": tokens.push({ type: "FUNC", name: "atan" }); continue;
                 default:
-                    throw new GraphFormulaError(`Der Befehl „\\${cmd}" wird für Funktionsgraphen nicht unterstützt. Unterstützt werden Zahlen, ${varName}, +, −, ×, ÷, Potenzen, Klammern sowie sin, cos, tan, √, ln, π und Beträge.`);
+                    throw new GraphFormulaError(`Der Befehl „\\${cmd}" wird für Funktionsgraphen nicht unterstützt. Unterstützt werden Zahlen, ${varName}, +, −, ×, ÷, Potenzen, Klammern sowie sin, cos, tan, sin⁻¹, cos⁻¹, tan⁻¹, √, ln, log, π und Beträge.`);
             }
         }
 
@@ -821,6 +964,10 @@ function evaluateGraphNode(node, xValue) {
                 case "cos": return Math.cos(a);
                 case "tan": return Math.tan(a);
                 case "ln": return a > 0 ? Math.log(a) : null;
+                case "log": return a > 0 ? Math.log(a) / Math.LN10 : null;
+                case "asin": return (a < -1 || a > 1) ? null : Math.asin(a);
+                case "acos": return (a < -1 || a > 1) ? null : Math.acos(a);
+                case "atan": return Math.atan(a);
                 default: return null;
             }
         }
@@ -841,7 +988,6 @@ const settingsState = {
     markIntersects: true,
     markYIntercept: true,
     autoScale: true,
-    aspectRatio: false,
     zoomMouseWheel: true,
     panEnabled: true
 };
@@ -880,13 +1026,10 @@ function initSettingsModal() {
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', (e) => {
             const key = e.target.id.replace('set-', '');
-            
+
             if (key in settingsState) {
                 settingsState[key] = e.target.checked;
-                console.log(`Live-Update für "${key}":`, settingsState[key]);
-                
-                // Hier rufst du deine Funktion auf, die das Koordinatensystem neu zeichnet:
-                // renderCoordinateSystem();
+                requestGraphRedraw();
             }
         });
     });
@@ -897,25 +1040,280 @@ document.addEventListener('DOMContentLoaded', initSettingsModal);
 
 
 
-// Beispiel-Datenstruktur für deine analysierten Funktionen
-const exampleFunctionsData = [
-    {
-        name: "f(x) = x² - 4",
-        nullstellen: "N₁(2 | 0), N₂(-2 | 0)",
-        yAbschnitt: "S_y(0 | -4)",
-        extrempunkte: "Tiefpunkt T(0 | -4)",
-        wendepunkte: "Keine",
-        symmetrie: "Achsensymmetrisch"
-    },
-    {
-        name: "g(x) = 2x + 1",
-        nullstellen: "N(-0.5 | 0)",
-        yAbschnitt: "S_y(0 | 1)",
-        extrempunkte: "Keine",
-        wendepunkte: "Keine",
-        symmetrie: "Keine"
+// ==========================================================================
+// FUNKTIONSANALYSE – numerische Nullstellen-/Extrempunkt-/Symmetriebestimmung
+// für die Ergebnisse-Tabelle. Bewusst numerisch statt symbolisch: der
+// Funktionsrechner hat keine Ableitungs-Engine, und der Parser erlaubt
+// beliebige Kombinationen aus trig/ln/Wurzel/Betrag – eine allgemeine
+// analytische Lösung ist damit nicht praktikabel. Durchsucht x ∈ [-50, 50].
+// Wendepunkte werden NICHT berechnet (zweite Ableitung ist bei numerischer
+// Schätzung zu störanfällig) – zeigt "–", analog zu ggT/kgV bei
+// Dezimalzahlen in der Zahlenanalyse.
+// ==========================================================================
+
+const ANALYSIS_RANGE = 50;
+const ANALYSIS_SAMPLES = 6000;
+const ANALYSIS_MAX_ENTRIES = 8;
+const ANALYSIS_DERIV_H = 1e-4;
+
+function formatAnalysisNum(n) {
+    return (Math.round(n * 1e4) / 1e4).toString();
+}
+
+function analysisSafeEval(ast, x) {
+    const v = evaluateGraphNode(ast, x);
+    return (v === null || !Number.isFinite(v)) ? null : v;
+}
+
+function analysisDerivative(ast, x) {
+    const left = analysisSafeEval(ast, x - ANALYSIS_DERIV_H);
+    const right = analysisSafeEval(ast, x + ANALYSIS_DERIV_H);
+    if (left === null || right === null) return null;
+    return (right - left) / (2 * ANALYSIS_DERIV_H);
+}
+
+function analysisBisect(g, a, b, ga) {
+    for (let i = 0; i < 30; i++) {
+        const mid = (a + b) / 2;
+        const gm = g(mid);
+        if (gm === null) return null;
+        if ((ga < 0) === (gm < 0)) { a = mid; ga = gm; } else { b = mid; }
     }
-];
+    return (a + b) / 2;
+}
+
+function analysisDedupe(values, tolerance = 1e-2) {
+    const sorted = [...values].sort((a, b) => a - b);
+    const result = [];
+    sorted.forEach(v => {
+        if (result.length === 0 || Math.abs(v - result[result.length - 1]) > tolerance) {
+            result.push(v);
+        }
+    });
+    return result;
+}
+
+function findFunctionRoots(ast) {
+    const step = (2 * ANALYSIS_RANGE) / ANALYSIS_SAMPLES;
+    const roots = [];
+    let prevX = -ANALYSIS_RANGE;
+    let prevY = analysisSafeEval(ast, prevX);
+
+    for (let i = 1; i <= ANALYSIS_SAMPLES; i++) {
+        const x = -ANALYSIS_RANGE + i * step;
+        const y = analysisSafeEval(ast, x);
+
+        if (prevY !== null && y !== null && (prevY < 0) !== (y < 0)) {
+            const root = analysisBisect(v => analysisSafeEval(ast, v), prevX, x, prevY);
+            // Echte Nullstelle vs. Sprungstelle (z.B. 1/x bei x=0) unterscheiden:
+            // an einer echten Nullstelle liegt |f(root)| nahe 0, an einer
+            // Polstelle bleibt der Wert deutlich von 0 entfernt.
+            if (root !== null) {
+                const value = analysisSafeEval(ast, root);
+                if (value !== null && Math.abs(value) < 1e-3) roots.push(root);
+            }
+        }
+        prevX = x; prevY = y;
+    }
+
+    return analysisDedupe(roots);
+}
+
+function findFunctionExtrema(ast) {
+    const step = (2 * ANALYSIS_RANGE) / ANALYSIS_SAMPLES;
+    const found = [];
+    let prevX = -ANALYSIS_RANGE;
+    let prevD = analysisDerivative(ast, prevX);
+
+    for (let i = 1; i <= ANALYSIS_SAMPLES; i++) {
+        const x = -ANALYSIS_RANGE + i * step;
+        const d = analysisDerivative(ast, x);
+
+        if (prevD !== null && d !== null && (prevD < 0) !== (d < 0)) {
+            const critX = analysisBisect(v => analysisDerivative(ast, v), prevX, x, prevD);
+            if (critX !== null) {
+                // Klassifikation über direkten Wertevergleich statt zweiter
+                // Ableitung (numerisch robuster für diesen Schritt).
+                const yHere = analysisSafeEval(ast, critX);
+                const yLeft = analysisSafeEval(ast, critX - 0.01);
+                const yRight = analysisSafeEval(ast, critX + 0.01);
+                if (yHere !== null && yLeft !== null && yRight !== null) {
+                    if (yHere > yLeft && yHere > yRight) found.push({ x: critX, y: yHere, type: "max" });
+                    else if (yHere < yLeft && yHere < yRight) found.push({ x: critX, y: yHere, type: "min" });
+                }
+            }
+        }
+        prevX = x; prevD = d;
+    }
+
+    found.sort((a, b) => a.x - b.x);
+    const result = [];
+    found.forEach(c => {
+        const last = result[result.length - 1];
+        if (!last || Math.abs(c.x - last.x) > 1e-2) result.push(c);
+    });
+    return result;
+}
+
+function checkFunctionSymmetry(ast) {
+    const testPoints = [0.5, 1, 1.7, 2.3, 3.1, 5, 8.4, 12];
+    let allEven = true, allOdd = true, anyValid = false;
+
+    for (const x of testPoints) {
+        const fPos = analysisSafeEval(ast, x);
+        const fNeg = analysisSafeEval(ast, -x);
+        if (fPos === null || fNeg === null) continue;
+        anyValid = true;
+        if (Math.abs(fPos - fNeg) > 1e-3) allEven = false;
+        if (Math.abs(fPos + fNeg) > 1e-3) allOdd = false;
+    }
+
+    if (!anyValid) return "–";
+    if (allEven) return "Achsensymmetrisch (y-Achse)";
+    if (allOdd) return "Punktsymmetrisch (Ursprung)";
+    return "Keine";
+}
+
+function formatAnalysisList(points, formatter) {
+    if (points.length === 0) return "Keine";
+    const shown = points.slice(0, ANALYSIS_MAX_ENTRIES).map(formatter);
+    const extra = points.length - shown.length;
+    return shown.join(", ") + (extra > 0 ? `, … (+${extra} weitere)` : "");
+}
+
+function analyzeFunction(fn, index) {
+    const varName = extractGraphVariable(fn.latex);
+    const name = `${letterForIndex(index)}(${varName})`;
+
+    if (!fn.ast) {
+        return { name, nullstellen: "–", yAbschnitt: "–", extrempunkte: "–", wendepunkte: "–", symmetrie: "–", raw: null };
+    }
+
+    const roots = findFunctionRoots(fn.ast);
+    const yValue = analysisSafeEval(fn.ast, 0);
+    const extrema = findFunctionExtrema(fn.ast);
+
+    return {
+        name,
+        nullstellen: formatAnalysisList(roots, x => `N(${formatAnalysisNum(x)} | 0)`),
+        yAbschnitt: yValue === null ? "Nicht definiert" : `S_y(0 | ${formatAnalysisNum(yValue)})`,
+        extrempunkte: formatAnalysisList(extrema, e => `${e.type === "max" ? "Hochpunkt" : "Tiefpunkt"}(${formatAnalysisNum(e.x)} | ${formatAnalysisNum(e.y)})`),
+        wendepunkte: "–",
+        symmetrie: checkFunctionSymmetry(fn.ast),
+        raw: { roots, yValue, extrema }
+    };
+}
+
+function computeAnalysisData() {
+    return functionsState.map((fn, index) => analyzeFunction(fn, index));
+}
+
+// ==========================================================================
+// GRAPH-MARKER (Nullstellen, y-Achsenabschnitt, Schnittpunkte) – nutzen die
+// Rohdaten aus computeAnalysisData() weiter. Wird NUR bei Änderungen an der
+// Funktionsliste neu berechnet, NICHT in render() – Pan/Zoom bleibt dadurch
+// bei der reinen Koordinatenumrechnung aus Fix 2 (Pooling), ohne erneute
+// Nullstellen-/Schnittpunktsuche pro Frame.
+// ==========================================================================
+
+let functionMarkersCache = { roots: [], yIntercepts: [], intersections: [] };
+
+function analysisDiffFn(astA, astB) {
+    return x => {
+        const a = analysisSafeEval(astA, x);
+        const b = analysisSafeEval(astB, x);
+        return (a === null || b === null) ? null : a - b;
+    };
+}
+
+function dedupePoints(points, tolerance = 1e-2) {
+    const sorted = [...points].sort((a, b) => a.x - b.x);
+    const result = [];
+    sorted.forEach(p => {
+        const last = result[result.length - 1];
+        if (!last || Math.abs(p.x - last.x) > tolerance) result.push(p);
+    });
+    return result;
+}
+
+function findFunctionIntersections(astA, astB) {
+    const step = (2 * ANALYSIS_RANGE) / ANALYSIS_SAMPLES;
+    const diff = analysisDiffFn(astA, astB);
+    const points = [];
+    let prevX = -ANALYSIS_RANGE;
+    let prevD = diff(prevX);
+
+    for (let i = 1; i <= ANALYSIS_SAMPLES; i++) {
+        const x = -ANALYSIS_RANGE + i * step;
+        const d = diff(x);
+
+        if (prevD !== null && d !== null && (prevD < 0) !== (d < 0)) {
+            const crossX = analysisBisect(diff, prevX, x, prevD);
+            if (crossX !== null) {
+                // Wie bei Nullstellen: echten Schnittpunkt von einer Polstelle
+                // unterscheiden (z.B. tan(x) springt, das sieht beim Sampling
+                // wie ein Vorzeichenwechsel der Differenz aus).
+                const yA = analysisSafeEval(astA, crossX);
+                const yB = analysisSafeEval(astB, crossX);
+                if (yA !== null && yB !== null && Math.abs(yA - yB) < 1e-2) {
+                    points.push({ x: crossX, y: yA });
+                }
+            }
+        }
+        prevX = x; prevD = d;
+    }
+
+    return dedupePoints(points);
+}
+
+function updateFunctionMarkersCache(analysisData) {
+    const roots = [];
+    const yIntercepts = [];
+
+    functionsState.forEach((fn, index) => {
+        if (!fn.visible) return;
+        const raw = analysisData[index] && analysisData[index].raw;
+        if (!raw) return;
+        raw.roots.forEach(x => roots.push({ x, y: 0 }));
+        if (raw.yValue !== null) yIntercepts.push({ x: 0, y: raw.yValue });
+    });
+
+    const intersections = [];
+    const visible = functionsState.filter(fn => fn.visible && fn.ast);
+    for (let i = 0; i < visible.length; i++) {
+        for (let j = i + 1; j < visible.length; j++) {
+            intersections.push(...findFunctionIntersections(visible[i].ast, visible[j].ast));
+        }
+    }
+
+    functionMarkersCache = { roots, yIntercepts, intersections };
+}
+
+// Bounding-Box aus allen aktuell bekannten "interessanten" Punkten (Nullstellen,
+// y-Achsenabschnitt, Extrempunkte, Schnittpunkte) – Basis für "Automatische
+// Skalierung".
+function computeAutoScaleBounds(analysisData) {
+    const xs = [];
+    const ys = [];
+
+    functionsState.forEach((fn, index) => {
+        if (!fn.visible) return;
+        const raw = analysisData[index] && analysisData[index].raw;
+        if (!raw) return;
+        raw.roots.forEach(x => { xs.push(x); ys.push(0); });
+        if (raw.yValue !== null) { xs.push(0); ys.push(raw.yValue); }
+        raw.extrema.forEach(e => { xs.push(e.x); ys.push(e.y); });
+    });
+
+    functionMarkersCache.intersections.forEach(p => { xs.push(p.x); ys.push(p.y); });
+
+    if (xs.length === 0) return null;
+
+    return {
+        minX: Math.min(...xs), maxX: Math.max(...xs),
+        minY: Math.min(...ys), maxY: Math.max(...ys)
+    };
+}
 
 function renderResultsTable(functionsData) {
     const table = document.querySelector('#resultsTable');
@@ -964,13 +1362,64 @@ function renderResultsTable(functionsData) {
         tbody.appendChild(tr);
     });
 
-    table.appendChild(tbody);
+   table.appendChild(tbody);
 }
 
-// Testaufruf zum Testen
-document.addEventListener('DOMContentLoaded', () => {
-    renderResultsTable(exampleFunctionsData);
-});
+// Rechenweg-Bereich: pro Funktion eine kompakte Erklärung der numerischen
+// Methode + Ergebnisse (siehe computeAnalysisData/analyzeFunction). Bewusst
+// KEINE Schritt-für-Schritt-Algebra wie bei Gleichungslöser/Formel Umformer,
+// da hier keine symbolische Ableitung existiert – stattdessen Transparenz
+// darüber, WIE numerisch gesucht wurde und WAS gefunden wurde.
+function buildFunctionRechenweg(fn, entry) {
+    const label = entry.name;
+
+    if (!entry.raw) {
+        return `
+            <div class="step-container">
+                <div class="step-title">${label}</div>
+                <div class="step-text">„${fn.latex}" konnte nicht ausgewertet werden.</div>
+            </div>`;
+    }
+
+    const { roots, yValue } = entry.raw;
+    const rootsResult = roots.length > 0 ? roots.map(x => formatAnalysisNum(x)).join(", ") : "keine gefunden";
+    const yResult = yValue === null ? "nicht definiert" : formatAnalysisNum(yValue);
+
+    return `
+        <div class="step-container">
+            <div class="step-title">${label} – Nullstellen</div>
+            <div class="step-text">Numerische Vorzeichenwechsel-Suche im Bereich x ∈ [−50, 50], anschließend per Bisektion eingegrenzt (keine symbolische Auflösung, da beliebige Funktionsterme wie trigonometrische Ausdrücke, Wurzeln oder Beträge unterstützt werden).</div>
+            <div class="step-formula-box">Gefundene x-Werte: ${rootsResult}</div>
+        </div>
+        <div class="step-container">
+            <div class="step-title">${label} – y-Achsenabschnitt</div>
+            <div class="step-text">Direkte Auswertung an der Stelle x = 0:</div>
+            <div class="step-formula-box">${label} bei x=0: ${yResult}</div>
+        </div>
+        <div class="step-container">
+            <div class="step-title">${label} – Extrempunkte</div>
+            <div class="step-text">Die Ableitung wird über den zentralen Differenzenquotienten geschätzt. Vorzeichenwechsel der Ableitung markieren Kandidaten, die anschließend durch Vergleich mit den Nachbarwerten als Hoch- oder Tiefpunkt klassifiziert werden.</div>
+        </div>
+        <div class="step-container">
+            <div class="step-title">${label} – Symmetrie</div>
+            <div class="step-text">Stichprobenvergleich von ${label} an mehreren Stellen x und −x.</div>
+            <div class="step-sub-solution">Wendepunkte werden aktuell nicht berechnet – die zweite Ableitung ist bei rein numerischer Schätzung zu störanfällig für ein verlässliches Ergebnis.</div>
+        </div>`;
+}
+
+function renderRechenweg(analysisData) {
+    const container = document.getElementById('rechenwegOutput');
+    if (!container) return;
+
+    if (functionsState.length === 0) {
+        container.innerHTML = `<p class="functionListEmpty">Noch keine Funktion hinzugefügt.</p>`;
+        return;
+    }
+
+    container.innerHTML = functionsState
+        .map((fn, index) => buildFunctionRechenweg(fn, analysisData[index]))
+        .join("");
+}
 
 
 
@@ -984,7 +1433,9 @@ function initCoordinateSystem() {
     const axesGroup = document.getElementById("graphAxes");
     const labelsGroup = document.getElementById("graphLabels");
     const functionsGroup = document.getElementById("graphFunctions");
-    if (!container || !svg || !gridGroup || !axesGroup || !labelsGroup || !functionsGroup) return;
+    const markersGroup = document.getElementById("graphMarkers");
+    const legendEl = document.getElementById("graphLegend");
+    if (!container || !svg || !gridGroup || !axesGroup || !labelsGroup || !functionsGroup || !markersGroup) return;
 
     const svgNS = "http://www.w3.org/2000/svg";
 
@@ -1029,10 +1480,29 @@ function initCoordinateSystem() {
         return (Math.round(value * 1e9) / 1e9).toString();
     }
 
-    function el(tag, attrs) {
-        const node = document.createElementNS(svgNS, tag);
-        Object.entries(attrs).forEach(([key, val]) => node.setAttribute(key, val));
+    // Liefert das i-te Kind einer Gruppe vom Typ "tag" – erstellt es nur bei
+    // Bedarf neu. Verhindert Destroy+Recreate aller SVG-Knoten bei jedem
+    // render()-Aufruf (Hauptursache für das Ruckeln bei Pan/Zoom, v.a. nah an
+    // Polstellen wie bei f(x)=1/x, wo häufig und nah herangezoomt wird).
+    function pooledChild(group, index, tag) {
+        let node = group.children[index];
+        if (!node) {
+            node = document.createElementNS(svgNS, tag);
+            group.appendChild(node);
+        }
         return node;
+    }
+
+    // Entfernt überzählige Kinder ab "count" (z.B. weniger Gitterlinien nach
+    // dem Herauszoomen).
+    function trimPoolExcess(group, count) {
+        while (group.children.length > count) {
+            group.removeChild(group.lastElementChild);
+        }
+    }
+
+    function setAttrs(node, attrs) {
+        Object.entries(attrs).forEach(([key, val]) => node.setAttribute(key, val));
     }
 
     // ── Zeichnen ──────────────────────────────────────────────────────────
@@ -1045,31 +1515,36 @@ function initCoordinateSystem() {
         const minX = toMathX(0), maxX = toMathX(widthPx);
         const minY = toMathY(heightPx), maxY = toMathY(0);
 
-        gridGroup.innerHTML = "";
-        labelsGroup.innerHTML = "";
-        axesGroup.innerHTML = "";
-        functionsGroup.innerHTML = "";
-
         const originScreenX = toScreenX(0);
         const originScreenY = toScreenY(0);
         const xAxisVisible = minY <= 0 && 0 <= maxY;
         const yAxisVisible = minX <= 0 && 0 <= maxX;
+
+        // Sichtbarkeits-Einstellungen aus dem Settings-Modal anwenden
+        gridGroup.style.display = settingsState.showGrid ? "" : "none";
+        axesGroup.style.display = settingsState.showAxes ? "" : "none";
+        labelsGroup.style.display = settingsState.showLabels ? "" : "none";
+        if (legendEl) legendEl.style.display = settingsState.showLegend ? "" : "none";
+
+        let gridIndex = 0;
+        let labelIndex = 0;
 
         // Vertikale Linien (konstantes x)
         const startXi = Math.floor(minX / step);
         const endXi = Math.ceil(maxX / step);
         for (let i = startXi; i <= endXi; i++) {
             const sx = toScreenX(i * step);
-            gridGroup.appendChild(el("line", { class: "graphGridLine", x1: sx, y1: 0, x2: sx, y2: heightPx }));
+            setAttrs(pooledChild(gridGroup, gridIndex++, "line"),
+                { class: "graphGridLine", x1: sx, y1: 0, x2: sx, y2: heightPx });
 
             if (i !== 0) {
-                const label = el("text", {
+                const label = pooledChild(labelsGroup, labelIndex++, "text");
+                setAttrs(label, {
                     class: "graphAxisLabel",
                     x: sx + 4,
                     y: xAxisVisible ? originScreenY - 6 : 14
                 });
                 label.textContent = formatLabel(i * step);
-                labelsGroup.appendChild(label);
             }
         }
 
@@ -1078,41 +1553,71 @@ function initCoordinateSystem() {
         const endYi = Math.ceil(maxY / step);
         for (let i = startYi; i <= endYi; i++) {
             const sy = toScreenY(i * step);
-            gridGroup.appendChild(el("line", { class: "graphGridLine", x1: 0, y1: sy, x2: widthPx, y2: sy }));
+            setAttrs(pooledChild(gridGroup, gridIndex++, "line"),
+                { class: "graphGridLine", x1: 0, y1: sy, x2: widthPx, y2: sy });
 
             if (i !== 0) {
-                const label = el("text", {
+                const label = pooledChild(labelsGroup, labelIndex++, "text");
+                setAttrs(label, {
                     class: "graphAxisLabel",
                     x: yAxisVisible ? originScreenX + 6 : 4,
                     y: sy - 4
                 });
                 label.textContent = formatLabel(i * step);
-                labelsGroup.appendChild(label);
             }
         }
 
-        // Achsen
+        trimPoolExcess(gridGroup, gridIndex);
+        trimPoolExcess(labelsGroup, labelIndex);
+
+        // Achsen (gleiches Pool-Muster, max. 2 Elemente)
+        let axisIndex = 0;
         if (yAxisVisible) {
-            axesGroup.appendChild(el("line", { class: "graphAxisLine", x1: originScreenX, y1: 0, x2: originScreenX, y2: heightPx }));
+            setAttrs(pooledChild(axesGroup, axisIndex++, "line"),
+                { class: "graphAxisLine", x1: originScreenX, y1: 0, x2: originScreenX, y2: heightPx });
         }
         if (xAxisVisible) {
-            axesGroup.appendChild(el("line", { class: "graphAxisLine", x1: 0, y1: originScreenY, x2: widthPx, y2: originScreenY }));
+            setAttrs(pooledChild(axesGroup, axisIndex++, "line"),
+                { class: "graphAxisLine", x1: 0, y1: originScreenY, x2: widthPx, y2: originScreenY });
         }
+        trimPoolExcess(axesGroup, axisIndex);
 
-        // Funktionen
+        // Funktionen (ein <path> pro sichtbarer Funktion)
+        let pathIndex = 0;
         functionsState.forEach((fn, index) => {
             if (!fn.visible || !fn.ast) return;
             const d = pointsToPathD(samplePoints(fn));
             if (!d) return;
-            functionsGroup.appendChild(el("path", {
+            setAttrs(pooledChild(functionsGroup, pathIndex++, "path"), {
                 d,
                 fill: "none",
                 stroke: colorForIndex(index),
                 "stroke-width": 2.5,
                 "stroke-linecap": "round",
                 "stroke-linejoin": "round"
-            }));
+            });
         });
+        trimPoolExcess(functionsGroup, pathIndex);
+
+        // Marker – Rohpositionen kommen aus functionMarkersCache (siehe oben),
+        // hier nur math->screen-Umrechnung, damit Pan/Zoom günstig bleibt.
+        let markerIndex = 0;
+        const drawMarker = (mathX, mathY, cssClass) => {
+            const sx = toScreenX(mathX), sy = toScreenY(mathY);
+            if (sx < -20 || sx > widthPx + 20 || sy < -20 || sy > heightPx + 20) return;
+            setAttrs(pooledChild(markersGroup, markerIndex++, "circle"), { cx: sx, cy: sy, r: 5, class: cssClass });
+        };
+
+        if (settingsState.markRoots) {
+            functionMarkersCache.roots.forEach(p => drawMarker(p.x, p.y, "graphMarkerRoot"));
+        }
+        if (settingsState.markYIntercept) {
+            functionMarkersCache.yIntercepts.forEach(p => drawMarker(p.x, p.y, "graphMarkerYIntercept"));
+        }
+        if (settingsState.markIntersects) {
+            functionMarkersCache.intersections.forEach(p => drawMarker(p.x, p.y, "graphMarkerIntersection"));
+        }
+        trimPoolExcess(markersGroup, markerIndex);
     }
 
     // Sampling: pro sichtbarer Pixel-Spalte den zugehörigen x-Wert auswerten.
@@ -1202,7 +1707,7 @@ function initCoordinateSystem() {
         svg.setPointerCapture(e.pointerId);
         activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-        if (activePointers.size === 1) {
+        if (activePointers.size === 1 && settingsState.panEnabled) {
             panStartScreen = { x: e.clientX, y: e.clientY };
             panStartCenter = { x: viewport.centerX, y: viewport.centerY };
             svg.classList.add("is-panning");
@@ -1241,7 +1746,7 @@ function initCoordinateSystem() {
 
         if (activePointers.size < 2) pinchStartDistance = null;
 
-        if (activePointers.size === 1) {
+        if (activePointers.size === 1 && settingsState.panEnabled) {
             // Von Pinch zurück zu Pan: neuen Startpunkt setzen, damit der
             // verbleibende Finger nicht springt
             const remaining = Array.from(activePointers.values())[0];
@@ -1259,6 +1764,7 @@ function initCoordinateSystem() {
 
     // ── Zoom (Mausrad, zentriert um den Cursor) ─────────────────────────────
     svg.addEventListener("wheel", (e) => {
+        if (!settingsState.zoomMouseWheel) return;
         e.preventDefault();
         const rect = svg.getBoundingClientRect();
         const cursorScreenX = e.clientX - rect.left;
@@ -1293,6 +1799,21 @@ function initCoordinateSystem() {
     });
 
     requestGraphRedraw = render;
+
+    // "Automatische Skalierung": zentriert den Viewport auf eine übergebene
+    // mathematische Bounding-Box (siehe computeAutoScaleBounds), mit Puffer.
+    requestAutoScale = function (bounds) {
+        if (!bounds || widthPx === 0 || heightPx === 0) return;
+
+        const spanX = Math.max(bounds.maxX - bounds.minX, 2) * 1.6;
+        const spanY = Math.max(bounds.maxY - bounds.minY, 2) * 1.6;
+
+        viewport.centerX = (bounds.minX + bounds.maxX) / 2;
+        viewport.centerY = (bounds.minY + bounds.maxY) / 2;
+        viewport.pixelsPerUnit = clampZoom(Math.min(widthPx / spanX, heightPx / spanY));
+
+        render();
+    };
 }
 
 document.addEventListener("DOMContentLoaded", initCoordinateSystem);

@@ -20,7 +20,7 @@ export const tools = [
         tags:     ["zahlen", "analyse", "algebra", "mathematik", "summe", "max", "maximum", "min", "minimum", "durchschnitt", "ggT", "kgV", "median", "modus", "spannweite", "varianz", "standardabweichung", "statistik"],
         info:     "Analysiert eine Zahlenliste und liefert umfassende statistische Kennzahlen wie Summe, Mittelwerte (Durchschnitt, Median, Modus), Streuungsmaße (Varianz, Standardabweichung, Spannweite) sowie ggT und kgV.",
         image: {
-            big:   `${BASE}/pictures/Zahlen Analyse2.png`,
+            big:   `${BASE}/pictures/Zahlen Analyse-appIcon.png`,
             small: `${BASE}/pictures/icons/zahlenAnalyse-icon.png`
         }
     },
@@ -33,7 +33,7 @@ export const tools = [
         tags:     ["zahlensystem", "umrechner", "dual", "binär", "hex", "oktal", "dezimal"],
         info:     "Rechnet Zahlen zwischen Zahlensystemen (Basis 2–20) um – inklusive Nachkommastellen und vollem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Zahlensystem Umrechner1.png`,
+            big:   `${BASE}/pictures/Zahlensystem Umrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/zsystUmrechner-icon.png`
         }
     },
@@ -46,7 +46,7 @@ export const tools = [
         tags:     ["zahlensystem", "rechner", "addition", "subtraktion", "multiplikation", "division", "dual"],
         info:     "Führt Grundrechenarten (+, −, ×, ÷) direkt in einem beliebigen Zahlensystem durch und zeigt den schriftlichen Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Zahlensystem Rechner1.png`,
+            big:   `${BASE}/pictures/Zahlensystem Rechner-appIcon.png`,
             small: `${BASE}/pictures/icons/zsystRechner-icon.png`
         }
     },
@@ -59,20 +59,20 @@ export const tools = [
         tags:     ["umrechner", "einheiten", "länge", "gewicht", "temperatur", "zeit"],
         info:     "Vielseitiger Umrechner für verschiedenste Maßeinheiten – inklusive Advanced Mode für internationale und spezialisierte Messsysteme.",
         image: {
-            big:   `${BASE}/pictures/einheitenUmrechner1.png`,
+            big:   `${BASE}/pictures/Einheiten Umrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/einheitenUmrechner-icon.png`
         }
     },
     {
         id:       "card5",
-        title:    "Prozentrechnung",
+        title:    "Prozentrechner",
         group:    "arithmetik",
         filename: "prozentrechner.html",
         url:      `${BASE}/Tools/Prozentrechner/prozentrechner.html`,
         tags:     ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner", "anteil", "prozentsatz", "grundwert", "veränderung", "erhöhung", "verminderung", "netto", "brutto", "skonto", "rechenweg", "advanced"],
         info:     "Umfassender Prozentrechner mit Advanced Mode: Berechnet Anteil, Prozentsatz, Grundwert, prozentuale Veränderungen, Erhöhungen/Verminderungen, MwSt (Netto/Brutto) sowie Rabatte inklusive detailliertem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Prozentrechnung4.png`,
+            big:   `${BASE}/pictures/Prozentrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/prozentrechner-icon.png`
         }
     },
@@ -85,7 +85,7 @@ export const tools = [
         tags:     ["bruch", "bruchrechner", "addieren", "subtrahieren", "multiplizieren", "dividieren", "kürzen", "erweitern", "gemischte zahlen"],
         info:     "Führt alle Grundrechenarten mit Brüchen durch – inklusive Kürzen, Erweitern, gemischten Zahlen und vollständigem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/bruchrechner-big2.png`,
+            big:   `${BASE}/pictures/Bruchrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/bruchrechner-icon.png`
         }
     },
@@ -98,7 +98,7 @@ export const tools = [
         tags:     ["dreisatz", "verhältnis", "proportional", "antiproportional", "mathematik"],
         info:      "Berechnet den Dreisatz bei proportionalen und antiproportionalen Zuordnungen – inklusive Schritt-für-Schritt-Lösungsweg.",
         image: {
-            big:   `${BASE}/pictures/Dreisatzrechner1.png`,
+            big:   `${BASE}/pictures/Dreisatzrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -111,7 +111,7 @@ export const tools = [
         tags:     ["dezimal", "bruch", "umrechner"],
         info:      "Wandelt Brüche in Dezimalzahlen und Dezimalzahlen in Brüche um – inklusive Schritt-für-Schritt-Lösungsweg.",
         image: {
-            big:   `${BASE}/pictures/DezBruchConverter1.png`,
+            big:   `${BASE}/pictures/DezBruchConverter-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -124,7 +124,7 @@ export const tools = [
         tags:     ["formel", "umformer", "algebra"],
         info:      "Formt mathematische Formeln um – inklusive Schritt-für-Schritt-Lösungsweg.",
         image: {
-            big:   `${BASE}/pictures/Formel Umformer2.png`,
+            big:   `${BASE}/pictures/Formel Umformer-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -137,7 +137,7 @@ export const tools = [
         tags:     ["gleichung", "linear", "lösen", "algebra", "lineare-gleichungen", "verfahren"],
         info:      "Löst allgemeine und lineare Gleichungssysteme – inklusive automatischer Auswahl des besten Lösungsverfahrens.",
         image: {
-            big:   `${BASE}/pictures/Gleichungslöser2.png`,
+            big:   `${BASE}/pictures/Gleichungslöser-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -150,7 +150,7 @@ export const tools = [
         tags:     ["finanzen", "rechner", "investition", "sparplan", "rendite", "inflation", "zinseszins"],
         info:      "All-in-One-Finanzrechner mit drei spezialisierten Tools: Berechnet den langfristigen Vermögensaufbau per Sparplan (Zinseszins), ermittelt den realen Kaufkraftverlust durch Inflation oder analysiert die genaue Performance (ROI & CAGR) von Investments – inklusive Live-Diagrammen und transparentem Rechenweg.",
         image: {
-            big:   `${BASE}/pictures/Finanzrechner7.png`,
+            big:   `${BASE}/pictures/Finanzrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -163,7 +163,7 @@ export const tools = [
         tags:     ["geometrie", "2d", "3d", "kreis", "rechteck", "quadrat", "dreieck", "rechtwinkliges dreieck", "trapez", "parallelogramm", "raute","würfel", "quader", "kugel", "zylinder", "kegel", "quadratische pyramide", "rechteckige pyramide"],
         info:      "Geometrie Rechner welcher mit 2D und 3D Figuren rechnet - inklusive Rechenweg und live Form-Vorschau",
         image: {
-            big:   `${BASE}/pictures/Geometrie Rechner1.png`,
+            big:   `${BASE}/pictures/Geometrie Rechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -176,7 +176,7 @@ export const tools = [
         tags:     ["funktionen", "koordinatensystem", "graph", "nullstelle", "schnittpunkte"],
         info:     "Erstelle und analysiere mathematische Funktionen mit interaktivem Koordinatensystem.",
         image: {
-            big:   `${BASE}/pictures/Funktionsrechner2.png`,
+            big:   `${BASE}/pictures/Funktionsrechner2-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     },
@@ -189,7 +189,7 @@ export const tools = [
         tags:     ["taschenrechner", "arithmetik", "trigonometrie", "algebra", "fortgeschritten", "advanced"],
         info:     "Wissenschaftlicher Taschenrechner mit Standard- und Advanced-Modus für komplexe Rechnungen.",
         image: {
-            big:   `${BASE}/pictures/Mathe Rechner1.png`,
+            big:   `${BASE}/pictures/Mathe Rechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     }
