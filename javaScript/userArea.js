@@ -34,6 +34,18 @@ const displayName     = document.getElementById('displayNameEl');
 const viewUsername    = document.getElementById('view-username');
 const viewEmail       = document.getElementById('view-email');
 
+const viewMemberSince = document.getElementById('view-member-since');
+
+function formatMemberSince(timestamp) {
+    if (!timestamp) return "–";
+
+    return new Date(timestamp).toLocaleDateString("de-AT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
+}
+
 // ── Shake-Keyframe (einmalig injiziert) ───────────────────────────────────────
 const shakeStyle = document.createElement('style');
 shakeStyle.textContent = `
@@ -126,6 +138,11 @@ function populateUserInfo() {
     if (displayName)     displayName.textContent     = name;
     if (viewUsername)    viewUsername.textContent     = name;
     if (viewEmail)       viewEmail.textContent        = maskEmail(email) || '–';
+
+
+    if (viewMemberSince) {
+    viewMemberSince.textContent = formatMemberSince(user.createdAt);
+}
 
     const inputUsername = document.getElementById('input-username');
     const inputEmail    = document.getElementById('input-email');

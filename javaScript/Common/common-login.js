@@ -95,7 +95,9 @@ localStorage.removeItem("");
         fontsize: 20,
         currency: 'EUR',
         decimalPlaces: 2,
-        isPro: false
+        isPro: false,
+
+        createdAt: null
     });
 
 

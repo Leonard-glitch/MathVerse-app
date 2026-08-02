@@ -387,7 +387,9 @@ form.addEventListener('submit', (e) => {
             fontsize: 20,
             currency: window.MV.getCurrency(),
             decimalPlaces: window.MV.getDecimalPlaces(),
-            isPro: false
+            isPro: false,
+
+            createdAt: Date.now()
         });
 
         const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');

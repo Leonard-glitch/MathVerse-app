@@ -294,7 +294,7 @@ body {
 }
 
 .settingsCard:hover {
-    border-color: rgba(138, 22, 255, 0.3);
+    border-color: var(--accent-color);
 }
 
 .settingsCard--dimmed {
