@@ -14,7 +14,8 @@ const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/;
 // Tools mit eigenem Advanced Mode – bei neuen Tools mit Advanced Mode hier ergänzen.
 const ADVANCED_MODE_TOOLS = [
     { key: 'einheitenUmrechner', label: 'Einheiten Umrechner', icon: 'fa-arrows-h' },
-    { key: 'prozentrechner', label: 'Prozentrechnung', icon: 'fa-percent' }
+    { key: 'prozentrechner', label: 'Prozentrechnung', icon: 'fa-percent' },
+    { key: 'matheRechner', label: 'Mathe Rechner', icon: 'fa-calculator' }
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────

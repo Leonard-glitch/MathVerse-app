@@ -44,7 +44,7 @@
                         <div class="liveresultbutton">
                             <span class="advancedText">Live Result</span>
                             <!-- Rounded switch -->
-                            <label class="switch"><input type="checkbox"><span class="slider round"></span></label>
+                            <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label>
                         </div>
 
                         <div>
@@ -57,6 +57,8 @@
                 </div>
                 <div class="mathMainCardMainContainer">
                     <math-field id="mathInput" class="zahlenInputfeld" placeholder="$$5+7$$"></math-field>
+
+                    <p class="falscheEingabestyle" id="errorMessages"></p>
 
                     <div class="resultAndpathDiv">
                         <div class="resultDiv"><span class="resultLable">Ergebnis:</span><span id="resultoutput"></span></div>
@@ -84,38 +86,38 @@
                         </div>
                         <div class="customInputContainer" id="numericKeypadContainer">
                             <div class="customInputContainerRow">
-                                <button class="padButton" id="btn-open">(</button>
-                                <button class="padButton" id="btn-close">)</button>
-                                <button class="padButton" id="btn-clear">C</button>
-                                <button class="padButton" id="btn-del">⌫</button>
+                                <button class="padButton" id="btn-open" data-insert="(">(</button>
+                                <button class="padButton" id="btn-close" data-insert=")">)</button>
+                                <button class="padButton" id="btn-clear" data-action="clear">C</button>
+                                <button class="padButton" id="btn-del" data-action="delete">⌫</button>
                             </div>
                             
                             <div class="customInputContainerRow">
-                                <button class="padButton" id="btn-7">7</button>
-                                <button class="padButton" id="btn-8">8</button>
-                                <button class="padButton" id="btn-9">9</button>
-                                <button class="padButton" id="btn-div">÷</button>
+                                <button class="padButton" id="btn-7" data-insert="7">7</button>
+                                <button class="padButton" id="btn-8" data-insert="8">8</button>
+                                <button class="padButton" id="btn-9" data-insert="9">9</button>
+                                <button class="padButton" id="btn-div" data-insert="\div">÷</button>
                             </div>
                             
                             <div class="customInputContainerRow">
-                                <button class="padButton" id="btn-4">4</button>
-                                <button class="padButton" id="btn-5">5</button>
-                                <button class="padButton" id="btn-6">6</button>
-                                <button class="padButton" id="btn-mul">×</button>
+                                <button class="padButton" id="btn-4" data-insert="4">4</button>
+                                <button class="padButton" id="btn-5" data-insert="5">5</button>
+                                <button class="padButton" id="btn-6" data-insert="6">6</button>
+                                <button class="padButton" id="btn-mul" data-insert="\times">×</button>
                             </div>
                             
                             <div class="customInputContainerRow">
-                                <button class="padButton" id="btn-1">1</button>
-                                <button class="padButton" id="btn-2">2</button>
-                                <button class="padButton" id="btn-3">3</button>
-                                <button class="padButton" id="btn-sub">−</button>
+                                <button class="padButton" id="btn-1" data-insert="1">1</button>
+                                <button class="padButton" id="btn-2" data-insert="2">2</button>
+                                <button class="padButton" id="btn-3" data-insert="3">3</button>
+                                <button class="padButton" id="btn-sub" data-insert="-">−</button>
                             </div>
                             
                             <div class="customInputContainerRow">
-                                <button class="padButton" id="btn-0">0</button>
-                                <button class="padButton" id="btn-dot">.</button>
-                                <button class="padButton" id="btn-add">+</button>
-                                <button class="padButton" id="btn-eq">=</button>
+                                <button class="padButton" id="btn-0" data-insert="0">0</button>
+                                <button class="padButton" id="btn-dot" data-insert=".">.</button>
+                                <button class="padButton" id="btn-add" data-insert="+">+</button>
+                                <button class="padButton" id="btn-eq" data-action="equals">=</button>
                             </div>
                         </div>
                     </div>

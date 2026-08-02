@@ -12,6 +12,7 @@
     align-items: center;
 
     width: 80%;
+    max-width: 900px;
     margin-top: 2rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
@@ -170,7 +171,7 @@
     text-align: center;
     background: transparent;
     border: none;
-    padding: none;
+    padding: 0.5rem 1rem;
 
     border-bottom-left-radius: 50px;
     border-bottom-right-radius: 50px;
@@ -179,39 +180,105 @@
     color: var(--text-primary);
 }
 
+/* ── Rechenweg Akkordeon ─────────────────────────────────────────────── */
 
-.customInputsSec {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 2rem;
+.detailsChevron {
+    transition: transform 0.3s ease;
 }
 
-.customInputContainer {
+#pathDropoutBtn.is-open .detailsChevron {
+    transform: rotate(180deg);
+}
+
+#pathOutput {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    padding: 1.2rem;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    min-width: 280px;
+    gap: 1rem;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 1rem;
+    transition: max-height 0.35s ease-in-out, opacity 0.3s ease-in-out, padding 0.35s ease-in-out;
 }
 
-.customInputContainerRow {
-    display: flex;
-    flex-direction: row;
-    gap: 0.4rem;
-    width: 100%;
+#pathOutput.is-open {
+    max-height: 3000px;
+    opacity: 1;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
 }
+
+/* ── Rechenweg-Schritte (gleiches Muster wie Bruchrechner/Geometrie Rechner) ── */
+
+.step-container {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color var(--transition-speed);
+}
+
+.step-container:hover {
+    border-color: rgba(138, 22, 255, 0.15);
+}
+
+.step-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--border-glow);
+}
+
+.step-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.step-formula-box {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.2rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.step-sub-solution {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.step-container.final-step {
+    border-color: rgba(0, 255, 204, 0.15);
+    background: rgba(0, 255, 204, 0.01);
+}
+
+.step-container.final-step .step-title {
+    color: var(--accent-live);
+}
+
+.step-container.final-step .step-formula-box {
+    border-color: rgba(0, 255, 204, 0.2);
+}
+
+.step-container.final-step .step-sub-solution {
+    color: var(--accent-live);
+    font-weight: 600;
+    text-shadow: 0 0 8px var(--glow-live);
+}
+
 
 .customInputsSec {
     display: flex;
     flex-direction: row;
-    flex-wrap:wrap-reverse;
+    flex-wrap: wrap-reverse;
     justify-content: center;
     gap: 1.5rem;
     margin-top: 1.5rem;
@@ -276,51 +343,55 @@
 }
 
 #btn-eq {
-    background-color: #e0f2fe;
-    color: #0369a1;
-    border-color: #bae6fd;
+    background-color: color-mix(in srgb, var(--border-glow) 16%, var(--bg-surface));
+    color: var(--text-primary);
+    border-color: var(--border-glow);
+    font-weight: 700;
 }
 
 #btn-eq:hover {
-    background-color: #bae6fd;
+    background-color: var(--border-glow);
+    box-shadow: 0 0 12px var(--glow-soft);
 }
 
 #btn-eq:active {
-    background-color: #7dd3fc;
+    background-color: color-mix(in srgb, var(--border-glow) 55%, var(--bg-surface));
     transform: translateY(2px);
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    box-shadow: none;
 }
 
 #btn-clear, #btn-del {
-    background-color: #fee2e2;
-    color: #b91c1c;
-    border-color: #fecaca;
+    background-color: color-mix(in srgb, var(--accent-error) 14%, var(--bg-surface));
+    color: var(--accent-error);
+    border-color: color-mix(in srgb, var(--accent-error) 45%, transparent);
 }
 
 #btn-clear:hover, #btn-del:hover {
-    background-color: #fecaca;
+    background-color: color-mix(in srgb, var(--accent-error) 26%, var(--bg-surface));
+    box-shadow: 0 0 12px var(--glow-error);
 }
 
 #btn-clear:active, #btn-del:active {
-    background-color: #fca5a5;
+    background-color: color-mix(in srgb, var(--accent-error) 45%, var(--bg-surface));
     transform: translateY(2px);
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    box-shadow: none;
 }
 
-#btn-std-ans, #btn-adv-ans {
-    background-color: #ffedd5;
-    color: #c2410c;
-    border-color: #fed7aa;
+#btn-adv-ans {
+    background-color: color-mix(in srgb, var(--accent-live) 14%, var(--bg-surface));
+    color: var(--accent-live);
+    border-color: color-mix(in srgb, var(--accent-live) 45%, transparent);
 }
 
-#btn-std-ans:hover, #btn-adv-ans:hover {
-    background-color: #fed7aa;
+#btn-adv-ans:hover {
+    background-color: color-mix(in srgb, var(--accent-live) 28%, var(--bg-surface));
+    box-shadow: 0 0 12px var(--glow-live);
 }
 
-#btn-std-ans:active, #btn-adv-ans:active {
-    background-color: #fdba74;
+#btn-adv-ans:active {
+    background-color: color-mix(in srgb, var(--accent-live) 45%, var(--bg-surface));
     transform: translateY(2px);
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    box-shadow: none;
 }
 
 
@@ -355,17 +426,151 @@
     text-shadow: none;
 }
 
-#historyOutput{display: none;border-top: 1px solid var(--border-color);}
-.deleteHistory{display: none;}
+#showHistoryBtn.is-open .detailsChevron{
+    transform: rotate(180deg);
+}
+
+#historyOutput{
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 1rem;
+    border-top: 1px solid var(--border-color);
+    transition: max-height 0.35s ease-in-out, opacity 0.3s ease-in-out, padding 0.35s ease-in-out;
+}
+
+#historyOutput.is-open{
+    max-height: 2000px;
+    opacity: 1;
+    padding: 1rem;
+}
+
+.historyEmptyState{
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 0.5rem 0;
+}
+
+.historyEntry{
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: border-color var(--transition-speed);
+}
+
+.historyEntry:hover{
+    border-color: var(--border-glow);
+}
+
+.historyEntryMain{
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    padding: 0;
+    color: inherit;
+    font-family: var(--font-main);
+}
+
+.historyEntryExpr{
+    flex: 1 1 auto;
+    min-width: 0;
+    display: block;
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    pointer-events: none;
+    overflow-x: auto;
+}
+
+.historyEntryResult{
+    flex-shrink: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent-live);
+    text-shadow: 0 0 6px var(--glow-live);
+}
+
+.historyEntryTime{
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.historyEntryDelete{
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.historyEntryDelete:hover{
+    color: var(--accent-error);
+    background: rgba(255, 42, 95, 0.08);
+}
+
+.deleteHistory{
+    display: none;
+    justify-content: flex-end;
+    padding: 0 1rem 1rem 1rem;
+}
+
+.deleteHistory.is-visible{
+    display: flex;
+}
+
+@media (max-width: 560px){
+    .historyEntryTime{ display: none; }
+    .historyEntryDelete{ width: 44px; height: 44px; }
+}
 
 
 @media (max-width: 900px) {
+    .mathCalculatorSection{
+        padding: 0 0.75rem;
+    }
+
     .mathMainCard{
         width: 100%;
         margin-top: 1rem;
     }
     #mathInput{
         padding: 0;
+    }
+
+    .padButton{
+        min-height: 44px;
+    }
+
+    #pathDropoutBtn,
+    #showHistoryBtn{
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
@@ -388,5 +593,20 @@
   .historyDiv{
     width: 99%;
   }
+}
+
+@media (max-width: 400px) {
+    .customInputContainer{
+        min-width: 100%;
+        padding: 0.6rem;
+    }
+
+    .padButton{
+        font-size: 0.8rem;
+    }
+
+    .historyEntryResult{
+        font-size: 0.85rem;
+    }
 }
 
