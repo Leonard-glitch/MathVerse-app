@@ -180,3 +180,10 @@ basierend auf Prozentrechner und Einheiten Umrechner. Keine Liveergebnisse. Mit 
 </html>
 
 
+
+
+do do:
+
+mathe rechner alte verbesserung teste!
+funktionisrechern auch noch testen
+finanzrechner auch noch fixen
