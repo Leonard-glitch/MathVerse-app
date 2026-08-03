@@ -95,6 +95,7 @@ localStorage.removeItem("");
         fontsize: 20,
         currency: 'EUR',
         decimalPlaces: 2,
+        toolStates: {},
         isPro: false,
 
         createdAt: null
@@ -468,6 +469,57 @@ localStorage.removeItem("");
         }
     }
 
+    // ==========================================================================
+    // TOOL-ZUSTAND (z.B. zuletzt gewählte Einheiten/Kategorien pro Tool) –
+    // gleiche Login/Gast-Logik wie Währung/Nachkommastellen, aber generisch:
+    // jedes Tool bekommt unter seinem eigenen Key ein beliebiges,
+    // JSON-serialisierbares Objekt.
+    // ==========================================================================
+
+    function getToolState(toolKey, fallback = null) {
+        if (isLoggedIn()) {
+            const u = getCurrentUser();
+            return (u && u.toolStates && u.toolStates[toolKey] !== undefined) ? u.toolStates[toolKey] : fallback;
+        }
+        try {
+            const raw = localStorage.getItem('mv-toolstate-' + toolKey);
+            return raw !== null ? JSON.parse(raw) : fallback;
+        } catch {
+            return fallback;
+        }
+    }
+
+    function setToolState(toolKey, stateObj) {
+        if (isLoggedIn()) {
+            const u = getCurrentUser() || DEFAULT_USER();
+            const toolStates = { ...(u.toolStates || {}), [toolKey]: stateObj };
+            updateCurrentUser({ toolStates });
+        } else {
+            try {
+                localStorage.setItem('mv-toolstate-' + toolKey, JSON.stringify(stateObj));
+            } catch {
+                /* Speicher voll oder deaktiviert – kein Blocker */
+            }
+        }
+    }
+
+    // Liest alle als Gast gespeicherten Tool-Zustände aus localStorage – wird
+    // bei der Registrierung genutzt, um sie in den neuen Account zu übernehmen
+    // (gleiches Migrations-Prinzip wie bei Währung/Nachkommastellen in register.js).
+    function getAllGuestToolStates() {
+        const result = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key || !key.startsWith('mv-toolstate-')) continue;
+            try {
+                result[key.slice('mv-toolstate-'.length)] = JSON.parse(localStorage.getItem(key));
+            } catch {
+                /* einzelner defekter Eintrag – überspringen statt Migration abzubrechen */
+            }
+        }
+        return result;
+    }
+
 
     function getPasswordStrength(pw) {
         if (!pw) return 0;
@@ -583,6 +635,7 @@ localStorage.removeItem("");
         applyTheme, applyFontSize, applyDesign,
         getCurrency, setCurrency, getCurrencySymbol, formatCurrency, formatCurrencyCompact,
         getDecimalPlaces, setDecimalPlaces,
+        getToolState, setToolState, getAllGuestToolStates,
         getPasswordStrength,
         showLoginPrompt, hideLoginPrompt,
         getUsername: () => (getCurrentUser()?.username) || 'Gast',

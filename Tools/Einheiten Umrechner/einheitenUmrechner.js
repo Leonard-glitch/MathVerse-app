@@ -217,6 +217,47 @@ const categoryDefaults = {
 };
 
 // ==========================================================================
+// GESPEICHERTER ZUSTAND – zuletzt gewählte Kategorie + Einheiten pro Kategorie
+// (Login: user.toolStates, Gast: localStorage – siehe window.MV.getToolState/
+// setToolState). Die eingegebene Zahl wird bewusst NICHT gespeichert.
+// ==========================================================================
+const UNIT_STATE_KEY = "einheitenUmrechner";
+let savedUnitState = window.MV.getToolState(UNIT_STATE_KEY, null) || { lastCategory: null, units: {} };
+if (!savedUnitState.units) savedUnitState.units = {};
+
+function persistUnitState() {
+    window.MV.setToolState(UNIT_STATE_KEY, savedUnitState);
+}
+
+function findCategoryButton(categoryKey) {
+    return Array.from(unitsButtons).find(b => b.dataset.category.replace("btn", "").toLowerCase() === categoryKey);
+}
+
+// Wendet für die aktuelle Kategorie die zuletzt gespeicherten Einheiten an –
+// Fallback auf categoryDefaults, falls noch nichts gespeichert ist oder die
+// gespeicherte Einheit (z.B. wegen ausgeschaltetem Advanced Mode) gerade
+// nicht in der aktiven Liste vorhanden ist.
+function applyUnitsForCurrentCategory() {
+    const keys = Object.keys(getActiveUnits());
+    const saved = savedUnitState.units[currentCategory];
+    const defaults = categoryDefaults[currentCategory];
+
+    einheitA.value = (saved && keys.includes(saved.from)) ? saved.from : (defaults ? defaults.from : keys[0]);
+    einheitZ.value = (saved && keys.includes(saved.to)) ? saved.to : (defaults ? defaults.to : (keys[1] || keys[0]));
+
+    savedUnitState.lastCategory = currentCategory;
+    persistUnitState();
+}
+
+// Speichert die aktuell gewählten Einheiten für die aktuelle Kategorie –
+// bei jeder manuellen Auswahl/jedem Tausch durch den Nutzer.
+function saveCurrentUnitsForCategory() {
+    savedUnitState.units[currentCategory] = { from: einheitA.value, to: einheitZ.value };
+    savedUnitState.lastCategory = currentCategory;
+    persistUnitState();
+}
+
+// ==========================================================================
 // AUSGESCHRIEBENE EINHEITENNAMEN für die Dropdowns
 // Jeder Eintrag enthält bereits den fertigen Anzeigetext (inkl. Symbol in
 // Klammern, wo das sinnvoll ist). Bei Einheiten, deren Symbol selbst schon
@@ -624,12 +665,7 @@ unitsButtons.forEach(button => {
         currentCategory = type.replace("btn", "").toLowerCase();
 
         updateDropdowns();
-
-        const defaults = categoryDefaults[currentCategory];
-        if (defaults) {
-            einheitA.value = defaults.from;
-            einheitZ.value = defaults.to;
-        }
+        applyUnitsForCurrentCategory();
 
         calculate();
     });
@@ -670,20 +706,38 @@ document.getElementById("swapEinheiten")?.addEventListener("click", () => {
     const tmp = einheitA.value;
     einheitA.value = einheitZ.value;
     einheitZ.value = tmp;
+    saveCurrentUnitsForCategory();
     calculate();
 });
 inputEinheit.addEventListener("input", calculate);
-einheitA.addEventListener("change", calculate);
-einheitZ.addEventListener("change", calculate);
+einheitA.addEventListener("change", () => { saveCurrentUnitsForCategory(); calculate(); });
+einheitZ.addEventListener("change", () => { saveCurrentUnitsForCategory(); calculate(); });
 
 // Initialisierung beim Laden der Seite
 document.addEventListener("DOMContentLoaded", () => {
+    // Muss VOR bindAdvancedToggle gelesen werden: dessen initialer Aufruf
+    // ruft bereits applyUnitsForCurrentCategory() auf und würde
+    // savedUnitState.lastCategory sonst vorzeitig auf "length" überschreiben.
+    const initialLastCategory = savedUnitState.lastCategory;
+
     window.MV.bindAdvancedToggle(advancedCheckbox, "einheitenUmrechner", (isChecked) => {
         updateAdvancedCategoryVisibility(isChecked);
         updateDropdowns();
+        applyUnitsForCurrentCategory();
         calculate();
     });
 
-    const firstButton = document.querySelector('[data-category="btnLength"]');
-    if (firstButton) firstButton.click();
+    // Zuletzt verwendete Kategorie wiederherstellen – Advanced-Kategorien nur,
+    // wenn Advanced Mode gerade aktiv ist, sonst Fallback auf Länge.
+    let startButton = null;
+    if (initialLastCategory) {
+        const isAdvancedCat = advancedCategoryNames.includes(initialLastCategory);
+        if (!isAdvancedCat || advancedCheckbox.checked) {
+            startButton = findCategoryButton(initialLastCategory);
+        }
+    }
+    if (!startButton) {
+        startButton = document.querySelector('[data-category="btnLength"]');
+    }
+    if (startButton) startButton.click();
 });

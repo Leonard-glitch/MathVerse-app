@@ -387,6 +387,7 @@ form.addEventListener('submit', (e) => {
             fontsize: 20,
             currency: window.MV.getCurrency(),
             decimalPlaces: window.MV.getDecimalPlaces(),
+            toolStates: window.MV.getAllGuestToolStates(),
             isPro: false,
 
             createdAt: Date.now()
