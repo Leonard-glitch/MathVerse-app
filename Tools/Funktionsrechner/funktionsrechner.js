@@ -592,24 +592,7 @@ function initAddFunctionModal() {
         hideModalError();
     });
 
-    // ── MathLive Tastatur-Layout ────────────────────────────────────────────
-    customElements.whenDefined("math-field").then(() => {
-        try {
-            // "onfocus" war ein Wert der ALTEN Property virtualKeyboardMode.
-            // mathVirtualKeyboardPolicy kennt nur "auto" | "manual" | "sandboxed" –
-            // der ungültige Wert machte den Toggle-Button wirkungslos.
-            // "manual": Tastatur erscheint nicht automatisch, ist aber über den
-            // eingebauten Toggle-Button steuerbar.
-            if (window.MathfieldElement) {
-                window.MathfieldElement.mathVirtualKeyboardPolicy = "manual";
-            }
-            if (window.mathVirtualKeyboard) {
-                window.mathVirtualKeyboard.layouts = ["numeric", "functions", "symbols", "alphabetic", "greek"];
-            }
-        } catch (e) {
-            console.warn("MathLive-Tastatur-Setup fehlgeschlagen:", e);
-        }
-    });
+    
 }
 
 document.addEventListener('DOMContentLoaded', () => {
