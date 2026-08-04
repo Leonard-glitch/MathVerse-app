@@ -1038,6 +1038,11 @@ const ANALYSIS_RANGE = 50;
 const ANALYSIS_SAMPLES = 6000;
 const ANALYSIS_MAX_ENTRIES = 8;
 const ANALYSIS_DERIV_H = 1e-4;
+// Gröbere Schrittweite für den Kontinuitäts-Check in findFunctionExtrema():
+// an einer echten Extremstelle bleibt die Steigung auch mit größerem h nahe 0,
+// an einer Definitionslücke (1/x, tan(x), ...) divergiert sie dort massiv.
+const ANALYSIS_DERIV_COARSE_H = 0.01;
+const ANALYSIS_EXTREMA_SLOPE_LIMIT = 1;
 
 function formatAnalysisNum(n) {
     return (Math.round(n * 1e4) / 1e4).toString();
@@ -1048,11 +1053,11 @@ function analysisSafeEval(ast, x) {
     return (v === null || !Number.isFinite(v)) ? null : v;
 }
 
-function analysisDerivative(ast, x) {
-    const left = analysisSafeEval(ast, x - ANALYSIS_DERIV_H);
-    const right = analysisSafeEval(ast, x + ANALYSIS_DERIV_H);
+function analysisDerivative(ast, x, h = ANALYSIS_DERIV_H) {
+    const left = analysisSafeEval(ast, x - h);
+    const right = analysisSafeEval(ast, x + h);
     if (left === null || right === null) return null;
-    return (right - left) / (2 * ANALYSIS_DERIV_H);
+    return (right - left) / (2 * h);
 }
 
 function analysisBisect(g, a, b, ga) {
@@ -1121,8 +1126,23 @@ function findFunctionExtrema(ast) {
                 const yLeft = analysisSafeEval(ast, critX - 0.01);
                 const yRight = analysisSafeEval(ast, critX + 0.01);
                 if (yHere !== null && yLeft !== null && yRight !== null) {
-                    if (yHere > yLeft && yHere > yRight) found.push({ x: critX, y: yHere, type: "max" });
-                    else if (yHere < yLeft && yHere < yRight) found.push({ x: critX, y: yHere, type: "min" });
+                    const isMax = yHere > yLeft && yHere > yRight;
+                    const isMin = yHere < yLeft && yHere < yRight;
+
+                    // Definitionslücken-Filter: An einer Polstelle (1/x bei x=0,
+                    // tan(x) bei π/2+kπ, ...) kann die fein geschätzte Ableitung
+                    // (h=1e-4) einen Vorzeichenwechsel vortäuschen, weil x-h/x+h
+                    // die Lücke überspannen – der Wertevergleich oben erkennt das
+                    // nicht, da die Funktion auf einer Seite gegen +∞, auf der
+                    // anderen gegen −∞ läuft. Mit deutlich größerem h bleibt die
+                    // Steigung an einer ECHTEN Extremstelle weiter nahe 0, an
+                    // einer Polstelle divergiert sie – das trennt beide sauber.
+                    if (isMax || isMin) {
+                        const coarseSlope = analysisDerivative(ast, critX, ANALYSIS_DERIV_COARSE_H);
+                        if (coarseSlope !== null && Math.abs(coarseSlope) < ANALYSIS_EXTREMA_SLOPE_LIMIT) {
+                            found.push({ x: critX, y: yHere, type: isMax ? "max" : "min" });
+                        }
+                    }
                 }
             }
         }
