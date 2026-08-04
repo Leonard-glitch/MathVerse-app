@@ -674,6 +674,7 @@ function renderHistoryList(onReuse) {
     const historyOutput = document.getElementById("historyOutput");
     const deleteWrapper = document.querySelector(".deleteHistory");
     if (!historyOutput) return;
+    if (typeof window.MV.getToolHistory !== "function") return;
 
     const entries = window.MV.getToolHistory(MATH_HISTORY_KEY);
     const isOpen = historyOutput.classList.contains("is-open");
@@ -723,13 +724,14 @@ function initHistoryPanel(onReuse) {
     showBtn.addEventListener("click", () => {
         const nowOpen = historyOutput.classList.toggle("is-open");
         showBtn.classList.toggle("is-open", nowOpen);
-        if (deleteWrapper) {
+        if (deleteWrapper && typeof window.MV.getToolHistory === "function") {
             const hasEntries = window.MV.getToolHistory(MATH_HISTORY_KEY).length > 0;
             deleteWrapper.classList.toggle("is-visible", nowOpen && hasEntries);
         }
     });
 
     deleteBtn?.addEventListener("click", () => {
+        if (typeof window.MV.clearToolHistory !== "function") return;
         window.MV.clearToolHistory(MATH_HISTORY_KEY);
         renderHistoryList(onReuse);
     });
@@ -794,7 +796,7 @@ customElements.whenDefined("math-field").then(() => {
             pathOutput.innerHTML = renderCalcSteps(steps);
             lastAnswer = value;
 
-            if (addToHistory) {
+            if (addToHistory && typeof window.MV.addToolHistoryEntry === "function") {
                 window.MV.addToolHistoryEntry(MATH_HISTORY_KEY, {
                     expr: latex,
                     result: formatCalcNum(value),
