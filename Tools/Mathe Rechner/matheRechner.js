@@ -311,12 +311,25 @@ function parseCalcExpression(tokens) {
             }
             case "FRAC": {
                 advance();
-                expect("LBRACE", "Der Bruch ist unvollständig – der Zähler fehlt.");
-                const num = parseExpr();
-                expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
-                expect("LBRACE", "Der Bruch ist unvollständig – der Nenner fehlt.");
-                const den = parseExpr();
-                expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
+                let num, den;
+                if (peek().type === "LBRACE") {
+                    advance();
+                    num = parseExpr();
+                    expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
+                } else if (startsAtom(peek().type) || peek().type === "MINUS") {
+                    num = parseFactor();
+                } else {
+                    throw new CalcError("Der Bruch ist unvollständig – der Zähler fehlt.");
+                }
+                if (peek().type === "LBRACE") {
+                    advance();
+                    den = parseExpr();
+                    expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
+                } else if (startsAtom(peek().type) || peek().type === "MINUS") {
+                    den = parseFactor();
+                } else {
+                    throw new CalcError("Der Bruch ist unvollständig – der Nenner fehlt.");
+                }
                 return { type: "div", left: num, right: den };
             }
             case "SQRT": {
@@ -327,9 +340,16 @@ function parseCalcExpression(tokens) {
                     index = parseExpr();
                     expect("RBRACKET", "Der Wurzelindex wurde nicht geschlossen.");
                 }
-                expect("LBRACE", "Der Inhalt der Wurzel fehlt.");
-                const arg = parseExpr();
-                expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
+                let arg;
+                if (peek().type === "LBRACE") {
+                    advance();
+                    arg = parseExpr();
+                    expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
+                } else if (startsAtom(peek().type) || peek().type === "MINUS") {
+                    arg = parseFactor();
+                } else {
+                    throw new CalcError("Der Inhalt der Wurzel fehlt.");
+                }
                 return { type: "sqrt", arg, index };
             }
             case "FUNC": {
@@ -749,6 +769,13 @@ customElements.whenDefined("math-field").then(() => {
     const errorMessages = document.getElementById("errorMessages");
     const pathOutput = document.getElementById("pathOutput");
     const liveResultCheckbox = document.querySelector(".liveresultbutton input[type='checkbox']");
+    liveResultCheckbox.checked = window.MV.getLiveResult();
+    liveResultCheckbox.addEventListener("change", () => {
+        window.MV.setLiveResult(liveResultCheckbox.checked);
+    });
+    window.addEventListener("mv:staterestore", () => {
+        liveResultCheckbox.checked = window.MV.getLiveResult();
+    });
 
     if (!mf) return;
 
@@ -843,12 +870,12 @@ customElements.whenDefined("math-field").then(() => {
     });
 
     mf.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === "=") {
-            e.preventDefault();
-            clearTimeout(debounceTimer);
-            calculate(true);
-        }
-    });
+            if (e.key === "Enter") {
+                e.preventDefault();
+                clearTimeout(debounceTimer);
+                calculate(true);
+            }
+        });
 
     initHistoryPanel(reuseExpression);
 
@@ -867,8 +894,11 @@ customElements.whenDefined("math-field").then(() => {
 
         switch (btn.dataset.action) {
             case "clear":
-                mf.insert("", { insertionMode: "replaceAll" });
-                return;
+            mf.executeCommand("deleteAll");
+            hideCalcError();
+            resultOutput.textContent = "";
+            pathOutput.innerHTML = "";
+            return;
             case "delete":
                 mf.executeCommand("deleteBackward");
                 return;

@@ -95,7 +95,7 @@ localStorage.removeItem("");
         fontsize: 20,
         currency: 'EUR',
         decimalPlaces: 2,
-        toolStates: {},
+        liveResult: false,
         isPro: false,
 
         createdAt: null
@@ -521,6 +521,21 @@ localStorage.removeItem("");
     }
 
 
+    function getLiveResult() {
+        const u = getCurrentUser();
+        if (isLoggedIn() && u && u.liveResult !== undefined) return !!u.liveResult;
+        const stored = localStorage.getItem('mv-liveResult');
+        return stored === null ? false : stored === 'true';
+    }
+
+    function setLiveResult(value) {
+        if (isLoggedIn()) {
+            updateCurrentUser({ liveResult: value });
+        } else {
+            localStorage.setItem('mv-liveResult', String(!!value));
+        }
+    }
+
     function getPasswordStrength(pw) {
         if (!pw) return 0;
         let score = 0;
@@ -635,6 +650,7 @@ localStorage.removeItem("");
         applyTheme, applyFontSize, applyDesign,
         getCurrency, setCurrency, getCurrencySymbol, formatCurrency, formatCurrencyCompact,
         getDecimalPlaces, setDecimalPlaces,
+        getLiveResult, setLiveResult,
         getToolState, setToolState, getAllGuestToolStates,
         getPasswordStrength,
         showLoginPrompt, hideLoginPrompt,
@@ -769,7 +785,7 @@ localStorage.removeItem("");
     // Listener mehr zu bauen, sondern hören nur noch auf dieses eine Event:
     //   window.addEventListener('mv:staterestore', meineRefreshFunktion)
     // ==========================================================================
-    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize', 'mv-decimalPlaces'];
+    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize', 'mv-decimalPlaces', 'mv-liveResult'];
 
     function dispatchStateRestore() {
         window.dispatchEvent(new CustomEvent('mv:staterestore'));
