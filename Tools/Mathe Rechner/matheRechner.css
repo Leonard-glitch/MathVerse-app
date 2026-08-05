@@ -222,7 +222,7 @@
 }
 
 .step-container:hover {
-    border-color: rgba(138, 22, 255, 0.15);
+    border-color: var(--border-glow);
 }
 
 .step-title {
@@ -540,6 +540,11 @@
 
 .deleteHistory.is-visible{
     display: flex;
+}
+
+.historyEntryExpr{
+    color: var(--text-primary);
+    font-size: 1rem;
 }
 
 @media (max-width: 560px){

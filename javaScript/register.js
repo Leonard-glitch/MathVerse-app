@@ -388,10 +388,12 @@ form.addEventListener('submit', (e) => {
             currency: window.MV.getCurrency(),
             decimalPlaces: window.MV.getDecimalPlaces(),
             liveResult: window.MV.getLiveResult(),
+            toolHistory: window.MV.getAllGuestToolHistory(),
             isPro: false,
 
             createdAt: Date.now()
         });
+        window.MV.clearGuestToolHistoryStore();
 
         const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
         sessionStorage.removeItem('mv-return-url');

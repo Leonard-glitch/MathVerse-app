@@ -96,6 +96,7 @@ localStorage.removeItem("");
         currency: 'EUR',
         decimalPlaces: 2,
         liveResult: false,
+        toolHistory: {},
         isPro: false,
 
         createdAt: null
@@ -536,6 +537,83 @@ localStorage.removeItem("");
         }
     }
 
+    const GUEST_HISTORY_KEY = 'mv-toolHistory';
+    const HISTORY_LIMIT = 50;
+
+    function getGuestToolHistoryStore() {
+        try {
+            const store = JSON.parse(localStorage.getItem(GUEST_HISTORY_KEY));
+            return (store && typeof store === 'object') ? store : {};
+        } catch {
+            return {};
+        }
+    }
+
+    function saveGuestToolHistoryStore(store) {
+        localStorage.setItem(GUEST_HISTORY_KEY, JSON.stringify(store));
+    }
+
+    // Verlauf wird IMMER aufgezeichnet, unabhängig vom Login-Status – nur das
+    // ANZEIGEN ist login-abhängig (Prüfung erfolgt Tool-seitig, siehe matheRechner.js).
+    function getToolHistory(key) {
+        if (isLoggedIn()) {
+            const u = getCurrentUser();
+            return (u && u.toolHistory && u.toolHistory[key]) || [];
+        }
+        return getGuestToolHistoryStore()[key] || [];
+    }
+
+    function addToolHistoryEntry(key, entry) {
+        const fullEntry = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, ...entry };
+
+        if (isLoggedIn()) {
+            const u = getCurrentUser();
+            const history = { ...(u.toolHistory || {}) };
+            history[key] = [...(history[key] || []), fullEntry].slice(-HISTORY_LIMIT);
+            updateCurrentUser({ toolHistory: history });
+        } else {
+            const store = getGuestToolHistoryStore();
+            store[key] = [...(store[key] || []), fullEntry].slice(-HISTORY_LIMIT);
+            saveGuestToolHistoryStore(store);
+        }
+        return fullEntry;
+    }
+
+    function deleteToolHistoryEntry(key, id) {
+        if (isLoggedIn()) {
+            const u = getCurrentUser();
+            const history = { ...(u.toolHistory || {}) };
+            history[key] = (history[key] || []).filter(e => e.id !== id);
+            updateCurrentUser({ toolHistory: history });
+        } else {
+            const store = getGuestToolHistoryStore();
+            store[key] = (store[key] || []).filter(e => e.id !== id);
+            saveGuestToolHistoryStore(store);
+        }
+    }
+
+    function clearToolHistory(key) {
+        if (isLoggedIn()) {
+            const u = getCurrentUser();
+            const history = { ...(u.toolHistory || {}) };
+            history[key] = [];
+            updateCurrentUser({ toolHistory: history });
+        } else {
+            const store = getGuestToolHistoryStore();
+            store[key] = [];
+            saveGuestToolHistoryStore(store);
+        }
+    }
+
+    // Für die Registrierung: kompletter Gast-Verlauf aller Tools zur Übernahme in den neuen Account.
+    function getAllGuestToolHistory() {
+        return getGuestToolHistoryStore();
+    }
+
+    function clearGuestToolHistoryStore() {
+        localStorage.removeItem(GUEST_HISTORY_KEY);
+    }
+
     function getPasswordStrength(pw) {
         if (!pw) return 0;
         let score = 0;
@@ -650,6 +728,8 @@ localStorage.removeItem("");
         applyTheme, applyFontSize, applyDesign,
         getCurrency, setCurrency, getCurrencySymbol, formatCurrency, formatCurrencyCompact,
         getDecimalPlaces, setDecimalPlaces,
+        getToolHistory, addToolHistoryEntry, deleteToolHistoryEntry, clearToolHistory,
+        getAllGuestToolHistory, clearGuestToolHistoryStore,
         getLiveResult, setLiveResult,
         getToolState, setToolState, getAllGuestToolStates,
         getPasswordStrength,
@@ -789,7 +869,7 @@ localStorage.removeItem("");
     // Listener mehr zu bauen, sondern hören nur noch auf dieses eine Event:
     //   window.addEventListener('mv:staterestore', meineRefreshFunktion)
     // ==========================================================================
-    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize', 'mv-decimalPlaces', 'mv-liveResult'];
+    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize', 'mv-decimalPlaces', 'mv-liveResult', 'mv-toolHistory'];
 
     function dispatchStateRestore() {
         window.dispatchEvent(new CustomEvent('mv:staterestore'));

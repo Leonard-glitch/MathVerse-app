@@ -118,6 +118,53 @@ function checkCalcBlacklist(latex) {
     }
 }
 
+// Liest EIN Argument für \frac oder \sqrt in klammerloser LaTeX-Kurzschreibweise
+// (z.B. "\frac36" = 3/6) ein: entweder eine geklammerte Gruppe {...} oder genau EIN
+// einzelnes Zeichen (Ziffer, "e" oder \pi) – niemals einen mehrstelligen Ziffernlauf,
+// damit Zähler und Nenner nicht zu einer Zahl "36" verschmelzen.
+function readCalcBraceOrBareArgument(latex, i, contextLabel) {
+    const n = latex.length;
+    while (i < n && /\s/.test(latex[i])) i++;
+
+    if (latex[i] === "{") {
+        let depth = 0;
+        const start = i;
+        for (let k = i; k < n; k++) {
+            if (latex[k] === "{") depth++;
+            else if (latex[k] === "}") {
+                depth--;
+                if (depth === 0) {
+                    const end = k + 1;
+                    const inner = latex.slice(start + 1, end - 1);
+                    const innerTokens = tokenizeCalc(inner).slice(0, -1); // ohne EOF
+                    return { tokens: [{ type: "LBRACE" }, ...innerTokens, { type: "RBRACE" }], nextIndex: end };
+                }
+            }
+        }
+        throw new CalcError("Eine geschweifte Klammer wurde nicht richtig geschlossen.");
+    }
+
+    if (latex[i] === "\\") {
+        let j = i + 1;
+        while (j < n && /[a-zA-Z]/.test(latex[j])) j++;
+        const cmd = latex.slice(i + 1, j);
+        if (cmd === "pi") {
+            return { tokens: [{ type: "LBRACE" }, { type: "CONST", name: "pi" }, { type: "RBRACE" }], nextIndex: j };
+        }
+        throw new CalcError(`Nach „${contextLabel}" ohne geschweifte Klammern wird eine einzelne Ziffer, „e" oder „\\pi" erwartet.`);
+    }
+
+    if (/[0-9]/.test(latex[i])) {
+        return { tokens: [{ type: "LBRACE" }, { type: "NUM", value: parseFloat(latex[i]) }, { type: "RBRACE" }], nextIndex: i + 1 };
+    }
+
+    if (latex[i] === "e") {
+        return { tokens: [{ type: "LBRACE" }, { type: "CONST", name: "e" }, { type: "RBRACE" }], nextIndex: i + 1 };
+    }
+
+    throw new CalcError(`„${contextLabel}" ist unvollständig.`);
+}
+
 // ── Tokenizer ──────────────────────────────────────────────────────────────
 function tokenizeCalc(latex) {
     const tokens = [];
@@ -138,8 +185,33 @@ function tokenizeCalc(latex) {
                 case "left": case "right": continue;
                 case "cdot": case "times": tokens.push({ type: "MUL" }); continue;
                 case "div": tokens.push({ type: "DIV" }); continue;
-                case "frac": tokens.push({ type: "FRAC" }); continue;
-                case "sqrt": tokens.push({ type: "SQRT" }); continue;
+                 case "frac": {
+                    const numArg = readCalcBraceOrBareArgument(latex, i, "\\frac");
+                    const denArg = readCalcBraceOrBareArgument(latex, numArg.nextIndex, "\\frac");
+                    tokens.push({ type: "FRAC" }, ...numArg.tokens, ...denArg.tokens);
+                    i = denArg.nextIndex;
+                    continue;
+                }
+                case "sqrt": {
+                    let cursor = i;
+                    while (cursor < n && /\s/.test(latex[cursor])) cursor++;
+                    const indexTokens = [];
+                    if (latex[cursor] === "[") {
+                        let depth = 0, bracketEnd = -1;
+                        for (let k = cursor; k < n; k++) {
+                            if (latex[k] === "[") depth++;
+                            else if (latex[k] === "]") { depth--; if (depth === 0) { bracketEnd = k + 1; break; } }
+                        }
+                        if (bracketEnd === -1) throw new CalcError("Der Wurzelindex wurde nicht geschlossen.");
+                        const innerIndex = latex.slice(cursor + 1, bracketEnd - 1);
+                        indexTokens.push({ type: "LBRACKET" }, ...tokenizeCalc(innerIndex).slice(0, -1), { type: "RBRACKET" });
+                        cursor = bracketEnd;
+                    }
+                    const arg = readCalcBraceOrBareArgument(latex, cursor, "\\sqrt");
+                    tokens.push({ type: "SQRT" }, ...indexTokens, ...arg.tokens);
+                    i = arg.nextIndex;
+                    continue;
+                }
                 case "pi": tokens.push({ type: "CONST", name: "pi" }); continue;
                 case "sin": case "cos": case "tan": case "ln":
                     tokens.push({ type: "FUNC", name: cmd }); continue;
@@ -311,25 +383,12 @@ function parseCalcExpression(tokens) {
             }
             case "FRAC": {
                 advance();
-                let num, den;
-                if (peek().type === "LBRACE") {
-                    advance();
-                    num = parseExpr();
-                    expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
-                } else if (startsAtom(peek().type) || peek().type === "MINUS") {
-                    num = parseFactor();
-                } else {
-                    throw new CalcError("Der Bruch ist unvollständig – der Zähler fehlt.");
-                }
-                if (peek().type === "LBRACE") {
-                    advance();
-                    den = parseExpr();
-                    expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
-                } else if (startsAtom(peek().type) || peek().type === "MINUS") {
-                    den = parseFactor();
-                } else {
-                    throw new CalcError("Der Bruch ist unvollständig – der Nenner fehlt.");
-                }
+                expect("LBRACE", "Der Bruch ist unvollständig – der Zähler fehlt.");
+                const num = parseExpr();
+                expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
+                expect("LBRACE", "Der Bruch ist unvollständig – der Nenner fehlt.");
+                const den = parseExpr();
+                expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
                 return { type: "div", left: num, right: den };
             }
             case "SQRT": {
@@ -340,16 +399,9 @@ function parseCalcExpression(tokens) {
                     index = parseExpr();
                     expect("RBRACKET", "Der Wurzelindex wurde nicht geschlossen.");
                 }
-                let arg;
-                if (peek().type === "LBRACE") {
-                    advance();
-                    arg = parseExpr();
-                    expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
-                } else if (startsAtom(peek().type) || peek().type === "MINUS") {
-                    arg = parseFactor();
-                } else {
-                    throw new CalcError("Der Inhalt der Wurzel fehlt.");
-                }
+                expect("LBRACE", "Der Inhalt der Wurzel fehlt.");
+                const arg = parseExpr();
+                expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
                 return { type: "sqrt", arg, index };
             }
             case "FUNC": {
@@ -694,10 +746,16 @@ function renderHistoryList(onReuse) {
     const historyOutput = document.getElementById("historyOutput");
     const deleteWrapper = document.querySelector(".deleteHistory");
     if (!historyOutput) return;
-    if (typeof window.MV.getToolHistory !== "function") return;
+
+    const isOpen = historyOutput.classList.contains("is-open");
+
+    if (!window.MV.isLoggedIn()) {
+        historyOutput.innerHTML = `<p class="historyEmptyState">Melde dich an, um deinen Verlauf zu sehen.</p>`;
+        if (deleteWrapper) deleteWrapper.classList.remove("is-visible");
+        return;
+    }
 
     const entries = window.MV.getToolHistory(MATH_HISTORY_KEY);
-    const isOpen = historyOutput.classList.contains("is-open");
 
     if (entries.length === 0) {
         historyOutput.innerHTML = `<p class="historyEmptyState">Noch keine Berechnungen im Verlauf.</p>`;
@@ -744,14 +802,13 @@ function initHistoryPanel(onReuse) {
     showBtn.addEventListener("click", () => {
         const nowOpen = historyOutput.classList.toggle("is-open");
         showBtn.classList.toggle("is-open", nowOpen);
-        if (deleteWrapper && typeof window.MV.getToolHistory === "function") {
-            const hasEntries = window.MV.getToolHistory(MATH_HISTORY_KEY).length > 0;
+        if (deleteWrapper) {
+            const hasEntries = window.MV.isLoggedIn() && window.MV.getToolHistory(MATH_HISTORY_KEY).length > 0;
             deleteWrapper.classList.toggle("is-visible", nowOpen && hasEntries);
         }
     });
 
     deleteBtn?.addEventListener("click", () => {
-        if (typeof window.MV.clearToolHistory !== "function") return;
         window.MV.clearToolHistory(MATH_HISTORY_KEY);
         renderHistoryList(onReuse);
     });
@@ -823,7 +880,7 @@ customElements.whenDefined("math-field").then(() => {
             pathOutput.innerHTML = renderCalcSteps(steps);
             lastAnswer = value;
 
-            if (addToHistory && typeof window.MV.addToolHistoryEntry === "function") {
+            if (addToHistory) {
                 window.MV.addToolHistoryEntry(MATH_HISTORY_KEY, {
                     expr: latex,
                     result: formatCalcNum(value),
@@ -870,7 +927,7 @@ customElements.whenDefined("math-field").then(() => {
     });
 
     mf.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" || e.key === "=") {
                 e.preventDefault();
                 clearTimeout(debounceTimer);
                 calculate(true);
