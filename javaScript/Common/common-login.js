@@ -718,7 +718,11 @@ localStorage.removeItem("");
         // Nicht auf der UserArea-Seite (hat eigenes Layout)
         if (document.querySelector('.settingsLayout')) return;
 
-        document.querySelectorAll('.navbar, .secondNavList').forEach(setupNavBurgerFor);
+        // .secondNavList (Funktionsrechner Fullscreen) hat bereits ihr eigenes
+        // Auf-/Zuklapp-Gate über #buttonForSecondNavList (.is-open) – ein
+        // zusätzlicher Burger würde ein zweites, verschachteltes Ausklappen
+        // erzwingen. Nur die normale .navbar bekommt daher den Burger.
+        document.querySelectorAll('.navbar').forEach(setupNavBurgerFor);
     }
 
     function setupNavBurgerFor(navRow) {
