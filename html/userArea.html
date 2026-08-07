@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="../pictures/favicon v1.png">
     <link rel="stylesheet" href="../css/Common/common.css">
     <link rel="stylesheet" href="../css/userArea.css">
-    <title>Einstellungen</title>
+    <title>Settings</title>
 </head>
 <body>
     <div id="sidebarOverlay" class="sidebarOverlay"></div>
@@ -18,9 +18,9 @@
             <div class="sidebarTop">
                 <a href="../index.html" class="backBtn">
                     <i class="fa fa-arrow-left"></i>
-                    <span>Zurück zur Startseite</span>
+                    <span>Back to home</span>
                 </a>
-                <button class="sidebarMobileClose" id="sidebarMobileClose" aria-label="Menü schließen">
+                <button class="sidebarMobileClose" id="sidebarMobileClose" aria-label="Close menu">
                     <i class="fa fa-times"></i>
                 </button>
             </div>
@@ -28,14 +28,14 @@
             <nav class="sidebarNav">
 
                 <div class="navGroup">
-                    <span class="navGroupTitle">Mein Konto</span>
+                    <span class="navGroupTitle">My account</span>
                     <button class="navItem active" data-panel="account">
                         <i class="fa fa-user-circle navItemIcon"></i>
-                        Konto
+                        Account
                     </button>
                     <button class="navItem" data-panel="security">
                         <i class="fa fa-lock navItemIcon"></i>
-                        Sicherheit
+                        Security
                     </button>
                 </div>
 
@@ -45,15 +45,15 @@
                     <span class="navGroupTitle">App</span>
                     <button class="navItem" data-panel="appearance">
                         <i class="fa fa-paint-brush navItemIcon"></i>
-                        Erscheinungsbild
+                        Appearance
                     </button>
                     <button class="navItem" data-panel="favorites">
                         <i class="fa fa-heart navItemIcon"></i>
-                        Meine Favoriten
+                        My favorites
                     </button>
                     <button class="navItem" data-panel="extras">
                         <i class="fa fa-sliders navItemIcon"></i>
-                        Zusatzeinstellungen
+                        Extra settings
                     </button>
                 </div>
 
@@ -62,11 +62,11 @@
                 <div class="navGroup">
                     <button class="navItem navItem--danger" id="logoutNavBtn">
                         <i class="fa fa-sign-out navItemIcon"></i>
-                        Abmelden
+                        Sign out
                     </button>
                     <button class="navItem navItem--danger" data-panel="delete">
                         <i class="fa fa-trash navItemIcon"></i>
-                        Konto löschen
+                        Delete account
                     </button>
                 </div>
 
@@ -81,7 +81,7 @@
             </div>
 
         </aside>
-        <button class="sidebarMobileToggle" id="sidebarMobileToggle" aria-label="Menü öffnen">
+        <button class="sidebarMobileToggle" id="sidebarMobileToggle" aria-label="Open menu">
             <i class="fa fa-bars"></i>
         </button>
         <main class="settingsContent">
@@ -89,7 +89,7 @@
             <section class="settingsPanel active" id="panel-account">
 
                 <div class="panelHeader">
-                    <h1 class="panelTitle">Mein Konto</h1>
+                    <h1 class="panelTitle">My account</h1>
                 </div>
 
                 <div class="profileBanner">
@@ -105,56 +105,56 @@
 
                 <div class="settingsCard">
                     <div class="cardHeader">
-                        <h2 class="cardTitle">Kontoinformationen</h2>
+                        <h2 class="cardTitle">Account information</h2>
                         <button class="editCardBtn" id="editAccountBtn">
-                            <i class="fa fa-pencil"></i> <span>Bearbeiten</span>
+                            <i class="fa fa-pencil"></i> <span>Edit</span>
                         </button>
                     </div>
 
                     <div id="accountViewMode">
                         <div class="infoRow">
-                            <div class="infoLabel">Benutzername</div>
+                            <div class="infoLabel">Username</div>
                             <div class="infoValue" id="view-username"></div>
                         </div>
                         <div class="infoRow">
-                            <div class="infoLabel">E-Mail-Adresse</div>
+                            <div class="infoLabel">Email address</div>
                             <div class="infoValue" id="view-email"></div>
                         </div>
                         <div class="infoRow">
-                            <div class="infoLabel">Mitglied seit</div>
+                            <div class="infoLabel">Member since</div>
                             <div class="infoValue" id="view-member-since"></div>
                         </div>
                     </div>
 
                     <div id="accountEditMode" class="hidden">
-                        <p class="editModeHint">Gib dein aktuelles Passwort ein, um Änderungen zu bestätigen.</p>
+                        <p class="editModeHint">Enter your current password to confirm changes.</p>
 
                         <div class="formGroup">
-                            <label class="formLabel">Benutzername</label>
+                            <label class="formLabel">Username</label>
                             <input type="text" id="input-username" class="settingsInput" value="Leolegend6260">
                         </div>
                         <div class="formGroup">
-                            <label class="formLabel">E-Mail-Adresse</label>
-                            <input type="email" id="input-email" class="settingsInput" placeholder="Neue E-Mail...">
+                            <label class="formLabel">Email address</label>
+                            <input type="email" id="input-email" class="settingsInput" placeholder="New email...">
                         </div>
                         <div class="formGroup">
-                            <label class="formLabel">Aktuelles Passwort <span class="required"></span></label>
+                            <label class="formLabel">Current password <span class="required"></span></label>
                             <div class="passwordWrapper">
-                                <input type="password" id="input-current-pw" class="settingsInput" placeholder="Aktuelles Passwort">
+                                <input type="password" id="input-current-pw" class="settingsInput" placeholder="Current password">
                                 <button type="button" class="pwToggle" data-target="input-current-pw"><i class="fa fa-eye"></i></button>
                             </div>
                         </div>
 
                         <div class="editActions">
-                            <button class="cancelEditBtn" id="cancelAccountBtn">Abbrechen</button>
-                            <button class="saveChangesBtn" id="saveAccountBtn">Änderungen speichern</button>
+                            <button class="cancelEditBtn" id="cancelAccountBtn">Cancel</button>
+                            <button class="saveChangesBtn" id="saveAccountBtn">Save changes</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="toastMessage hidden" id="accountToast">
                     <i class="fa fa-check-circle"></i>
-                    <span>Gespeichert!</span>
+                    <span>Saved!</span>
                 </div>
 
             </section>
@@ -162,14 +162,14 @@
             <section class="settingsPanel" id="panel-security">
 
                 <div class="panelHeader">
-                    <h1 class="panelTitle">Sicherheit</h1>
+                    <h1 class="panelTitle">Security</h1>
                 </div>
 
                 <div class="settingsCard">
-                    <h2 class="cardTitle">Passwort ändern</h2>
+                    <h2 class="cardTitle">Change password</h2>
 
                     <div class="formGroup">
-                        <label class="formLabel">Aktuelles Passwort</label>
+                        <label class="formLabel">Current password</label>
                         <div class="passwordWrapper">
                             <input type="password" id="sec-current-pw" class="settingsInput" placeholder="••••••••">
                             <button type="button" class="pwToggle" data-target="sec-current-pw"><i class="fa fa-eye"></i></button>
@@ -177,7 +177,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label class="formLabel">Neues Passwort</label>
+                        <label class="formLabel">New password</label>
                         <div class="passwordWrapper">
                             <input type="password" id="sec-new-pw" class="settingsInput" placeholder="••••••••">
                             <button type="button" class="pwToggle" data-target="sec-new-pw"><i class="fa fa-eye"></i></button>
@@ -189,7 +189,7 @@
                     </div>
 
                     <div class="formGroup">
-                        <label class="formLabel">Neues Passwort bestätigen</label>
+                        <label class="formLabel">Confirm new password</label>
                         <div class="passwordWrapper">
                             <input type="password" id="sec-confirm-pw" class="settingsInput" placeholder="••••••••">
                             <button type="button" class="pwToggle" data-target="sec-confirm-pw"><i class="fa fa-eye"></i></button>
@@ -199,17 +199,17 @@
                     <div class="formError hidden" id="sec-error"></div>
 
                     <div class="editActions editActions--left">
-                        <button class="saveChangesBtn" id="savePwBtn">Passwort aktualisieren</button>
+                        <button class="saveChangesBtn" id="savePwBtn">Update password</button>
                     </div>
                 </div>
 
                 <div class="settingsCard settingsCard--dimmed">
                     <div class="teaserRow">
                         <div>
-                            <h2 class="cardTitle">Zwei-Faktor-Authentifizierung</h2>
-                            <p class="cardSubtitle">Schütze dein Konto mit einer zusätzlichen Sicherheitsstufe.</p>
+                            <h2 class="cardTitle">Two-factor authentication</h2>
+                            <p class="cardSubtitle">Protect your account with an extra layer of security.</p>
                         </div>
-                        <span class="comingSoonBadge">Bald verfügbar</span>
+                        <span class="comingSoonBadge">Coming soon</span>
                     </div>
                 </div>
 
@@ -218,23 +218,23 @@
             <section class="settingsPanel" id="panel-appearance">
 
                 <div class="panelHeader">
-                    <h1 class="panelTitle">Erscheinungsbild</h1>
-                    <p class="panelSubtitle">Passe Globomath an deinen Stil an.</p>
+                    <h1 class="panelTitle">Appearance</h1>
+                    <p class="panelSubtitle">Customize Globomath to match your style.</p>
                 </div>
 
                 <div class="settingsCard">
                     <h2 class="cardTitle">Design</h2>
-                    <p class="cardSubtitle">Wähle das Hauptdesign für dein Konto.</p>
+                    <p class="cardSubtitle">Choose the main design for your account.</p>
 
                     <div class="designButtons">
                         <button class="designBtn" data-design="abyss">
                             Abyss
                         </button>
                         <button class="designBtn" data-design="dark">
-                            Dunkel
+                            Dark
                         </button>
                         <button class="designBtn" data-design="light">
-                            Hell
+                            Light
                         </button>
                     </div>
                 </div>
@@ -242,18 +242,18 @@
 
 
                 <div class="settingsCard">
-                    <h2 class="cardTitle">Akzentfarbe</h2>
-                    <p class="cardSubtitle">Wähle die Hauptfarbe für Rahmen, Buttons und Glüheffekte.</p>
+                    <h2 class="cardTitle">Accent color</h2>
+                    <p class="cardSubtitle">Choose the main color for borders, buttons, and glow effects.</p>
 
                     <div class="colorGrid" id="colorGrid">
                         <button class="colorSwatch active" data-theme="violet"
-                            style="--swatch: #8a16ff;" title="Neon Violett (Standard)">
+                            style="--swatch: #8a16ff;" title="Neon violet (default)">
                             <div class="swatchCircle"></div>
-                            <span class="swatchLabel">Violett</span>
+                            <span class="swatchLabel">Violet</span>
                             <i class="fa fa-check swatchCheck"></i>
                         </button>
                         <button class="colorSwatch" data-theme="cyan"
-                            style="--swatch: #00ffcc;" title="Cyber Cyan">
+                            style="--swatch: #00ffcc;" title="Cyber cyan">
                             <div class="swatchCircle"></div>
                             <span class="swatchLabel">Cyan</span>
                             <i class="fa fa-check swatchCheck"></i>
@@ -261,7 +261,7 @@
                         <button class="colorSwatch" data-theme="blue"
                             style="--swatch: #1e90ff;" title="Electric Blue">
                             <div class="swatchCircle"></div>
-                            <span class="swatchLabel">Blau</span>
+                            <span class="swatchLabel">Blue</span>
                             <i class="fa fa-check swatchCheck"></i>
                         </button>
                         <button class="colorSwatch" data-theme="pink"
@@ -286,8 +286,8 @@
                 </div>
 
                 <div class="settingsCard">
-                    <h2 class="cardTitle">Schriftgröße</h2>
-                    <p class="cardSubtitle">Basis-Schriftgröße der gesamten App.</p>
+                    <h2 class="cardTitle">Font size</h2>
+                    <p class="cardSubtitle">Base font size for the whole app.</p>
 
                     <div class="sliderRow">
                         <span class="sliderMin">A</span>
@@ -297,38 +297,38 @@
                     </div>
                     <div class="sliderValueDisplay"><span id="fontSizeDisplay">20</span>px</div>
                     <p class="fontSizeHint">
-                        <i class="fa fa-mobile"></i> Auf mobilen Geräten wird die Schriftgröße auf maximal <strong>20px</strong> begrenzt.
+                        <i class="fa fa-mobile"></i> On mobile devices, the font size is limited to a maximum of <strong>20px</strong>.
                     </p>
                 </div>
 
                 <div class="settingsCard settingsCard--preview">
-                    <h2 class="cardTitle">Vorschau</h2>
+                    <h2 class="cardTitle">Preview</h2>
                     <div class="appearancePreview">
                         <div class="previewNavbar">
                             <div class="previewLogo">Globomath</div>
-                            <div class="previewBtn">Tool öffnen</div>
+                            <div class="previewBtn">Open tool</div>
                         </div>
                         <div class="previewContent">
                             <div class="previewCard">
-                                <div class="previewCardTitle">Bruchrechner</div>
-                                <div class="previewCardSub">Addieren · Subtrahieren · Kürzen</div>
+                                <div class="previewCardTitle">Fraction calculator</div>
+                                <div class="previewCardSub">Add · Subtract · Simplify</div>
                             </div>
                             <div class="previewCard previewCard--active">
-                                <div class="previewCardTitle">Zahlensystem Umrechner</div>
-                                <div class="previewCardSub">Basis 2–20 · mit Rechenweg</div>
+                                <div class="previewCardTitle">Number system converter</div>
+                                <div class="previewCardSub">Base 2–20 · with steps</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="editActions editActions--left">
-                    <button class="saveChangesBtn" id="saveAppearanceBtn">Design speichern</button>
-                    <button class="cancelEditBtn" id="resetAppearanceBtn">Zurücksetzen</button>
+                    <button class="saveChangesBtn" id="saveAppearanceBtn">Save design</button>
+                    <button class="cancelEditBtn" id="resetAppearanceBtn">Reset</button>
                 </div>
 
                 <div class="toastMessage hidden" id="appearanceToast">
                     <i class="fa fa-check-circle"></i>
-                    <span>Design gespeichert!</span>
+                    <span>Design saved!</span>
                 </div>
 
             </section>
@@ -336,8 +336,8 @@
             <section class="settingsPanel" id="panel-favorites">
 
                 <div class="panelHeader">
-                    <h1 class="panelTitle">Meine Favoriten</h1>
-                    <p class="panelSubtitle">Tools, die du mit dem Herz-Icon markiert hast.</p>
+                    <h1 class="panelTitle">My favorites</h1>
+                    <p class="panelSubtitle">Tools you marked with the heart icon.</p>
                 </div>
 
                 <div class="favoritesGrid" id="favoritesGrid">
@@ -345,10 +345,10 @@
 
                 <div class="emptyState hidden" id="favEmptyState">
                     <i class="fa fa-heart emptyIcon"></i>
-                    <p class="emptyTitle">Noch keine Favoriten</p>
-                    <p class="emptyText">Markiere Tools auf der Startseite mit dem Herz-Icon, um sie hier zu sehen.</p>
+                    <p class="emptyTitle">No favorites yet</p>
+                    <p class="emptyText">Mark tools on the homepage with the heart icon to see them here.</p>
                     <a href="../index.html" class="saveChangesBtn" style="display:inline-block; margin-top:1rem;">
-                        Zur Startseite
+                        Go to homepage
                     </a>
                 </div>
 
@@ -357,34 +357,34 @@
             <section class="settingsPanel" id="panel-extras">
 
                 <div class="panelHeader">
-                    <h1 class="panelTitle">Zusatzeinstellungen</h1>
-                    <p class="panelSubtitle">Kleinere, werkzeugübergreifende Einstellungen an einem Ort.</p>
+                    <h1 class="panelTitle">Extra settings</h1>
+                    <p class="panelSubtitle">Smaller cross-tool settings in one place.</p>
                 </div>
 
                 <div class="settingsCard">
-                    <h2 class="cardTitle">Währung</h2>
-                    <p class="cardSubtitle">Wird von allen Finanz-Tools verwendet (z. B. Finanzrechner). Ändert nur die Anzeige, keine Umrechnung.</p>
+                    <h2 class="cardTitle">Currency</h2>
+                    <p class="cardSubtitle">Used by all finance tools, such as financial calculators. It only changes the display, not the conversion.</p>
 
-                    <select id="extrasCurrencySelect" class="settingsInput settingsSelect" aria-label="Währung auswählen"></select>
+                    <select id="extrasCurrencySelect" class="settingsInput settingsSelect" aria-label="Choose currency"></select>
                 </div>
 
                 <div class="settingsCard">
-                    <h2 class="cardTitle">Nachkommastellen</h2>
-                    <p class="cardSubtitle">Wird aktuell vom Geometrie Rechner verwendet, um Ergebnisse zu runden.</p>
+                    <h2 class="cardTitle">Decimal places</h2>
+                    <p class="cardSubtitle">Currently used by the geometry calculator to round results.</p>
 
-                    <select id="extrasDecimalSelect" class="settingsInput settingsSelect" aria-label="Nachkommastellen auswählen"></select>
+                    <select id="extrasDecimalSelect" class="settingsInput settingsSelect" aria-label="Choose decimal places"></select>
                 </div>
 
                 <div class="settingsCard">
                     <h2 class="cardTitle">Advanced Modes</h2>
-                    <p class="cardSubtitle">Erweiterte Optionen für einzelne Tools zentral an- und ausschalten.</p>
+                    <p class="cardSubtitle">Turn advanced options for individual tools on and off from one place.</p>
 
                     <div class="extrasToggleList" id="advancedModesList"></div>
                 </div>
 
                 <div class="toastMessage hidden" id="extrasToast">
                     <i class="fa fa-check-circle"></i>
-                    <span>Gespeichert!</span>
+                    <span>Saved!</span>
                 </div>
 
             </section>
@@ -392,26 +392,26 @@
             <section class="settingsPanel" id="panel-delete">
 
                 <div class="panelHeader">
-                    <h1 class="panelTitle">Konto löschen</h1>
+                    <h1 class="panelTitle">Delete account</h1>
                 </div>
 
                 <div class="settingsCard settingsCard--danger">
                     <div class="dangerIcon"><i class="fa fa-exclamation-triangle"></i></div>
-                    <h2 class="cardTitle" style="color: var(--accent-error);">Achtung – diese Aktion ist unwiderruflich</h2>
+                    <h2 class="cardTitle" style="color: var(--accent-error);">Warning – this action is irreversible</h2>
                     <p class="cardSubtitle" style="margin-top: 0.5rem;">
-                        Wenn du dein Konto löschst, werden alle deine Daten, Favoriten und Einstellungen
-                        dauerhaft entfernt. Eine Wiederherstellung ist nicht möglich.
+                        If you delete your account, all your data, favorites, and settings will be removed permanently.
+                        Recovery is not possible.
                     </p>
 
                     <div class="formGroup" style="margin-top: 1.5rem;">
-                        <label class="formLabel">Tippe <strong style="color:var(--accent-error);">LÖSCHEN</strong> zur Bestätigung</label>
+                        <label class="formLabel">Type <strong style="color:var(--accent-error);">DELETE</strong> to confirm</label>
                         <input type="text" id="deleteConfirmInput" class="settingsInput settingsInput--danger"
-                               placeholder="LÖSCHEN">
+                               placeholder="DELETE">
                     </div>
 
                     <div class="editActions editActions--left" style="margin-top: 1rem;">
                         <button class="deleteFinalBtn" id="deleteAccountBtn" disabled>
-                            <i class="fa fa-trash"></i> Konto dauerhaft löschen
+                            <i class="fa fa-trash"></i> Delete account permanently
                         </button>
                     </div>
                 </div>
@@ -423,11 +423,11 @@
 
     <div class="modalOverlay hidden" id="logoutModal">
         <div class="modalBox">
-            <h2 class="modalTitle">Abmelden?</h2>
-            <p class="modalText">Du wirst aus deinem MathVerse-Konto abgemeldet.</p>
+            <h2 class="modalTitle">Sign out?</h2>
+            <p class="modalText">You will be signed out of your MathVerse account.</p>
             <div class="modalActions">
-                <button class="cancelEditBtn" id="logoutCancelBtn">Abbrechen</button>
-                <button class="saveChangesBtn" id="logoutConfirmBtn">Abmelden</button>
+                <button class="cancelEditBtn" id="logoutCancelBtn">Cancel</button>
+                <button class="saveChangesBtn" id="logoutConfirmBtn">Sign out</button>
             </div>
         </div>
     </div>

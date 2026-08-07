@@ -1,4 +1,4 @@
-// search.js – unterstützt mehrere Such-Instanzen (z.B. Haupt- + zweiter Header)
+// search.js – supports multiple search instances (for example main + second header)
 import { tools } from "./toolsCollection.js";
 
 const searchInputs = document.querySelectorAll('[id^="searchInput"]');
@@ -10,9 +10,8 @@ function initSearchInstance(searchInput) {
     const searchResults = wrapper ? wrapper.querySelector('[id^="searchResults"]') : null;
     if (!wrapper || !searchResults) return;
 
-    // Breite/Position richten sich nach der ganzen Nav-Zeile (Logo bis
-    // Login) – exakt wie im ursprünglichen "width: 100%"-Verhalten, nicht
-    // nach dem schmaleren Eingabefeld-Wrapper.
+    // Width and position are based on the entire nav row (logo to login) –
+    // exactly like the original "width: 100%" behavior, not the narrower input wrapper.
     const navRow = searchInput.closest(".navbar, .secondNavList") || wrapper;
 
     function positionResults() {
@@ -37,8 +36,7 @@ function initSearchInstance(searchInput) {
             return titleMatch || tagMatch;
         });
 
-        // Erst rendern, DANACH positionieren: verhindert eine Berechnung auf
-        // Basis eines Layouts, das sich durch den neuen Inhalt noch ändert.
+        // Render first, then position: prevents calculation based on layout that is still changing.
         renderResults(searchResults, matches);
         positionResults();
     }
@@ -64,7 +62,7 @@ function initSearchInstance(searchInput) {
 function renderResults(searchResults, results) {
 
     if (results.length === 0) {
-        searchResults.innerHTML = `<div class="searchResult">Keine Ergebnisse gefunden</div>`;
+        searchResults.innerHTML = `<div class="searchResult">No results found</div>`;
         searchResults.style.display = "block";
         return;
     }

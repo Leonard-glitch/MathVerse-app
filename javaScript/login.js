@@ -24,9 +24,8 @@ function setValid(input, errEl) {
 function setError(input, errEl, msg) {
     input.classList.remove('is-valid');
     input.classList.add('is-error');
-    // Shake-Animation triggern
     input.classList.remove('shake');
-    void input.offsetWidth; // reflow → Animation neu starten
+    void input.offsetWidth;
     input.classList.add('shake');
     if (errEl && msg) showMsg(errEl, msg);
 }
@@ -45,7 +44,7 @@ function hideMsg(el) {
 }
 
 // ===========================================================================
-// BLUR VALIDATION (grün wenn ok, neutral wenn leer)
+// BLUR VALIDATION (green when valid, neutral when empty)
 // ===========================================================================
 
 usernameInput.addEventListener('blur', () => {
@@ -65,7 +64,7 @@ passwordInput.addEventListener('blur', () => {
 });
 
 // ===========================================================================
-// INPUT (Tipp-Events) – Fehlermarker beim Tippen entfernen
+// INPUT EVENTS – clear error markers while typing
 // ===========================================================================
 
 usernameInput.addEventListener('input', () => {
@@ -99,14 +98,14 @@ form.addEventListener('submit', (e) => {
     let valid = true;
 
     if (!usernameInput.value.trim()) {
-        setError(usernameInput, usernameError, 'Bitte gib deinen Benutzernamen oder deine E-Mail-Adresse ein.');
+        setError(usernameInput, usernameError, 'Please enter your username or email address.');
         valid = false;
     } else {
         setValid(usernameInput, usernameError);
     }
 
     if (!passwordInput.value) {
-        setError(passwordInput, formError, 'Bitte gib dein Passwort ein.');
+        setError(passwordInput, formError, 'Please enter your password.');
         valid = false;
     } else {
         setValid(passwordInput, formError);
@@ -117,10 +116,8 @@ form.addEventListener('submit', (e) => {
         const result = window.MV.loginUser(uname, passwordInput.value);
 
         if (!result.success) {
-            // Aus Sicherheitsgründen eine generische Fehlermeldung,
-            // egal ob User nicht existiert oder Passwort falsch ist.
             setError(usernameInput, null);
-            setError(passwordInput, formError, 'Benutzername/E-Mail oder Passwort ist falsch.');
+            setError(passwordInput, formError, 'Username/email or password is incorrect.');
             return;
         }
 
@@ -131,7 +128,7 @@ form.addEventListener('submit', (e) => {
 });
 
 // ===========================================================================
-// PASSWORT TOGGLE (Auge-Icon)
+// PASSWORD TOGGLE (eye icon)
 // ===========================================================================
 
 if (toggleBtn) {
@@ -140,6 +137,6 @@ if (toggleBtn) {
         passwordInput.type = isHidden ? 'text' : 'password';
         const icon = toggleBtn.querySelector('i');
         icon.className = isHidden ? 'fa fa-eye-slash' : 'fa fa-eye';
-        toggleBtn.setAttribute('aria-label', isHidden ? 'Passwort verbergen' : 'Passwort anzeigen');
+        toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
     });
 }

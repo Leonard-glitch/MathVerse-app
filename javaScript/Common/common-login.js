@@ -70,15 +70,15 @@ localStorage.removeItem("");
     // wechselt – siehe formatCurrency() weiter unten.
     const CURRENCIES = {
         EUR: 'Euro',
-        USD: 'US-Dollar',
-        GBP: 'Britisches Pfund',
-        JPY: 'Japanischer Yen',
-        CHF: 'Schweizer Franken',
-        CAD: 'Kanadischer Dollar',
-        AUD: 'Australischer Dollar',
-        CNY: 'Chinesischer Yuan',
-        INR: 'Indische Rupie',
-        BRL: 'Brasilianischer Real'
+        USD: 'US Dollar',
+        GBP: 'British Pound',
+        JPY: 'Japanese Yen',
+        CHF: 'Swiss Franc',
+        CAD: 'Canadian Dollar',
+        AUD: 'Australian Dollar',
+        CNY: 'Chinese Yuan',
+        INR: 'Indian Rupee',
+        BRL: 'Brazilian Real'
     };
 
     // Schema für currentUser anpassen (Standard auf 'abyss')
@@ -330,7 +330,7 @@ localStorage.removeItem("");
         checkbox.addEventListener('change', () => {
             if (!isLoggedIn()) {
                 checkbox.checked = false;
-                showLoginPrompt('Melde dich an, um den Advanced Mode zu nutzen.');
+                showLoginPrompt('Please log in to use the advanced mode.');
                 if (typeof onChange === 'function') onChange(false);
                 return;
             }
@@ -693,11 +693,11 @@ localStorage.removeItem("");
         overlay.style.display = 'none';
         overlay.innerHTML = `
             <div class="mv-modalBox">
-                <h2 class="mv-modalTitle">Anmeldung erforderlich</h2>
-                <p class="mv-modalText" id="mvLoginPromptText">Melde dich an, um diese Funktion zu nutzen.</p>
+                <h2 class="mv-modalTitle">Login required</h2>
+                <p class="mv-modalText" id="mvLoginPromptText">Please log in to use this feature.</p>
                 <div class="mv-modalActions">
-                    <button class="mv-modalBtnSecondary" id="mvLoginPromptCancel">Abbrechen</button>
-                    <a class="mv-modalBtnPrimary" href="${window.MV_BASE}/html/login.html">Anmelden</a>
+                    <button class="mv-modalBtnSecondary" id="mvLoginPromptCancel">Cancel</button>
+                    <a class="mv-modalBtnPrimary" href="${window.MV_BASE}/html/login.html">Log in</a>
                 </div>
             </div>
         `;

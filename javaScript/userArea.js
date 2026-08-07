@@ -13,9 +13,9 @@ const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/;
 
 // Tools mit eigenem Advanced Mode – bei neuen Tools mit Advanced Mode hier ergänzen.
 const ADVANCED_MODE_TOOLS = [
-    { key: 'einheitenUmrechner', label: 'Einheiten Umrechner', icon: 'fa-arrows-h' },
-    { key: 'prozentrechner', label: 'Prozentrechnung', icon: 'fa-percent' },
-    { key: 'matheRechner', label: 'Mathe Rechner', icon: 'fa-calculator' }
+    { key: 'einheitenUmrechner', label: 'Unit Converter', icon: 'fa-arrows-h' },
+    { key: 'prozentrechner', label: 'Percentage Calculator', icon: 'fa-percent' },
+    { key: 'matheRechner', label: 'Math Calculator', icon: 'fa-calculator' }
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -247,17 +247,17 @@ function initSecurityPanel() {
         errorEl.classList.add('hidden');
 
         if (!cur || cur !== (user.password || '')) {
-            showFormError(errorEl, 'Das aktuelle Passwort ist falsch.');
+            showFormError(errorEl, 'The current password is incorrect.');
             shakeElement(document.getElementById('sec-current-pw'));
             return;
         }
         if (nw.length < 6) {
-            showFormError(errorEl, 'Das neue Passwort muss mindestens 6 Zeichen lang sein.');
+            showFormError(errorEl, 'The new password must be at least 6 characters long.');
             shakeElement(newPwInput);
             return;
         }
         if (nw !== conf) {
-            showFormError(errorEl, 'Die Passwörter stimmen nicht überein.');
+            showFormError(errorEl, 'The passwords do not match.');
             shakeElement(confPwInput);
             return;
         }
@@ -268,7 +268,7 @@ function initSecurityPanel() {
         newPwInput.value  = '';
         confPwInput.value = '';
         updateStrength('');
-        showFormError(errorEl, '✓ Passwort erfolgreich geändert.', true);
+        showFormError(errorEl, '✓ Password changed successfully.', true);
         setTimeout(() => errorEl.classList.add('hidden'), 3000);
     });
 }
@@ -286,7 +286,7 @@ function updateStrength(pw) {
     }
 
     const lvl    = window.MV.getPasswordStrength(pw);
-    const labels = ['', 'Schwach', 'Ok', 'Gut', 'Stark'];
+    const labels = ['', 'Weak', 'Okay', 'Good', 'Strong'];
     const colors = ['', '#ff2a5f', '#ff9100', '#ffcc00', '#00ffcc'];
 
     fill.style.width           = `${lvl * 25}%`;

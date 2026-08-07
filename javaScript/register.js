@@ -1,5 +1,3 @@
-
-
 const form             = document.querySelector('.loginForm');
 const usernameInput    = document.getElementById('userName');
 const emailInput       = document.getElementById('email');
@@ -15,7 +13,6 @@ const strengthWrapper  = document.getElementById('strengthWrapper');
 const strengthFill     = document.getElementById('strengthFill');
 const strengthLabel    = document.getElementById('strengthLabel');
 
-// Konfiguration
 const TAKEN_NAMES    = ['admin', 'test', 'max_mustermann', 'mathverse', 'moderator'];
 const MIN_PW_LENGTH  = 6;
 const USERNAME_REGEX = /^[a-zA-Z0-9_.-]{3,20}$/;
@@ -38,9 +35,8 @@ function setValid(input) {
 function setError(input) {
     input.classList.remove('is-valid');
     input.classList.add('is-error');
-    // Shake-Animation neu triggern
     input.classList.remove('shake');
-    void input.offsetWidth; // reflow
+    void input.offsetWidth;
     input.classList.add('shake');
 }
 
@@ -72,36 +68,32 @@ function showSuccessMsg(el, msg) {
 }
 
 // ===========================================================================
-// VALIDIERUNGS-FUNKTIONEN
+// VALIDATION FUNCTIONS
 // ===========================================================================
 
-/**
- * @param {boolean} silent – true = nur Klassen setzen, keine Fehlertext-Änderungen
- * @returns {boolean} – true wenn valide
- */
 function validateUsername(silent = false) {
     const val = usernameInput.value.trim();
 
     if (!val) {
-        setNeutral(usernameInput);
-        if (!silent) hideMsg(usernameError);
+        setError(usernameInput);
+        if (!silent) showMsg(usernameError, 'Please enter a username.');
         return false;
     }
 
     if (!USERNAME_REGEX.test(val)) {
         setError(usernameInput);
-        if (!silent) showMsg(usernameError, 'Nur Buchstaben, Zahlen, _, - und . erlaubt (3–20 Zeichen).');
+        if (!silent) showMsg(usernameError, 'Only letters, numbers, _, - and . are allowed (3–20 characters).');
         return false;
     }
 
     if (TAKEN_NAMES.includes(val.toLowerCase()) || window.MV.isUsernameTaken(val)) {
         setError(usernameInput);
-        if (!silent) showMsg(usernameError, `„${val}" ist bereits vergeben.`);
+        if (!silent) showMsg(usernameError, `“${val}” is already taken.`);
         return false;
     }
 
     setValid(usernameInput);
-    if (!silent) showSuccessMsg(usernameError, `„${val}" ist verfügbar.`);
+    if (!silent) showSuccessMsg(usernameError, `“${val}” is available.`);
     return true;
 }
 
@@ -109,18 +101,18 @@ function validateEmail(silent = false) {
     const val = emailInput.value.trim();
 
     if (!val) {
-        setNeutral(emailInput);
-        if (!silent) hideMsg(emailError);
+        setError(emailInput);
+        if (!silent) showMsg(emailError, 'Please enter an email address.');
         return false;
     }
     if (!emailInput.checkValidity()) {
         setError(emailInput);
-        if (!silent) showMsg(emailError, 'Bitte gib eine gültige E-Mail-Adresse ein.');
+        if (!silent) showMsg(emailError, 'Please enter a valid email address.');
         return false;
     }
     if (window.MV.isEmailTaken(val)) {
         setError(emailInput);
-        if (!silent) showMsg(emailError, 'Für diese E-Mail-Adresse existiert bereits ein Konto.');
+        if (!silent) showMsg(emailError, 'An account already exists for this email address.');
         return false;
     }
 
@@ -133,12 +125,13 @@ function validatePassword(silent = false) {
     const val = passwordInput.value;
 
     if (!val) {
-        setNeutral(passwordInput);
+        setError(passwordInput);
+        if (!silent) showMsg(formError, 'Please enter a password.');
         return false;
     }
     if (val.length < MIN_PW_LENGTH) {
         setError(passwordInput);
-        if (!silent) showMsg(formError, `Das Passwort muss mindestens ${MIN_PW_LENGTH} Zeichen lang sein.`);
+        if (!silent) showMsg(formError, `The password must be at least ${MIN_PW_LENGTH} characters long.`);
         return false;
     }
 
@@ -151,12 +144,13 @@ function validatePasswordConf(silent = false) {
     const pwc = passwordConfInput.value;
 
     if (!pwc) {
-        setNeutral(passwordConfInput);
+        setError(passwordConfInput);
+        if (!silent) showMsg(formError, 'Please confirm your password.');
         return false;
     }
     if (pw !== pwc) {
         setError(passwordConfInput);
-        if (!silent) showMsg(formError, 'Die Passwörter stimmen nicht überein.');
+        if (!silent) showMsg(formError, 'The passwords do not match.');
         return false;
     }
     if (pw.length < MIN_PW_LENGTH) {
@@ -169,8 +163,7 @@ function validatePasswordConf(silent = false) {
     return true;
 }
 
-// PASSWORT-STÄRKE INDIKATOR
-
+// PASSWORD STRENGTH INDICATOR
 
 function updateStrengthBar(pw) {
     if (!strengthWrapper) return;
@@ -184,28 +177,25 @@ function updateStrengthBar(pw) {
     const lvl = window.MV.getPasswordStrength(pw);
     strengthWrapper.dataset.strength = lvl;
 
-    const labels = ['', 'Schwach', 'Ok', 'Gut', 'Stark'];
+    const labels = ['', 'Weak', 'Okay', 'Good', 'Strong'];
     strengthLabel.textContent = labels[lvl];
 }
 
 // BLUR EVENTS
 
-usernameInput.addEventListener('blur',    () => validateUsername());
-emailInput.addEventListener('blur',       () => validateEmail());
+usernameInput.addEventListener('blur', () => validateUsername());
+emailInput.addEventListener('blur', () => validateEmail());
 passwordInput.addEventListener('blur', () => {
     validatePassword();
-    // Passwort-Bestätigung neu prüfen falls schon ausgefüllt
     if (passwordConfInput.value) validatePasswordConf();
 });
 passwordConfInput.addEventListener('blur', () => validatePasswordConf());
 
-// ===========================================================================
-// INPUT (Tipp-Events)
-// ===========================================================================
+// INPUT EVENTS
 
 usernameInput.addEventListener('input', () => {
     usernameInput.classList.remove('shake');
-    validateUsername(); // läuft live bei jedem Tastendruck, zeigt dauerhaft Status
+    validateUsername();
 });
 
 emailInput.addEventListener('input', () => {
@@ -218,16 +208,13 @@ emailInput.addEventListener('input', () => {
 passwordInput.addEventListener('input', () => {
     const pw = passwordInput.value;
 
-    // Stärke-Balken aktualisieren
     updateStrengthBar(pw);
 
-    // Fehler-Klasse beim Tippen entfernen (Feld wirkt "aktiv")
     if (passwordInput.classList.contains('is-error')) {
         passwordInput.classList.remove('is-error', 'shake');
     }
-    if (formError.textContent.includes('Zeichen')) hideMsg(formError);
+    if (formError.textContent.includes('characters')) hideMsg(formError);
 
-    // Echtzeit-Match: Wenn Bestätigungsfeld schon ausgefüllt ist → live prüfen
     if (passwordConfInput.value) {
         if (pw === passwordConfInput.value && pw.length >= MIN_PW_LENGTH) {
             setValid(passwordInput);
@@ -239,14 +226,10 @@ passwordInput.addEventListener('input', () => {
     }
 });
 
-// Erkennt, wenn der Browser/Passwortmanager (z.B. "Starkes Passwort
-// vorschlagen") das Feld automatisch befüllt – dafür triggert :-webkit-autofill
-// in register.css eine CSS-Animation, die wir hier abfangen.
 passwordInput.addEventListener('animationstart', (e) => {
     if (e.animationName === 'onAutoFillStart') {
         updateStrengthBar(passwordInput.value);
         if (passwordConfInput.value) {
-            // Bestätigungsfeld ggf. mit-validieren, falls auch befüllt
             if (passwordInput.value === passwordConfInput.value) {
                 setValid(passwordInput);
                 setValid(passwordConfInput);
@@ -259,152 +242,63 @@ passwordInput.addEventListener('animationstart', (e) => {
 passwordConfInput.addEventListener('input', () => {
     if (passwordConfInput.classList.contains('is-error')) {
         passwordConfInput.classList.remove('is-error', 'shake');
-    }
-    if (formError.textContent.includes('überein')) hideMsg(formError);
-
-    // Echtzeit-Match
-    const pw  = passwordInput.value;
-    const pwc = passwordConfInput.value;
-    if (pw && pwc && pw === pwc && pw.length >= MIN_PW_LENGTH) {
-        setValid(passwordInput);
-        setValid(passwordConfInput);
         hideMsg(formError);
     }
 });
 
-privacyCheckbox.addEventListener('change', () => {
-    if (privacyCheckbox.checked && formError.textContent.includes('Datenschutz')) {
-        hideMsg(formError);
-    }
-});
-
-// ===========================================================================
-// SUBMIT
-// ===========================================================================
+// SUBMIT HANDLER
 
 form.addEventListener('submit', (e) => {
-    // Verhindert das Abschicken an das (noch) nicht vorhandene Backend
     e.preventDefault();
 
-    // Alle Fehlermeldungen zurücksetzen
     hideMsg(usernameError);
     hideMsg(emailError);
     hideMsg(formError);
 
-    let valid = true;
-    let firstErrorInput = null;
+    const usernameOk = validateUsername(true);
+    const emailOk    = validateEmail(true);
+    const passwordOk = validatePassword(true);
+    const confOk     = validatePasswordConf(true);
+    const privacyOk  = privacyCheckbox ? privacyCheckbox.checked : true;
 
-    // 1. Benutzername
-    const uname = usernameInput.value.trim();
-    if (!uname) {
-        setError(usernameInput);
-        showMsg(usernameError, 'Bitte gib einen Benutzernamen ein.');
-        valid = false;
-        firstErrorInput = firstErrorInput || usernameInput;
-    } else if (!USERNAME_REGEX.test(uname)) {
-        setError(usernameInput);
-        showMsg(usernameError, 'Nur Buchstaben, Zahlen, _, - und . erlaubt (3–20 Zeichen).');
-        valid = false;
-        firstErrorInput = firstErrorInput || usernameInput;
-    } else if (TAKEN_NAMES.includes(uname.toLowerCase()) || window.MV.isUsernameTaken(uname)) {
-        setError(usernameInput);
-        showMsg(usernameError, `„${uname}" ist bereits vergeben.`);
-        valid = false;
-        firstErrorInput = firstErrorInput || usernameInput;
-    } else {
-        setValid(usernameInput);
+    if (!usernameOk || !emailOk || !passwordOk || !confOk) {
+        if (!usernameOk) validateUsername();
+        if (!emailOk) validateEmail();
+        if (!passwordOk) validatePassword();
+        if (!confOk) validatePasswordConf();
+        return;
     }
 
-    // 2. E-Mail
-    if (!emailInput.value.trim() || !emailInput.checkValidity()) {
-        setError(emailInput);
-        showMsg(emailError, 'Bitte gib eine gültige E-Mail-Adresse ein.');
-        valid = false;
-        firstErrorInput = firstErrorInput || emailInput;
-    } else if (window.MV.isEmailTaken(emailInput.value.trim())) {
-        setError(emailInput);
-        showMsg(emailError, 'Für diese E-Mail-Adresse existiert bereits ein Konto.');
-        valid = false;
-        firstErrorInput = firstErrorInput || emailInput;
-    } else {
-        setValid(emailInput);
+    if (!privacyOk) {
+        setError(privacyCheckbox);
+        showMsg(formError, 'You must accept the privacy policy to continue.');
+        return;
     }
 
-    // 3. Passwort
-    if (!passwordInput.value) {
-        setError(passwordInput);
-        if (!formError.textContent) showMsg(formError, 'Bitte gib ein Passwort ein.');
-        valid = false;
-        firstErrorInput = firstErrorInput || passwordInput;
-    } else if (passwordInput.value.length < MIN_PW_LENGTH) {
-        setError(passwordInput);
-        showMsg(formError, `Das Passwort muss mindestens ${MIN_PW_LENGTH} Zeichen lang sein.`);
-        valid = false;
-        firstErrorInput = firstErrorInput || passwordInput;
-    } else {
-        setValid(passwordInput);
+    const userData = {
+        username: usernameInput.value.trim(),
+        email: emailInput.value.trim(),
+        password: passwordInput.value
+    };
+
+    const result = window.MV.registerUser(userData);
+    if (!result.success) {
+        showMsg(formError, result.message || 'Registration failed.');
+        return;
     }
 
-    // 4. Passwort-Bestätigung
-    if (!passwordConfInput.value) {
-        setError(passwordConfInput);
-        if (!formError.textContent) showMsg(formError, 'Bitte bestätige dein Passwort.');
-        valid = false;
-        firstErrorInput = firstErrorInput || passwordConfInput;
-    } else if (passwordInput.value !== passwordConfInput.value) {
-        setError(passwordConfInput);
-        setError(passwordInput);
-        showMsg(formError, 'Die Passwörter stimmen nicht überein.');
-        valid = false;
-        firstErrorInput = firstErrorInput || passwordConfInput;
-    } else if (passwordInput.value.length >= MIN_PW_LENGTH) {
-        setValid(passwordConfInput);
-    }
+    const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
+    sessionStorage.removeItem('mv-return-url');
+    window.location.href = returnUrl;
+});
 
-    // 5. Datenschutz-Checkbox
-    if (!privacyCheckbox.checked) {
-        if (!formError.textContent) showMsg(formError, 'Du musst die Datenschutzerklärung akzeptieren.');
-        valid = false;
-    }
-
-    // AUSWERTUNG
-    if (!valid) {
-        // Scroll zum ersten Fehler-Feld, falls etwas nicht passt
-        if (firstErrorInput) {
-            firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstErrorInput.focus();
-        }
-    } else {
-        // WENN ALLES PASST: User in "allUsers" registrieren und einloggen
-        window.MV.registerUser({
-            username: uname,
-            email: emailInput.value.trim(),
-            password: passwordInput.value,
-            favoriten: [],
-            pinnedGroups: [],
-            containerOrders: {},
-            theme: 'violet',
-            fontsize: 20,
-            currency: window.MV.getCurrency(),
-            decimalPlaces: window.MV.getDecimalPlaces(),
-            liveResult: window.MV.getLiveResult(),
-            angleMode: window.MV.getAngleMode(),
-            toolHistory: window.MV.getAllGuestToolHistory(),
-            isPro: false,
-
-            createdAt: Date.now()
-        });
-        window.MV.clearGuestToolHistoryStore();
-
-        const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
-        sessionStorage.removeItem('mv-return-url');
-        window.location.href = returnUrl;
+privacyCheckbox.addEventListener('change', () => {
+    if (privacyCheckbox.checked && formError.textContent.includes('privacy')) {
+        hideMsg(formError);
     }
 });
 
-// ===========================================================================
-// PASSWORT-TOGGLE BUTTONS (Auge-Icon)
-// ===========================================================================
+// PASSWORD-TOGGLE BUTTONS
 
 function setupPasswordToggle(toggleId, inputEl) {
     const btn = document.getElementById(toggleId);
@@ -415,10 +309,9 @@ function setupPasswordToggle(toggleId, inputEl) {
         inputEl.type = isHidden ? 'text' : 'password';
         const icon = btn.querySelector('i');
         icon.className = isHidden ? 'fa fa-eye-slash' : 'fa fa-eye';
-        btn.setAttribute('aria-label',
-            isHidden ? 'Passwort verbergen' : 'Passwort anzeigen');
+        btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
     });
 }
 
-setupPasswordToggle('togglePassword',     passwordInput);
+setupPasswordToggle('togglePassword', passwordInput);
 setupPasswordToggle('togglePasswordConf', passwordConfInput);

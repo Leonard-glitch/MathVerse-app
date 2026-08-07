@@ -1,24 +1,24 @@
 const BASE = window.MV_BASE || '';
 
 export const groups = [
-    { id: "arithmetik",    title: "Arithmetik",    icon: "fa-percent" },
-    { id: "zahlensysteme", title: "Zahlensysteme", icon: "fa-calculator" },
+    { id: "arithmetik",    title: "Arithmetic",    icon: "fa-percent" },
+    { id: "zahlensysteme", title: "Number Systems", icon: "fa-calculator" },
     { id: "algebra",       title: "Algebra",       icon: "fa-bar-chart" },
-    { id: "geometrie",     title: "Geometrie",     icon: "fa-circle-o" },
-    { id: "statistik",     title: "Statistik",     icon: "fa-line-chart" },
-    { id: "einheiten",     title: "Einheiten",     icon: "fa-arrows-h" },
-    { id: "finanzen",      title: "Finanzen",      icon: "fa-money" }
+    { id: "geometrie",     title: "Geometry",      icon: "fa-circle-o" },
+    { id: "statistik",     title: "Statistics",    icon: "fa-line-chart" },
+    { id: "einheiten",     title: "Units",         icon: "fa-arrows-h" },
+    { id: "finanzen",      title: "Finance",       icon: "fa-money" }
 ];
 
 export const tools = [
     {
         id:       "card1",
-        title:    "Zahlen Analyse",
+        title:    "Number Analysis",
         group:    "statistik",
         filename: "zahlenAnalyse.html",
         url:      `${BASE}/Tools/Zahlenanalyse/zahlenAnalyse.html`,
-        tags:     ["zahlen", "analyse", "algebra", "mathematik", "summe", "max", "maximum", "min", "minimum", "durchschnitt", "ggT", "kgV", "median", "modus", "spannweite", "varianz", "standardabweichung", "statistik"],
-        info:     "Analysiert eine Zahlenliste und liefert umfassende statistische Kennzahlen wie Summe, Mittelwerte (Durchschnitt, Median, Modus), Streuungsmaße (Varianz, Standardabweichung, Spannweite) sowie ggT und kgV.",
+        tags:     ["numbers", "analysis", "algebra", "math", "sum", "max", "maximum", "min", "minimum", "average", "gcd", "lcm", "median", "mode", "range", "variance", "standard deviation", "statistics"],
+        info:     "Analyzes a list of numbers and provides comprehensive statistical measures such as sum, averages, median, mode, spread, variance, standard deviation, gcd, and lcm.",
         image: {
             big:   `${BASE}/pictures/Zahlen Analyse-appIcon.png`,
             small: `${BASE}/pictures/icons/zahlenAnalyse-icon.png`
@@ -26,12 +26,12 @@ export const tools = [
     },
     {
         id:       "card2",
-        title:    "Zahlensystem Umrechner",
+        title:    "Number System Converter",
         group:    "zahlensysteme",
         filename: "zsystUmrechner.html",
         url:      `${BASE}/Tools/Zahlensystemumrechner/zsystUmrechner.html`,
-        tags:     ["zahlensystem", "umrechner", "dual", "binär", "hex", "oktal", "dezimal"],
-        info:     "Rechnet Zahlen zwischen Zahlensystemen (Basis 2–20) um – inklusive Nachkommastellen und vollem Rechenweg.",
+        tags:     ["number system", "converter", "dual", "binary", "hex", "octal", "decimal"],
+        info:     "Converts numbers between numeral systems (base 2–20), including fractional values and full calculation steps.",
         image: {
             big:   `${BASE}/pictures/Zahlensystem Umrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/zsystUmrechner-icon.png`
@@ -39,12 +39,12 @@ export const tools = [
     },
     {
         id:       "card3",
-        title:    "Zahlensystem Rechner",
+        title:    "Number System Calculator",
         group:    "zahlensysteme",
         filename: "zsystRechner.html",
         url:      `${BASE}/Tools/Zahlensystemrechner/zsystRechner.html`,
-        tags:     ["zahlensystem", "rechner", "addition", "subtraktion", "multiplikation", "division", "dual"],
-        info:     "Führt Grundrechenarten (+, −, ×, ÷) direkt in einem beliebigen Zahlensystem durch und zeigt den schriftlichen Rechenweg.",
+        tags:     ["number system", "calculator", "addition", "subtraction", "multiplication", "division", "dual"],
+        info:     "Performs basic arithmetic operations (+, −, ×, ÷) in any numeral system and shows the written calculation steps.",
         image: {
             big:   `${BASE}/pictures/Zahlensystem Rechner-appIcon.png`,
             small: `${BASE}/pictures/icons/zsystRechner-icon.png`
@@ -52,12 +52,12 @@ export const tools = [
     },
     {
         id:       "card4",
-        title:    "Einheiten Umrechner",
+        title:    "Unit Converter",
         group:    "einheiten",
         filename: "einheitenUmrechner.html",
         url:      `${BASE}/Tools/Einheiten Umrechner/einheitenUmrechner.html`,
-        tags:     ["umrechner", "einheiten", "länge", "gewicht", "temperatur", "zeit"],
-        info:     "Vielseitiger Umrechner für verschiedenste Maßeinheiten – inklusive Advanced Mode für internationale und spezialisierte Messsysteme.",
+        tags:     ["converter", "units", "length", "weight", "temperature", "time"],
+        info:     "Versatile converter for many measurement units, including an advanced mode for international and specialized systems.",
         image: {
             big:   `${BASE}/pictures/Einheiten Umrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/einheitenUmrechner-icon.png`
@@ -65,12 +65,12 @@ export const tools = [
     },
     {
         id:       "card5",
-        title:    "Prozentrechner",
+        title:    "Percentage Calculator",
         group:    "arithmetik",
         filename: "prozentrechner.html",
         url:      `${BASE}/Tools/Prozentrechner/prozentrechner.html`,
-        tags:     ["prozent", "prozentrechnung", "rabatt", "mehrwertsteuer", "rechner", "anteil", "prozentsatz", "grundwert", "veränderung", "erhöhung", "verminderung", "netto", "brutto", "skonto", "rechenweg", "advanced"],
-        info:     "Umfassender Prozentrechner mit Advanced Mode: Berechnet Anteil, Prozentsatz, Grundwert, prozentuale Veränderungen, Erhöhungen/Verminderungen, MwSt (Netto/Brutto) sowie Rabatte inklusive detailliertem Rechenweg.",
+        tags:     ["percent", "percentage calculation", "discount", "value added tax", "calculator", "share", "percentage", "base value", "change", "increase", "decrease", "net", "gross", "cash discount", "calculation steps", "advanced"],
+        info:     "Comprehensive percentage calculator with an advanced mode: calculates shares, percentages, base values, percentage changes, increases/decreases, VAT (net/gross), and discounts with detailed calculation steps.",
         image: {
             big:   `${BASE}/pictures/Prozentrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/prozentrechner-icon.png`
@@ -78,12 +78,12 @@ export const tools = [
     },
     {
         id:       "card6",
-        title:    "Bruchrechner",
+        title:    "Fraction Calculator",
         group:    "arithmetik",
         filename: "bruchRechner.html",
         url:      `${BASE}/Tools/Bruchrechner/bruchRechner.html`,
-        tags:     ["bruch", "bruchrechner", "addieren", "subtrahieren", "multiplizieren", "dividieren", "kürzen", "erweitern", "gemischte zahlen"],
-        info:     "Führt alle Grundrechenarten mit Brüchen durch – inklusive Kürzen, Erweitern, gemischten Zahlen und vollständigem Rechenweg.",
+        tags:     ["fraction", "fraction calculator", "add", "subtract", "multiply", "divide", "simplify", "expand", "mixed numbers"],
+        info:     "Performs all basic arithmetic operations with fractions, including simplification, expansion, mixed numbers, and full calculation steps.",
         image: {
             big:   `${BASE}/pictures/Bruchrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/bruchrechner-icon.png`
@@ -91,12 +91,12 @@ export const tools = [
     },
     {
         id:       "card7",
-        title:    "Dreisatzrechner",
+        title:    "Ratio Calculator",
         group:    "arithmetik",
         filename: "dreisatz.html",
         url:      `${BASE}/Tools/Dreisatz Rechner/dreisatz.html`,
-        tags:     ["dreisatz", "verhältnis", "proportional", "antiproportional", "mathematik"],
-        info:      "Berechnet den Dreisatz bei proportionalen und antiproportionalen Zuordnungen – inklusive Schritt-für-Schritt-Lösungsweg.",
+        tags:     ["ratio", "proportion", "direct proportion", "inverse proportion", "math"],
+        info:     "Calculates ratios for direct and inverse proportional relationships, including step-by-step solutions.",
         image: {
             big:   `${BASE}/pictures/Dreisatzrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
@@ -104,12 +104,12 @@ export const tools = [
     },
     {
         id:       "card8",
-        title:    "Dezimal ↔ Bruch Umrechner",
+        title:    "Decimal ↔ Fraction Converter",
         group:    "arithmetik",
         filename: "dezBruchConverter.html",
         url:      `${BASE}/Tools/DezBruchConverter/dezBruchConverter.html`,
-        tags:     ["dezimal", "bruch", "umrechner"],
-        info:      "Wandelt Brüche in Dezimalzahlen und Dezimalzahlen in Brüche um – inklusive Schritt-für-Schritt-Lösungsweg.",
+        tags:     ["decimal", "fraction", "converter"],
+        info:     "Converts fractions to decimals and decimals to fractions, including step-by-step solutions.",
         image: {
             big:   `${BASE}/pictures/DezBruchConverter-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
@@ -117,12 +117,12 @@ export const tools = [
     },
     {
         id:       "card9",
-        title:    "Formel Umformer",
+        title:    "Formula Transformer",
         group:    "algebra",
         filename: "formelUmformer.html",
         url:      `${BASE}/Tools/Formel Umformer/formelUmformer.html`,
-        tags:     ["formel", "umformer", "algebra"],
-        info:      "Formt mathematische Formeln um – inklusive Schritt-für-Schritt-Lösungsweg.",
+        tags:     ["formula", "transformer", "algebra"],
+        info:     "Rearranges mathematical formulas, including step-by-step solutions.",
         image: {
             big:   `${BASE}/pictures/Formel Umformer-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
@@ -130,12 +130,12 @@ export const tools = [
     },
     {
         id:       "card10",
-        title:    "Gleichungslöser",
+        title:    "Equation Solver",
         group:    "algebra",
         filename: "gleichungslöser.html",
         url:      `${BASE}/Tools/Gleichungslöser/gleichungslöser.html`,
-        tags:     ["gleichung", "linear", "lösen", "algebra", "lineare-gleichungen", "verfahren"],
-        info:      "Löst allgemeine und lineare Gleichungssysteme – inklusive automatischer Auswahl des besten Lösungsverfahrens.",
+        tags:     ["equation", "linear", "solve", "algebra", "linear equations", "method"],
+        info:     "Solves general and linear equation systems, including automatic selection of the best solving method.",
         image: {
             big:   `${BASE}/pictures/Gleichungslöser-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
@@ -143,12 +143,12 @@ export const tools = [
     },
     {
         id:       "card11",
-        title:    "Finanzrechner",
+        title:    "Finance Calculator",
         group:    "finanzen",
         filename: "finanzrechner.html",
         url:      `${BASE}/Tools/Finanzrechner/finanzrechner.html`,
-        tags:     ["finanzen", "rechner", "investition", "sparplan", "rendite", "inflation", "zinseszins"],
-        info:      "All-in-One-Finanzrechner mit drei spezialisierten Tools: Berechnet den langfristigen Vermögensaufbau per Sparplan (Zinseszins), ermittelt den realen Kaufkraftverlust durch Inflation oder analysiert die genaue Performance (ROI & CAGR) von Investments – inklusive Live-Diagrammen und transparentem Rechenweg.",
+        tags:     ["finance", "calculator", "investment", "savings plan", "return", "inflation", "compound interest"],
+        info:     "All-in-one finance calculator with three specialized tools: calculates long-term wealth growth through a savings plan (compound interest), determines real purchasing power loss through inflation, or analyzes investment performance (ROI & CAGR) with live charts and transparent calculation steps.",
         image: {
             big:   `${BASE}/pictures/Finanzrechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
@@ -156,12 +156,12 @@ export const tools = [
     },
     {
         id:       "card12",
-        title:    "Geometrie Rechner",
+        title:    "Geometry Calculator",
         group:    "geometrie",
         filename: "geometrieRechner.html",
         url:      `${BASE}/Tools/Geometrie Rechner/geometrieRechner.html`,
-        tags:     ["geometrie", "2d", "3d", "kreis", "rechteck", "quadrat", "dreieck", "rechtwinkliges dreieck", "trapez", "parallelogramm", "raute","würfel", "quader", "kugel", "zylinder", "kegel", "quadratische pyramide", "rechteckige pyramide"],
-        info:      "Geometrie Rechner welcher mit 2D und 3D Figuren rechnet - inklusive Rechenweg und live Form-Vorschau",
+        tags:     ["geometry", "2d", "3d", "circle", "rectangle", "square", "triangle", "right triangle", "trapezoid", "parallelogram", "rhombus", "cube", "cuboid", "sphere", "cylinder", "cone", "square pyramid", "rectangular pyramid"],
+        info:     "Geometry calculator for 2D and 3D figures, including calculation steps and live shape previews.",
         image: {
             big:   `${BASE}/pictures/Geometrie Rechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
@@ -169,12 +169,12 @@ export const tools = [
     },
     {
         id:       "card13",
-        title:    "Funktionsrechner",
+        title:    "Function Calculator",
         group:    "algebra",
         filename: "funktionsrechner.html",
         url:      `${BASE}/Tools/Funktionsrechner/funktionsrechner.html`,
-        tags:     ["funktionen", "koordinatensystem", "graph", "nullstelle", "schnittpunkte"],
-        info:     "Erstelle und analysiere mathematische Funktionen mit interaktivem Koordinatensystem.",
+        tags:     ["functions", "coordinate system", "graph", "root", "intersections"],
+        info:     "Create and analyze mathematical functions with an interactive coordinate system.",
         image: {
             big:   `${BASE}/pictures/Funktionsrechner2-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
@@ -182,32 +182,31 @@ export const tools = [
     },
     {
         id:       "card14",
-        title:    "Mathe Rechner",
+        title:    "Math Calculator",
         group:    "arithmetik",
         filename: "matheRechner.html",
         url:      `${BASE}/Tools/Mathe Rechner/matheRechner.html`,
-        tags:     ["taschenrechner", "arithmetik", "trigonometrie", "algebra", "fortgeschritten", "advanced"],
-        info:     "Wissenschaftlicher Taschenrechner mit Standard- und Advanced-Modus für komplexe Rechnungen.",
+        tags:     ["calculator", "arithmetic", "trigonometry", "algebra", "advanced", "advanced"],
+        info:     "Scientific calculator with standard and advanced modes for complex calculations.",
         image: {
             big:   `${BASE}/pictures/Mathe Rechner-appIcon.png`,
             small: `${BASE}/pictures/icons/meinTool-icon.png`
         }
     }
 
-
     // -----------------------------------------------------------------------
-    // Neues Tool hinzufügen? Schema:
+    // Add a new tool? Schema:
     // {
     //     id:       "card14",
-    //     title:    "Tool Titel",
-    //     group:    "eine-der-gruppen-ids",
-    //     filename: "meinTool.html",
-    //     url:      `${BASE}/Tools/MeinTool/meinTool.html`,
+    //     title:    "Tool title",
+    //     group:    "one-of-the-group-ids",
+    //     filename: "myTool.html",
+    //     url:      `${BASE}/Tools/MyTool/myTool.html`,
     //     tags:     ["tag1", "tag2"],
-    //     info:     "Kurzbeschreibung für den Tooltip.",
+    //     info:     "Short description for the tooltip.",
     //     image: {
-    //         big:   `${BASE}/pictures/meinTool-big.jpg`,
-    //         small: `${BASE}/pictures/icons/meinTool-icon.png`
+    //         big:   `${BASE}/pictures/myTool-big.jpg`,
+    //         small: `${BASE}/pictures/icons/myTool-icon.png`
     //     }
     // }
     // -----------------------------------------------------------------------

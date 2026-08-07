@@ -1,8 +1,8 @@
 /**
- * toolFavorite.js – Floating Heart Button auf Tool-Seiten
+ * toolFavorite.js – Floating heart button on tool pages
  *
- * Nutzt window.MV (aus common-login.js) für Login-Check und
- * Favoriten-Verwaltung -> exakt dieselbe Logik wie auf der Homepage.
+ * Uses window.MV (from common-login.js) for login checks and
+ * favorite management, matching the homepage logic exactly.
  *
  * HTML: <script type="module" src="../../javaScript/toolFavorite.js"></script>
  */
@@ -16,10 +16,10 @@ if (toolData) init(toolData.id);
 
 function init(toolId) {
 
-    // ── Heart-Button bauen ──────────────────────────────────────────────────
+    // ── Build the heart button ────────────────────────────────────────────
     const btn = document.createElement('button');
     btn.className = 'tool-page-heart';
-    btn.setAttribute('aria-label', 'Zu Favoriten hinzufügen');
+    btn.setAttribute('aria-label', 'Add to favorites');
     btn.innerHTML = `
         <svg class="heart-svg" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2"
@@ -32,7 +32,7 @@ function init(toolId) {
     `;
     document.body.appendChild(btn);
 
-    // ── Zustand rendern ─────────────────────────────────────────────────────
+    // ── Render state ─────────────────────────────────────────────────────
     function render() {
         const loggedIn = window.MV.isLoggedIn();
         const isFav    = loggedIn && window.MV.getFavorites().includes(toolId);
@@ -40,21 +40,21 @@ function init(toolId) {
         btn.classList.toggle('is-active', isFav);
         btn.classList.toggle('is-disabled', !loggedIn);
 
-        btn.setAttribute('aria-label', isFav ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen');
-        btn.querySelector('.heart-tooltip-label').textContent = isFav ? 'Favorit' : 'Favorit?';
+        btn.setAttribute('aria-label', isFav ? 'Remove from favorites' : 'Add to favorites');
+        btn.querySelector('.heart-tooltip-label').textContent = isFav ? 'Favorite' : 'Favorite?';
     }
 
-    // ── Klick ────────────────────────────────────────────────────────────────
+    // ── Click handling ────────────────────────────────────────────────────
     btn.addEventListener('click', () => {
         if (!window.MV.isLoggedIn()) {
-            window.MV.showLoginPrompt('Melde dich an, um Tools als Favorit zu speichern.');
+            window.MV.showLoginPrompt('Log in to save tools as favorites.');
             return;
         }
         window.MV.toggleFavorite(toolId);
         render();
     });
 
-    // ── Cross-Tab-Sync ──────────────────────────────────────────────────────
+    // ── Cross-tab sync ───────────────────────────────────────────────────
     window.addEventListener('storage', (e) => {
         if (e.key === 'currentUser' || e.key === 'isLoggedIn') render();
     });

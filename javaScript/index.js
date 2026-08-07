@@ -9,7 +9,7 @@ function initMathVerse() {
     if (!groupsContainer) return;
     groupsContainer.innerHTML = "";
 
-    createGroupDOM({ id: "favoriten", title: "Favoriten" }, "favoritenGroupStar");
+    createGroupDOM({ id: "favoriten", title: "Favorites" }, "favoritenGroupStar");
     groups.forEach(group => createGroupDOM(group, `${group.id}GroupStar`));
     createGroupDOM({ id: "allTools", title: "All Tools" }, "allToolsGroupStar");
 
@@ -91,7 +91,7 @@ function createCardElement(tool, isAllToolsView = false) {
         event.stopPropagation();
 
         if (!window.MV.isLoggedIn()) {
-            window.MV.showLoginPrompt("Melde dich an, um Tools als Favorit zu speichern.");
+            window.MV.showLoginPrompt("Please log in to save tools as favorites.");
             return;
         }
 
@@ -250,7 +250,7 @@ function handleGroupStarClick(event, groupId) {
     event.preventDefault();
 
     if (!window.MV.isLoggedIn()) {
-        window.MV.showLoginPrompt("Melde dich an, um Gruppen anzupinnen.");
+        window.MV.showLoginPrompt("Please log in to pin groups.");
         return;
     }
 
