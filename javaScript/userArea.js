@@ -127,7 +127,7 @@ function maskEmail(email) {
 
 function populateUserInfo() {
     const user   = window.MV.getCurrentUser() || {};
-    const name   = user.username || 'Gast';
+    const name   = user.username || 'Guest';
     const email  = user.email || '';
     const letter = name.charAt(0).toUpperCase();
 
@@ -528,12 +528,12 @@ function initDeletePanel() {
     if (!input || !btn) return;
 
     input.addEventListener('input', () => {
-        btn.disabled = input.value !== 'LÖSCHEN';
+        btn.disabled = input.value !== 'DELETE';
     });
 
    btn.addEventListener('click', () => {
         window.MV.deleteCurrentAccount();
-        alert('Konto wurde gelöscht. Du wirst zur Startseite weitergeleitet.');
+        alert('Account deleted. You will be redirected to the homepage.');
         window.location.href = '../index.html';
     });
 }

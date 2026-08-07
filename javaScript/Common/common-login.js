@@ -697,7 +697,7 @@ localStorage.removeItem("");
                 <p class="mv-modalText" id="mvLoginPromptText">Please log in to use this feature.</p>
                 <div class="mv-modalActions">
                     <button class="mv-modalBtnSecondary" id="mvLoginPromptCancel">Cancel</button>
-                    <a class="mv-modalBtnPrimary" href="${window.MV_BASE}/html/login.html">Log in</a>
+                    <a class="mv-modalBtnPrimary" href="${window.MV_BASE}/html/login.html">Sign in</a>
                 </div>
             </div>
         `;
@@ -750,7 +750,7 @@ localStorage.removeItem("");
         getToolState, setToolState, getAllGuestToolStates,
         getPasswordStrength,
         showLoginPrompt, hideLoginPrompt,
-        getUsername: () => (getCurrentUser()?.username) || 'Gast',
+        getUsername: () => (getCurrentUser()?.username) || 'Guest',
         getEmail: () => (getCurrentUser()?.email) || '',
         getAllUsers, saveAllUsers,
         findUserByUsername, findUserByEmail, findUserByUsernameOrEmail,
