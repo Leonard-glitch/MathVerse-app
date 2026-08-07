@@ -68,6 +68,11 @@
 }
 
 .calculatorShell {
+    /* Ohne explizite Breite berechnet sich dieses Flex-Kind per Shrink-to-Fit
+       (align-items:center auf .finanzenSection ist nicht "stretch") – jede
+       zu breite Mindestbreite eines Nachfahren hätte dann die ganze Karte
+       über den Viewport hinaus wachsen lassen, egal was overflow:hidden tut. */
+    width: 100%;
     overflow: hidden;
     border: 1px solid var(--finance-border);
     border-radius: var(--finance-radius-lg);
@@ -114,6 +119,8 @@
     font-size: 0.86rem;
     font-weight: 700;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border: 0;
     border-radius: 10px;
     outline: none;
@@ -961,6 +968,16 @@
 
     .resultPanel {
         min-height: auto;
+    }
+
+    .calculatorToolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .finanzenTypeTabs {
+        width: 100%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 

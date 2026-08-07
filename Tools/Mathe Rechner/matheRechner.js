@@ -834,6 +834,17 @@ customElements.whenDefined("math-field").then(() => {
         liveResultCheckbox.checked = window.MV.getLiveResult();
     });
 
+    const degradSwitch = document.getElementById("degradSwitch");
+    if (degradSwitch) {
+        degradSwitch.value = window.MV.getAngleMode();
+        degradSwitch.addEventListener("change", () => {
+            window.MV.setAngleMode(degradSwitch.value);
+        });
+        window.addEventListener("mv:staterestore", () => {
+            degradSwitch.value = window.MV.getAngleMode();
+        });
+    }
+
     if (!mf) return;
 
     // Die eigene Schnellzugriff-/Zahlen-Tastatur deckt den kompletten
@@ -906,10 +917,13 @@ customElements.whenDefined("math-field").then(() => {
         clearTimeout(debounceTimer);
 
         // "=" über die virtuelle MathLive-Tastatur landet nicht im "keydown"-
-        // Handler unten, sondern hier als normale Werteänderung – wirkt aber
-        // wie die Enter-Taste eines Taschenrechners statt als Gleichheitszeichen.
-        if (mf.value.endsWith("=")) {
-            mf.value = mf.value.slice(0, -1);
+        // Handler unten, sondern hier als normale Werteänderung – auch wenn
+        // der Cursor gerade innerhalb eines Bruchs oder einer Klammer steht,
+        // also nicht zwingend am Ende der Eingabe. Deshalb wird der gesamte
+        // Wert durchsucht statt nur das Ende zu prüfen.
+        const eqIndex = mf.value.indexOf("=");
+        if (eqIndex !== -1) {
+            mf.value = mf.value.slice(0, eqIndex) + mf.value.slice(eqIndex + 1);
             calculate(true);
             return;
         }

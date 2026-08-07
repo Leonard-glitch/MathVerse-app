@@ -388,6 +388,7 @@ form.addEventListener('submit', (e) => {
             currency: window.MV.getCurrency(),
             decimalPlaces: window.MV.getDecimalPlaces(),
             liveResult: window.MV.getLiveResult(),
+            angleMode: window.MV.getAngleMode(),
             toolHistory: window.MV.getAllGuestToolHistory(),
             isPro: false,
 

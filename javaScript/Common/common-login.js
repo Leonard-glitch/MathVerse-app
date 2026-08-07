@@ -96,6 +96,7 @@ localStorage.removeItem("");
         currency: 'EUR',
         decimalPlaces: 2,
         liveResult: false,
+        angleMode: 'deg',
         toolHistory: {},
         isPro: false,
 
@@ -537,6 +538,20 @@ localStorage.removeItem("");
         }
     }
 
+    function getAngleMode() {
+        const u = getCurrentUser();
+        if (isLoggedIn() && u && u.angleMode) return u.angleMode;
+        return localStorage.getItem('mv-angleMode') || 'deg';
+    }
+
+    function setAngleMode(mode) {
+        if (isLoggedIn()) {
+            updateCurrentUser({ angleMode: mode });
+        } else {
+            localStorage.setItem('mv-angleMode', mode);
+        }
+    }
+
     const GUEST_HISTORY_KEY = 'mv-toolHistory';
     const HISTORY_LIMIT = 50;
 
@@ -725,6 +740,7 @@ localStorage.removeItem("");
         getContainerOrders, setContainerOrders,
         getTheme, setTheme, getFontSize, setFontSize,
         getDesign, setDesign,
+        getAngleMode, setAngleMode,
         applyTheme, applyFontSize, applyDesign,
         getCurrency, setCurrency, getCurrencySymbol, formatCurrency, formatCurrencyCompact,
         getDecimalPlaces, setDecimalPlaces,
@@ -869,7 +885,7 @@ localStorage.removeItem("");
     // Listener mehr zu bauen, sondern hören nur noch auf dieses eine Event:
     //   window.addEventListener('mv:staterestore', meineRefreshFunktion)
     // ==========================================================================
-    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize', 'mv-decimalPlaces', 'mv-liveResult', 'mv-toolHistory'];
+    const RESTORE_STORAGE_KEYS = ['currentUser', 'isLoggedIn', 'mv-currency', 'mv-theme', 'mv-design', 'mv-fontsize', 'mv-decimalPlaces', 'mv-liveResult', 'mv-angleMode', 'mv-toolHistory'];
 
     function dispatchStateRestore() {
         window.dispatchEvent(new CustomEvent('mv:staterestore'));
