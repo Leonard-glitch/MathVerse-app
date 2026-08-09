@@ -67,8 +67,8 @@ export const tools = [
         id:       "card5",
         title:    "Percentage Calculator",
         group:    "arithmetik",
-        filename: "prozentrechner.html",
-        url:      `${BASE}/Tools/Prozentrechner/prozentrechner.html`,
+        filename: "percentageCalculator.html",
+        url:      `${BASE}/Tools/PercentageCalculator/percentageCalculator.html`,
         tags:     ["percent", "percentage calculation", "discount", "value added tax", "calculator", "share", "percentage", "base value", "change", "increase", "decrease", "net", "gross", "cash discount", "calculation steps", "advanced"],
         info:     "Comprehensive percentage calculator with an advanced mode: calculates shares, percentages, base values, percentage changes, increases/decreases, VAT (net/gross), and discounts with detailed calculation steps.",
         image: {
