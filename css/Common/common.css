@@ -160,27 +160,27 @@ main {
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.platzhalter {
+.placeholderFooter {
     text-align: center;
     color: var(--text-muted);
     font-size: 0.85rem;
 }
 
-.linksFooterect {
+.leftFootersect {
     display: flex;
     flex-direction: row;
     justify-content: center;
     gap: 4rem;
 }
 
-.linksFooterect a {
+.leftFootersect a {
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 0.8rem;
     transition: var(--transition-speed);
 }
 
-.linksFooterect a:hover {
+.leftFootersect a:hover {
     color: var(--accent-live);
     text-shadow: 0 0 8px var(--accent-live);
 }
@@ -201,7 +201,7 @@ main {
 }
 
 /* Global Shared Headers */
-.zahlenHeader {
+.titleHeader {
     color: var(--text-primary);
     padding: 2.5rem 1rem 1.5rem 1rem;
     font-size: 2.8rem;
@@ -299,7 +299,7 @@ input:-webkit-autofill:focus {
 /* ==========================================================================
    GLOBAL ERROR MESSAGES
    ========================================================================== */
-.falscheEingabestyle {
+.errorMessagestyle {
     font-size: 1rem;
     font-weight: 600;
     text-align: center;
@@ -837,7 +837,7 @@ input[type="number"] {
     }
 
     /* Footer */
-    .linksFooterect {
+    .leftFootersect {
         gap: 1.5rem;
         flex-wrap: wrap;
         justify-content: center;

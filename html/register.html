@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="icon" type="image/x-icon" href="../pictures/favicon v1.png">
+    <link rel="icon" type="image/png" href="../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="shortcut icon" href="../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="../css/feedback.css">
     <link rel="stylesheet" href="../css/Common/common.css">
     <link rel="stylesheet" href="../css/register.css">
-    <title>Register</title>
+    <title>Register Globomath</title>
 </head>
 <body>
     <header>
@@ -39,7 +44,7 @@
                                required autocomplete="username">
                         <label for="userName" class="floatingLabel">Username</label>
                     </div>
-                    <div id="usernameError" class="falscheEingabestyle field-error" style="display:none;"></div>
+                    <div id="usernameError" class="errorMessagestyle field-error" style="display:none;"></div>
 
                     <div class="inputGroup">
                         <input type="email" id="email" name="email"
@@ -47,7 +52,7 @@
                                required autocomplete="email">
                         <label for="email" class="floatingLabel">Email address</label>
                     </div>
-                    <div id="emailError" class="falscheEingabestyle field-error" style="display:none;"></div>
+                    <div id="emailError" class="errorMessagestyle field-error" style="display:none;"></div>
 
                     <div class="inputGroup">
                         <input type="password" id="password" name="password"
@@ -70,13 +75,13 @@
                             <i class="fa fa-eye"></i>
                         </button>
                     </div>
-                    <div id="formError" class="falscheEingabestyle field-error" style="display:none;"></div>
+                    <div id="formError" class="errorMessagestyle field-error" style="display:none;"></div>
 
                     <div class="checkboxGroup">
                         <input type="checkbox" id="privacyAccept" name="privacyAccept" required>
                         <span class="checkboxText">
                             I have read and accept the
-                            <a href="./datenSchutz.html" target="_blank">Privacy policy</a>.
+                            <a href="./Privacypolicy.html" target="_blank">Privacy policy</a>.
                             <span class="accent-error">*</span>
                         </span>
                     </div>
@@ -107,7 +112,7 @@
                 <a href="https://github.com"    target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
             </div>
             <div class="linksFooterect">
-                <a href="./datenSchutz.html">Privacy policy</a>
+                <a href="./Privacypolicy.html">Privacy policy</a>
                 <button id="openFeedbackBtn">Send feedback</button>
                 <a href="./impressum.html">Imprint</a>
             </div>

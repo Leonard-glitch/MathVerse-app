@@ -35,7 +35,7 @@
         <div id="feedbackSuccessMessage" class="success-container" style="display: none;">
           <div class="success-icon">&#10004;</div>
           <h3 class="success-header">Sent!</h3>
-          <p class="success-text">Thank you, your feedback helps us improve MathVerse even further.</p>
+          <p class="success-text">Thank you, your feedback helps us improve Globomath even further.</p>
         </div>
       </div>
     </div>
