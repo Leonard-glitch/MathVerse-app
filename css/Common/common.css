@@ -98,6 +98,7 @@ main {
 
 .navImage {
     height: 45px;
+    width: 100px;
     border-radius: var(--radius-sm);
     filter: drop-shadow(0 0 8px var(--glow-soft));
     transition: var(--transition-speed);
@@ -216,7 +217,7 @@ main {
 /* ==========================================================================
    GLOBAL INPUT FIELDS
    ========================================================================== */
-.zahlenInputfeld {
+.numberInputField {
     font-size: 1.2rem;
     text-align: center;
     padding: 0.6rem 1.5rem;
@@ -232,12 +233,12 @@ main {
     transition: all var(--transition-speed) ease;
 }
 
-.zahlenInputfeld:hover {
+.numberInputField:hover {
     transform: translateY(-2px);
     border-color: var(--border-glow);
 }
 
-.zahlenInputfeld:focus {
+.numberInputField:focus {
     border-color: var(--border-glow);
     box-shadow: 0 0 15px var(--glow-soft), var(--shadow-main);
 }
@@ -654,7 +655,7 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-.zahlenButtoncss:focus-visible {
+.numberButtoncss:focus-visible {
     outline: 2px solid var(--border-glow);
     outline-offset: 3px;
     box-shadow: 0 0 12px var(--glow-soft);
@@ -753,7 +754,6 @@ input[type="number"] {
         justify-content: center;
         gap: 0.75rem;
         padding: 0.75rem 0 0.4rem;
-        border-top: 1px solid var(--border-color);
         animation: navFadeSlide 0.22s ease;
     }
 
@@ -788,18 +788,18 @@ input[type="number"] {
 @media (max-width: 768px) {
 
     /* Header */
-    .zahlenHeader {
+    .titleHeader {
         font-size: clamp(1.4rem, 6vw, 2rem);
         padding: 1.5rem 1rem 1rem 1rem;
     }
 
     /* Input & Button – Touch-freundlich */
-    .zahlenInputfeld {
+    .numberInputField {
         max-width: 100%;
         min-height: 44px;
     }
 
-    .zahlenButtoncss {
+    .numberButtoncss {
         min-height: 44px;
         width: 100%;
         max-width: 280px;
@@ -825,13 +825,13 @@ input[type="number"] {
     }
 
     /* Ausgabe-Boxen */
-    .zahlenAusgabestyle {
+    .outputStyle {
         padding: 1rem;
         margin: 1rem 0;
     }
 
     /* Fehler-Meldungen */
-    .falscheEingabestyle {
+    .errorMessagestyle {
         font-size: 0.85rem;
         padding: 0.5rem 1rem;
     }
@@ -854,7 +854,7 @@ input[type="number"] {
 
 /* Sehr kleine Screens (≤ 400px) */
 @media (max-width: 400px) {
-    .zahlenHeader {
+    .titleHeader {
         font-size: clamp(1.2rem, 7vw, 1.6rem);
     }
 

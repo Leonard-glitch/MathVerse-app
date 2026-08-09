@@ -15,8 +15,8 @@ export const tools = [
         id:       "card1",
         title:    "Number Analysis",
         group:    "statistik",
-        filename: "zahlenAnalyse.html",
-        url:      `${BASE}/Tools/Zahlenanalyse/zahlenAnalyse.html`,
+        filename: "numberAnalysis.html",
+        url:      `${BASE}/Tools/NumberAnalysis/numberAnalysis.html`,
         tags:     ["numbers", "analysis", "algebra", "math", "sum", "max", "maximum", "min", "minimum", "average", "gcd", "lcm", "median", "mode", "range", "variance", "standard deviation", "statistics"],
         info:     "Analyzes a list of numbers and provides comprehensive statistical measures such as sum, averages, median, mode, spread, variance, standard deviation, gcd, and lcm.",
         image: {

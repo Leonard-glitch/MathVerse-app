@@ -4,11 +4,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zahlen Analyse</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Number Analysis</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./zahlenAnalyse.css">
+    <link rel="stylesheet" href="./numberAnalysis.css">
 </head>
 <body>
     <header>
@@ -28,35 +33,35 @@
     </header>
     <main>
         <section class="zahlenBody">
-            <h1 class="zahlenHeader">Zahlen Analyse</h1>
+            <h1 class="titleHeader">Number Analysis</h1>
 
-            <input type="text" id="zahlenInput" placeholder="z.B. 4, 8, 15, 16, 23, 42" class="zahlenInputfeld">
+            <input type="text" id="zahlenInput" placeholder="e.g. 4, 8, 15, 16, 23, 42" class="numberInputField" autocomplete="off">
 
-            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
+            <button class="numberButtoncss" id="buttonZahlenInput" type="button">Calculate</button>
 
-            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+            <p class="errorMessagestyle" id="errorMessages">Invalid Input</p>
 
-            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+            <div class="outputStyle" id="ausgabeContainer">
 
                 <!-- Gruppe 1: Kennzahlen (bestehend) -->
                 <div class="ergebnisGruppe">
-                    <p class="ergebnisGruppenTitel">Kennzahlen</p>
+                    <p class="ergebnisGruppenTitel">Key figures</p>
                     <div class="ergebnisGrid">
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Summe</p><p id="ausgabeSumme" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Sum</p><p id="ausgabeSumme" class="ergebnisValue"></p></div>
                         <div class="ergebnisItem"><p class="ergebnisLabel">Maximum</p><p id="ausgabeMax" class="ergebnisValue"></p></div>
                         <div class="ergebnisItem"><p class="ergebnisLabel">Minimum</p><p id="ausgabeMin" class="ergebnisValue"></p></div>
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Durchschnitt</p><p id="ausgabeDurchschnitt" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Average</p><p id="ausgabeDurchschnitt" class="ergebnisValue"></p></div>
                         <div class="ergebnisItem">
                             <p class="ergebnisLabel">
-                                ggT
-                                <i class="fa fa-info-circle infoIcon" data-info="Größter gemeinsamer Teiler"></i>
+                                GCD
+                                <i class="fa fa-info-circle infoIcon" data-info="Greatest Common Divisor"></i>
                             </p>
                             <p id="ausgabeGgt" class="ergebnisValue"></p>
                         </div>
                         <div class="ergebnisItem">
                             <p class="ergebnisLabel">
-                                kgV
-                                <i class="fa fa-info-circle infoIcon" data-info="Kleinstes gemeinsames Vielfaches"></i>
+                                LCM
+                                <i class="fa fa-info-circle infoIcon" data-info="Least Common Multiple"></i>
                             </p>
                             <p id="ausgabeKgv" class="ergebnisValue"></p>
                         </div>
@@ -65,35 +70,35 @@
 
                 <!-- Gruppe 2: Grundlegende Statistik (neu) -->
                 <div class="ergebnisGruppe">
-                    <p class="ergebnisGruppenTitel">Grundlegende Statistik</p>
+                    <p class="ergebnisGruppenTitel">Basic Statistics</p>
                     <div class="ergebnisGrid">
                         <div class="ergebnisItem"><p class="ergebnisLabel">Median</p><p id="ausgabeMedian" class="ergebnisValue"></p></div>
                         <div class="ergebnisItem">
                             <p class="ergebnisLabel">
-                                Modus
-                                <i class="fa fa-info-circle infoIcon" data-info="Der/die am häufigsten vorkommende(n) Wert(e)"></i>
+                                Mode
+                                <i class="fa fa-info-circle infoIcon" data-info="The most frequently occurring value(s)"></i>
                             </p>
                             <p id="ausgabeModus" class="ergebnisValue"></p>
                         </div>
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Spannweite</p><p id="ausgabeSpannweite" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Range</p><p id="ausgabeSpannweite" class="ergebnisValue"></p></div>
                     </div>
                 </div>
 
                 <!-- Gruppe 3: Erweiterte Statistik (neu) -->
                 <div class="ergebnisGruppe">
-                    <p class="ergebnisGruppenTitel">Erweiterte Statistik</p>
+                    <p class="ergebnisGruppenTitel">Advanced statistics</p>
                     <div class="ergebnisGrid">
                         <div class="ergebnisItem">
                             <p class="ergebnisLabel">
-                                Varianz
-                                <i class="fa fa-info-circle infoIcon" data-info="Durchschnittliche quadratische Abweichung vom Mittelwert"></i>
+                                Variance
+                                <i class="fa fa-info-circle infoIcon" data-info="Average squared deviation from the mean"></i>
                             </p>
                             <p id="ausgabeVarianz" class="ergebnisValue"></p>
                         </div>
                         <div class="ergebnisItem">
                             <p class="ergebnisLabel">
-                                Standardabw.
-                                <i class="fa fa-info-circle infoIcon" data-info="Quadratwurzel der Varianz"></i>
+                                Standard deviation
+                                <i class="fa fa-info-circle infoIcon" data-info="Square root of the variance"></i>
                             </p>
                             <p id="ausgabeStdAbw" class="ergebnisValue"></p>
                         </div>
@@ -102,24 +107,24 @@
 
                 <!-- Gruppe 4: Datenübersicht (neu) -->
                 <div class="ergebnisGruppe">
-                    <p class="ergebnisGruppenTitel">Datenübersicht</p>
+                    <p class="ergebnisGruppenTitel">Data Overview</p>
                     <div class="ergebnisGrid">
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Anzahl</p><p id="ausgabeAnzahl" class="ergebnisValue"></p></div>
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Positiv</p><p id="ausgabePositiv" class="ergebnisValue"></p></div>
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Negativ</p><p id="ausgabeNegativ" class="ergebnisValue"></p></div>
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Nullen</p><p id="ausgabeNullen" class="ergebnisValue"></p></div>
-                        <div class="ergebnisItem"><p class="ergebnisLabel">Eindeutige Werte</p><p id="ausgabeEindeutig" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Number</p><p id="ausgabeAnzahl" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Positive</p><p id="ausgabePositiv" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Negative</p><p id="ausgabeNegativ" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Zeros</p><p id="ausgabeNullen" class="ergebnisValue"></p></div>
+                        <div class="ergebnisItem"><p class="ergebnisLabel">Unique Values</p><p id="ausgabeEindeutig" class="ergebnisValue"></p></div>
                     </div>
                 </div>
 
                 <!-- Gruppe 5: Sortierte Liste (neu, eigener Block statt Grid-Zelle) -->
                 <div class="ergebnisGruppe ergebnisGruppeSortiert">
-                    <p class="ergebnisGruppenTitel">Sortierte Liste (aufsteigend)</p>
+                    <p class="ergebnisGruppenTitel">Sorted list (ascending)</p>
                     <p id="ausgabeSortiert" class="sortierteListeBox"></p>
                 </div>
 
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p>
+                    <p class="rechenwegText">Calculation steps:</p>
                     <div id="rechenwegOutput"></div>
                 </div>
                 <span id="tipp"></span>
@@ -148,7 +153,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./zahlenAnalyse.js"></script>
+    <script src="./numberAnalysis.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>

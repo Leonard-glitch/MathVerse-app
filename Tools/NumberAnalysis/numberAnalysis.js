@@ -1,8 +1,9 @@
+
 const zahlenInput = document.getElementById("zahlenInput");
 const buttonInput = document.getElementById("buttonZahlenInput");
 
 const errorMessages = document.getElementById("errorMessages");
-const errorBox = document.querySelector(".falscheEingabestyle");
+const errorBox = document.querySelector(".errorMessagestyle");
 
 const ausgabeContainer    = document.getElementById("ausgabeContainer");
 const ausgabeSumme        = document.getElementById("ausgabeSumme");
@@ -29,7 +30,7 @@ const ausgabeSortiert    = document.getElementById("ausgabeSortiert");
 
 const rechenwegOutput     = document.getElementById("rechenwegOutput");
 
-// ── Mathematische Hilfsfunktionen 
+// ── Mathematische Hilfsfunktionen
 function ggt(a, b) {
     a = Math.abs(a);
     b = Math.abs(b);
@@ -137,25 +138,25 @@ function zahlenAnalyse(arr) {
 
 function validateInput(inputString) {
     if (inputString.trim() === "") {
-        return "Bitte eine Zahl eingeben!";
+        return "Please enter a number!";
     }
 
     const teile = inputString.split(",");
 
     if (teile.some(t => t.trim() === "")) {
-        return "Keine leeren Werte oder doppelte Kommas erlaubt!";
+        return "Empty values or duplicate commas are not allowed!";
     }
 
     const zahlenArray = teile.map(t => Number(t.trim()));
 
     if (zahlenArray.some(num => isNaN(num))) {
-        return "Bitte gültige Zahlen eingeben!";
+        return "Please enter valid numbers!";
     }
 
     return zahlenArray;
 }
 
-// ── Rechenweg-Generierung 
+// ── Rechenweg-Generierung
 function infoIconHTML(text) {
     return `<i class="fa fa-info-circle infoIcon" data-info="${text}"></i>`;
 }
@@ -172,17 +173,17 @@ function buildRechenweg(arr, result) {
     const liste = arr.join(", ");
     const sortiertStr = result.sortiert.join(", ");
 
-    let html = schrittHTML("Eingabe", `Werte: ${liste}`);
-    html += schrittHTML("Summe", `${arr.join(" + ")} = ${result.sum}`);
-    html += schrittHTML("Maximum", `Größter Wert der Liste = ${result.max}`);
-    html += schrittHTML("Minimum", `Kleinster Wert der Liste = ${result.min}`);
-    html += schrittHTML("Durchschnitt", `(${arr.join(" + ")}) / ${arr.length} = ${result.average}`);
+    let html = schrittHTML("Input", `Values: ${liste}`);
+    html += schrittHTML("Sum", `${arr.join(" + ")} = ${result.sum}`);
+    html += schrittHTML("Maximum", `Largest value in the list = ${result.max}`);
+    html += schrittHTML("Minimum", `Smallest value in the list = ${result.min}`);
+    html += schrittHTML("Average", `(${arr.join(" + ")}) / ${arr.length} = ${result.average}`);
 
     // ── Median ───────────────────────────────────────────────────────────
     const mid = Math.floor(result.sortiert.length / 2);
     const medianFormel = result.sortiert.length % 2 === 0
-        ? `Sortiert: ${sortiertStr}<br>Mittelwert der beiden mittleren Werte: (${result.sortiert[mid - 1]} + ${result.sortiert[mid]}) / 2 = ${result.median}`
-        : `Sortiert: ${sortiertStr}<br>Mittlerer Wert (Position ${mid + 1}) = ${result.median}`;
+        ? `Sorted: ${sortiertStr}<br>Average of the two middle values: (${result.sortiert[mid - 1]} + ${result.sortiert[mid]}) / 2 = ${result.median}`
+        : `Sorted: ${sortiertStr}<br>Middle value (position ${mid + 1}) = ${result.median}`;
     html += schrittHTML("Median", medianFormel);
 
     // ── Modus ────────────────────────────────────────────────────────────
@@ -190,50 +191,75 @@ function buildRechenweg(arr, result) {
         .sort((a, b) => a[0] - b[0])
         .map(([wert, h]) => `${wert} → ${h}×`)
         .join(", ");
+
     const modusFormel = result.modus.eindeutig
-        ? `Häufigkeiten: ${haeufigkeitsZeilen}<br>Häufigster Wert(e): ${result.modus.werte.join(", ")} (je ${result.modus.haeufigkeit}×)`
-        : `Häufigkeiten: ${haeufigkeitsZeilen}<br>Alle Werte kommen gleich oft vor ⇒ kein eindeutiger Modus`;
-    html += schrittHTML(`Modus ${infoIconHTML("Der/die am häufigsten vorkommende(n) Wert(e)")}`, modusFormel);
+        ? `Frequencies: ${haeufigkeitsZeilen}<br>Most frequent value(s): ${result.modus.werte.join(", ")} (${result.modus.haeufigkeit}× each)`
+        : `Frequencies: ${haeufigkeitsZeilen}<br>All values occur equally often ⇒ no unique mode`;
+
+    html += schrittHTML(
+        `Mode ${infoIconHTML("The most frequently occurring value(s)")}`,
+        modusFormel
+    );
 
     // ── Spannweite ───────────────────────────────────────────────────────
-    html += schrittHTML("Spannweite", `Maximum − Minimum = ${result.max} − ${result.min} = ${result.spannweite}`);
+    html += schrittHTML(
+        "Range",
+        `Maximum − Minimum = ${result.max} − ${result.min} = ${result.spannweite}`
+    );
 
     if (result.alleGanzzahlen) {
-        html += schrittHTML(`ggT ${infoIconHTML("Größter gemeinsamer Teiler")}`, `ggT(${liste}) = ${result.ggt}`);
-        html += schrittHTML(`kgV ${infoIconHTML("Kleinstes gemeinsames Vielfaches")}`, `kgV(${liste}) = ${result.kgv}`);
+        html += schrittHTML(
+            `GCD ${infoIconHTML("Greatest Common Divisor")}`,
+            `GCD(${liste}) = ${result.ggt}`
+        );
+
+        html += schrittHTML(
+            `LCM ${infoIconHTML("Least Common Multiple")}`,
+            `LCM(${liste}) = ${result.kgv}`
+        );
     } else {
-        html += schrittHTML("ggT / kgV", "Nur für ganze Zahlen definiert – Eingabe enthält Dezimalzahlen.");
+        html += schrittHTML(
+            "GCD / LCM",
+            "Only defined for integers – input contains decimal numbers."
+        );
     }
 
     // ── Varianz ──────────────────────────────────────────────────────────
     const abweichungsZeilen = arr
         .map(x => `(${x} − ${result.average})² = ${rund4(Math.pow(x - result.average, 2))}`)
         .join("<br>");
-    const summeQuadrateAnzeige = rund4(arr.reduce((acc, x) => acc + Math.pow(x - result.average, 2), 0));
+
+    const summeQuadrateAnzeige = rund4(
+        arr.reduce((acc, x) => acc + Math.pow(x - result.average, 2), 0)
+    );
+
     html += schrittHTML(
-        `Varianz ${infoIconHTML("Durchschnittliche quadratische Abweichung vom Mittelwert")}`,
-        `x̄ = ${result.average}<br>${abweichungsZeilen}<br>Summe = ${summeQuadrateAnzeige}<br>Varianz = ${summeQuadrateAnzeige} / ${arr.length} = ${result.varianz}`
+        `Variance ${infoIconHTML("Average squared deviation from the mean")}`,
+        `x̄ = ${result.average}<br>${abweichungsZeilen}<br>Sum = ${summeQuadrateAnzeige}<br>Variance = ${summeQuadrateAnzeige} / ${arr.length} = ${result.varianz}`
     );
 
     // ── Standardabweichung ───────────────────────────────────────────────
     html += schrittHTML(
-        `Standardabweichung ${infoIconHTML("Quadratwurzel der Varianz")}`,
-        `√Varianz = √${result.varianz} = ${result.stdAbweichung}`
+        `Standard Deviation ${infoIconHTML("Square root of the variance")}`,
+        `√Variance = √${result.varianz} = ${result.stdAbweichung}`
     );
 
     // ── Datenübersicht ───────────────────────────────────────────────────
     html += schrittHTML(
-        "Datenübersicht",
-        `Anzahl der Werte: ${result.anzahl}<br>Positive Werte: ${result.anzahlPositiv}<br>Negative Werte: ${result.anzahlNegativ}<br>Nullen: ${result.anzahlNullen}<br>Eindeutige Werte: ${result.anzahlEindeutig}`
+        "Data Overview",
+        `Number of values: ${result.anzahl}<br>Positive values: ${result.anzahlPositiv}<br>Negative values: ${result.anzahlNegativ}<br>Zeros: ${result.anzahlNullen}<br>Unique values: ${result.anzahlEindeutig}`
     );
 
     // ── Sortierte Liste ──────────────────────────────────────────────────
-    html += schrittHTML("Sortierte Liste", `${liste}<br>→ sortiert: ${sortiertStr}`);
+    html += schrittHTML(
+        "Sorted List",
+        `${liste}<br>→ sorted: ${sortiertStr}`
+    );
 
     return html;
 }
 
-// ── Ausgabe zurücksetzen 
+// ── Ausgabe zurücksetzen
 function resetOutput() {
     ausgabeContainer.style.display = "none";
     ausgabeSumme.textContent = "";
@@ -260,7 +286,7 @@ function resetOutput() {
     hideInfoTooltip();
 }
 
-// ── Hauptlogik 
+// ── Hauptlogik
 buttonInput.addEventListener("click", function() {
     const validationResult = validateInput(zahlenInput.value);
 
@@ -287,7 +313,7 @@ buttonInput.addEventListener("click", function() {
     ausgabeKgv.textContent          = result.alleGanzzahlen ? result.kgv : "–";
 
     ausgabeMedian.textContent     = result.median;
-    ausgabeModus.textContent      = result.modus.eindeutig ? result.modus.werte.join(", ") : "Kein eindeutiger Modus";
+    ausgabeModus.textContent      = result.modus.eindeutig ? result.modus.werte.join(", ") : "No unique mode";
     ausgabeSpannweite.textContent = result.spannweite;
 
     ausgabeVarianz.textContent = result.varianz;
@@ -370,7 +396,6 @@ function hideInfoTooltip() {
     if (infoTooltip) infoTooltip.classList.remove("visible", "tooltip-above", "tooltip-below");
     activeInfoIcon = null;
 }
-
 
 document.addEventListener("click", (e) => {
     const icon = e.target.closest(".infoIcon");

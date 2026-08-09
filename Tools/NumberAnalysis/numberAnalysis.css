@@ -6,7 +6,7 @@
     padding: 0 1rem;
 }
 
-.zahlenInputfeld {
+.numberInputField {
     border: 3px solid var(--border-glow);
 
     box-shadow: 0 0 20px var(--glow-soft), var(--shadow-main);
@@ -14,17 +14,17 @@
     transition: all var(--transition-speed) ease;
 }
 
-.zahlenInputfeld:focus {
+.numberInputField:focus {
     border-color: var(--accent-live);
     box-shadow: 0 0 30px rgba(0, 255, 204, 0.6), var(--shadow-main);
 }
 
-::placeholder {
+.zahlenBody ::placeholder {
     color: var(--text-primary);
     opacity: 0.8;
 }
 
-.zahlenButtoncss {
+.numberButtoncss {
     font-size: 1.4rem;
     text-align: center;
     margin: 2rem 0;
@@ -45,18 +45,18 @@
     transition: box-shadow 0.1s ease-in, transform 0.1s ease;
 }
 
-.zahlenButtoncss:hover {
+.numberButtoncss:hover {
     box-shadow:
         0 5px 5px var(--border-glow),
         0 10px 15px var(--border-glow);
 }
 
-.zahlenButtoncss:active {
+.numberButtoncss:active {
     transform: translateY(3px);
 }
 
 
-.zahlenAusgabestyle {
+.outputStyle {
     display: none;
     flex-direction: column;
     width: 100%;
@@ -75,8 +75,8 @@
     transition: border-color var(--transition-speed);
 }
 
-.zahlenAusgabestyle:hover {
-    border-color: rgba(138, 22, 255, 0.4);
+.outputStyle:hover {
+    border-color: var(--border-glow);
 }
 
 .ergebnisGrid {
@@ -298,7 +298,7 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         padding: 1rem;
     }
 }
@@ -308,11 +308,11 @@
         padding: 0 0.75rem;
     }
 
-    .zahlenInputfeld {
+    .numberInputField {
         max-width: 100%;
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         max-width: 100%;
         padding: 1rem;
     }
@@ -367,4 +367,52 @@
     .ergebnisValue {
         font-size: 0.9rem;
     }
+}
+
+
+
+.outputStyle {
+    /* dein bisheriges CSS */
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.outputStyle::-webkit-scrollbar {
+    display: none;
+}
+
+.ergebnisGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    min-width: 0;
+}
+
+.ergebnisValue {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-live);
+    text-shadow: 0 0 5px var(--glow-live);
+    min-height: 1.4rem;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.sortierteListeBox {
+    /* dein bisheriges CSS */
+
+    white-space: nowrap;
+    overflow-x: auto;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.sortierteListeBox::-webkit-scrollbar {
+    display: none;
 }
