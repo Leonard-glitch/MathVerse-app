@@ -28,8 +28,8 @@ export const tools = [
         id:       "card2",
         title:    "Number System Converter",
         group:    "zahlensysteme",
-        filename: "zsystUmrechner.html",
-        url:      `${BASE}/Tools/Zahlensystemumrechner/zsystUmrechner.html`,
+        filename: "numberSystemConverter.html",
+        url:      `${BASE}/Tools/NumberSystemConverter/numberSystemConverter.html`,
         tags:     ["number system", "converter", "dual", "binary", "hex", "octal", "decimal"],
         info:     "Converts numbers between numeral systems (base 2–20), including fractional values and full calculation steps.",
         image: {

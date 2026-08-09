@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zahlensystem Umrechner</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Number System Converter</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./zsystUmrechner.css">
+    <link rel="stylesheet" href="./numberSystemConverter.css">
 </head>
 <body>
     <header>
@@ -31,14 +36,14 @@
 
 
         <section class="zahlenBody">
-            <h1 class="zahlenHeader">Zahlensystem Umrechner</h1>
+            <h1 class="titleHeader">Number System Converter</h1>
 
             <div class="systemeContainer">
                 <div class="ausgansSytemDiv">
-                <label for="basea" class="labelBasea">Ausganssystem:</label>
+                <label for="basea" class="labelBasea">Initial system:</label>
 
                 <select id="basea" class="selectBasea">
-                <option value="2">2 (Dual)</option>
+                <option value="2">2 (Binary )</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
@@ -46,13 +51,13 @@
                 <option value="7">7</option>
                 <option value="8">8</option>
                 <option value="9">9</option>
-                <option value="10">10 (Dezimal)</option>
+                <option value="10">10 (Decimal)</option>
                 <option value="11">11</option>
                 <option value="12">12</option>
                 <option value="13">13</option>
                 <option value="14">14</option>
                 <option value="15">15</option>
-                <option value="16">16 (Hexadezimal)</option>
+                <option value="16">16 (Hexadecimal)</option>
                 <option value="17">17</option>
                 <option value="18">18</option>
                 <option value="19">19</option>
@@ -61,10 +66,10 @@
             </div>
 
              <div class="zielSytemDiv">
-                <label for="basez" class="labelBasez">Zielsystem wählen:</label>
+                <label for="basez" class="labelBasez">Target system:</label>
 
                 <select id="basez" class="selectBasez">
-                <option value="2">2 (Dual)</option>
+                <option value="2">2 (Binary )</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
                 <option value="5">5</option>
@@ -72,13 +77,13 @@
                 <option value="7">7</option>
                 <option value="8">8</option>
                 <option value="9">9</option>
-                <option value="10">10 (Dezimal)</option>
+                <option value="10">10 (Decimal)</option>
                 <option value="11">11</option>
                 <option value="12">12</option>
                 <option value="13">13</option>
                 <option value="14">14</option>
                 <option value="15">15</option>
-                <option value="16">16 (Hexadezimal)</option>
+                <option value="16">16 (Hexadecimal)</option>
                 <option value="17">17</option>
                 <option value="18">18</option>
                 <option value="19">19</option>
@@ -89,16 +94,16 @@
 
 
 
-            <input type="text" id="zahlenInput" placeholder="Zahl" class="zahlenInputfeld">
+            <input type="text" id="zahlenInput" placeholder="Number" class="numberInputField" autocomplete="off">
 
-            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
+            <button class="numberButtoncss" id="buttonZahlenInput" type="button">Calculate</button>
 
-            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+            <p class="errorMessagestyle" id="errorMessages">Wrong input</p>
 
-            <div class="zahlenAusgabestyle">
-                <div class="loesungsDiv"> <p class="loesungText">Lösung:</p><p id="loesungOutput"></p></div>
+            <div class="outputStyle">
+                <div class="loesungsDiv"> <p class="loesungText">Result:</p><p id="loesungOutput"></p></div>
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                    <p class="rechenwegText">Calculation Steps:</p> <div id="rechenwegOutput"></div>
                 </div>
                 <span id="tipp"></span>
             </div>
@@ -130,7 +135,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./zsystUmrechner.js"></script>
+    <script src="./numberSystemConverter.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>

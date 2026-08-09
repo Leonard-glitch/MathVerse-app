@@ -102,7 +102,7 @@
 
 /* Eingabefeld */
 
-.zahlenInputfeld {
+.numberInputField {
 
     font-size: 1.2rem;
 
@@ -134,7 +134,7 @@
 
 
 
-.zahlenInputfeld:hover {
+.numberInputField:hover {
 
     transform: translateY(-2px);
 
@@ -144,7 +144,7 @@
 
 
 
-.zahlenInputfeld:focus {
+.numberInputField:focus {
 
     border-color: var(--border-glow);
 
@@ -166,7 +166,7 @@
 
 /* Button */
 
-.zahlenButtoncss {
+.numberButtoncss {
 
     font-size: 1.1rem;
 
@@ -198,7 +198,7 @@
 
 
 
-.zahlenButtoncss:hover {
+.numberButtoncss:hover {
 
     background-color: var(--border-glow);
 
@@ -210,7 +210,7 @@
 
 
 
-.zahlenButtoncss:active {
+.numberButtoncss:active {
 
     transform: translateY(1px);
 
@@ -220,7 +220,7 @@
 
 /* Ausgabe & Rechenweg Box */
 
-.zahlenAusgabestyle {
+.outputStyle {
 
     display: flex;
 
@@ -248,9 +248,9 @@
 
 
 
-.zahlenAusgabestyle:hover {
+.outputStyle:hover {
 
-    border-color: rgba(138, 22, 255, 0.4);
+    border-color:var(--border-glow);
 
 }
 
@@ -393,16 +393,16 @@ sub {
         padding: 0.45rem 0.5rem;
     }
 
-    .zahlenInputfeld {
+    .numberInputField {
         max-width: 100%;
     }
 
-    .zahlenButtoncss {
+    .numberButtoncss {
         width: 100%;
         max-width: 280px;
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         max-width: 100%;
         padding: 1rem;
     }
