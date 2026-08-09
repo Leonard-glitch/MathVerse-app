@@ -80,8 +80,8 @@ export const tools = [
         id:       "card6",
         title:    "Fraction Calculator",
         group:    "arithmetik",
-        filename: "bruchRechner.html",
-        url:      `${BASE}/Tools/Bruchrechner/bruchRechner.html`,
+        filename: "fractionCalculator.html",
+        url:      `${BASE}/Tools/FractionCalculator/fractionCalculator.html`,
         tags:     ["fraction", "fraction calculator", "add", "subtract", "multiply", "divide", "simplify", "expand", "mixed numbers"],
         info:     "Performs all basic arithmetic operations with fractions, including simplification, expansion, mixed numbers, and full calculation steps.",
         image: {
