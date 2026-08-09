@@ -93,8 +93,8 @@ export const tools = [
         id:       "card7",
         title:    "Ratio Calculator",
         group:    "arithmetik",
-        filename: "dreisatz.html",
-        url:      `${BASE}/Tools/Dreisatz Rechner/dreisatz.html`,
+        filename: "ratioCalculator.html",
+        url:      `${BASE}/Tools/RatioCalculator/ratioCalculator.html`,
         tags:     ["ratio", "proportion", "direct proportion", "inverse proportion", "math"],
         info:     "Calculates ratios for direct and inverse proportional relationships, including step-by-step solutions.",
         image: {
