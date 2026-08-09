@@ -65,7 +65,7 @@ function calculate() {
     const values = inputs.map(parseVal);
 
     if (values.some(v => Number.isNaN(v))) {
-        showError("Bitte nur gültige Zahlen eingeben.");
+        showError("Please enter only valid numbers.");
         return;
     }
 
@@ -75,12 +75,12 @@ function calculate() {
         .filter(i => i !== -1);
 
     if (targetIndexes.length === 0) {
-        showError("Bitte genau ein Feld leer lassen – es wird automatisch berechnet.");
+        showError("Please leave exactly one field empty – it will be calculated automatically.");
         return;
     }
 
     if (targetIndexes.length > 1) {
-        ausgabeContainer.style.display = "none"; // noch nicht genug Werte
+        ausgabeContainer.style.display = "none"; // not enough values yet
         return;
     }
 
@@ -92,7 +92,7 @@ function calculate() {
     const denominator = values[map.den];
 
     if (denominator === 0) {
-        showError("Division durch 0 ist bei dieser Eingabe nicht möglich.");
+        showError("Division by 0 is not possible with this input.");
         return;
     }
 
@@ -110,20 +110,20 @@ function calculate() {
 
 
 function renderRechenweg(targetIndex, values, isProp, map, result) {
-    const label = i => `Wert ${i + 1}`;
+    const label = i => `Value ${i + 1}`;
     const val   = i => formatNum(values[i]);
 
     const beziehungZeile = isProp
-        ? "Wert 1 : Wert 2 = Wert 3 : Wert 4"
-        : "Wert 1 × Wert 2 = Wert 3 × Wert 4";
+    ? "Value 1 : Value 2 = Value 3 : Value 4"
+    : "Value 1 × Value 2 = Value 3 × Value 4";
 
     const formelZeile   = `${label(targetIndex)} = (${label(map.num[0])} × ${label(map.num[1])}) / ${label(map.den)}`;
     const rechnungZeile = `${label(targetIndex)} = (${val(map.num[0])} × ${val(map.num[1])}) / ${val(map.den)}`;
 
     rechenwegOutput.innerHTML = `<pre>${beziehungZeile}
 
-Formel:    ${formelZeile}
-Rechnung:  ${rechnungZeile} = <b>${formatNum(result)}</b></pre>`;
+Formula:    ${formelZeile}
+Calculation:  ${rechnungZeile} = <b>${formatNum(result)}</b></pre>`;
 
     ausgabeContainer.style.display = "flex";
 }

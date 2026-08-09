@@ -91,7 +91,7 @@
 }
 
 
-.zahlenInputfeld{
+.numberInputField{
     flex: 1 1 0%;   
     max-width: none;
     margin: 0;
@@ -112,21 +112,21 @@
 
 
 
-.zahlenInputfeld.is-result {
+.numberInputField.is-result {
     color: var(--accent-live);
     font-weight: 700;
     background-color: rgba(0, 255, 204, 0.04);
     text-shadow: 0 0 8px var(--glow-live);
 }
 
-.zahlenInputfeld.is-result:hover,
-.zahlenInputfeld.is-result:focus {
+.numberInputField.is-result:hover,
+.numberInputField.is-result:focus {
     color: var(--accent-live);
     background-color: rgba(0, 255, 204, 0.07);
 }
 
 
-.zahlenAusgabestyle {
+.outputStyle {
     display: none;   
     flex-direction: column;
     width: 100%;
@@ -140,8 +140,8 @@
     transition: border-color var(--transition-speed);
 }
 
-.zahlenAusgabestyle:hover {
-    border-color: rgba(138, 22, 255, 0.35);
+.outputStyle:hover {
+    border-color: var(--border-glow);
 }
 
 .rechenwegDiv {
@@ -209,13 +209,13 @@
         max-width: 100%;
     }
 
-    .zahlenInputfeld {
+    .numberInputField {
         font-size: 1rem;
         padding: 0.6rem 0.3rem;
         min-height: 44px;
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         max-width: 100%;
         padding: 1rem;
     }
@@ -229,7 +229,7 @@
 }
 
 @media (max-width: 400px) {
-    .zahlenInputfeld {
+    .numberInputField {
         font-size: 0.9rem;
     }
 }
