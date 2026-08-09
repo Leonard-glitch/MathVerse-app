@@ -41,8 +41,8 @@ export const tools = [
         id:       "card3",
         title:    "Number System Calculator",
         group:    "zahlensysteme",
-        filename: "zsystRechner.html",
-        url:      `${BASE}/Tools/Zahlensystemrechner/zsystRechner.html`,
+        filename: "numberSystemCalculator.html",
+        url:      `${BASE}/Tools/NumberSystemCalculator/numberSystemCalculator.html`,
         tags:     ["number system", "calculator", "addition", "subtraction", "multiplication", "division", "dual"],
         info:     "Performs basic arithmetic operations (+, −, ×, ÷) in any numeral system and shows the written calculation steps.",
         image: {
