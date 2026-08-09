@@ -1,5 +1,7 @@
+// ==========================================================================
+// STATE 
+// ==========================================================================
 
-// ── Zustand 
 let currentOperation = "add";
 
 const opButtons       = document.querySelectorAll(".btnUnits");
@@ -23,7 +25,7 @@ const rechenwegOutput  = document.getElementById("rechenwegOutput");
 const errorMessages    = document.getElementById("errorMessages");
 const ausgabeContainer = document.getElementById("ausgabeContainer");
 
-// ── Mathematische Hilfsfunktionen 
+// ── Mathematical helper functions 
 function ggt(a, b) {
     return b === 0 ? Math.abs(a) : ggt(b, a % b);
 }
@@ -32,33 +34,33 @@ function kgv(a, b) {
     return Math.abs(a * b) / ggt(a, b);
 }
 
-// ── Fehler-Handling 
+// ── Error handling 
 function hideError() {
     errorMessages.style.display = "none";
 }
 
 function showError(msg) {
     ausgabeContainer.style.display = "none";
-    loesungOutput.innerText        = "Fehler";
+    loesungOutput.innerText        = "Error";
     errorMessages.textContent      = msg;
     errorMessages.style.display    = "block";
 }
 
-// ── UI-Update (Operation & Mixed-Mode) 
+// ── UI update (Operation & Mixed Mode) 
 function updateUI() {
     const isMixed = mixedToggle.checked;
 
-    // Ganzzahlfelder zeigen / verstecken
+    // Show / hide whole number fields
     document.querySelectorAll(".mixed-field").forEach(el => {
         el.style.display = isMixed ? "block" : "none";
     });
 
-    // Standardzustand zurücksetzen
+    // Reset default state
     wrapperBruch2.style.display   = "flex";
     bruch2Eingabe.style.display   = "flex";
     inputs.factor.style.display   = "none";
 
-    // Operation-spezifisches Layout
+    // Operation-specific layout
     if (currentOperation === "kuerzen") {
         opZeichen.textContent       = "➔";
         wrapperBruch2.style.display = "none";
@@ -77,7 +79,7 @@ function updateUI() {
     calculate();
 }
 
-// ── Bruch aus Eingabefeldern lesen 
+// ── Read fraction from input fields 
 function getFraction(gEl, zEl, nEl) {
     let g = mixedToggle.checked ? (parseInt(gEl.value) || 0) : 0;
     let z = parseInt(zEl.value);
@@ -91,7 +93,7 @@ function getFraction(gEl, zEl, nEl) {
         const absZ = Math.abs(z);
         z = g < 0 ? g * n - absZ : g * n + absZ;
     } else if (n < 0) {
-        // Reiner Bruch: negativen Nenner früh normalisieren
+        // Pure fraction: normalize negative denominator early
         z = -z;
         n = -n;
     }
@@ -99,7 +101,7 @@ function getFraction(gEl, zEl, nEl) {
     return { z, n };
 }
 
-// ── Ergebnis als HTML formatieren 
+// ── Format result as HTML 
 function formatResultHTML(z, n) {
     if (z === 0) return "0";
     if (n === 1) return `${z}`;
@@ -116,57 +118,58 @@ function formatResultHTML(z, n) {
     return `<div class="resBruch"><span>${z}</span><div class="resBruchStrich"></div><span>${n}</span></div>${extraMixed}`;
 }
 
-// ── Hauptberechnung
+// ── Main calculation
 function calculate() {
     hideError();
 
     const f1 = getFraction(inputs.g1, inputs.z1, inputs.n1);
     if (!f1)               { resetOutput(); return; }
-    if (f1 === "NaN_Nenner") { showError("Nenner darf nicht 0 sein!"); return; }
+    if (f1 === "NaN_Nenner") { showError("Denominator cannot be 0!"); return; }
 
     let finalZ, finalN;
     const steps = [];
     const printBruch = (z, n) => `${z}/${n}`;
 
-    // ── Kürzen 
+    // ── Simplify 
     if (currentOperation === "kuerzen") {
         const teiler = ggt(f1.z, f1.n);
         finalZ = f1.z / teiler;
         finalN = f1.n / teiler;
 
         steps.push({
-            title:   "Schritt 1: Größten gemeinsamen Teiler (ggT) ermitteln",
-            text:    `Ausgangsbruch: ${printBruch(f1.z, f1.n)}`,
-            formula: `ggT(${f1.z}, ${f1.n}) = ${teiler}`
-        });
-        steps.push({
-            title:    "Schritt 2: Zähler und Nenner kürzen",
-            text:     `Teilen durch den ggT (${teiler}):`,
-            formula:  `Zähler: ${f1.z} ÷ ${teiler} = ${finalZ}\nNenner: ${f1.n} ÷ ${teiler} = ${finalN}`,
-            solution: `Gekürzter Bruch: ${printBruch(finalZ, finalN)}`
+            title:   "Step 1: Find the Greatest Common Divisor (GCD)",
+            text:    `Original fraction: ${printBruch(f1.z, f1.n)}`,
+            formula: `GCD(${f1.z}, ${f1.n}) = ${teiler}`
         });
 
-    // ── Erweitern 
+        steps.push({
+            title:    "Step 2: Simplify the numerator and denominator",
+            text:     `Divide by the GCD (${teiler}):`,
+            formula:  `Numerator: ${f1.z} ÷ ${teiler} = ${finalZ}\nDenominator: ${f1.n} ÷ ${teiler} = ${finalN}`,
+            solution: `Simplified fraction: ${printBruch(finalZ, finalN)}`
+        });
+
+    // ── Expand 
     } else if (currentOperation === "erweitern") {
         const factor = parseInt(inputs.factor.value);
         if (isNaN(factor)) { resetOutput(); return; }
-        if (factor === 0)  { showError("Erweiterungsfaktor darf nicht 0 sein!"); return; }
+        if (factor === 0)  { showError("Expansion factor cannot be 0!"); return; }
 
         finalZ = f1.z * factor;
         finalN = f1.n * factor;
 
         steps.push({
-            title:    "Schritt 1: Zähler und Nenner multiplizieren",
-            text:     `Erweitern mit Faktor: ${factor}`,
-            formula:  `Zähler: ${f1.z} × ${factor} = ${finalZ}\nNenner: ${f1.n} × ${factor} = ${finalN}`,
-            solution: `Erweiterter Bruch: ${printBruch(finalZ, finalN)}`
+            title:    "Step 1: Multiply the numerator and denominator",
+            text:     `Expanding by factor: ${factor}`,
+            formula:  `Numerator: ${f1.z} × ${factor} = ${finalZ}\nDenominator: ${f1.n} × ${factor} = ${finalN}`,
+            solution: `Expanded fraction: ${printBruch(finalZ, finalN)}`
         });
 
-    // ── Grundrechenarten 
+    // ── Basic arithmetic operations 
     } else {
         const f2 = getFraction(inputs.g2, inputs.z2, inputs.n2);
         if (!f2)               { resetOutput(); return; }
-        if (f2 === "NaN_Nenner") { showError("Nenner darf nicht 0 sein!"); return; }
+        if (f2 === "NaN_Nenner") { showError("Denominator cannot be 0!"); return; }
 
         if (currentOperation === "add" || currentOperation === "sub") {
             const hauptnenner = kgv(f1.n, f2.n);
@@ -176,33 +179,36 @@ function calculate() {
             const z2_erw      = f2.z * mf2;
 
             steps.push({
-                title:   "Schritt 1: Hauptnenner bestimmen",
-                text:    `Nenner vergleichen (${f1.n} und ${f2.n}):`,
-                formula: `kgV(${f1.n}, ${f2.n}) = ${hauptnenner}`
+                title:   "Step 1: Find the Least Common Denominator",
+                text:    `Compare denominators (${f1.n} and ${f2.n}):`,
+                formula: `LCM(${f1.n}, ${f2.n}) = ${hauptnenner}`
             });
+
             steps.push({
-                title:   "Schritt 2: Brüche gleichnamig machen",
-                text:    "Erweiterungsfaktoren berechnen und anwenden:",
-                formula: `Bruch 1 (×${mf1}): (${f1.z}×${mf1}) / (${f1.n}×${mf1}) = ${z1_erw}/${hauptnenner}\nBruch 2 (×${mf2}): (${f2.z}×${mf2}) / (${f2.n}×${mf2}) = ${z2_erw}/${hauptnenner}`
+                title:   "Step 2: Convert the fractions to a common denominator",
+                text:    "Calculate and apply the expansion factors:",
+                formula: `Fraction 1 (×${mf1}): (${f1.z}×${mf1}) / (${f1.n}×${mf1}) = ${z1_erw}/${hauptnenner}\nFraction 2 (×${mf2}): (${f2.z}×${mf2}) / (${f2.n}×${mf2}) = ${z2_erw}/${hauptnenner}`
             });
 
             if (currentOperation === "add") {
                 finalZ = z1_erw + z2_erw;
                 steps.push({
-                    title:    "Schritt 3: Zähler addieren",
-                    text:     `Nenner (${hauptnenner}) bleibt unverändert:`,
+                    title:    "Step 3: Add the numerators",
+                    text:     `The denominator (${hauptnenner}) remains unchanged:`,
                     formula:  `${z1_erw}/${hauptnenner} + ${z2_erw}/${hauptnenner} = (${z1_erw} + ${z2_erw}) / ${hauptnenner} = ${finalZ}/${hauptnenner}`,
-                    solution: `Zwischenergebnis: ${printBruch(finalZ, hauptnenner)}`
+                    solution: `Intermediate result: ${printBruch(finalZ, hauptnenner)}`
                 });
+
             } else {
                 finalZ = z1_erw - z2_erw;
                 steps.push({
-                    title:    "Schritt 3: Zähler subtrahieren",
-                    text:     `Nenner (${hauptnenner}) bleibt unverändert:`,
+                    title:    "Step 3: Subtract the numerators",
+                    text:     `The denominator (${hauptnenner}) remains unchanged:`,
                     formula:  `${z1_erw}/${hauptnenner} - ${z2_erw}/${hauptnenner} = (${z1_erw} - ${z2_erw}) / ${hauptnenner} = ${finalZ}/${hauptnenner}`,
-                    solution: `Zwischenergebnis: ${printBruch(finalZ, hauptnenner)}`
+                    solution: `Intermediate result: ${printBruch(finalZ, hauptnenner)}`
                 });
             }
+
             finalN = hauptnenner;
 
         } else if (currentOperation === "mul") {
@@ -210,56 +216,57 @@ function calculate() {
             finalN = f1.n * f2.n;
 
             steps.push({
-                title:    "Schritt 1: Multiplikationsregel anwenden",
-                text:     "Zähler mal Zähler, Nenner mal Nenner:",
-                formula:  `Zähler: ${f1.z} × ${f2.z} = ${finalZ}\nNenner: ${f1.n} × ${f2.n} = ${finalN}`,
-                solution: `Zwischenergebnis: ${printBruch(finalZ, finalN)}`
+                title:    "Step 1: Apply the multiplication rule",
+                text:     "Multiply numerator by numerator and denominator by denominator:",
+                formula:  `Numerator: ${f1.z} × ${f2.z} = ${finalZ}\nDenominator: ${f1.n} × ${f2.n} = ${finalN}`,
+                solution: `Intermediate result: ${printBruch(finalZ, finalN)}`
             });
 
         } else if (currentOperation === "div") {
-            if (f2.z === 0) { showError("Division durch 0 ist nicht erlaubt!"); return; }
+            if (f2.z === 0) { showError("Division by 0 is not allowed!"); return; }
             finalZ = f1.z * f2.n;
             finalN = f1.n * f2.z;
 
             steps.push({
-                title:   "Schritt 1: Kehrwert bilden",
-                text:    `Division wird zur Multiplikation mit dem Kehrwert von ${printBruch(f2.z, f2.n)}:`,
-                formula: `Kehrwert: ${printBruch(f2.n, f2.z)}\nAnsatz: (${f1.z}/${f1.n}) × (${f2.n}/${f2.z})`
+                title:   "Step 1: Find the reciprocal",
+                text:    `Division becomes multiplication by the reciprocal of ${printBruch(f2.z, f2.n)}:`,
+                formula: `Reciprocal: ${printBruch(f2.n, f2.z)}\nSetup: (${f1.z}/${f1.n}) × (${f2.n}/${f2.z})`
             });
+
             steps.push({
-                title:    "Schritt 2: Ausmultiplizieren",
-                text:     "Zähler mal Zähler, Nenner mal Nenner rechnen:",
-                formula:  `Zähler: ${f1.z} × ${f2.n} = ${finalZ}\nNenner: ${f1.n} × ${f2.z} = ${finalN}`,
-                solution: `Zwischenergebnis: ${printBruch(finalZ, finalN)}`
+                title:    "Step 2: Multiply",
+                text:     "Multiply numerator by numerator and denominator by denominator:",
+                formula:  `Numerator: ${f1.z} × ${f2.n} = ${finalZ}\nDenominator: ${f1.n} × ${f2.z} = ${finalN}`,
+                solution: `Intermediate result: ${printBruch(finalZ, finalN)}`
             });
         }
 
-        // Automatisches Kürzen des Endergebnisses
+        // Automatically simplify the final result
         const endTeiler = ggt(finalZ, finalN);
         if (endTeiler > 1) {
             const vorZ = finalZ, vorN = finalN;
             finalZ /= endTeiler;
             finalN /= endTeiler;
             steps.push({
-                title:    `Schritt ${steps.length + 1}: Ergebnis vollständig kürzen`,
-                text:     `Zähler und Nenner durch gemeinsamen Teiler (${endTeiler}) dividieren:`,
+                title:    `Step ${steps.length + 1}: Fully simplify the result`,
+                text:     `Divide the numerator and denominator by the common divisor (${endTeiler}):`,
                 formula:  `${vorZ} ÷ ${endTeiler} = ${finalZ}\n${vorN} ÷ ${endTeiler} = ${finalN}`,
-                solution: `Endgültiges Ergebnis: ${printBruch(finalZ, finalN)}`
+                solution: `Final result: ${printBruch(finalZ, finalN)}`
             });
         } else {
-            // Letzten vorhandenen Schritt als finales Ergebnis markieren
+            // Mark the last existing step as the final result
             const last = steps[steps.length - 1];
-            if (last) last.solution = `Endgültiges Ergebnis: ${printBruch(finalZ, finalN)}`;
+            if (last) last.solution = `Final result: ${printBruch(finalZ, finalN)}`;
         }
     }
 
-    // Vorzeichen-Fix: negativer Nenner
+    // Sign fix: negative denominator
     if (finalN < 0) {
         finalZ = -finalZ;
         finalN = Math.abs(finalN);
     }
 
-    // ── Ausgabe rendern 
+    // ── Render output 
     loesungOutput.innerHTML = formatResultHTML(finalZ, finalN);
 
     rechenwegOutput.innerHTML = steps.map((step, i) => {
@@ -278,7 +285,7 @@ function calculate() {
 
 // ── Reset 
 function resetOutput() {
-    loesungOutput.innerText        = "Ergebnis";
+    loesungOutput.innerText        = "Result";
     rechenwegOutput.innerHTML      = "";
     ausgabeContainer.style.display = "none";
 }
@@ -299,5 +306,5 @@ Object.values(inputs).forEach(input => {
     input.addEventListener("input", calculate);
 });
 
-// ── Initialisierung 
+// ── Initialization 
 document.addEventListener("DOMContentLoaded", updateUI);

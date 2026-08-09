@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./bruchRechner.css">
-    <title>Bruchrechner</title>
+    <link rel="stylesheet" href="./fractionCalculator.css">
+    <title>Fraction Calculator</title>
 </head>
 <body>
        <header>
@@ -16,7 +21,7 @@
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
         <div>
-            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+            <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
             <div id="searchResults"></div>
         </div>
@@ -29,21 +34,21 @@
 
     <main>
         <section class="bruchrechnerBody">
-            <h1 class="zahlenHeader">Bruchrechner</h1>
+            <h1 class="titleHeader">Fraction Calculator</h1>
 
             <!-- Operation Tabs -->
             <div class="einheitenGruppenContainer">
-                <button data-operation="add"       class="btnUnits active">Addieren</button>
-                <button data-operation="sub"       class="btnUnits">Subtrahieren</button>
-                <button data-operation="mul"       class="btnUnits">Multiplizieren</button>
-                <button data-operation="div"       class="btnUnits">Dividieren</button>
-                <button data-operation="kuerzen"   class="btnUnits">Kürzen</button>
-                <button data-operation="erweitern" class="btnUnits">Erweitern</button>
+                <button data-operation="add"       class="btnUnits active">Add</button>
+                <button data-operation="sub"       class="btnUnits">Subtract</button>
+                <button data-operation="mul"       class="btnUnits">Multiply</button>
+                <button data-operation="div"       class="btnUnits">Divide</button>
+                <button data-operation="kuerzen"   class="btnUnits">Simplify</button>
+                <button data-operation="erweitern" class="btnUnits">Expand</button>
             </div>
 
             <!-- Mixed Numbers Toggle -->
             <div class="advancedMode">
-                <span class="advancedText">Gemischte Zahlen</span>
+                <span class="advancedText">Mixed numbers</span>
                 <label class="switch">
                     <input type="checkbox" id="mixedToggle">
                     <span class="slider round"></span>
@@ -55,11 +60,11 @@
 
                 <!-- Bruch 1 -->
                 <div class="bruchWrapper" id="wrapperBruch1">
-                    <input type="number" id="ganzzahl1" placeholder="0" class="zahlenInputfeld mixed-field">
+                    <input type="number" id="ganzzahl1" placeholder="0" class="numberInputField mixed-field">
                     <div class="bruchEingabe">
-                        <input type="number" id="zaehler1" placeholder="Zähler" class="zahlenInputfeld">
+                        <input type="number" id="zaehler1" placeholder="Numerator " class="numberInputField">
                         <div class="bruchStrich"></div>
-                        <input type="number" id="nenner1"  placeholder="Nenner" class="zahlenInputfeld">
+                        <input type="number" id="nenner1"  placeholder="Denominator" class="numberInputField">
                     </div>
                 </div>
 
@@ -68,31 +73,31 @@
 
                 <!-- Bruch 2 / Erweiterungsfaktor -->
                 <div class="bruchWrapper" id="wrapperBruch2">
-                    <input type="number" id="ganzzahl2" placeholder="0"      class="zahlenInputfeld mixed-field">
-                    <input type="number" id="erwFaktor" placeholder="Faktor" class="zahlenInputfeld single-factor-field">
+                    <input type="number" id="ganzzahl2" placeholder="0"      class="numberInputField mixed-field">
+                    <input type="number" id="erwFaktor" placeholder="Factor" class="numberInputField single-factor-field">
                     <div class="bruchEingabe" id="bruch2Eingabe">
                         
-                        <input type="number" id="zaehler2"  placeholder="Zähler" class="zahlenInputfeld">
+                        <input type="number" id="zaehler2"  placeholder="Numerator " class="numberInputField">
                         <div class="bruchStrich"></div>
-                        <input type="number" id="nenner2"   placeholder="Nenner" class="zahlenInputfeld">
+                        <input type="number" id="nenner2"   placeholder="Denominator" class="numberInputField">
                     </div>
                 </div>
 
                 <!-- Equals + Result -->
                 <div class="opSymbol">=</div>
                 <div class="loesungsDiv">
-                    <p id="loesungOutput">Ergebnis</p>
+                    <p id="loesungOutput">Result</p>
                 </div>
 
             </div>
 
             <!-- Error Message -->
-            <p id="errorMessages" class="falscheEingabestyle"></p>
+            <p id="errorMessages" class="errorMessagestyle"></p>
 
             <!-- Step-by-Step Rechenweg -->
-            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+            <div class="outputStyle" id="ausgabeContainer">
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p>
+                    <p class="rechenwegText">Calculation steps:</p>
                     <div id="rechenwegOutput"></div>
                 </div>
             </div>
@@ -118,7 +123,7 @@
     </footer>
 
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./bruchRechner.js"></script>
+    <script src="./fractionCalculator.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>
