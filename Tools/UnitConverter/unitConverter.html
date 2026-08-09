@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Einheiten Umrechner</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Unit Converter</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./einheitenUmrechner.css">
+    <link rel="stylesheet" href="./unitConverter.css">
 </head>
 <body>
     <header>
@@ -16,7 +21,7 @@
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
         <div>
-            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+            <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
             <div id="searchResults"></div>
         </div>
@@ -31,23 +36,23 @@
 
 
         <section class="einheitenBody">
-            <h1 class="zahlenHeader">Einheiten Umrechner</h1>
+            <h1 class="titleHeader">Unit Converter</h1>
 
             <div class="einheitenGruppenContainer">
-                <button data-category="btnLength" class="btnUnits">Länge</button>
-                <button data-category="btnMass" class="btnUnits">Masse</button>
-                <button data-category="btnTime" class="btnUnits">Zeit</button>
-                <button data-category="btnArea" class="btnUnits">Fläche</button>
-                <button data-category="btnSpeed" class="btnUnits">Geschwindigkeit</button>
-                <button data-category="btnVolume" class="btnUnits advancedCategory">Volumen</button>
-                <button data-category="btnPressure" class="btnUnits advancedCategory">Druck</button>
-                <button data-category="btnEnergy" class="btnUnits advancedCategory">Energie</button>
-                <button data-category="btnFrequency" class="btnUnits advancedCategory">Frequenz</button>
-                <button data-category="btnDecimalPrefixes" class="btnUnits advancedCategory">Dezimalpräfixe</button>
-                <button data-category="btnAngle" class="btnUnits advancedCategory">Flächenwinkel</button>
-                <button data-category="btnDataSize" class="btnUnits advancedCategory">Datengröße</button>
-                <button data-category="btnTemperature" class="btnUnits advancedCategory">Temperatur</button>
-                <button data-category="btnFuelConsumption" class="btnUnits advancedCategory">Kraftstoffverbrauch</button>
+                <button data-category="btnLength" class="btnUnits">Length</button>
+                <button data-category="btnMass" class="btnUnits">Mass</button>
+                <button data-category="btnTime" class="btnUnits">Time</button>
+                <button data-category="btnArea" class="btnUnits">Area</button>
+                <button data-category="btnSpeed" class="btnUnits">Speed</button>
+                <button data-category="btnVolume" class="btnUnits advancedCategory">Volume</button>
+                <button data-category="btnPressure" class="btnUnits advancedCategory">Pressure</button>
+                <button data-category="btnEnergy" class="btnUnits advancedCategory">Energy</button>
+                <button data-category="btnFrequency" class="btnUnits advancedCategory">Frequency</button>
+                <button data-category="btnDecimalPrefixes" class="btnUnits advancedCategory">Decimal Prefixes</button>
+                <button data-category="btnAngle" class="btnUnits advancedCategory">Plane Angle</button>
+                <button data-category="btnDataSize" class="btnUnits advancedCategory">Data Size</button>
+                <button data-category="btnTemperature" class="btnUnits advancedCategory">Temperature</button>
+                <button data-category="btnFuelConsumption" class="btnUnits advancedCategory">Fuel Consumption</button>
             </div>
 
             <div class="advancedMode">
@@ -57,10 +62,10 @@
             </div>
 
             <div class="einheitsDiv">
-                <input type="number" id="inputEinheit" placeholder="Zahl eingeben..." class="zahlenInputfeld">
+                <input type="number" id="inputEinheit" placeholder="Enter number..." class="numberInputField">
 
                 <select name="inputA" id="einheitA" class="selection">
-                    <option value=""> ...</option>
+                    <option value=""></option>
                 </select>
 
                 <div class="einheitenSwapRow">
@@ -71,17 +76,17 @@
                 </div>
 
                 <select name="inputZ" id="einheitZ" class="selection">
-                    <option value=""> ...</option>
+                    <option value=""></option>
                 </select>
 
-                <div class="loesungsDiv"><p id="loesungOutput">Ergebnis</p></div>
+                <div class="loesungsDiv"><p id="loesungOutput">Result</p></div>
             </div>
             
-            <p id="errorMessages" class="falscheEingabestyle"></p>
+            <p id="errorMessages" class="errorMessagestyle"></p>
 
-            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+            <div class="outputStyle" id="ausgabeContainer">
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p> 
+                    <p class="rechenwegText">Calculation steps:</p> 
                     <div id="rechenwegOutput"></div>
                 </div>
             </div>
@@ -113,7 +118,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./einheitenUmrechner.js"></script>
+    <script src="./unitConverter.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>

@@ -156,7 +156,7 @@
    ========================================================================== */
 
 /* Der Hauptcontainer bleibt absolut stabil in der Breite */
-.zahlenAusgabestyle {
+.outputStyle {
     display: none; 
     flex-direction: column;
     width: 100%;
@@ -170,8 +170,8 @@
     transition: border-color var(--transition-speed);
 }
 
-.zahlenAusgabestyle:hover {
-    border-color: rgba(138, 22, 255, 0.4);
+.outputStyle:hover {
+    border-color: var(--border-glow);
 }
 
 /* Der Container für den Inhalt */
@@ -241,7 +241,7 @@
         padding: 0 0.25rem;
     }
 
-    .zahlenInputfeld {
+    .numberInputField {
         max-width: 100%;
     }
 
@@ -260,7 +260,7 @@
         word-break: break-all;
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         max-width: 100%;
         padding: 1rem;
     }
