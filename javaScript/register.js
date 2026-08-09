@@ -70,7 +70,10 @@ function showSuccessMsg(el, msg) {
 // ===========================================================================
 // VALIDATION FUNCTIONS
 // ===========================================================================
-
+/**
+ * @param {boolean} silent – true = nur Klassen setzen, keine Fehlertext-Änderungen
+ * @returns {boolean} – true wenn valide
+ */
 function validateUsername(silent = false) {
     const val = usernameInput.value.trim();
 
@@ -242,6 +245,21 @@ passwordInput.addEventListener('animationstart', (e) => {
 passwordConfInput.addEventListener('input', () => {
     if (passwordConfInput.classList.contains('is-error')) {
         passwordConfInput.classList.remove('is-error', 'shake');
+    }
+    if (formError.textContent.includes('überein')) hideMsg(formError);
+
+    // Echtzeit-Match
+    const pw  = passwordInput.value;
+    const pwc = passwordConfInput.value;
+    if (pw && pwc && pw === pwc && pw.length >= MIN_PW_LENGTH) {
+        setValid(passwordInput);
+        setValid(passwordConfInput);
+        hideMsg(formError);
+    }
+});
+
+privacyCheckbox.addEventListener('change', () => {
+    if (privacyCheckbox.checked && formError.textContent.includes('Datenschutz')) {
         hideMsg(formError);
     }
 });
@@ -255,41 +273,118 @@ form.addEventListener('submit', (e) => {
     hideMsg(emailError);
     hideMsg(formError);
 
-    const usernameOk = validateUsername(true);
-    const emailOk    = validateEmail(true);
-    const passwordOk = validatePassword(true);
-    const confOk     = validatePasswordConf(true);
-    const privacyOk  = privacyCheckbox ? privacyCheckbox.checked : true;
+    let valid = true;
+    let firstErrorInput = null;
 
-    if (!usernameOk || !emailOk || !passwordOk || !confOk) {
-        if (!usernameOk) validateUsername();
-        if (!emailOk) validateEmail();
-        if (!passwordOk) validatePassword();
-        if (!confOk) validatePasswordConf();
-        return;
+    // 1. Benutzername
+    const uname = usernameInput.value.trim();
+    if (!uname) {
+        setError(usernameInput);
+        showMsg(usernameError, 'Bitte gib einen Benutzernamen ein.');
+        valid = false;
+        firstErrorInput = firstErrorInput || usernameInput;
+    } else if (!USERNAME_REGEX.test(uname)) {
+        setError(usernameInput);
+        showMsg(usernameError, 'Nur Buchstaben, Zahlen, _, - und . erlaubt (3–20 Zeichen).');
+        valid = false;
+        firstErrorInput = firstErrorInput || usernameInput;
+    } else if (TAKEN_NAMES.includes(uname.toLowerCase()) || window.MV.isUsernameTaken(uname)) {
+        setError(usernameInput);
+        showMsg(usernameError, `„${uname}" ist bereits vergeben.`);
+        valid = false;
+        firstErrorInput = firstErrorInput || usernameInput;
+    } else {
+        setValid(usernameInput);
+    }
+    
+    
+
+    // 2. E-Mail
+    if (!emailInput.value.trim() || !emailInput.checkValidity()) {
+        setError(emailInput);
+        showMsg(emailError, 'Bitte gib eine gültige E-Mail-Adresse ein.');
+        valid = false;
+        firstErrorInput = firstErrorInput || emailInput;
+    } else if (window.MV.isEmailTaken(emailInput.value.trim())) {
+        setError(emailInput);
+        showMsg(emailError, 'Für diese E-Mail-Adresse existiert bereits ein Konto.');
+        valid = false;
+        firstErrorInput = firstErrorInput || emailInput;
+    } else {
+        setValid(emailInput);
     }
 
-    if (!privacyOk) {
-        setError(privacyCheckbox);
-        showMsg(formError, 'You must accept the privacy policy to continue.');
-        return;
+
+    // 3. Passwort
+    if (!passwordInput.value) {
+        setError(passwordInput);
+        if (!formError.textContent) showMsg(formError, 'Bitte gib ein Passwort ein.');
+        valid = false;
+        firstErrorInput = firstErrorInput || passwordInput;
+    } else if (passwordInput.value.length < MIN_PW_LENGTH) {
+        setError(passwordInput);
+        showMsg(formError, `Das Passwort muss mindestens ${MIN_PW_LENGTH} Zeichen lang sein.`);
+        valid = false;
+        firstErrorInput = firstErrorInput || passwordInput;
+    } else {
+        setValid(passwordInput);
     }
 
-    const userData = {
-        username: usernameInput.value.trim(),
-        email: emailInput.value.trim(),
-        password: passwordInput.value
-    };
-
-    const result = window.MV.registerUser(userData);
-    if (!result.success) {
-        showMsg(formError, result.message || 'Registration failed.');
-        return;
+    // 4. Passwort-Bestätigung
+    if (!passwordConfInput.value) {
+        setError(passwordConfInput);
+        if (!formError.textContent) showMsg(formError, 'Bitte bestätige dein Passwort.');
+        valid = false;
+        firstErrorInput = firstErrorInput || passwordConfInput;
+    } else if (passwordInput.value !== passwordConfInput.value) {
+        setError(passwordConfInput);
+        setError(passwordInput);
+        showMsg(formError, 'Die Passwörter stimmen nicht überein.');
+        valid = false;
+        firstErrorInput = firstErrorInput || passwordConfInput;
+    } else if (passwordInput.value.length >= MIN_PW_LENGTH) {
+        setValid(passwordConfInput);
     }
 
-    const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
-    sessionStorage.removeItem('mv-return-url');
-    window.location.href = returnUrl;
+    // 5. Datenschutz-Checkbox
+    if (!privacyCheckbox.checked) {
+        if (!formError.textContent) showMsg(formError, 'Du musst die Datenschutzerklärung akzeptieren.');
+        valid = false;
+    }
+
+    // AUSWERTUNG
+    if (!valid) {
+        // Scroll zum ersten Fehler-Feld, falls etwas nicht passt
+        if (firstErrorInput) {
+            firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstErrorInput.focus();
+        }
+    } else {
+        // WENN ALLES PASST: User in "allUsers" registrieren und einloggen
+        window.MV.registerUser({
+            username: uname,
+            email: emailInput.value.trim(),
+            password: passwordInput.value,
+            favoriten: [],
+            pinnedGroups: [],
+            containerOrders: {},
+            theme: 'violet',
+            fontsize: 20,
+            currency: window.MV.getCurrency(),
+            decimalPlaces: window.MV.getDecimalPlaces(),
+            liveResult: window.MV.getLiveResult(),
+            angleMode: window.MV.getAngleMode(),
+            toolHistory: window.MV.getAllGuestToolHistory(),
+            isPro: false,
+
+            createdAt: Date.now()
+        });
+        window.MV.clearGuestToolHistoryStore();
+
+        const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
+        sessionStorage.removeItem('mv-return-url');
+        window.location.href = returnUrl;
+    }
 });
 
 privacyCheckbox.addEventListener('change', () => {

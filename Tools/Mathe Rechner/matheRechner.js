@@ -93,6 +93,9 @@ window.MV.bindAdvancedToggle(advancedCheckbox, 'matheRechner', updateAdvancedMod
 class CalcError extends Error {}
 
 function exaktRunden(n) {
+    // Zahlen dieser Größenordnung brauchen keine Nachkomma-Bereinigung mehr,
+    // und ×1e10 würde ohnehin zu Infinity überlaufen (z.B. 170!, 10^300).
+    if (!Number.isFinite(n) || Math.abs(n) >= 1e15) return n;
     return Math.round(n * 1e10) / 1e10;
 }
 
@@ -839,6 +842,7 @@ customElements.whenDefined("math-field").then(() => {
         degradSwitch.value = window.MV.getAngleMode();
         degradSwitch.addEventListener("change", () => {
             window.MV.setAngleMode(degradSwitch.value);
+            calculate(); // angezeigtes Ergebnis wurde im alten Modus berechnet
         });
         window.addEventListener("mv:staterestore", () => {
             degradSwitch.value = window.MV.getAngleMode();
