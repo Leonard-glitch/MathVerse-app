@@ -149,7 +149,7 @@
 }
 
 /* Großer Berechnen-Button */
-.zahlenButtoncss {
+.numberButtoncss {
     font-size: 1.4rem;
     text-align: center;
     margin: 2rem 0;
@@ -164,17 +164,17 @@
     transition: all var(--transition-speed) ease;
 }
 
-.zahlenButtoncss:hover {
+.numberButtoncss:hover {
     box-shadow: 0 5px 25px var(--border-glow), var(--shadow-main);
     transform: scale(1.02);
 }
 
-.zahlenButtoncss:active {
+.numberButtoncss:active {
     transform: translateY(1px);
     box-shadow: 0 2px 10px var(--glow-soft);
 }
 
-.zahlenAusgabestyle {
+.outputStyle {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -189,8 +189,8 @@
     transition: border-color var(--transition-speed);
 }
 
-.zahlenAusgabestyle:hover {
-    border-color: rgba(138, 22, 255, 0.4);
+.outputStyle:hover {
+    border-color: var(--border-glow);
 }
 
 .loesungsDiv {
@@ -299,12 +299,12 @@ sub {
         justify-content: center;
     }
 
-    .zahlenButtoncss {
+    .numberButtoncss {
         width: 100%;
         max-width: 280px;
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         max-width: 100%;
         padding: 1rem;
     }

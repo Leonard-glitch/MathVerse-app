@@ -13,7 +13,7 @@
     <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./zsystRechner.css">
+    <link rel="stylesheet" href="./numberSystemCalculator.css">
 </head>
 <body>
     <header>
@@ -34,27 +34,27 @@
     <main>
 
         <section class="zahlenBody">
-            <h1 class="zahlenHeader">Number System Calculator</h1>
+            <h1 class="titleHeader">Number System Calculator</h1>
 
             <!-- Basis-Auswahl -->
             <div class="basisAuswahlDiv">
-                <label for="basea" class="labelBasea">Basis:</label>
+                <label for="basea" class="labelBasea">Base:</label>
                 <select id="basea" class="selectBasea">
-                    <option value="2">2 (Dual)</option>
+                    <option value="2">2 (Binary)</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
                     <option value="6">6</option>
                     <option value="7">7</option>
-                    <option value="8">8 (Oktal)</option>
+                    <option value="8">8</option>
                     <option value="9">9</option>
-                    <option value="10">10 (Dezimal)</option>
+                    <option value="10">10 (Decimal)</option>
                     <option value="11">11</option>
                     <option value="12">12</option>
                     <option value="13">13</option>
                     <option value="14">14</option>
                     <option value="15">15</option>
-                    <option value="16">16 (Hexadezimal)</option>
+                    <option value="16">16 (Hexadecimal)</option>
                     <option value="17">17</option>
                     <option value="18">18</option>
                     <option value="19">19</option>
@@ -66,7 +66,7 @@
             <div id="systemeContainer">
 
                 <div class="SytemDiv">
-                    <input type="text" name="zahl1" id="zahl1Input" placeholder="Zahl 1" class="zahlenInput">
+                    <input type="text" name="zahl1" id="zahl1Input" placeholder="Number 1" class="zahlenInput">
                 </div>
 
                 <div class="rechenZeichenSelectDiv">
@@ -79,7 +79,7 @@
                 </div>
 
                 <div class="SytemDiv">
-                    <input type="text" name="zahl2" id="zahl2Input" placeholder="Zahl 2" class="zahlenInput">
+                    <input type="text" name="zahl2" id="zahl2Input" placeholder="Number 2" class="zahlenInput">
                 </div>
 
             </div>
@@ -87,24 +87,24 @@
             <!-- Eingabefelder dynamisch erweitern -->
             <div class="inputSteuerungDiv">
                 <button id="btnAddInput" class="buttton" type="button">
-                    <i class="fa fa-plus" aria-hidden="true"></i> Zahl hinzufügen
+                    <i class="fa fa-plus" aria-hidden="true"></i> Add number
                 </button>
                 <button id="btnDeleteInput" class="buttton" type="button">
-                    <i class="fa fa-minus" aria-hidden="true"></i> Zahl entfernen
+                    <i class="fa fa-minus" aria-hidden="true"></i> Remove number
                 </button>
             </div>
 
-            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Berechnen</button>
+            <button class="numberButtoncss" id="buttonZahlenInput" type="button">Calculate</button>
 
-            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+            <p class="errorMessagestyle" id="errorMessages">Wrong Input</p>
 
-            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+            <div class="outputStyle" id="ausgabeContainer">
                 <div class="loesungsDiv">
-                    <p class="loesungText">Lösung:</p>
+                    <p class="loesungText">Result:</p>
                     <p id="loesungOutput"></p>
                 </div>
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p>
+                    <p class="rechenwegText">Calculation steps:</p>
                     <div id="rechenwegOutput"></div>
                 </div>
                 <span id="tipp"></span>
@@ -134,7 +134,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./zsystRechner.js"></script>
+    <script src="./numberSystemCalculator.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>
