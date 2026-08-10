@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gleichungslöser</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Equation Solver</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./gleichungslöser.css">
+    <link rel="stylesheet" href="./equationSolver.css">
 
     <script type="module">
         import "https://esm.run/mathlive";
@@ -20,7 +25,7 @@
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
         <div>
-            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+            <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
             <div id="searchResults"></div>
         </div>
@@ -33,19 +38,19 @@
     <main>
 
         <section class="gleichungSection">
-            <h1 class="zahlenHeader">Gleichungslöser</h1>
+            <h1 class="titleHeader">Equation Solver</h1>
 
             <div class="gleichungSwitchDiv">
-                <button class="gleichungTypeBtn active" data-type="allgemein">Allgemeine Gleichungen</button>
-                <button class="gleichungTypeBtn" data-type="linear">Lineare Gleichungen</button>
+                <button class="gleichungTypeBtn active" data-type="allgemein">General equations</button>
+                <button class="gleichungTypeBtn" data-type="linear">Linear equations</button>
             </div>
 
             <div class="gleichungsContainer" id="allgemeineGleichungsContainer">
 
-                <math-field id="mathInputAllgemein" class="zahlenInputfeld" placeholder="z.B.: $$2+4=c $$"></math-field>
+                <math-field id="mathInputAllgemein" class="numberInputField" placeholder="$$2+4=c $$"></math-field>
 
                 <div class="zielVariableDiv">
-                    <h2 class="zielVariableLabel">Lösen nach</h2>
+                    <h2 class="zielVariableLabel">Redeem for</h2>
 
                     <select name="selectVariable" id="selectVariableAllgemein" class="selection">
                         <option value=""> ...</option>
@@ -55,51 +60,51 @@
 
             <div class="gleichungsContainer" id="lineareGleichungsContainer">
                 <div class="inputsContainer">
-                    <div class="inputRow"><span class="rowNumber">1&#41;</span><math-field class="zahlenInputfeld lgsGleichungInput" placeholder="z.B.: $$a+7b=6 $$"></math-field></div>
-                    <div class="inputRow"><span class="rowNumber">2&#41;</span><math-field class="zahlenInputfeld lgsGleichungInput" placeholder="z.B.: $$a+7b=6 $$"></math-field></div>
+                    <div class="inputRow"><span class="rowNumber">1&#41;</span><math-field class="numberInputField lgsGleichungInput" placeholder="$$a+7b=6 $$"></math-field></div>
+                    <div class="inputRow"><span class="rowNumber">2&#41;</span><math-field class="numberInputField lgsGleichungInput" placeholder="$$a+7b=6 $$"></math-field></div>
                 </div>
 
                     <!-- Eingabefelder dynamisch erweitern -->
                 <div class="inputSteuerungDiv">
                     <button id="btnAddInput" class="buttton" type="button">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Feld hinzufügen
+                        <i class="fa fa-plus" aria-hidden="true"></i> Add field
                     </button>
                     <button id="btnDeleteInput" class="buttton" type="button">
-                        <i class="fa fa-minus" aria-hidden="true"></i> Feld entfernen
+                        <i class="fa fa-minus" aria-hidden="true"></i> Remove field
                     </button>
                 </div>
 
                 <div class="lösungsVerfahrenDiv">
-                    <div class="lösungsVerfahrenExpendDiv"><h2 class="lösungsVerfahrenLabel">Lösungsverfahren</h2><button class="expandBtn" aria-label="Ausklappen"><i class="fa fa-chevron-down"></i></button></div>
+                    <div class="lösungsVerfahrenExpendDiv"><h2 class="lösungsVerfahrenLabel">Solution methods</h2><button class="expandBtn" aria-label="Ausklappen"><i class="fa fa-chevron-down"></i></button></div>
 
                     <select name="selectProcedure" id="selectProcedure" class="selection">
-                        <option value="automatic">Automatisch</option>
-                        <option value="substitution">Einsetzungsverfahren</option>
-                        <option value="addition">Additionsverfahren</option>
-                        <option value="equalization">Gleichsetzungsverfahren</option>
-                        <option value="gaussian">Gauß-Verfahren</option>
+                        <option value="automatic">Automatic</option>
+                        <option value="substitution">Substitution method</option>
+                        <option value="addition">Addition method</option>
+                        <option value="equalization">Equalization method</option>
+                        <option value="gaussian">Gaussian method</option>
                     </select>
                 </div>
 
                 <div class="zielVariableDiv">
-                    <h2 class="zielVariableLabel">Lösen nach</h2>
+                    <h2 class="zielVariableLabel">Redeem for</h2>
 
                     <select name="selectVariable" id="selectVariableLinear" class="selection">
-                        <option value="all">Alle</option>
+                        <option value="all">All</option>
                         <option value="">...</option>
                     </select>
                 </div>
             </div>
 
 
-            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Lösen</button>
+            <button class="numberButtoncss" id="buttonZahlenInput" type="button">Lösen</button>
 
-            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+            <p class="errorMessagestyle" id="errorMessages">Wrong input</p>
 
-            <div class="zahlenAusgabestyle">
-                <div class="loesungsDiv"> <p class="loesungText">Lösung:</p><p id="loesungOutput"></p></div>
+            <div class="outputStyle">
+                <div class="loesungsDiv"> <p class="loesungText">Result:</p><p id="loesungOutput"></p></div>
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                    <p class="rechenwegText">Calculation steps:</p> <div id="rechenwegOutput"></div>
                 </div>
                 <span id="tipp"></span>
             </div>
@@ -127,7 +132,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./gleichungslöser.js"></script>
+    <script src="./equationSolver.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>

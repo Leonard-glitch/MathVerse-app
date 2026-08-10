@@ -51,7 +51,7 @@
     font-weight: 600;
 }
 
-.zahlenInputfeld{
+.numberInputField{
     margin: 0;
     width: 100%;
     max-width: 500px;
@@ -113,7 +113,7 @@
     white-space: nowrap;
 }
 
-.inputsContainer .zahlenInputfeld{
+.inputsContainer .numberInputField{
     border-radius: 0 20px 20px 0;
 }
 
@@ -246,7 +246,7 @@
 
 /* Button */
 
-.zahlenButtoncss {
+.numberButtoncss {
     font-size: 1.1rem;
     font-weight: 600;
     text-align: center;
@@ -262,13 +262,13 @@
     transition: all var(--transition-speed);
 }
 
-.zahlenButtoncss:hover {
+.numberButtoncss:hover {
     background-color: var(--border-glow);
     box-shadow: 0 0 20px var(--glow-soft), var(--shadow-main);
     transform: translateY(-2px);
 }
 
-.zahlenButtoncss:active {
+.numberButtoncss:active {
     transform: translateY(1px);
 }
 
@@ -276,7 +276,7 @@
 
 /* Ausgabe & Rechenweg Box */
 
-.zahlenAusgabestyle {
+.outputStyle {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -290,8 +290,8 @@
     transition: border-color var(--transition-speed);
 }
 
-.zahlenAusgabestyle:hover {
-    border-color: rgba(138, 22, 255, 0.4);
+.outputStyle:hover {
+    border-color: var(--border-glow);
 }
 
 .loesungsDiv {
@@ -591,7 +591,7 @@
         padding: 0.5rem 0.6rem;
     }
 
-    .inputsContainer .zahlenInputfeld {
+    .inputsContainer .numberInputField {
         min-width: 0;
         flex: 1 1 auto;
         font-size: 1rem;
@@ -627,7 +627,7 @@
         padding: 0.45rem 0.5rem;
     }
 
-    .inputsContainer .zahlenInputfeld {
+    .inputsContainer .numberInputField {
         font-size: 0.9rem;
         padding: 0.45rem 0.6rem;
     }
