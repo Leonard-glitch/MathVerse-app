@@ -106,8 +106,8 @@ export const tools = [
         id:       "card8",
         title:    "Decimal ↔ Fraction Converter",
         group:    "arithmetik",
-        filename: "dezBruchConverter.html",
-        url:      `${BASE}/Tools/DezBruchConverter/dezBruchConverter.html`,
+        filename: "decimalFractionConverter.html",
+        url:      `${BASE}/Tools/DecimalFractionConverter/decimalFractionConverter.html`,
         tags:     ["decimal", "fraction", "converter"],
         info:     "Converts fractions to decimals and decimals to fractions, including step-by-step solutions.",
         image: {
