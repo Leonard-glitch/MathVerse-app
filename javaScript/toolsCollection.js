@@ -132,8 +132,8 @@ export const tools = [
         id:       "card10",
         title:    "Equation Solver",
         group:    "algebra",
-        filename: "gleichungslöser.html",
-        url:      `${BASE}/Tools/Gleichungslöser/gleichungslöser.html`,
+        filename: "equationSolver.html",
+        url:      `${BASE}/Tools/EquationSolver/equationSolver.html`,
         tags:     ["equation", "linear", "solve", "algebra", "linear equations", "method"],
         info:     "Solves general and linear equation systems, including automatic selection of the best solving method.",
         image: {
