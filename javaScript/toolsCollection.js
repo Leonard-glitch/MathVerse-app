@@ -119,8 +119,8 @@ export const tools = [
         id:       "card9",
         title:    "Formula Transformer",
         group:    "algebra",
-        filename: "formelUmformer.html",
-        url:      `${BASE}/Tools/Formel Umformer/formelUmformer.html`,
+        filename: "formulaTransformer.html",
+        url:      `${BASE}/Tools/FormulaTransformer/formulaTransformer.html`,
         tags:     ["formula", "transformer", "algebra"],
         info:     "Rearranges mathematical formulas, including step-by-step solutions.",
         image: {
