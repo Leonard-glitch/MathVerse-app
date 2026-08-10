@@ -2,26 +2,26 @@
 
 class FormulaError extends Error {}
 
-// Rundet auf 10 Nachkommastellen, um JS-Fließkommafehler zu eliminieren
-// (gleiches Prinzip wie exaktRunden() im Zahlensystem-Umrechner).
+// Rounds to 10 decimal places to eliminate JS floating-point errors
+// (same principle as exaktRunden() in the number system converter).
 function exaktRunden(n) {
     return Math.round(n * 1e10) / 1e10;
 }
 
 const BLACKLIST_CHECKS = [
-    { re: /\\int|\\iint|\\iiint|\\oint/, msg: "Integrale werden nicht unterstützt." },
-    { re: /\\sum/, msg: "Summenzeichen werden nicht unterstützt." },
-    { re: /\\prod/, msg: "Produktzeichen werden nicht unterstützt." },
-    { re: /\\lim/, msg: "Grenzwerte werden nicht unterstützt." },
-    { re: /\\begin\{(matrix|pmatrix|bmatrix|vmatrix|Vmatrix|cases|array)\}/, msg: "Matrizen/Fallunterscheidungen werden nicht unterstützt." },
-    { re: /\\vec|\\overrightarrow/, msg: "Vektoren werden nicht unterstützt." },
-    { re: /\\det/, msg: "Determinanten werden nicht unterstützt." },
-    { re: /\\in\b|\\notin|\\subset|\\subseteq|\\cup|\\cap|\\emptyset|\\forall|\\exists/, msg: "Mengenlehre wird nicht unterstützt." },
-    { re: /\\Rightarrow|\\Leftrightarrow|\\rightarrow|\\wedge|\\vee|\\neg/, msg: "Logikoperatoren werden nicht unterstützt." },
-    { re: /\\leq|\\geq|\\neq|\\approx|\\equiv|[<>]/, msg: "Ungleichungen werden nicht unterstützt – nur Gleichungen mit \"=\"." },
-    { re: /\\partial|\\nabla|\\prime/, msg: "Ableitungen werden nicht unterstützt." },
-    { re: /\\Im\b|\\Re\b|\\overline\{|\\bar\{|\\mathbb\{C\}/, msg: "Komplexe Zahlen werden nicht unterstützt." },
-    { re: /\\binom|\\choose/, msg: "Binomialkoeffizienten werden nicht unterstützt." }
+    { re: /\\int|\\iint|\\iiint|\\oint/, msg: "Integrals are not supported." },
+    { re: /\\sum/, msg: "Summations are not supported." },
+    { re: /\\prod/, msg: "Products are not supported." },
+    { re: /\\lim/, msg: "Limits are not supported." },
+    { re: /\\begin\{(matrix|pmatrix|bmatrix|vmatrix|Vmatrix|cases|array)\}/, msg: "Matrices and piecewise functions are not supported." },
+    { re: /\\vec|\\overrightarrow/, msg: "Vectors are not supported." },
+    { re: /\\det/, msg: "Determinants are not supported." },
+    { re: /\\in\b|\\notin|\\subset|\\subseteq|\\cup|\\cap|\\emptyset|\\forall|\\exists/, msg: "Set theory is not supported." },
+    { re: /\\Rightarrow|\\Leftrightarrow|\\rightarrow|\\wedge|\\vee|\\neg/, msg: "Logic operators are not supported." },
+    { re: /\\leq|\\geq|\\neq|\\approx|\\equiv|[<>]/, msg: "Inequalities are not supported – only equations with \"=\"." },
+    { re: /\\partial|\\nabla|\\prime/, msg: "Derivatives are not supported." },
+    { re: /\\Im\b|\\Re\b|\\overline\{|\\bar\{|\\mathbb\{C\}/, msg: "Complex numbers are not supported." },
+    { re: /\\binom|\\choose/, msg: "Binomial coefficients are not supported." }
 ];
 
 function checkBlacklist(latex) {
@@ -82,7 +82,7 @@ function tokenize(latex) {
                         tokens.push({ type: "LETTER", value: GREEK_LETTERS[cmd] });
                         continue;
                     }
-                    throw new FormulaError("Dieses mathematische Element wird aktuell nicht unterstützt.");
+                    throw new FormulaError("This mathematical element is currently not supported.");
             }
         }
 
@@ -120,7 +120,7 @@ function tokenize(latex) {
             continue;
         }
 
-        throw new FormulaError(`Das Zeichen „${ch}" wird nicht erkannt. Bitte überprüfe deine Eingabe.`);
+        throw new FormulaError(`The character "${ch}" is not recognized. Please check your input.`);
     }
 
     tokens.push({ type: "EOF" });
@@ -128,7 +128,7 @@ function tokenize(latex) {
 }
 
 // ==========================================================================
-// 3. PARSER (rekursiver Abstieg, Grammatik = Whitelist)
+// 3. PARSER (recursive descent, grammar = whitelist)
 // ==========================================================================
 
 function parseEquation(tokens) {
@@ -137,7 +137,7 @@ function parseEquation(tokens) {
     const peek = () => tokens[pos];
     const advance = () => tokens[pos++];
     const expect = (type, msg) => {
-        if (peek().type !== type) throw new FormulaError(msg || `Erwartet: ${type}`);
+        if (peek().type !== type) throw new FormulaError(msg || `Expected: ${type}`);
         return advance();
     };
     const atomStartTypes = ["NUM", "LETTER", "CONST", "LPAREN", "PIPE", "FRAC", "SQRT", "FUNC"];
@@ -159,7 +159,7 @@ function parseEquation(tokens) {
             const t = peek().type;
             if (t === "MUL") { advance(); node = { type: "mul", left: node, right: parseFactor() }; }
             else if (t === "DIV") { advance(); node = { type: "div", left: node, right: parseFactor() }; }
-            else if (t === "PIPE" && openPipes > 0) { break; } // schließendes Betragsstrich-Zeichen, keine implizite Multiplikation
+            else if (t === "PIPE" && openPipes > 0) { break; } // closing absolute value bracket, no implicit multiplication
             else if (startsAtom(t)) { node = { type: "mul", left: node, right: parseFactor() }; }
             else break;
         }
@@ -188,7 +188,7 @@ function parseEquation(tokens) {
         if (peek().type === "LBRACE") {
             advance();
             const e = parseExpression();
-            expect("RBRACE", "Der Exponent wurde nicht richtig geschlossen.");
+            expect("RBRACE", "The exponent was not closed properly.");
             return e;
         }
         return parseFactor();
@@ -199,11 +199,11 @@ function parseEquation(tokens) {
             advance();
             let text = "";
             while (peek().type !== "RBRACE") {
-                if (peek().type === "EOF") throw new FormulaError("Der Index wurde nicht geschlossen.");
+                if (peek().type === "EOF") throw new FormulaError("The subscript was not closed.");
                 const t = advance();
                 if (t.type === "LETTER") text += t.value;
                 else if (t.type === "NUM") text += t.raw;
-                else throw new FormulaError("Der Index enthält ein ungültiges Zeichen.");
+                else throw new FormulaError("The subscript contains an invalid character.");
             }
             advance();
             return text;
@@ -211,14 +211,14 @@ function parseEquation(tokens) {
         const t = advance();
         if (t.type === "LETTER") return t.value;
         if (t.type === "NUM") return t.raw;
-        throw new FormulaError("Der Index enthält ein ungültiges Zeichen.");
+        throw new FormulaError("The subscript contains an invalid character.");
     }
 
     function parseSubscriptExpr() {
         if (peek().type === "LBRACE") {
             advance();
             const e = parseExpression();
-            expect("RBRACE", "Die Basis des Logarithmus wurde nicht richtig geschlossen.");
+            expect("RBRACE", "The base of the logarithm was not closed properly.");
             return e;
         }
         return parseAtom();
@@ -260,7 +260,7 @@ function parseEquation(tokens) {
             case "LPAREN": {
                 advance();
                 const e = parseExpression();
-                expect("RPAREN", "Eine runde Klammer wurde nicht geschlossen.");
+                expect("RPAREN", "A parenthesis was not closed.");
                 return e;
             }
 
@@ -268,19 +268,19 @@ function parseEquation(tokens) {
                 openPipes++;
                 advance();
                 const e = parseExpression();
-                expect("PIPE", "Die Betragsstriche wurden nicht geschlossen.");
+                expect("PIPE", "The absolute value bars were not closed.");
                 openPipes--;
                 return { type: "abs", arg: e };
             }
 
             case "FRAC": {
                 advance();
-                expect("LBRACE", "Der Bruch ist unvollständig – der Zähler fehlt.");
+                expect("LBRACE", "The fraction is incomplete – the numerator is missing.");
                 const num = parseExpression();
-                expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
-                expect("LBRACE", "Der Bruch ist unvollständig – der Nenner fehlt.");
+                expect("RBRACE", "The fraction's numerator was not properly closed.");
+                expect("LBRACE", "The fraction is incomplete – the denominator is missing.");
                 const den = parseExpression();
-                expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
+                expect("RBRACE", "The fraction's denominator was not properly closed.");
                 return { type: "div", left: num, right: den };
             }
 
@@ -290,11 +290,11 @@ function parseEquation(tokens) {
                 if (peek().type === "LBRACKET") {
                     advance();
                     index = parseExpression();
-                    expect("RBRACKET", "Der Wurzelindex wurde nicht geschlossen.");
+                    expect("RBRACKET", "The root index was not closed.");
                 }
-                expect("LBRACE", "Der Inhalt der Wurzel fehlt.");
+                expect("LBRACE", "The content of the root is missing.");
                 const arg = parseExpression();
-                expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
+                expect("RBRACE", "The root was not properly closed.");
                 return { type: "sqrt", arg, index };
             }
 
@@ -313,12 +313,12 @@ function parseEquation(tokens) {
                 if (peek().type === "LPAREN") {
                     advance();
                     const arg = parseExpression();
-                    expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
+                    expect("RPAREN", "The parenthesis after the function was not closed.");
                     const funcNode = { type: "func", name: t.name, arg, base };
                     return funcExponent ? { type: "pow", base: funcNode, exp: funcExponent } : funcNode;
                 }
                 if (!startsAtom(peek().type) && peek().type !== "MINUS") {
-                    throw new FormulaError(`Nach der Funktion „${t.name}" fehlt ein Argument (z. B. eine Zahl, Variable oder Klammer).`);
+                    throw new FormulaError(`An argument (e.g., a number, variable, or parenthesis) is missing after the function "${t.name}".`);
                 }
                 const arg = parseFuncArgNoParens();
                 const funcNode = { type: "func", name: t.name, arg, base };
@@ -326,24 +326,24 @@ function parseEquation(tokens) {
             }
 
             default:
-                throw new FormulaError("Die Formel enthält an dieser Stelle ein unerwartetes Element.");
+                throw new FormulaError("The formula contains an unexpected element at this point.");
         }
     }
 
     const left = parseExpression();
-    expect("EQUALS", "Deine Formel muss genau ein Gleichheitszeichen (=) enthalten.");
+    expect("EQUALS", "Your formula must contain exactly one equals sign (=).");
     const right = parseExpression();
     if (peek().type === "EQUALS") {
-        throw new FormulaError("Es darf nur ein Gleichheitszeichen (=) vorkommen.");
+        throw new FormulaError("Only one equals sign (=) is allowed.");
     }
     if (peek().type !== "EOF") {
-        throw new FormulaError("Am Ende der Formel befinden sich überzählige Zeichen. Bitte überprüfe deine Eingabe.");
+        throw new FormulaError("There are extra characters at the end of the formula. Please check your input.");
     }
     return { left, right };
 }
 
 // ==========================================================================
-// 4. AST-HILFSFUNKTIONEN
+// 4. AST HELPER FUNCTIONS
 // ==========================================================================
 
 function getChildren(node) {
@@ -393,8 +393,8 @@ function numNode(v) {
 }
 
 // ==========================================================================
-// 5. SIMPLIFY (Doppel-Minus auflösen, Zahlen zusammenfassen – für einen
-//    sauberen, schulischen Rechenweg statt "4 − 10" oder "−(−x)")
+// 5. SIMPLIFY (Resolve double negatives, combine numbers – for a
+//    clean, educational solution path instead of "4 − 10" or "−(−x)")
 // ==========================================================================
 
 function flattenTerms(node, sign, terms) {
@@ -411,8 +411,8 @@ function flattenTerms(node, sign, terms) {
     }
 }
 
-// Struktureller Schlüssel eines Ausdrucks, um gleichartige Terme (z.B. 3x
-// und 2x, oder 3·√x und √x) unabhängig vom Vorfaktor zu erkennen.
+// Structural key of an expression to identify like terms (e.g., 3x
+// and 2x, or 3·√x and √x) independently of their coefficient.
 function structuralKey(node) {
     switch (node.type) {
         case "num": return `num:${node.value}`;
@@ -431,7 +431,7 @@ function structuralKey(node) {
     }
 }
 
-// Zerlegt einen Term in Vorfaktor und "Basis" (z.B. 3·x -> Vorfaktor 3, Basis x).
+// Decomposes a term into a coefficient and a "base" (e.g., 3·x -> coefficient 3, base x).
 function extractCoefficient(node) {
     if (node.type === "mul") {
         if (node.left.type === "num") {
@@ -468,8 +468,8 @@ function combineAddSub(node) {
     });
     constantSum = exaktRunden(constantSum);
 
-    // Gleichartige Terme zusammenfassen (z.B. 3x + 2x -> 5x, 2x − x -> x),
-    // damit eine Variable auch bei mehreren Vorfaktoren isolierbar bleibt.
+    // Combine like terms (e.g., 3x + 2x -> 5x, 2x − x -> x),
+    // so that a variable remains isolatable even with multiple coefficients.
     const groups = [];
     const groupIndexByKey = new Map();
 
@@ -499,9 +499,9 @@ function combineAddSub(node) {
 
     if (combinedTerms.length === 0) return numNode(constantSum);
 
-    // Bevorzugt einen positiven symbolischen Term als Start. Gibt es keinen,
-    // aber eine positive Konstante, führt die Konstante (z.B. "5 − λ_2" statt
-    // "−λ_2 + 5"). Nur wenn beides fehlt, wird der erste Term negiert.
+    // Prefers starting with a positive symbolic term. If none exists,
+    // but a positive constant is available, the constant leads (e.g., "5 − λ_2" instead of
+    // "−λ_2 + 5"). Only if both are missing is the first term negated.
     const firstPosIdx = combinedTerms.findIndex(t => t.sign === 1);
     const leadWithConstant = firstPosIdx === -1 && hasConstant && constantSum > 0;
 
@@ -555,7 +555,7 @@ function simplify(node) {
         case "mul": {
             const left = simplify(node.left), right = simplify(node.right);
 
-            // Distributivgesetz: a·(b±c) -> a·b ± a·c (und gespiegelt (b±c)·a)
+            // Distributive law: a·(b±c) -> a·b ± a·c (and mirrored (b±c)·a)
             if (left.type === "add" || left.type === "sub") {
                 return simplify({ type: left.type, left: { type: "mul", left: left.left, right }, right: { type: "mul", left: left.right, right } });
             }
@@ -569,9 +569,9 @@ function simplify(node) {
             if (left.type === "num" && left.value === 1) return right;
             if (right.type === "num" && right.value === 1) return left;
 
-            // Koeffizienten-Folding bei verschachtelter Multiplikation: a·(b·c) -> (a·b)·c,
-            // falls a und b Zahlen sind – sonst bleiben z.B. 2·(3·x) und 6·x strukturell
-            // verschieden und combineAddSub kann gleichartige Terme nicht zusammenfassen.
+            // Coefficient folding in nested multiplication: a·(b·c) -> (a·b)·c,
+            // if a and b are numbers – otherwise, e.g., 2·(3·x) and 6·x remain structurally
+            // different and combineAddSub cannot combine like terms.
             if (left.type === "num" && right.type === "mul") {
                 if (right.left.type === "num")  return simplify({ type: "mul", left: numNode(left.value * right.left.value),  right: right.right });
                 if (right.right.type === "num") return simplify({ type: "mul", left: numNode(left.value * right.right.value), right: right.left });
@@ -587,7 +587,7 @@ function simplify(node) {
         case "div": {
             const left = simplify(node.left), right = simplify(node.right);
 
-            // Distribution bei Division durch eine Zahl: (a±b)/c -> a/c ± b/c
+            // Distribution in division by a number: (a±b)/c -> a/c ± b/c
             if ((left.type === "add" || left.type === "sub") && right.type === "num" && right.value !== 0) {
                 return simplify({ type: left.type, left: { type: "div", left: left.left, right }, right: { type: "div", left: left.right, right } });
             }
@@ -632,9 +632,9 @@ function simplify(node) {
 }
 
 
-// Versucht, einen Ausdruck vollständig numerisch auszuwerten – nur möglich,
-// wenn er ausschließlich Zahlen/Konstanten enthält (keine Variablen).
-// Wird ausschließlich für Definitionsbereich-Prüfungen genutzt.
+// Tries to evaluate an expression completely numerically – only possible
+// if it contains exclusively numbers/constants (no variables).
+// Used exclusively for domain constraint checks.
 function tryEvalNumeric(node) {
     switch (node.type) {
         case "num": return node.value;
@@ -648,7 +648,7 @@ function tryEvalNumeric(node) {
         case "pow": {
             const a = tryEvalNumeric(node.base), b = tryEvalNumeric(node.exp);
             if (a === null || b === null) return null;
-            if (a < 0 && !Number.isInteger(b)) return null; // z.B. (-4)^0.5 ist nicht reell
+            if (a < 0 && !Number.isInteger(b)) return null; // e.g., (-4)^0.5 is not real
             return Math.pow(a, b);
         }
         case "sqrt": {
@@ -682,7 +682,7 @@ function tryEvalNumeric(node) {
 }
 
 // ==========================================================================
-// 6. RENDERER (AST -> HTML im Design der anderen Rechenwege)
+// 6. RENDERER (AST -> HTML matching the design of the other solution paths)
 // ==========================================================================
 
 const FUNC_LABELS = {
@@ -730,7 +730,7 @@ function renderExpr(node) {
 
         case "mul": {
             const wrap = (n) => (n.type === "add" || n.type === "sub" || n.type === "neg") ? `(${renderExpr(n)})` : renderExpr(n);
-            return `${wrap(node.left)} · ${wrap(node.right)}`;
+            return `${wrap(node.left)} · ${wrap(wrap(node.right))}`;
         }
 
         case "div":
@@ -766,8 +766,8 @@ function renderExpr(node) {
     }
 }
 
-// Kompakte Operanden-Darstellung für die "| Operation"-Kurzschreibweise
-// (setzt Klammern, damit z.B. ": 2 · π" nicht missverständlich wirkt)
+// Compact operand representation for the "| operation" notation
+// (wraps in parentheses so e.g. ": 2 · π" does not look ambiguous)
 function opnd(node) {
     if (node.type === "add" || node.type === "sub" || node.type === "mul" || node.type === "div" || node.type === "neg") {
         return `(${renderExpr(node)})`;
@@ -776,8 +776,8 @@ function opnd(node) {
 }
 
 // ==========================================================================
-// 7. SOLVER – eine Ebene der Ziel-Seite umkehren ("peelOnce"), dann
-//    wiederholen bis die Variable isoliert ist ("isolate")
+// 7. SOLVER – invert one layer of the target side ("peelOnce"), then
+//    repeat until the variable is isolated ("isolate")
 // ==========================================================================
 
 function peelOnce(node, other, varName) {
@@ -818,21 +818,21 @@ function peelOnce(node, other, varName) {
             };
         }
 
-         case "mul": {
+        case "mul": {
             const inLeft = containsVar(node.left, varName);
             const keep = inLeft ? node.left : node.right;
             const divisor = inLeft ? node.right : node.left;
 
             const divisorVal = tryEvalNumeric(divisor);
             if (divisorVal === 0) {
-                return { domainError: "Division durch 0 ist nicht möglich." };
+                return { domainError: "Division by 0 is not possible." };
             }
 
             return {
                 opLabel: `: ${opnd(divisor)}`,
                 newSubject: keep,
                 newOther: { type: "div", left: other, right: divisor },
-                note: divisorVal === null ? `Angenommen, ${renderExpr(divisor)} ≠ 0.` : undefined
+                note: divisorVal === null ? `Assuming ${renderExpr(divisor)} ≠ 0.` : undefined
             };
         }
 
@@ -841,7 +841,7 @@ function peelOnce(node, other, varName) {
 
             const bVal = tryEvalNumeric(B);
             if (bVal === 0) {
-                return { domainError: "Division durch 0 ist nicht möglich." };
+                return { domainError: "Division by 0 is not possible." };
             }
 
             return {
@@ -850,6 +850,7 @@ function peelOnce(node, other, varName) {
                 newOther: { type: "mul", left: other, right: B }
             };
         }
+
         case "pow": {
             const inBase = containsVar(node.base, varName);
             const inExp = containsVar(node.exp, varName);
@@ -860,12 +861,12 @@ function peelOnce(node, other, varName) {
 
                 const otherVal = tryEvalNumeric(other);
                 if (isEven && otherVal !== null && otherVal < 0) {
-                    return { domainError: "Diese Gleichung hat keine reelle Lösung – eine gerade Potenz kann nicht negativ werden." };
+                    return { domainError: "This equation has no real solution – an even power cannot be negative." };
                 }
 
                 if (isEven) {
                     return {
-                        ambiguous: `Die gesuchte Variable steht hier in einer geraden Potenz (${isSquare ? "Quadrat" : `Exponent ${opnd(node.exp)}`}). Das führt in der Regel zu zwei möglichen Lösungen (positiver und negativer Lösungszweig) – diese Fallunterscheidung wird aktuell noch nicht unterstützt.`
+                        ambiguous: `The target variable is raised to an even power (${isSquare ? "square" : `exponent ${opnd(node.exp)}`}). This usually leads to two possible solutions (positive and negative solution branches) – this case distinction is currently not supported.`
                     };
                 }
 
@@ -880,11 +881,11 @@ function peelOnce(node, other, varName) {
 
                 const baseVal = tryEvalNumeric(node.base);
                 if (baseVal !== null && (baseVal <= 0 || baseVal === 1)) {
-                    return { domainError: "Diese Gleichung hat keine gültige Logarithmus-Basis (muss positiv und ≠ 1 sein)." };
+                    return { domainError: "This equation does not have a valid logarithm base (must be positive and ≠ 1)." };
                 }
                 const otherVal = tryEvalNumeric(other);
                 if (otherVal !== null && otherVal <= 0) {
-                    return { domainError: "Diese Gleichung hat keine reelle Lösung – der Logarithmus ist nur für positive Zahlen definiert." };
+                    return { domainError: "This equation has no real solution – the logarithm is only defined for positive numbers." };
                 }
 
                 return {
@@ -893,11 +894,11 @@ function peelOnce(node, other, varName) {
                     newOther: { type: "func", name: "log", base: node.base, arg: other }
                 };
             }
-            return null; // Variable in Basis UND Exponent -> nicht unterstützt
+            return null; // Variable in base AND exponent -> not supported
         }
 
         case "sqrt": {
-            if (!containsVar(node.arg, varName)) return null; // Variable im Wurzelindex -> nicht unterstützt
+            if (!containsVar(node.arg, varName)) return null; // Variable in root index -> not supported
             const isSquare = !node.index;
             const n = node.index || { type: "num", value: 2, raw: "2" };
 
@@ -905,7 +906,7 @@ function peelOnce(node, other, varName) {
             const isEvenRoot = nVal !== null && Number.isInteger(nVal) && nVal % 2 === 0;
             const otherVal = tryEvalNumeric(other);
             if (isEvenRoot && otherVal !== null && otherVal < 0) {
-                return { domainError: "Diese Gleichung hat keine reelle Lösung – eine Wurzel kann nicht negativ sein." };
+                return { domainError: "This equation has no real solution – a root cannot be negative." };
             }
 
             return {
@@ -918,10 +919,10 @@ function peelOnce(node, other, varName) {
         case "abs": {
             const otherVal = tryEvalNumeric(other);
             if (otherVal !== null && otherVal < 0) {
-                return { domainError: "Diese Gleichung hat keine reelle Lösung – ein Betrag kann nicht negativ sein." };
+                return { domainError: "This equation has no real solution – an absolute value cannot be negative." };
             }
             return {
-                ambiguous: "Diese Gleichung enthält einen Betrag der gesuchten Variable. Ein Betrag führt in der Regel zu zwei möglichen Lösungen (z. B. x = 5 oder x = −5) – diese Fallunterscheidung wird aktuell noch nicht unterstützt."
+                ambiguous: "This equation contains an absolute value of the target variable. An absolute value usually leads to two possible solutions (e.g., x = 5 or x = −5) – this case distinction is currently not supported."
             };
         }
 
@@ -931,11 +932,11 @@ function peelOnce(node, other, varName) {
 
                 const baseVal = tryEvalNumeric(base);
                 if (baseVal !== null && (baseVal <= 0 || baseVal === 1)) {
-                    return { domainError: "Diese Gleichung hat keine gültige Logarithmus-Basis (muss positiv und ≠ 1 sein)." };
+                    return { domainError: "This equation does not have a valid logarithm base (must be positive and ≠ 1)." };
                 }
                 const otherVal = tryEvalNumeric(other);
                 if (otherVal !== null && otherVal <= 0) {
-                    return { domainError: "Diese Gleichung hat keine reelle Lösung – der Logarithmus ist nur für positive Zahlen definiert." };
+                    return { domainError: "This equation has no real solution – the logarithm is only defined for positive numbers." };
                 }
 
                 return {
@@ -949,15 +950,15 @@ function peelOnce(node, other, varName) {
 
             const otherVal = tryEvalNumeric(other);
             if (node.name === "exp" && otherVal !== null && otherVal <= 0) {
-                return { domainError: "Diese Gleichung hat keine reelle Lösung – der natürliche Logarithmus ist nur für positive Zahlen definiert." };
+                return { domainError: "This equation has no real solution – the natural logarithm is only defined for positive numbers." };
             }
             if ((node.name === "sin" || node.name === "cos") && otherVal !== null && (otherVal < -1 || otherVal > 1)) {
-                return { domainError: "Diese Gleichung hat keine reelle Lösung – Sinus- und Kosinuswerte liegen immer zwischen −1 und 1." };
+                return { domainError: "This equation has no real solution – sine and cosine values are always between −1 and 1." };
             }
 
             if (node.name === "sin" || node.name === "cos" || node.name === "tan") {
                 return {
-                    ambiguous: `Die gesuchte Variable steht hier im Argument von ${FUNC_LABELS[node.name]}(...). Trigonometrische Funktionen sind periodisch und haben unendlich viele Lösungen – aktuell wird nur der Hauptwert unterstützt, eine vollständige Lösungsmenge wird noch nicht berechnet.`
+                    ambiguous: `The target variable is inside the argument of ${FUNC_LABELS[node.name]}(...). Trigonometric functions are periodic and have infinitely many solutions – currently only the principal value is supported, a complete solution set is not calculated yet.`
                 };
             }
 
@@ -980,9 +981,9 @@ function isolate(eq, varName) {
 
     if (!containsVar(curLeft, varName) && !containsVar(curRight, varName)) return null;
 
-    // Variable auf BEIDEN Seiten (z.B. "5x + 2 = 3x + 10"): zuerst alle
-    // Variablen-Terme der rechten Seite auf die linke bringen und
-    // zusammenfassen ("Variablen zusammenfassen" wie in der Schule).
+    // Variable on BOTH sides (e.g., "5x + 2 = 3x + 10"): first move all
+    // variable terms from the right side to the left side and
+    // combine them ("combine variables" like in school).
     if (containsVar(curLeft, varName) && containsVar(curRight, varName)) {
         const rightTerms = [];
         flattenTerms(curRight, 1, rightTerms);
@@ -1007,7 +1008,7 @@ function isolate(eq, varName) {
     let guard = 0;
     while (!((curLeft.type === "var" && curLeft.name === varName) ||
              (curRight.type === "var" && curRight.name === varName))) {
-        if (++guard > 60) return null; // Sicherheitsnetz gegen Endlosschleifen
+        if (++guard > 60) return null; // Safety net against infinite loops
 
         const varOnLeft = containsVar(curLeft, varName);
         const targetNode = varOnLeft ? curLeft : curRight;
@@ -1048,19 +1049,19 @@ function findSpecificSolveIssue(eq, varName) {
     const totalOccurrences = countVarOccurrences(eq.left, varName) + countVarOccurrences(eq.right, varName);
 
     if (totalOccurrences > 1) {
-        return `Die Variable ${formatVarName(varName)} kommt mehrfach in der Gleichung vor (u. a. möglich, wenn sie gleichzeitig in Basis und Exponent auftritt). Aktuell können nur Gleichungen gelöst werden, in denen die gesuchte Variable genau einmal vorkommt.`;
+        return `The variable ${formatVarName(varName)} occurs multiple times in the equation (e.g., if it appears simultaneously in base and exponent). Currently, only equations where the target variable appears exactly once can be solved.`;
     }
     if (totalOccurrences === 0) return null;
 
     if (hasVarInSqrtIndex(eq.left, varName) || hasVarInSqrtIndex(eq.right, varName)) {
-        return `Die Variable ${formatVarName(varName)} befindet sich im Wurzelindex. Das Auflösen nach einer Variable an dieser Stelle wird aktuell nicht unterstützt.`;
+        return `The variable ${formatVarName(varName)} is located in the root index. Solving for a variable in this position is currently not supported.`;
     }
 
-    return `Diese Art von Gleichung wird für ${formatVarName(varName)} aktuell noch nicht unterstützt.`;
+    return `This type of equation is currently not supported for ${formatVarName(varName)}.`;
 }
 
 // ==========================================================================
-// 8. UI-ANBINDUNG
+// 8. UI INTEGRATION
 // ==========================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1118,7 +1119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-             checkBlacklist(latex);
+            checkBlacklist(latex);
             const tokens = tokenize(latex);
             const eq = parseEquation(tokens);
             eq.left = simplify(eq.left);
@@ -1132,7 +1133,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 disableSelection();
                 hideError();
                 tipp.textContent = (varNames.length === 1 && findSpecificSolveIssue(eq, varNames[0]))
-                    || "Diese Gleichung enthält keine Variable, die sich eindeutig isolieren lässt – z. B. weil eine Variable mehrfach vorkommt, im Wurzelindex steht oder gleichzeitig in Basis und Exponent auftritt.";
+                    || "This equation does not contain a variable that can be uniquely isolated – e.g., because a variable appears multiple times, is located in the root index, or appears in both the base and exponent simultaneously.";
                 return;
             }
 
@@ -1146,7 +1147,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (err) {
             currentEquation = null;
-            const msg = err instanceof FormulaError ? err.message : "Deine Formel konnte nicht verarbeitet werden. Bitte überprüfe die Eingabe.";
+            const msg = err instanceof FormulaError ? err.message : "Your formula could not be processed. Please check your input.";
             showError(msg);
         }
     }
@@ -1158,7 +1159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const result = isolate(currentEquation, varName);
         if (!result) {
-            showSolveError("Diese Variable lässt sich mit den aktuell unterstützten Umformungen nicht isolieren.");
+            showSolveError("This variable cannot be isolated using the currently supported transformations.");
             return;
         }
         if (result.error) {
@@ -1188,7 +1189,7 @@ document.addEventListener("DOMContentLoaded", () => {
         rechenwegDiv.style.display = "flex";
     }
 
-    // ── MathLive-Feld anbinden ───────────────────────────────────────────
+    // ── Connect MathLive field ───────────────────────────────────────────
     customElements.whenDefined("math-field").then(() => {
         const mf = document.getElementById("mathInput");
         if (!mf) return;
@@ -1196,16 +1197,12 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             if (window.mathVirtualKeyboard) {
                 window.mathVirtualKeyboard.layouts = [
-
-"numeric",
-
-"alphabetic",
-
-"greek"
-
-];
+                    "numeric",
+                    "alphabetic",
+                    "greek"
+                ];
             }
-        } catch (e) { /* Version-abhängig, kein Blocker */ }
+        } catch (e) { /* Version-dependent, non-blocking */ }
 
         let debounceTimer = null;
         mf.addEventListener("input", () => {

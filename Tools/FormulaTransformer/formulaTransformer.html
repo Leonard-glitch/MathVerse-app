@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formel Umformer</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Formula Transformer</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./formelUmformer.css">
+    <link rel="stylesheet" href="./formulaTransformer.css">
 
     <script type="module">
         import "https://esm.run/mathlive";
@@ -20,7 +25,7 @@
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
         <div>
-            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+            <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
             <div id="searchResults"></div>
         </div>
@@ -34,26 +39,26 @@
 
         <section class="formelUmformerSection">
 
-            <h1 class="zahlenHeader">Formel Umformer</h1>
+            <h1 class="titleHeader">Formula Transformer</h1>
 
-            <math-field id="mathInput" class="zahlenInputfeld" placeholder="z.B.: $$a^2+b^2=c^2 $$"></math-field>
+            <math-field id="mathInput" class="numberInputField" placeholder="$$a^2+b^2=c^2 $$"></math-field>
 
             <div class="zielVariableDiv">
-                <h2 class="zielVariableLabel">Umformen nach</h2>
+                <h2 class="zielVariableLabel">Rearrange for</h2>
 
                 <select name="selectVariable" id="selectVariable" class="selection">
                     <option value=""> ...</option>
                 </select>
             </div>
 
-            <button class="zahlenButtoncss" id="buttonZahlenInput" type="button">Umformen</button>
+            <button class="numberButtoncss" id="buttonZahlenInput" type="button">Rearrange</button>
 
-            <p class="falscheEingabestyle" id="errorMessages">Falsche Eingabe</p>
+            <p class="errorMessagestyle" id="errorMessages">Wrong input</p>
 
-            <div class="zahlenAusgabestyle">
-                <div class="loesungsDiv"> <p class="loesungText">Lösung:</p><p id="loesungOutput"></p></div>
+            <div class="outputStyle">
+                <div class="loesungsDiv"> <p class="loesungText">Result:</p><p id="loesungOutput"></p></div>
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p> <div id="rechenwegOutput"></div>
+                    <p class="rechenwegText">Calculation steps:</p> <div id="rechenwegOutput"></div>
                 </div>
                 <span id="tipp"></span>
             </div>
@@ -83,7 +88,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./formelUmformer.js"></script>
+    <script src="./formulaTransformer.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>
