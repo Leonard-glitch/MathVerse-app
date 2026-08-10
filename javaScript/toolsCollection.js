@@ -145,8 +145,8 @@ export const tools = [
         id:       "card11",
         title:    "Finance Calculator",
         group:    "finanzen",
-        filename: "finanzrechner.html",
-        url:      `${BASE}/Tools/Finanzrechner/finanzrechner.html`,
+        filename: "financeCalculator.html",
+        url:      `${BASE}/Tools/FinanceCalculator/financeCalculator.html`,
         tags:     ["finance", "calculator", "investment", "savings plan", "return", "inflation", "compound interest"],
         info:     "All-in-one finance calculator with three specialized tools: calculates long-term wealth growth through a savings plan (compound interest), determines real purchasing power loss through inflation, or analyzes investment performance (ROI & CAGR) with live charts and transparent calculation steps.",
         image: {
