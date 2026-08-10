@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dezimal ↔ Bruch Umrechner</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Decimal ↔ Fraction Converter</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./dezBruchConverter.css">
+    <link rel="stylesheet" href="./decimalFractionConverter.css">
 </head>
 <body>
     <header>
@@ -16,7 +21,7 @@
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
         <div>
-            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+            <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
             <div id="searchResults"></div>
         </div>
@@ -29,16 +34,16 @@
     <main>
 
         <section class="dezBruchSection">
-            <h1 class="zahlenHeader">Dezimal ↔ Bruch Umrechner</h1>
+            <h1 class="titleHeader">Decimal ↔ Fraction Converter</h1>
 
             <div class="cardsContainer">
                 <div class="cards">
-                    <h3>Eingabe</h3>
+                    <h3>Input</h3>
                     <div id="cardDezimalContainer">
                         <div class="card">
-                            <h2>Dezimal</h2>
+                            <h2>Decimal</h2>
 
-                            <input type="number" id="inputFeld3" placeholder="z.B. 0.75" class="zahlenInputfeld">
+                            <input type="number" id="inputFeld3" placeholder="0.75" class="numberInputField">
                         </div>
                     </div>
                 </div>
@@ -48,26 +53,26 @@
                 </button>
 
                 <div class="cards">
-                    <h3>Ausgabe</h3>
+                    <h3>Output</h3>
                     <div id="cardBruchContainer">
                         <div class="card">
-                            <h2>Bruch</h2>
+                            <h2>Fraction </h2>
 
                             <div class="bruchEingabe">
-                                <input type="number" id="zaehler1" placeholder="Zähler" class="zahlenInputfeld" step="1">
+                                <input type="number" id="zaehler1" placeholder="Numerator " class="numberInputField" step="1">
                                 <div class="bruchStrich"></div>
-                                <input type="number" id="nenner1"  placeholder="Nenner" class="zahlenInputfeld" step="1">
+                                <input type="number" id="nenner1"  placeholder="Denominator" class="numberInputField" step="1">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <p class="falscheEingabestyle" id="errorMessages"></p>
+            <p class="errorMessagestyle" id="errorMessages"></p>
 
-            <div class="zahlenAusgabestyle" id="ausgabeContainer">
+            <div class="outputStyle" id="ausgabeContainer">
                 <div class="rechenwegDiv">
-                    <p class="rechenwegText">Rechenweg:</p>
+                    <p class="rechenwegText">Calculation steps:</p>
                     <div id="rechenwegOutput"></div>
                 </div>
             </div>
@@ -96,7 +101,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./dezBruchConverter.js"></script>
+    <script src="./decimalFractionConverter.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>

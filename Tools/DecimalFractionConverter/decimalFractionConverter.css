@@ -73,7 +73,7 @@
         0 0 20px rgba(138, 22, 255, 0.12);
 }
 
-.zahlenInputfeld {
+.numberInputField {
     margin: 0;
 }
 
@@ -92,7 +92,7 @@
     border-radius: 2px;
 }
 
-.zahlenInputfeld[readonly] {
+.numberInputField[readonly] {
     background-color: rgba(0, 255, 204, 0.05);
     color: var(--accent-live);
     font-weight: 700;
@@ -102,11 +102,11 @@
     outline: none;
 }
 
-.zahlenInputfeld[readonly]:hover{
+.numberInputField[readonly]:hover{
     transform: none;
 }
 
-.zahlenInputfeld[readonly]:focus{
+.numberInputField[readonly]:focus{
     transform: none;
     box-shadow: var(--shadow-main);
 }
@@ -151,7 +151,7 @@
 }
 
 
-.zahlenAusgabestyle {
+.outputStyle {
     display: none;
     flex-direction: column;
     width: 100%;
@@ -165,8 +165,8 @@
     transition: border-color var(--transition-speed);
 }
 
-.zahlenAusgabestyle:hover {
-    border-color: rgba(138, 22, 255, 0.4);
+.outputStyle:hover {
+    border-color: var(--border-glow);
 }
 
 .rechenwegDiv {
@@ -267,7 +267,7 @@
         max-width: 280px;
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         padding: 1rem;
     }
 }
@@ -312,12 +312,12 @@
         transform: rotate(180deg);
     }
 
-    .zahlenInputfeld {
+    .numberInputField {
         max-width: 100%;
         min-height: 44px;
     }
 
-    .zahlenAusgabestyle {
+    .outputStyle {
         max-width: 100%;
         padding: 1rem;
     }
