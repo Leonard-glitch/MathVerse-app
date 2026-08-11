@@ -1623,40 +1623,73 @@ function initCoordinateSystem() {
         trimPoolExcess(markersGroup, markerIndex);
     }
 
-    // Sampling: pro sichtbarer Pixel-Spalte den zugehörigen x-Wert auswerten.
-    // Alle 2px statt jedem einzelnen Pixel – visuell nicht wahrnehmbar,
-    // halbiert aber die Auswertungen pro Redraw (siehe Performance-Hinweis).
-    // Werte außerhalb eines großzügigen Bereichs (Asymptoten, z.B. tan(x))
-    // brechen den Pfad ab, statt eine falsche Spitze durchzuziehen.
+    // Sampling: pro sichtbarer Pixel-Spalte mehrere Unterpunkte auswerten und
+    // deren Bildschirm-Y auf einen FESTEN Rand jenseits des Viewports klemmen
+    // (statt Punkte je nach Zufalls-Distanz zur Polstelle zu verwerfen). Neue
+    // Kurvenzweige entstehen nur bei echtem Vorzeichenwechsel der Klemm-Richtung
+    // (oben->unten), nicht anhand roher Pixelabstände.
     function samplePoints(fn) {
         const points = [];
-        // Grenzen in Bildschirm-Pixeln statt Mathe-Einheiten: dadurch bleibt die
-        // Logik unabhängig vom Zoom-Level korrekt, ohne separate Kalibrierung
-        // pro Zoomstufe (das war der Grund für das "Hin- und Herspringen").
-        const farLimit = heightPx * 2;   // jenseits davon: Punkt gar nicht erst zeichnen
-        const jumpLimit = heightPx;      // Sprung zwischen zwei Nachbarpunkten größer als die
-                                          // sichtbare Höhe -> Polstelle dazwischen, nicht verbinden
+        const MARGIN = 60;            // fester Puffer in px jenseits des Viewports
+        const TOP = -MARGIN;
+        const BOTTOM = heightPx + MARGIN;
+        const SUBSAMPLES = 6;         // pro Spalte -> Hüllkurve gegen Aliasing bei Hochfrequenz-Funktionen
 
-        let prevScreenY = null;
+        // Letzte eindeutige Klemm-Richtung: -1 = oben, 1 = unten, 0 = frei.
+        // Ein Wechsel von -1 zu 1 (oder umgekehrt) OHNE zwischenzeitliche
+        // Rückkehr zu 0 ist die Signatur einer Polstelle.
+        let clampSign = 0;
 
         for (let px = 0; px <= widthPx; px += 2) {
-            const mathY = evaluateGraphNode(fn.ast, toMathX(px));
-            let screenY = null;
+            const xLeft = toMathX(px);
+            const xRight = toMathX(px + 2);
 
-            if (mathY !== null && Number.isFinite(mathY)) {
-                const sy = toScreenY(mathY);
-                if (sy >= -farLimit && sy <= heightPx + farLimit) screenY = sy;
+            let colMin = Infinity, colMax = -Infinity, anyFinite = false;
+
+            for (let s = 0; s < SUBSAMPLES; s++) {
+                const xSample = xLeft + (xRight - xLeft) * (s / (SUBSAMPLES - 1));
+                const mathY = evaluateGraphNode(fn.ast, xSample);
+                if (mathY === null || !Number.isFinite(mathY)) continue;
+
+                let sy = toScreenY(mathY);
+                if (sy < TOP) sy = TOP;
+                else if (sy > BOTTOM) sy = BOTTOM;
+
+                anyFinite = true;
+                if (sy < colMin) colMin = sy;
+                if (sy > colMax) colMax = sy;
             }
 
-            if (screenY !== null && prevScreenY !== null && Math.abs(screenY - prevScreenY) > jumpLimit) {
-                // Sprung zu groß für eine glatte Kurve bei diesem Sampling-Abstand
-                // -> Polstelle dazwischen (z.B. 1/x bei x=0). Neuer Kurvenzweig
-                // statt Verbindungslinie über die Asymptote hinweg.
-                points.push(null);
+            if (!anyFinite) {
+                points.push(null); // Definitionslücke über die ganze Spalte
+                clampSign = 0;
+                continue;
             }
 
-            points.push(screenY === null ? null : { x: px, y: screenY });
-            prevScreenY = screenY;
+            const touchesTop = colMin <= TOP;
+            const touchesBottom = colMax >= BOTTOM;
+
+            if (touchesTop && touchesBottom) {
+                // Spalte deckt beide Ränder ab -> Polstelle liegt genau hier
+                if (clampSign !== 0) points.push(null);
+                points.push({ x: px, y: colMin });
+                points.push({ x: px, y: colMax });
+                clampSign = 0;
+            } else {
+                const side = touchesTop ? -1 : touchesBottom ? 1 : 0;
+                if (side !== 0 && clampSign !== 0 && side !== clampSign) {
+                    points.push(null); // direkter Vorzeichenwechsel -> Polstelle
+                }
+                if (colMax - colMin < 0.5) {
+                    points.push({ x: px, y: colMin });
+                } else {
+                    // Hüllkurve: Min/Max der Spalte verbinden statt nur ein
+                    // Sample -> fängt schnelle Oszillation (10*sin(50x)) ein
+                    points.push({ x: px, y: colMin });
+                    points.push({ x: px, y: colMax });
+                }
+                clampSign = side;
+            }
         }
         return points;
     }
