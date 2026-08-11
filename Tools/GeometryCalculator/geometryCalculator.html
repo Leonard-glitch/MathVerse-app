@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geometrie Rechner</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Geometry Calculator</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./geometrieRechner.css">
+    <link rel="stylesheet" href="./geometryCalculator.css">
 </head>
 <body>
     <header>
@@ -16,7 +21,7 @@
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
         <div>
-            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+            <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
             <div id="searchResults"></div>
         </div>
@@ -29,7 +34,7 @@
     <main>
 
         <section class="geometrySection">
-            <h1 class="zahlenHeader">Geometrie Rechner</h1>
+            <h1 class="titleHeader">Geometry Calculator</h1>
 
             <div class="geometryContainer">
                 <div class="geometryDivTop">
@@ -41,19 +46,19 @@
 
                         <div class="formSelectDiv">
                             <select name="selectForm" id="selectForm" class="selection">
-                                <option value="circle">Kreis</option>
-                                <option value="rectangle">Rechteck</option>
-                                <option value="square">Quadrat</option>
-                                <option value="triangle">Allgemeines Dreieck</option>
-                                <option value="rightTriangle">Rechtwinkliges Dreieck</option>
-                                <option value="trapezoid">Trapez</option>
-                                <option value="parallelogram">Parallelogramm</option>
+                                <option value="circle">Circle</option>
+                                <option value="rectangle">Rectangle</option>
+                                <option value="square">Square</option>
+                                <option value="triangle">General triangle</option>
+                                <option value="rightTriangle">Right-angled triangle</option>
+                                <option value="trapezoid">Trapezoid</option>
+                                <option value="parallelogram">Parallelogram</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="advancedSettingsContainer">
-                        <button class="button" id="advancedSettingsBtn" type="button">Erweiterte Einstellungen</button>
+                        <button class="button" id="advancedSettingsBtn" type="button">Advanced Mode</button>
                     </div>
                 </div>
 
@@ -66,17 +71,16 @@
 
                                     </select>
                                 </div>
-                                <input type="number" id="zahlenInput" placeholder="Zahl" class="zahlenInputfeld">
+                                <input type="number" id="zahlenInput" placeholder="Number" class="numberInputField">
                             </div>
                         </div>
 
-                        <p class="falscheEingabestyle" id="errorMessages"></p>
+                        <p class="errorMessagestyle" id="errorMessages"></p>
 
 
-                        <div class="zahlenAusgabestyle" id="ausgabeContainer">
-
+                        <div class="outputStyle" id="ausgabeContainer">
                             <div class="ergebnisGruppe">
-                                <p class="ergebnisGruppenTitel">Ergebnisse</p>
+                                <p class="ergebnisGruppenTitel">Results</p>
                                 <div class="ergebnisGrid"></div>
                             </div>
                         </div>
@@ -86,7 +90,7 @@
                             <summary>
                                 <span>
                                     <i class="fa fa-calculator" aria-hidden="true"></i>
-                                    Rechenweg
+                                    Calculation steps
                                 </span>
                                 <i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i>
                             </summary>
@@ -115,7 +119,7 @@
             </div>
 
             <div class="linksFooterect">
-                <a href="../../html/datenSchutz.html">Datenschutz</a>
+                <a href="../../html/datenSchutz.html">Data Protection</a>
 
                 <button id="openFeedbackBtn">Feedback senden</button>
 
@@ -126,7 +130,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./geometrieRechner.js"></script>
+    <script src="./geometryCalculator.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>
@@ -134,13 +138,13 @@
     <div id="settingsModal" class="modalOverlay">
     <div class="modalContent">
         <div class="modalHeader">
-            <h2>Erweiterte Einstellungen</h2>
+            <h2>Advanced settings</h2>
             <button id="closeModalBtn" class="closeBtn">&times;</button>
         </div>
         
         <div class="modalBody">
             <div class="settingItem">
-                <label for="decimalPlaces">Nachkommastellen:</label>
+                <label for="decimalPlaces">Decimal places:</label>
                 <select id="decimalPlaces" class="selection">
                     <option value="0">0</option>
                     <option value="1">1</option>
@@ -154,7 +158,7 @@
             </div>
         
         <div class="modalFooter">
-            <button id="saveSettingsBtn" class="button">Speichern</button>
+            <button id="saveSettingsBtn" class="button">Save</button>
         </div>
     </div>
 </div>
