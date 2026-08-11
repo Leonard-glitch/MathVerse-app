@@ -158,8 +158,8 @@ export const tools = [
         id:       "card12",
         title:    "Geometry Calculator",
         group:    "geometrie",
-        filename: "geometrieRechner.html",
-        url:      `${BASE}/Tools/Geometrie Rechner/geometrieRechner.html`,
+        filename: "geometryCalculator.html",
+        url:      `${BASE}/Tools/GeometryCalculator/geometryCalculator.html`,
         tags:     ["geometry", "2d", "3d", "circle", "rectangle", "square", "triangle", "right triangle", "trapezoid", "parallelogram", "rhombus", "cube", "cuboid", "sphere", "cylinder", "cone", "square pyramid", "rectangular pyramid"],
         info:     "Geometry calculator for 2D and 3D figures, including calculation steps and live shape previews.",
         image: {
