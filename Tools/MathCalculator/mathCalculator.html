@@ -1,14 +1,20 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mathe Rechner</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Math Calculator</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./matheRechner.css">
+    <link rel="stylesheet" href="./mathCalculator.css">
 
     <script type="module">
         import "https://esm.run/mathlive";
@@ -20,7 +26,7 @@
             <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
             <div>
-                <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+                <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
                 <div id="searchResults"></div>
             </div>
@@ -32,7 +38,7 @@
     </header>
     <main>
         <section class="mathCalculatorSection">
-            <h1 class="zahlenHeader">Mathe Rechner</h1>
+            <h1 class="titleHeader">Math Calculator</h1>
 
             <div class="mathMainCard">
                 <div class="mathMainCardTop">
@@ -42,7 +48,7 @@
                     </div>
                     <div class="liveanddegSettings">
                         <div class="liveresultbutton">
-                            <span class="advancedText">Live Result</span>
+                            <span class="advancedText">Live result</span>
                             <!-- Rounded switch -->
                             <label class="switch"><input type="checkbox"><span class="slider round"></span></label>
                         </div>
@@ -56,14 +62,14 @@
                     </div>
                 </div>
                 <div class="mathMainCardMainContainer">
-                    <math-field id="mathInput" class="zahlenInputfeld" placeholder="$$5+7$$"></math-field>
+                    <math-field id="mathInput" class="numberInputField" placeholder="$$5+7$$"></math-field>
 
-                    <p class="falscheEingabestyle" id="errorMessages"></p>
+                    <p class="errorMessagestyle" id="errorMessages"></p>
 
                     <div class="resultAndpathDiv">
-                        <div class="resultDiv"><span class="resultLable">Ergebnis:</span><span id="resultoutput"></span></div>
+                        <div class="resultDiv"><span class="resultLable">Result:</span><span id="resultoutput"></span></div>
                         <div class="pathDiv">
-                            <div class="pathLable"><button class="button" id="pathDropoutBtn"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Rechenweg<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button></div>
+                            <div class="pathLable"><button class="button" id="pathDropoutBtn"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Calculation steps<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button></div>
                             <div id="pathOutput"></div>
                         </div>
                     </div>
@@ -123,9 +129,9 @@
                     </div>
 
                     <div class="historyDiv">
-                        <div class="historyLable"><button class="button" id="showHistoryBtn"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>Verlauf<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button></div>
+                        <div class="historyLable"><button class="button" id="showHistoryBtn"><span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span>History<span class="arrowButtonSpan"><i class="fa fa-chevron-down detailsChevron" aria-hidden="true"></i></span></button></div>
                         <div id="historyOutput"></div>
-                        <div class="deleteHistory"><button class="button" id="deleteHistoryBtn">Verlauf löschen</button></div>
+                        <div class="deleteHistory"><button class="button" id="deleteHistoryBtn">Delete history</button></div>
                     </div>
                 </div>
             </div>
@@ -133,27 +139,23 @@
     </main>
     <footer>
         <div class="footerNav">
-
             <div class="footerSocial">
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i></a>
+                <a href="https://www.tiktok.com/@globomath?_r=1&_t=ZN-98pHu3qNgeM" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><i class="bx bxl-tiktok"></i></a>
+                <a href="https://www.instagram.com/globomath?igsh=NmZzNW5mcjE3bWs5" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram"></i></a>
+                <a href="https://www.youtube.com/@Globomath" target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
             </div>
 
-            <div class="linksFooterect">
-                <a href="../../html/datenSchutz.html">Datenschutz</a>
-
-                <button id="openFeedbackBtn">Feedback senden</button>
-
-                <a href="../../html/impressum.html">Impressum</a>
+            <div class="leftFootersect">
+                <a href="../../html/Privacypolicy.html">Privacy policy</a>
+                <button id="openFeedbackBtn">Feedback</button>
+                <a href="../../html/Imprint.html">Imprint</a>
             </div>
-
-            <div class="platzhalter">&copy; 2026 MathVerse</div>
+            
+            <div class="placeholderFooter">&copy;2026 Globomath</div>
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./matheRechner.js"></script>
+    <script src="./mathCalculator.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>

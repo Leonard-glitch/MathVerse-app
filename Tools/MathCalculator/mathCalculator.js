@@ -1,8 +1,8 @@
-// Selektiere die relevanten Elemente
+// Select the relevant elements
 const advancedCheckbox = document.querySelector('.advancedMode input[type="checkbox"]');
 const targetContainer = document.getElementById('quickAccessContainer');
 
-// 1. Template für den Advanced Mode
+// 1. Template for Advanced Mode
 const quickAccessContainerAdvanced = `
     <div class="customInputContainerRow">
         <button class="padButton" id="btn-adv-sq" data-insert="^{2}">x²</button>
@@ -46,7 +46,7 @@ const quickAccessContainerAdvanced = `
         <button class="padButton" id="btn-adv-ans" data-action="ans">Ans</button>
     </div>`;
 
-// 2. Template für den Standard-Modus (deaktiviert)
+// 2. Template for Standard Mode (disabled)
 const quickAccessContainerStandard = `
 <div class="customInputContainerRow">
     <button class="padButton" id="btn-std-sq" data-insert="^{2}">x²</button>
@@ -61,21 +61,21 @@ const quickAccessContainerStandard = `
     <div style="flex: 1;"></div>
 </div>`;
 
-// Funktion zum Umschalten
+// Function to toggle modes
 function updateAdvancedMode() {
-    // Container vor jedem Befüllen einmal leeren
+    // Clear the container before populating it
     targetContainer.innerHTML = '';
 
     if (advancedCheckbox.checked) {
-        // Wenn aktiv: Advanced-Inhalt rein
+        // If active: Insert advanced content
         targetContainer.innerHTML = quickAccessContainerAdvanced;
     } else {
-        // Wenn deaktiviert: Standard-Inhalt rein
+        // If disabled: Insert standard content
         targetContainer.innerHTML = quickAccessContainerStandard;
     }
 }
 
-// Persistenz + Umschalten zusammen anbinden (Konto oder Gast, siehe common-login.js)
+// Bind persistence + toggle together (account or guest, see common-login.js)
 window.MV.bindAdvancedToggle(advancedCheckbox, 'matheRechner', updateAdvancedMode);
 
 
@@ -83,36 +83,36 @@ window.MV.bindAdvancedToggle(advancedCheckbox, 'matheRechner', updateAdvancedMod
 
 
 // ==========================================================================
-// RECHEN-ENGINE (Phase 1: Standard-Funktionsumfang)
-// Reine Zahlenausdrücke – keine Gleichungen, keine Variablen. Grammatik
-// bewusst schlanker als Formel Umformer: da Variablen komplett verboten
-// sind, ist jeder erfolgreich geparste Ausdruck automatisch vollständig
-// numerisch auswertbar (kein tryEvalNumeric-Nullfall nötig).
+// CALCULATION ENGINE (Phase 1: Standard feature set)
+// Pure numeric expressions – no equations, no variables. Grammar is
+// deliberately leaner than Formel Umformer: since variables are completely
+// forbidden, every successfully parsed expression is automatically fully
+// numerically evaluable (no tryEvalNumeric null-case needed).
 // ==========================================================================
 
 class CalcError extends Error {}
 
 function exaktRunden(n) {
-    // Zahlen dieser Größenordnung brauchen keine Nachkomma-Bereinigung mehr,
-    // und ×1e10 würde ohnehin zu Infinity überlaufen (z.B. 170!, 10^300).
+    // Numbers of this magnitude do not need decimal cleanup,
+    // and ×1e10 would overflow to Infinity anyway (e.g., 170!, 10^300).
     if (!Number.isFinite(n) || Math.abs(n) >= 1e15) return n;
     return Math.round(n * 1e10) / 1e10;
 }
 
 const CALC_BLACKLIST_CHECKS = [
-    { re: /\\int|\\iint|\\iiint|\\oint/, msg: "Integrale werden nicht unterstützt." },
-    { re: /\\sum/, msg: "Summenzeichen werden nicht unterstützt." },
-    { re: /\\prod/, msg: "Produktzeichen werden nicht unterstützt." },
-    { re: /\\lim/, msg: "Grenzwerte werden nicht unterstützt." },
-    { re: /\\begin\{(matrix|pmatrix|bmatrix|vmatrix|Vmatrix|cases|array)\}/, msg: "Matrizen werden nicht unterstützt." },
-    { re: /\\vec|\\overrightarrow/, msg: "Vektoren werden nicht unterstützt." },
-    { re: /\\det/, msg: "Determinanten werden nicht unterstützt." },
-    { re: /\\in\b|\\notin|\\subset|\\subseteq|\\cup|\\cap|\\emptyset|\\forall|\\exists/, msg: "Mengenlehre wird nicht unterstützt." },
-    { re: /\\Rightarrow|\\Leftrightarrow|\\rightarrow|\\wedge|\\vee|\\neg/, msg: "Logikoperatoren werden nicht unterstützt." },
-    { re: /\\leq|\\geq|\\neq|\\approx|\\equiv|[<>]/, msg: "Ungleichungen werden nicht unterstützt." },
-    { re: /\\partial|\\nabla|\\prime/, msg: "Ableitungen werden nicht unterstützt." },
-    { re: /\\Im\b|\\Re\b|\\overline\{|\\bar\{|\\mathbb\{C\}/, msg: "Komplexe Zahlen werden nicht unterstützt." },
-    { re: /\\binom|\\choose/, msg: "Binomialkoeffizienten werden nicht unterstützt." }
+    { re: /\\int|\\iint|\\iiint|\\oint/, msg: "Integrals are not supported." },
+    { re: /\\sum/, msg: "Summation symbols are not supported." },
+    { re: /\\prod/, msg: "Product symbols are not supported." },
+    { re: /\\lim/, msg: "Limits are not supported." },
+    { re: /\\begin\{(matrix|pmatrix|bmatrix|vmatrix|Vmatrix|cases|array)\}/, msg: "Matrices are not supported." },
+    { re: /\\vec|\\overrightarrow/, msg: "Vectors are not supported." },
+    { re: /\\det/, msg: "Determinants are not supported." },
+    { re: /\\in\b|\\notin|\\subset|\\subseteq|\\cup|\\cap|\\emptyset|\\forall|\\exists/, msg: "Set theory is not supported." },
+    { re: /\\Rightarrow|\\Leftrightarrow|\\rightarrow|\\wedge|\\vee|\\neg/, msg: "Logic operators are not supported." },
+    { re: /\\leq|\\geq|\\neq|\\approx|\\equiv|[<>]/, msg: "Inequalities are not supported." },
+    { re: /\\partial|\\nabla|\\prime/, msg: "Derivatives are not supported." },
+    { re: /\\Im\b|\\Re\b|\\overline\{|\\bar\{|\\mathbb\{C\}/, msg: "Complex numbers are not supported." },
+    { re: /\\binom|\\choose/, msg: "Binomial coefficients are not supported." }
 ];
 
 function checkCalcBlacklist(latex) {
@@ -121,10 +121,10 @@ function checkCalcBlacklist(latex) {
     }
 }
 
-// Liest EIN Argument für \frac oder \sqrt in klammerloser LaTeX-Kurzschreibweise
-// (z.B. "\frac36" = 3/6) ein: entweder eine geklammerte Gruppe {...} oder genau EIN
-// einzelnes Zeichen (Ziffer, "e" oder \pi) – niemals einen mehrstelligen Ziffernlauf,
-// damit Zähler und Nenner nicht zu einer Zahl "36" verschmelzen.
+// Reads ONE argument for \frac or \sqrt in bracketless LaTeX shorthand notation
+// (e.g., "\frac36" = 3/6): either a bracketed group {...} or exactly ONE
+// single character (digit, "e", or \pi) – never a multi-digit sequence,
+// so that numerator and denominator do not merge into a single number "36".
 function readCalcBraceOrBareArgument(latex, i, contextLabel) {
     const n = latex.length;
     while (i < n && /\s/.test(latex[i])) i++;
@@ -139,12 +139,12 @@ function readCalcBraceOrBareArgument(latex, i, contextLabel) {
                 if (depth === 0) {
                     const end = k + 1;
                     const inner = latex.slice(start + 1, end - 1);
-                    const innerTokens = tokenizeCalc(inner).slice(0, -1); // ohne EOF
+                    const innerTokens = tokenizeCalc(inner).slice(0, -1); // without EOF
                     return { tokens: [{ type: "LBRACE" }, ...innerTokens, { type: "RBRACE" }], nextIndex: end };
                 }
             }
         }
-        throw new CalcError("Eine geschweifte Klammer wurde nicht richtig geschlossen.");
+        throw new CalcError("A curly brace was not closed properly.");
     }
 
     if (latex[i] === "\\") {
@@ -154,7 +154,7 @@ function readCalcBraceOrBareArgument(latex, i, contextLabel) {
         if (cmd === "pi") {
             return { tokens: [{ type: "LBRACE" }, { type: "CONST", name: "pi" }, { type: "RBRACE" }], nextIndex: j };
         }
-        throw new CalcError(`Nach „${contextLabel}" ohne geschweifte Klammern wird eine einzelne Ziffer, „e" oder „\\pi" erwartet.`);
+        throw new CalcError(`A single digit, "e", or "\\pi" is expected after "${contextLabel}" without curly braces.`);
     }
 
     if (/[0-9]/.test(latex[i])) {
@@ -165,7 +165,7 @@ function readCalcBraceOrBareArgument(latex, i, contextLabel) {
         return { tokens: [{ type: "LBRACE" }, { type: "CONST", name: "e" }, { type: "RBRACE" }], nextIndex: i + 1 };
     }
 
-    throw new CalcError(`„${contextLabel}" ist unvollständig.`);
+    throw new CalcError(`"${contextLabel}" is incomplete.`);
 }
 
 // ── Tokenizer ──────────────────────────────────────────────────────────────
@@ -188,7 +188,7 @@ function tokenizeCalc(latex) {
                 case "left": case "right": continue;
                 case "cdot": case "times": tokens.push({ type: "MUL" }); continue;
                 case "div": tokens.push({ type: "DIV" }); continue;
-                 case "frac": {
+                case "frac": {
                     const numArg = readCalcBraceOrBareArgument(latex, i, "\\frac");
                     const denArg = readCalcBraceOrBareArgument(latex, numArg.nextIndex, "\\frac");
                     tokens.push({ type: "FRAC" }, ...numArg.tokens, ...denArg.tokens);
@@ -205,7 +205,7 @@ function tokenizeCalc(latex) {
                             if (latex[k] === "[") depth++;
                             else if (latex[k] === "]") { depth--; if (depth === 0) { bracketEnd = k + 1; break; } }
                         }
-                        if (bracketEnd === -1) throw new CalcError("Der Wurzelindex wurde nicht geschlossen.");
+                        if (bracketEnd === -1) throw new CalcError("The root index was not closed.");
                         const innerIndex = latex.slice(cursor + 1, bracketEnd - 1);
                         indexTokens.push({ type: "LBRACKET" }, ...tokenizeCalc(innerIndex).slice(0, -1), { type: "RBRACKET" });
                         cursor = bracketEnd;
@@ -231,7 +231,7 @@ function tokenizeCalc(latex) {
                 case "lceil": tokens.push({ type: "LCEIL" }); continue;
                 case "rceil": tokens.push({ type: "RCEIL" }); continue;
                 default:
-                    throw new CalcError("Diese Funktion wird aktuell nicht unterstützt.");
+                    throw new CalcError("This function is currently not supported.");
             }
         }
 
@@ -266,10 +266,10 @@ function tokenizeCalc(latex) {
 
         if (ch === "e") { tokens.push({ type: "CONST", name: "e" }); i++; continue; }
         if (/[a-zA-Z]/.test(ch)) {
-            throw new CalcError("Variablen werden hier nicht unterstützt – nur Zahlen und die angebotenen Funktionen sind erlaubt.");
+            throw new CalcError("Variables are not supported here – only numbers and the provided functions are allowed.");
         }
 
-        throw new CalcError(`Das Zeichen „${ch}" wird nicht erkannt.`);
+        throw new CalcError(`The character "${ch}" is not recognized.`);
     }
 
     tokens.push({ type: "EOF" });
@@ -278,11 +278,11 @@ function tokenizeCalc(latex) {
 
 function assertNoEquals(tokens) {
     if (tokens.some(t => t.type === "EQUALS")) {
-        throw new CalcError("Gleichungen werden hier nicht unterstützt. Gib einfach einen Rechenausdruck ein.");
+        throw new CalcError("Equations are not supported here. Simply enter a mathematical expression.");
     }
 }
 
-// ── Parser (rekursiver Abstieg) ──────────────────────────────────────────────
+// ── Parser (recursive descent) ──────────────────────────────────────────────
 function parseCalcExpression(tokens) {
     let pos = 0;
     const peek = () => tokens[pos];
@@ -311,7 +311,7 @@ function parseCalcExpression(tokens) {
             if (t === "MUL") { advance(); node = { type: "mul", left: node, right: parseFactor() }; }
             else if (t === "DIV") { advance(); node = { type: "div", left: node, right: parseFactor() }; }
             else if (t === "MOD") { advance(); node = { type: "mod", left: node, right: parseFactor() }; }
-            else if (t === "PIPE" && openPipes > 0) { break; } // schließendes Betragsstrich-Zeichen, keine implizite Multiplikation
+            else if (t === "PIPE" && openPipes > 0) { break; } // closing absolute value bar, no implicit multiplication
             else if (startsAtom(t)) { node = { type: "mul", left: node, right: parseFactor() }; }
             else break;
         }
@@ -327,7 +327,7 @@ function parseCalcExpression(tokens) {
         if (peek().type === "LBRACE") {
             advance();
             const e = parseExpr();
-            expect("RBRACE", "Der Exponent wurde nicht richtig geschlossen.");
+            expect("RBRACE", "The exponent was not closed properly.");
             return e;
         }
         return parseFactor();
@@ -342,8 +342,8 @@ function parseCalcExpression(tokens) {
         return base;
     }
 
-    // Fakultät (!) und Prozent (%) binden direkt an den vorausgehenden Wert,
-    // noch bevor eine mögliche Potenz ausgewertet wird (2^3! = 2^(3!), nicht (2^3)!).
+    // Factorial (!) and percent (%) bind directly to the preceding value,
+    // before a potential exponentiation is evaluated (2^3! = 2^(3!), not (2^3)!).
     function parseAtomPostfix() {
         let node = parseAtom();
         while (peek().type === "FACTORIAL" || peek().type === "PERCENT") {
@@ -361,37 +361,37 @@ function parseCalcExpression(tokens) {
             case "LPAREN": {
                 advance();
                 const e = parseExpr();
-                expect("RPAREN", "Eine runde Klammer wurde nicht geschlossen.");
+                expect("RPAREN", "A parenthesis was not closed.");
                 return e;
             }
             case "PIPE": {
                 openPipes++;
                 advance();
                 const e = parseExpr();
-                expect("PIPE", "Die Betragsstriche wurden nicht geschlossen.");
+                expect("PIPE", "The absolute value bars were not closed.");
                 openPipes--;
                 return { type: "func", name: "abs", arg: e };
             }
             case "LFLOOR": {
                 advance();
                 const e = parseExpr();
-                expect("RFLOOR", "Die Abrundungsklammer wurde nicht richtig geschlossen.");
+                expect("RFLOOR", "The floor bracket was not closed properly.");
                 return { type: "func", name: "floor", arg: e };
             }
             case "LCEIL": {
                 advance();
                 const e = parseExpr();
-                expect("RCEIL", "Die Aufrundungsklammer wurde nicht richtig geschlossen.");
+                expect("RCEIL", "The ceiling bracket was not closed properly.");
                 return { type: "func", name: "ceil", arg: e };
             }
             case "FRAC": {
                 advance();
-                expect("LBRACE", "Der Bruch ist unvollständig – der Zähler fehlt.");
+                expect("LBRACE", "The fraction is incomplete – the numerator is missing.");
                 const num = parseExpr();
-                expect("RBRACE", "Der Zähler des Bruchs wurde nicht richtig abgeschlossen.");
-                expect("LBRACE", "Der Bruch ist unvollständig – der Nenner fehlt.");
+                expect("RBRACE", "The numerator of the fraction was not closed properly.");
+                expect("LBRACE", "The fraction is incomplete – the denominator is missing.");
                 const den = parseExpr();
-                expect("RBRACE", "Der Nenner des Bruchs wurde nicht richtig abgeschlossen.");
+                expect("RBRACE", "The denominator of the fraction was not closed properly.");
                 return { type: "div", left: num, right: den };
             }
             case "SQRT": {
@@ -400,11 +400,11 @@ function parseCalcExpression(tokens) {
                 if (peek().type === "LBRACKET") {
                     advance();
                     index = parseExpr();
-                    expect("RBRACKET", "Der Wurzelindex wurde nicht geschlossen.");
+                    expect("RBRACKET", "The root index was not closed.");
                 }
-                expect("LBRACE", "Der Inhalt der Wurzel fehlt.");
+                expect("LBRACE", "The content of the root is missing.");
                 const arg = parseExpr();
-                expect("RBRACE", "Die Wurzel wurde nicht richtig geschlossen.");
+                expect("RBRACE", "The root was not closed properly.");
                 return { type: "sqrt", arg, index };
             }
             case "FUNC": {
@@ -412,22 +412,22 @@ function parseCalcExpression(tokens) {
                 if (peek().type === "LPAREN") {
                     advance();
                     const arg = parseExpr();
-                    expect("RPAREN", "Die Klammer nach der Funktion wurde nicht geschlossen.");
+                    expect("RPAREN", "The parenthesis after the function was not closed.");
                     return { type: "func", name: t.name, arg };
                 }
                 if (!startsAtom(peek().type) && peek().type !== "MINUS") {
-                    throw new CalcError(`Nach „${t.name}" fehlt eine Zahl oder Klammer.`);
+                    throw new CalcError(`A number or parenthesis is missing after "${t.name}".`);
                 }
                 return { type: "func", name: t.name, arg: parseFactor() };
             }
             default:
-                throw new CalcError("Die Eingabe ist unvollständig oder enthält an dieser Stelle ein unerwartetes Zeichen.");
+                throw new CalcError("The input is incomplete or contains an unexpected character at this position.");
         }
     }
 
     const expr = parseExpr();
     if (peek().type !== "EOF") {
-        throw new CalcError("Am Ende der Eingabe befinden sich überzählige Zeichen.");
+        throw new CalcError("There are extra characters at the end of the input.");
     }
     return expr;
 }
@@ -449,14 +449,14 @@ function evaluateCalcNode(node) {
         case "div": {
             const a = evaluateCalcNode(node.left);
             const b = evaluateCalcNode(node.right);
-            if (b === 0) throw new CalcError("Division durch 0 ist nicht möglich.");
+            if (b === 0) throw new CalcError("Division by zero is not possible.");
             return exaktRunden(a / b);
         }
         case "pow": {
             const base = evaluateCalcNode(node.base);
             const exp = evaluateCalcNode(node.exp);
             if (base < 0 && !Number.isInteger(exp)) {
-                throw new CalcError("Diese Rechnung hat kein reelles Ergebnis.");
+                throw new CalcError("This calculation has no real result.");
             }
             return exaktRunden(Math.pow(base, exp));
         }
@@ -464,17 +464,17 @@ function evaluateCalcNode(node) {
             const a = evaluateCalcNode(node.arg);
             const idx = node.index ? evaluateCalcNode(node.index) : 2;
             if (a < 0 && idx % 2 === 0) {
-                throw new CalcError("Diese Rechnung hat kein reelles Ergebnis – aus einer negativen Zahl kann keine geradzahlige Wurzel gezogen werden.");
+                throw new CalcError("This calculation has no real result – an even root cannot be taken from a negative number.");
             }
             return exaktRunden(a < 0 ? -Math.pow(-a, 1 / idx) : Math.pow(a, 1 / idx));
         }
         case "fact": {
             const a = evaluateCalcNode(node.arg);
             if (a < 0 || !Number.isInteger(a)) {
-                throw new CalcError("Die Fakultät ist nur für nicht-negative ganze Zahlen definiert.");
+                throw new CalcError("The factorial is defined only for non-negative integers.");
             }
             if (a > 170) {
-                throw new CalcError("Diese Zahl ist zu groß für eine Fakultätsberechnung.");
+                throw new CalcError("This number is too large for a factorial calculation.");
             }
             let result = 1;
             for (let k = 2; k <= a; k++) result *= k;
@@ -486,7 +486,7 @@ function evaluateCalcNode(node) {
         case "mod": {
             const a = evaluateCalcNode(node.left);
             const b = evaluateCalcNode(node.right);
-            if (b === 0) throw new CalcError("Division durch 0 ist bei Modulo nicht möglich.");
+            if (b === 0) throw new CalcError("Division by zero is not possible with modulo.");
             return exaktRunden(a % b);
         }
         case "func": {
@@ -500,33 +500,33 @@ function evaluateCalcNode(node) {
                 case "cos": return exaktRunden(Math.cos(inRad));
                 case "tan": {
                     if (Math.abs(Math.cos(inRad)) < 1e-12) {
-                        throw new CalcError("Der Tangens ist an dieser Stelle nicht definiert.");
+                        throw new CalcError("Tangent is undefined at this point.");
                     }
                     return exaktRunden(Math.tan(inRad));
                 }
                 case "asin":
-                    if (a < -1 || a > 1) throw new CalcError("Der Arkussinus ist nur für Werte zwischen −1 und 1 definiert.");
+                    if (a < -1 || a > 1) throw new CalcError("Arcsine is defined only for values between −1 and 1.");
                     return exaktRunden(toCurrentMode(Math.asin(a)));
                 case "acos":
-                    if (a < -1 || a > 1) throw new CalcError("Der Arkuskosinus ist nur für Werte zwischen −1 und 1 definiert.");
+                    if (a < -1 || a > 1) throw new CalcError("Arccosine is defined only for values between −1 and 1.");
                     return exaktRunden(toCurrentMode(Math.acos(a)));
                 case "atan":
                     return exaktRunden(toCurrentMode(Math.atan(a)));
                 case "ln":
-                    if (a <= 0) throw new CalcError("Der natürliche Logarithmus ist nur für positive Zahlen definiert.");
+                    if (a <= 0) throw new CalcError("Natural logarithm is defined only for positive numbers.");
                     return exaktRunden(Math.log(a));
                 case "log":
-                    if (a <= 0) throw new CalcError("Der Logarithmus ist nur für positive Zahlen definiert.");
+                    if (a <= 0) throw new CalcError("Logarithm is defined only for positive numbers.");
                     return exaktRunden(Math.log10(a));
                 case "floor": return exaktRunden(Math.floor(a));
                 case "ceil": return exaktRunden(Math.ceil(a));
                 case "abs": return exaktRunden(Math.abs(a));
                 default:
-                    throw new CalcError("Diese Funktion wird aktuell nicht unterstützt.");
+                    throw new CalcError("This function is currently not supported.");
             }
         }
         default:
-            throw new CalcError("Diese Eingabe wird derzeit nicht unterstützt.");
+            throw new CalcError("This input is currently not supported.");
     }
 }
 
@@ -562,19 +562,19 @@ function calcOpSymbol(type) {
 function calcOpTitle(type) {
     switch (type) {
         case "add": return "Addition";
-        case "sub": return "Subtraktion";
-        case "mul": return "Multiplikation";
+        case "sub": return "Subtraction";
+        case "mul": return "Multiplication";
         case "div": return "Division";
         case "mod": return "Modulo";
-        default: return "Berechnung";
+        default: return "Calculation";
     }
 }
 
 const CALC_FUNC_TITLES = {
-    sin: "Sinus anwenden", cos: "Kosinus anwenden", tan: "Tangens anwenden",
-    asin: "Arkussinus anwenden", acos: "Arkuskosinus anwenden", atan: "Arkustangens anwenden",
-    ln: "Natürlichen Logarithmus anwenden", log: "Logarithmus anwenden",
-    floor: "Abrunden", ceil: "Aufrunden", abs: "Betrag bilden"
+    sin: "Apply sine", cos: "Apply cosine", tan: "Apply tangent",
+    asin: "Apply arcsine", acos: "Apply arccosine", atan: "Apply arctangent",
+    ln: "Apply natural logarithm", log: "Apply logarithm",
+    floor: "Round down", ceil: "Round up", abs: "Calculate absolute value"
 };
 
 const CALC_FUNC_LABELS = {
@@ -632,10 +632,10 @@ function makeCalcStep(title, node, value) {
     return { title, formula: `${renderCalcExpr(node)} = ${formatCalcNum(value)}` };
 }
 
-// Reduziert genau eine Ebene: sucht (links vor rechts, innen vor außen) die
-// erste Operation, deren Operanden bereits Zahlen/Konstanten sind, wertet
-// nur diese aus und liefert den Baum mit der ersetzten Stelle zurück.
-// null = dieser Knoten ist bereits vollständig atomar.
+// Reduces exactly one level: searches (left-to-right, inside-out) for the
+// first operation whose operands are already numbers/constants, evaluates
+// only this operation, and returns the tree with the replaced position.
+// null = this node is already completely atomic.
 function tryReduceCalc(node) {
     switch (node.type) {
         case "num": case "const":
@@ -644,8 +644,8 @@ function tryReduceCalc(node) {
         case "neg": {
             const childResult = tryReduceCalc(node.arg);
             if (childResult) return { node: { type: "neg", arg: childResult.node }, step: childResult.step };
-            // Vorzeichen einer bereits bekannten Zahl ist reine Notation,
-            // kein eigenständiger Rechenschritt (sonst z.B. "−5 = −5").
+            // The sign of an already known number is pure notation,
+            // not an independent calculation step (otherwise e.g. "−5 = −5").
             return { node: resultToNode(-atomicValue(node.arg)), step: null };
         }
 
@@ -664,7 +664,7 @@ function tryReduceCalc(node) {
             const expResult = tryReduceCalc(node.exp);
             if (expResult) return { node: { ...node, exp: expResult.node }, step: expResult.step };
             const value = evaluateCalcNode(node);
-            return { node: resultToNode(value), step: makeCalcStep("Potenz berechnen", node, value) };
+            return { node: resultToNode(value), step: makeCalcStep("Calculate exponent", node, value) };
         }
 
         case "sqrt": {
@@ -675,14 +675,14 @@ function tryReduceCalc(node) {
             const argResult = tryReduceCalc(node.arg);
             if (argResult) return { node: { ...node, arg: argResult.node }, step: argResult.step };
             const value = evaluateCalcNode(node);
-            return { node: resultToNode(value), step: makeCalcStep("Wurzel ziehen", node, value) };
+            return { node: resultToNode(value), step: makeCalcStep("Calculate root", node, value) };
         }
 
         case "fact": case "percent": {
             const argResult = tryReduceCalc(node.arg);
             if (argResult) return { node: { ...node, arg: argResult.node }, step: argResult.step };
             const value = evaluateCalcNode(node);
-            const title = node.type === "fact" ? "Fakultät berechnen" : "Prozent umwandeln";
+            const title = node.type === "fact" ? "Calculate factorial" : "Convert percentage";
             return { node: resultToNode(value), step: makeCalcStep(title, node, value) };
         }
 
@@ -690,7 +690,7 @@ function tryReduceCalc(node) {
             const argResult = tryReduceCalc(node.arg);
             if (argResult) return { node: { ...node, arg: argResult.node }, step: argResult.step };
             const value = evaluateCalcNode(node);
-            return { node: resultToNode(value), step: makeCalcStep(CALC_FUNC_TITLES[node.name] || "Funktion anwenden", node, value) };
+            return { node: resultToNode(value), step: makeCalcStep(CALC_FUNC_TITLES[node.name] || "Apply function", node, value) };
         }
 
         default:
@@ -713,14 +713,14 @@ function buildCalcSteps(ast) {
 
     const value = isAtomicCalc(current) ? exaktRunden(atomicValue(current)) : NaN;
     if (steps.length > 0) {
-        steps[steps.length - 1].solution = `Ergebnis: ${formatCalcNum(value)}`;
+        steps[steps.length - 1].solution = `Result: ${formatCalcNum(value)}`;
     }
     return { steps, value };
 }
 
 function renderCalcSteps(steps) {
     if (steps.length === 0) {
-        return `<div class="step-container final-step"><div class="step-title">Kein Rechenweg nötig</div><div class="step-text">Diese Eingabe ist bereits ein einzelner Wert.</div></div>`;
+        return `<div class="step-container final-step"><div class="step-title">No steps required</div><div class="step-text">This input is already a single value.</div></div>`;
     }
     return steps.map((step, i) => {
         const isLast = i === steps.length - 1;
@@ -733,13 +733,13 @@ function renderCalcSteps(steps) {
     }).join("");
 }
 
-// ── Verlauf (Persistenz via window.MV, siehe common-login.js) ─────────────
+// ── History (Persistence via window.MV, see common-login.js) ─────────────
 
 const MATH_HISTORY_KEY = "matheRechner";
 
 function formatHistoryTime(iso) {
     try {
-        return new Date(iso).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+        return new Date(iso).toLocaleString("en-US", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
     } catch {
         return "";
     }
@@ -753,7 +753,7 @@ function renderHistoryList(onReuse) {
     const isOpen = historyOutput.classList.contains("is-open");
 
     if (!window.MV.isLoggedIn()) {
-        historyOutput.innerHTML = `<p class="historyEmptyState">Melde dich an, um deinen Verlauf zu sehen.</p>`;
+        historyOutput.innerHTML = `<p class="historyEmptyState">Log in to see your history.</p>`;
         if (deleteWrapper) deleteWrapper.classList.remove("is-visible");
         return;
     }
@@ -761,20 +761,20 @@ function renderHistoryList(onReuse) {
     const entries = window.MV.getToolHistory(MATH_HISTORY_KEY);
 
     if (entries.length === 0) {
-        historyOutput.innerHTML = `<p class="historyEmptyState">Noch keine Berechnungen im Verlauf.</p>`;
+        historyOutput.innerHTML = `<p class="historyEmptyState">No calculations in history yet.</p>`;
         if (deleteWrapper) deleteWrapper.classList.remove("is-visible");
         return;
     }
 
-    // Neueste zuerst
+    // Newest first
     historyOutput.innerHTML = entries.slice().reverse().map(entry => `
         <div class="historyEntry" data-id="${entry.id}">
-            <button type="button" class="historyEntryMain" data-action="reuse" aria-label="Ausdruck erneut verwenden">
+            <button type="button" class="historyEntryMain" data-action="reuse" aria-label="Reuse expression">
                 <math-field read-only class="historyEntryExpr">${entry.expr}</math-field>
                 <span class="historyEntryResult">= ${entry.result}</span>
             </button>
             <span class="historyEntryTime">${formatHistoryTime(entry.timestamp)}</span>
-            <button type="button" class="historyEntryDelete" data-action="delete" aria-label="Eintrag löschen">
+            <button type="button" class="historyEntryDelete" data-action="delete" aria-label="Delete entry">
                 <i class="fa fa-trash-o"></i>
             </button>
         </div>
@@ -818,11 +818,11 @@ function initHistoryPanel(onReuse) {
 
     renderHistoryList(onReuse);
 
-    // Cross-Tab/bfcache-Sync (analog Finanzrechner/Geometrie Rechner)
+    // Cross-Tab/bfcache-Sync (similar to financial calculator / geometry calculator)
     window.addEventListener("mv:staterestore", () => renderHistoryList(onReuse));
 }
 
-// ── UI-Anbindung ──────────────────────────────────────────────────────────
+// ── UI Binding ──────────────────────────────────────────────────────────
 customElements.whenDefined("math-field").then(() => {
     const mf = document.getElementById("mathInput");
     const resultOutput = document.getElementById("resultoutput");
@@ -842,7 +842,7 @@ customElements.whenDefined("math-field").then(() => {
         degradSwitch.value = window.MV.getAngleMode();
         degradSwitch.addEventListener("change", () => {
             window.MV.setAngleMode(degradSwitch.value);
-            calculate(); // angezeigtes Ergebnis wurde im alten Modus berechnet
+            calculate(); // displayed result was calculated in the old mode
         });
         window.addEventListener("mv:staterestore", () => {
             degradSwitch.value = window.MV.getAngleMode();
@@ -851,15 +851,14 @@ customElements.whenDefined("math-field").then(() => {
 
     if (!mf) return;
 
-    // Die eigene Schnellzugriff-/Zahlen-Tastatur deckt den kompletten
-    // Funktionsumfang bereits ab -> MathLives eigene virtuelle Tastatur
-    // bewusst nie automatisch einblenden lassen (sonst zwei Tastaturen
-    // gleichzeitig sichtbar, vor allem auf Mobile ein Platzproblem).
+    // The dedicated quick access / numeric keypad covers the entire feature set
+    // -> deliberately prevent MathLive's own virtual keyboard from showing automatically
+    // (otherwise two keyboards are visible simultaneously, causing layout issues on mobile).
     try {
         if (window.MathfieldElement) {
             window.MathfieldElement.mathVirtualKeyboardPolicy = "manual";
         }
-    } catch (e) { /* Version-abhängig, kein Blocker */ }
+    } catch (e) { /* Version dependent, non-blocking */ }
 
     let lastAnswer = null;
 
@@ -904,7 +903,7 @@ customElements.whenDefined("math-field").then(() => {
                 renderHistoryList(reuseExpression);
             }
         } catch (err) {
-            const msg = err instanceof CalcError ? err.message : "Deine Eingabe konnte nicht verarbeitet werden. Bitte überprüfe den Ausdruck.";
+            const msg = err instanceof CalcError ? err.message : "Your input could not be processed. Please check the expression.";
             showCalcError(msg);
             pathOutput.innerHTML = "";
         }
@@ -920,11 +919,10 @@ customElements.whenDefined("math-field").then(() => {
     mf.addEventListener("input", () => {
         clearTimeout(debounceTimer);
 
-        // "=" über die virtuelle MathLive-Tastatur landet nicht im "keydown"-
-        // Handler unten, sondern hier als normale Werteänderung – auch wenn
-        // der Cursor gerade innerhalb eines Bruchs oder einer Klammer steht,
-        // also nicht zwingend am Ende der Eingabe. Deshalb wird der gesamte
-        // Wert durchsucht statt nur das Ende zu prüfen.
+        // "=" pressed via the virtual MathLive keyboard does not end up in the "keydown"
+        // handler below, but here as a normal value change – even if the cursor
+        // is currently inside a fraction or parentheses, not necessarily at the end.
+        // Therefore, the entire value is searched instead of checking only the end.
         const eqIndex = mf.value.indexOf("=");
         if (eqIndex !== -1) {
             mf.value = mf.value.slice(0, eqIndex) + mf.value.slice(eqIndex + 1);
@@ -945,21 +943,20 @@ customElements.whenDefined("math-field").then(() => {
     });
 
     mf.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === "=") {
-                e.preventDefault();
-                clearTimeout(debounceTimer);
-                calculate(true);
-            }
-        });
+        if (e.key === "Enter" || e.key === "=") {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            calculate(true);
+        }
+    });
 
     initHistoryPanel(reuseExpression);
 
-    // ── Schnellzugriff- & Zahlen-Tastatur → MathLive-Feld ──────────────────
-    // Delegation auf dem stabilen Elternknoten: #quickAccessContainer wird
-    // bei jedem Advanced/Standard-Wechsel per innerHTML neu aufgebaut (siehe
-    // updateAdvancedMode()) – direkte Listener auf einzelnen Buttons gingen
-    // dabei verloren. #numericKeypadContainer läuft aus Konsistenzgründen
-    // über denselben Handler, auch wenn es nie neu gerendert wird.
+    // ── Quick access & numeric keypad → MathLive field ──────────────────
+    // Event delegation on the stable parent node: #quickAccessContainer is
+    // rebuilt via innerHTML on every Advanced/Standard toggle (see updateAdvancedMode())
+    // – direct listeners on individual buttons would be lost. #numericKeypadContainer
+    // uses the same handler for consistency, even though it is never re-rendered.
     const keypadWrapper = document.querySelector(".customInputsSec");
     keypadWrapper?.addEventListener("click", (e) => {
         const btn = e.target.closest(".padButton");
@@ -969,11 +966,11 @@ customElements.whenDefined("math-field").then(() => {
 
         switch (btn.dataset.action) {
             case "clear":
-            mf.executeCommand("deleteAll");
-            hideCalcError();
-            resultOutput.textContent = "";
-            pathOutput.innerHTML = "";
-            return;
+                mf.executeCommand("deleteAll");
+                hideCalcError();
+                resultOutput.textContent = "";
+                pathOutput.innerHTML = "";
+                return;
             case "delete":
                 mf.executeCommand("deleteBackward");
                 return;
@@ -982,12 +979,12 @@ customElements.whenDefined("math-field").then(() => {
                 return;
             case "ans":
                 if (lastAnswer === null) {
-                    showCalcError("Es gibt noch kein vorheriges Ergebnis.");
+                    showCalcError("There is no previous result yet.");
                     return;
                 }
-                // Bewusst der rohe Zahlenwert (ASCII "-"), nicht formatCalcNum():
-                // das nutzt für die Anzeige das Unicode-Minuszeichen "−", das der
-                // Tokenizer beim erneuten Berechnen nicht als Minus erkennen würde.
+                // Intentionally using the raw numeric value (ASCII "-"), not formatCalcNum():
+                // formatCalcNum uses the Unicode minus sign "−" for display, which the
+                // tokenizer would not recognize as a minus when recalculating.
                 mf.insert(String(lastAnswer));
                 return;
         }
@@ -999,7 +996,7 @@ customElements.whenDefined("math-field").then(() => {
     });
 });
 
-// ── Rechenweg-Akkordeon ─────────────────────────────────────────────────
+// ── Solution path accordion ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
     const pathBtn = document.getElementById("pathDropoutBtn");
     const pathOutputEl = document.getElementById("pathOutput");
