@@ -184,8 +184,8 @@ export const tools = [
         id:       "card14",
         title:    "Math Calculator",
         group:    "arithmetik",
-        filename: "matheRechner.html",
-        url:      `${BASE}/Tools/Mathe Rechner/matheRechner.html`,
+        filename: "mathCalculator.html",
+        url:      `${BASE}/Tools/MathCalculator/mathCalculator.html`,
         tags:     ["calculator", "arithmetic", "trigonometry", "algebra", "advanced", "advanced"],
         info:     "Scientific calculator with standard and advanced modes for complex calculations.",
         image: {
