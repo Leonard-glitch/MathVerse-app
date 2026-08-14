@@ -156,8 +156,7 @@ const shapeConfig = {
             { id: 'O', label: 'Surface Area (O)' },
             { id: 'M', label: 'Lateral Area (M)' },
             { id: 'G', label: 'Base Area (G)' }
-        ],
-        redundantGroups: [['r', 'd']]
+        ]
     },
     cone: {
         name: 'Cone',
@@ -173,8 +172,7 @@ const shapeConfig = {
             { id: 'O', label: 'Surface Area (O)' },
             { id: 'M', label: 'Lateral Area (M)' },
             { id: 'G', label: 'Base Area (G)' }
-        ],
-        redundantGroups: [['r', 'd']]
+        ]
     },
     quadrangularpyramid: {
         name: 'Square Pyramid',
@@ -1056,7 +1054,7 @@ function resolveRectangle(given) {
             steps.push(step("Side b from area", "The area is A = a · b, rearranged for b:", `b = ${frac('A', 'a')} = ${frac(formatNum(v.A), formatNum(a))} = ${formatNum(b)}`));
             break;
 
-        case 'A,b':
+        case 'b,A':
             b = v.b; a = v.A / v.b;
             steps.push(step("Side a from area", "The area is A = a · b, rearranged for a:", `a = ${frac('A', 'b')} = ${frac(formatNum(v.A), formatNum(b))} = ${formatNum(a)}`));
             break;
@@ -2588,7 +2586,7 @@ function readGivenValues() {
 
     getAllActiveSelects().forEach(select => {
         const row = select.closest(".inputContainer, .inputRow");
-        const numberInput = row ? row.querySelector(".zahlenInputfeld") : null;
+        const numberInput = row ? row.querySelector(".numberInputField") : null;
         if (!numberInput) return;
 
         const raw = numberInput.value.trim();
@@ -2616,7 +2614,7 @@ function calculate() {
     if (!shape) return;
 
     const { given, hasInvalid } = readGivenValues();
-    const requiredCount = document.querySelectorAll("#variousInputContainer .zahlenInputfeld").length;
+    const requiredCount = document.querySelectorAll("#variousInputContainer .numberInputField").length;
     const givenCount = Object.keys(given).length;
 
     if (hasInvalid) {
@@ -2722,7 +2720,7 @@ function addThirdInput(){
         <div class="inputSelectDiv">
             <select name="selectInput" id="selectInputRow3" class="selection"></select>
         </div>
-        <input type="number" id="zahlenInputRow3" placeholder="Number" class="zahlenInputfeld">
+        <input type="number" id="zahlenInputRow3" placeholder="Number" class="numberInputField">
     </div>`);
 
     const select3 = document.getElementById("selectInputRow3");
@@ -2788,7 +2786,7 @@ inputsContainer.addEventListener("change", (e) => {
 });
 
 inputsContainer.addEventListener("input", (e) => {
-    if (!e.target.classList.contains("zahlenInputfeld")) return;
+    if (!e.target.classList.contains("numberInputField")) return;
     calculate();
 });
 
