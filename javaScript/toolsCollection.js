@@ -169,19 +169,6 @@ export const tools = [
     },
     {
         id:       "card13",
-        title:    "Function Calculator",
-        group:    "algebra",
-        filename: "funktionsrechner.html",
-        url:      `${BASE}/Tools/Funktionsrechner/funktionsrechner.html`,
-        tags:     ["functions", "coordinate system", "graph", "root", "intersections"],
-        info:     "Create and analyze mathematical functions with an interactive coordinate system.",
-        image: {
-            big:   `${BASE}/pictures/Funktionsrechner2-appIcon.png`,
-            small: `${BASE}/pictures/icons/meinTool-icon.png`
-        }
-    },
-    {
-        id:       "card14",
         title:    "Math Calculator",
         group:    "arithmetik",
         filename: "mathCalculator.html",

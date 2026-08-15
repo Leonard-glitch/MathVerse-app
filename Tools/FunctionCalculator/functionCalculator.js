@@ -237,7 +237,8 @@ function restoreFunctionsSnapshot(snapshot) {
     functionsState = snapshot.map(entry => {
         let ast = null;
         try { ast = compileGraphFormula(entry.latex); } catch (err) { /* war beim ursprünglichen Speichern bereits gültig */ }
-        return { id: entry.id, latex: entry.latex, visible: entry.visible, ast };
+        const singularities = ast ? findSingularities(ast) : [];
+        return { id: entry.id, latex: entry.latex, visible: entry.visible, ast, singularities };
     });
     openFunctionMenuId = null;
     renderFunctionsList();
@@ -552,14 +553,15 @@ function initAddFunctionModal() {
         // damit ein unvorhergesehener Fall die Funktion nicht zeichnet statt abzustürzen.
         let ast = null;
         try { ast = compileGraphFormula(latexValue); } catch (err) { /* siehe Kommentar oben */ }
+        const singularities = ast ? findSingularities(ast) : [];
 
         const isNewFunction = editingFunctionId === null;
 
         if (!isNewFunction) {
             const fn = functionsState.find(f => f.id === editingFunctionId);
-            if (fn) { fn.latex = latexValue; fn.ast = ast; }
+            if (fn) { fn.latex = latexValue; fn.ast = ast; fn.singularities = singularities; }
         } else {
-            functionsState.push({ id: nextFunctionId++, latex: latexValue, visible: true, ast });
+            functionsState.push({ id: nextFunctionId++, latex: latexValue, visible: true, ast, singularities });
         }
 
         pushFunctionsHistory();
@@ -1107,6 +1109,43 @@ function findFunctionRoots(ast) {
     return analysisDedupe(roots);
 }
 
+function findSingularities(ast) {
+    const points = [];
+
+    function walk(node) {
+        if (!node) return;
+        switch (node.type) {
+            case "div":
+                points.push(...findFunctionRoots(node.right));
+                walk(node.left);
+                walk(node.right);
+                break;
+            case "func":
+                if (node.name === "tan") {
+                    points.push(...findFunctionRoots({ type: "func", name: "cos", arg: node.arg }));
+                }
+                walk(node.arg);
+                break;
+            case "neg": case "sqrt": case "abs":
+                walk(node.arg);
+                break;
+            case "add": case "sub": case "mul":
+                walk(node.left);
+                walk(node.right);
+                break;
+            case "pow":
+                walk(node.base);
+                walk(node.exp);
+                break;
+            default:
+                break; // num, var, const – keine Kinder
+        }
+    }
+
+    walk(ast);
+    return analysisDedupe(points);
+}
+
 function findFunctionExtrema(ast) {
     const step = (2 * ANALYSIS_RANGE) / ANALYSIS_SAMPLES;
     const found = [];
@@ -1629,68 +1668,109 @@ function initCoordinateSystem() {
     // Kurvenzweige entstehen nur bei echtem Vorzeichenwechsel der Klemm-Richtung
     // (oben->unten), nicht anhand roher Pixelabstände.
     function samplePoints(fn) {
-        const points = [];
-        const MARGIN = 60;            // fester Puffer in px jenseits des Viewports
+        const MARGIN = 60;
         const TOP = -MARGIN;
         const BOTTOM = heightPx + MARGIN;
-        const SUBSAMPLES = 6;         // pro Spalte -> Hüllkurve gegen Aliasing bei Hochfrequenz-Funktionen
+        const SUBSAMPLES = 6;
+        const SINGULARITY_EPS = 1e-6; // Mathe-Einheiten, zoomunabhängig
 
-        // Letzte eindeutige Klemm-Richtung: -1 = oben, 1 = unten, 0 = frei.
-        // Ein Wechsel von -1 zu 1 (oder umgekehrt) OHNE zwischenzeitliche
-        // Rückkehr zu 0 ist die Signatur einer Polstelle.
+        // Sichtbare, aus dem AST bekannte Singularitäten -> Segmentgrenzen.
+        // Ersetzt die alte Polstellen-Erkennung über Subsample-Zufallstreffer.
+        const viewMinX = toMathX(0);
+        const viewMaxX = toMathX(widthPx);
+        const boundaries = (fn.singularities || []).filter(s => s > viewMinX && s < viewMaxX);
+
+        let cursor = viewMinX;
+        let cursorIsSingularity = false;
+        const segments = [];
+        boundaries.forEach(s => {
+            segments.push({ start: cursor, end: s, startAtSingularity: cursorIsSingularity, endAtSingularity: true });
+            cursor = s;
+            cursorIsSingularity = true;
+        });
+        segments.push({ start: cursor, end: viewMaxX, startAtSingularity: cursorIsSingularity, endAtSingularity: false });
+
+        const points = [];
+        segments.forEach(seg => {
+            const segPoints = sampleSegment(fn.ast, seg, TOP, BOTTOM, SUBSAMPLES, SINGULARITY_EPS);
+            if (points.length > 0 && segPoints.length > 0) points.push(null); // Segmentgrenze -> nie über eine Singularität hinweg verbinden
+            points.push(...segPoints);
+        });
+
+        return points;
+    }
+
+    // Samplet EIN Segment. Spalten-Logik (Subsamples, Hüllkurve, Clamp) 1:1
+    // wie zuvor – läuft jetzt nur strikt innerhalb der Segmentgrenzen. An
+    // einer echten Singularität wird zusätzlich knapp innerhalb des Segments
+    // ausgewertet (fester Epsilon-Abstand), statt auf einen zufällig nahen
+    // Subsample-Treffer zu hoffen.
+    function sampleSegment(ast, seg, TOP, BOTTOM, SUBSAMPLES, EPS) {
+        const points = [];
+
+        if (seg.startAtSingularity) {
+            const y = evaluateGraphNode(ast, seg.start + EPS);
+            if (y !== null && Number.isFinite(y)) {
+                let sy = toScreenY(y);
+                if (sy < TOP) sy = TOP; else if (sy > BOTTOM) sy = BOTTOM;
+                points.push({ x: toScreenX(seg.start), y: sy });
+            }
+        }
+
+        const pxStart = Math.max(0, Math.floor(toScreenX(seg.start) / 2) * 2);
+        const pxEnd = Math.min(widthPx, Math.ceil(toScreenX(seg.end) / 2) * 2);
         let clampSign = 0;
 
-        for (let px = 0; px <= widthPx; px += 2) {
-            const xLeft = toMathX(px);
-            const xRight = toMathX(px + 2);
+        for (let px = pxStart; px <= pxEnd; px += 2) {
+            const xLeft = Math.max(toMathX(px), seg.start);
+            const xRight = Math.min(toMathX(px + 2), seg.end);
+            if (xRight <= xLeft) continue;
 
             let colMin = Infinity, colMax = -Infinity, anyFinite = false;
 
             for (let s = 0; s < SUBSAMPLES; s++) {
                 const xSample = xLeft + (xRight - xLeft) * (s / (SUBSAMPLES - 1));
-                const mathY = evaluateGraphNode(fn.ast, xSample);
+                const mathY = evaluateGraphNode(ast, xSample);
                 if (mathY === null || !Number.isFinite(mathY)) continue;
-
                 let sy = toScreenY(mathY);
-                if (sy < TOP) sy = TOP;
-                else if (sy > BOTTOM) sy = BOTTOM;
-
+                if (sy < TOP) sy = TOP; else if (sy > BOTTOM) sy = BOTTOM;
                 anyFinite = true;
                 if (sy < colMin) colMin = sy;
                 if (sy > colMax) colMax = sy;
             }
 
-            if (!anyFinite) {
-                points.push(null); // Definitionslücke über die ganze Spalte
-                clampSign = 0;
-                continue;
-            }
+            if (!anyFinite) { points.push(null); clampSign = 0; continue; }
 
             const touchesTop = colMin <= TOP;
             const touchesBottom = colMax >= BOTTOM;
 
             if (touchesTop && touchesBottom) {
-                // Spalte deckt beide Ränder ab -> Polstelle liegt genau hier
                 if (clampSign !== 0) points.push(null);
                 points.push({ x: px, y: colMin });
                 points.push({ x: px, y: colMax });
                 clampSign = 0;
             } else {
                 const side = touchesTop ? -1 : touchesBottom ? 1 : 0;
-                if (side !== 0 && clampSign !== 0 && side !== clampSign) {
-                    points.push(null); // direkter Vorzeichenwechsel -> Polstelle
-                }
+                if (side !== 0 && clampSign !== 0 && side !== clampSign) points.push(null);
                 if (colMax - colMin < 0.5) {
                     points.push({ x: px, y: colMin });
                 } else {
-                    // Hüllkurve: Min/Max der Spalte verbinden statt nur ein
-                    // Sample -> fängt schnelle Oszillation (10*sin(50x)) ein
                     points.push({ x: px, y: colMin });
                     points.push({ x: px, y: colMax });
                 }
                 clampSign = side;
             }
         }
+
+        if (seg.endAtSingularity) {
+            const y = evaluateGraphNode(ast, seg.end - EPS);
+            if (y !== null && Number.isFinite(y)) {
+                let sy = toScreenY(y);
+                if (sy < TOP) sy = TOP; else if (sy > BOTTOM) sy = BOTTOM;
+                points.push({ x: toScreenX(seg.end), y: sy });
+            }
+        }
+
         return points;
     }
 

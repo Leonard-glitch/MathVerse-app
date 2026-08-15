@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funktionsrechner</title>
-    <link rel="icon" type="image/x-icon" href="../../pictures/favicon v1.png">
+    <title>Function Calculator</title>
+    <link rel="icon" type="image/png" href="../../favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+    <link rel="shortcut icon" href="../../favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Globomath" />
+    <link rel="manifest" href="../../site.webmanifest" />
     <link rel="stylesheet" href="../../css/feedback.css">
     <link rel="stylesheet" href="../../css/Common/common.css">
-    <link rel="stylesheet" href="./funktionsrechner.css">
+    <link rel="stylesheet" href="./functionCalculator.css">
 
     <script type="module">
         import "https://esm.run/mathlive";
@@ -21,7 +26,7 @@
         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
 
         <div>
-            <input type="text" name="search" id="searchInput" placeholder="Suche..." autocomplete="off">
+            <input type="text" name="search" id="searchInput" placeholder="Search..." autocomplete="off">
 
             <div id="searchResults"></div>
         </div>
@@ -34,14 +39,14 @@
     <main>
 
         <section class="functionsSecFull">
-            <h1 class="zahlenHeader">Funktionsrechner</h1>
+            <h1 class="zahlenHeader">Function Calculator</h1>
 
             <div class="functionsContainer">
                 <div class="topNavlistContainer">
                     <div class="secondNavList">
                         <a href="../../index.html"><img src="../../pictures/WebsiteLogoImageLongImageV2.png" alt="" class="navImage"></a>
                         <div>
-                            <input type="text" name="search" id="searchInputSecondary" placeholder="Suche..." autocomplete="off">
+                            <input type="text" name="search" id="searchInputSecondary" placeholder="Search..." autocomplete="off">
 
                             <div id="searchResultsSecondary"></div>
                         </div>
@@ -110,7 +115,7 @@
         </div>
     </footer>
     <script src="../../javaScript/Common/common-login.js"></script>
-    <script src="./funktionsrechner.js"></script>
+    <script src="./functionCalculator.js"></script>
     <script src="../../javaScript/feedback.js"></script>
     <script type="module" src="../../javaScript/toolFavorite.js"></script>
     <script type="module" src="../../javaScript/search.js"></script>
@@ -234,3 +239,20 @@
 </div>
 </body>
 </html>
+
+
+
+/*{
+        id:       "card14",
+        title:    "Function Calculator",
+        group:    "algebra",
+        filename: "functionCalculator.html",
+        url:      `${BASE}/Tools/FunctionCalculator/functionCalculator.html`,
+        tags:     ["functions", "coordinate system", "graph", "root", "intersections"],
+        info:     "Create and analyze mathematical functions with an interactive coordinate system.",
+        image: {
+            big:   `${BASE}/pictures/Funktionsrechner2-appIcon.png`,
+            small: `${BASE}/pictures/icons/meinTool-icon.png`
+        }
+    },
+    */
