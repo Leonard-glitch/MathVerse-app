@@ -332,7 +332,8 @@ function initSearch() {
 // ==========================================================================
 
 function calcFirstRowHeight(container) {
-    const TOLERANCE = 3; // px – toleriert Sub-Pixel-Rendering ohne Math.round
+    // Erhöht auf 15, damit translateY(-5px) beim :hover/:active nicht als neue Zeile gewertet wird
+    const TOLERANCE = 15; 
 
     const cards = Array.from(container.querySelectorAll(".card"))
         .filter(c => c.style.display !== "none");
@@ -341,6 +342,8 @@ function calcFirstRowHeight(container) {
     const cRect = container.getBoundingClientRect();
     const rects = cards.map(c => c.getBoundingClientRect());
     const tops  = rects.map(r => r.top - cRect.top);
+
+    // ... (der restliche Code in dieser Funktion bleibt exakt gleich)
 
     const rowTops = [];
     tops.forEach(top => {
@@ -542,8 +545,16 @@ window.addEventListener("storage", (e) => {
 });
 
 // Collapsible-Höhen bei Resize neu auswerten (debounced)
+let _lastInnerWidth = window.innerWidth;
 let _collapsibleResizeTimer;
+
 window.addEventListener("resize", () => {
+    // Ignoriere reines vertikales Scrollen (z.B. wenn sich die URL-Leiste auf Mobile ein/ausblendet)
+    if (window.innerWidth === _lastInnerWidth) {
+        return; 
+    }
+    _lastInnerWidth = window.innerWidth;
+
     clearTimeout(_collapsibleResizeTimer);
     _collapsibleResizeTimer = setTimeout(applyCollapsibleLogic, 200);
 }, { passive: true });
