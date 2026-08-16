@@ -2,7 +2,6 @@
 window.MV_BASE = ((document.currentScript || {}).src || '')
     .replace(/\/javaScript\/Common\/common-login\.js([?#].*)?$/, '');
 
-localStorage.removeItem(""); 
 (function () {
 
     const THEMES = {
@@ -106,15 +105,15 @@ localStorage.removeItem("");
 
 
     function redirectIfLoggedIn(path) {
-    if (!isLoggedIn()) return;
-    const returnUrl = sessionStorage.getItem('mv-return-url');
-    if (returnUrl) {
-        sessionStorage.removeItem('mv-return-url');
-        window.location.href = returnUrl;
-    } else {
-        window.location.href = path;
+        if (!isLoggedIn()) return;
+        const returnUrl = sessionStorage.getItem('mv-return-url');
+        if (returnUrl) {
+            sessionStorage.removeItem('mv-return-url');
+            window.location.href = returnUrl;
+        } else {
+            window.location.href = path;
+        }
     }
-}
 
     function isLoggedIn() {
         return localStorage.getItem('isLoggedIn') === 'true' && !!localStorage.getItem('currentUser');

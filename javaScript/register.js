@@ -381,8 +381,18 @@ form.addEventListener('submit', (e) => {
         });
         window.MV.clearGuestToolHistoryStore();
 
-        const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
+        // ... (dein restlicher Code davor, wo Login/Register gecheckt wird)
+
+        let baseUrl = window.MV_BASE || ''; 
+        let returnUrl = sessionStorage.getItem('mv-return-url') || (baseUrl + '/index.html');
         sessionStorage.removeItem('mv-return-url');
+
+        // SICHERHEITS-CHECK: Verhindert den Redirect-Loop
+        // Sucht nach "login" oder "register" im Link. Falls gefunden -> ab zur Startseite!
+        if (returnUrl.includes('login') || returnUrl.includes('register')) {
+            returnUrl = baseUrl + '/index.html';
+        }
+
         window.location.href = returnUrl;
     }
 });
