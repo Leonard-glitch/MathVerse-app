@@ -864,16 +864,20 @@ function peelOnce(node, other, varName) {
                     return { domainError: "This equation has no real solution – an even power cannot be negative." };
                 }
 
-                if (isEven) {
+                // Only block as ambiguous when the other side is a concrete
+                // number (genuine ± case, e.g. (x+1)²=9). Symbolic other side
+                // (e.g. isolating a from a²+b²=c²) takes the principal root,
+                // same convention as the sibling "sqrt" case below.
+                if (isEven && otherVal !== null) {
                     return {
                         ambiguous: `The target variable is raised to an even power (${isSquare ? "square" : `exponent ${opnd(node.exp)}`}). This usually leads to two possible solutions (positive and negative solution branches) – this case distinction is currently not supported.`
                     };
                 }
 
                 return {
-                    opLabel: `${opnd(node.exp)}√`,
+                    opLabel: isSquare ? `√` : `${opnd(node.exp)}√`,
                     newSubject: node.base,
-                    newOther: { type: "sqrt", arg: other, index: node.exp }
+                    newOther: { type: "sqrt", arg: other, index: isSquare ? null : node.exp }
                 };
             }
             if (inExp && !inBase) {
@@ -1036,7 +1040,8 @@ function isolate(eq, varName) {
 
 function canSolveFor(eq, varName) {
     if (countVarOccurrences(eq.left, varName) + countVarOccurrences(eq.right, varName) === 0) return false;
-    return isolate(eq, varName) !== null;
+    const result = isolate(eq, varName);
+    return result !== null && !result.error;
 }
 
 function hasVarInSqrtIndex(node, varName) {

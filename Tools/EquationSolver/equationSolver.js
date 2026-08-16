@@ -945,16 +945,16 @@ function peelOnce(node, other, varName) {
                     return { domainError: "This equation has no real solution – an even power cannot be negative." };
                 }
 
-                if (isEven) {
+                if (isEven && otherVal !== null) {
                     return {
                         ambiguous: `The target variable is raised to an even power here (${isSquare ? "square" : `exponent ${opnd(node.exp)}`}). This usually leads to two possible solutions (positive and negative branches) – branch handling is currently not supported.`
                     };
                 }
 
                 return {
-                    opLabel: `${opnd(node.exp)}√`,
+                    opLabel: isSquare ? `√` : `${opnd(node.exp)}√`,
                     newSubject: node.base,
-                    newOther: { type: "sqrt", arg: other, index: node.exp }
+                    newOther: { type: "sqrt", arg: other, index: isSquare ? null : node.exp }
                 };
             }
             if (inExp && !inBase) {
