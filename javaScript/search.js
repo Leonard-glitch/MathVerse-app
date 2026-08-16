@@ -30,10 +30,47 @@ function initSearchInstance(searchInput) {
             return;
         }
 
+        // 1. Zuerst filtern wir alle passenden Tools heraus (wie bisher)
         const matches = tools.filter(tool => {
             const titleMatch = tool.title.toLowerCase().includes(query);
             const tagMatch   = tool.tags.some(tag => tag.toLowerCase().includes(query));
             return titleMatch || tagMatch;
+        });
+
+        // 2. Jetzt sortieren wir die Ergebnisse nach Priorität
+        matches.sort((a, b) => {
+            const getScore = (tool) => {
+                const title = tool.title.toLowerCase();
+                
+                // Prio 1: Titel BEGINNT exakt mit dem Suchbegriff 
+                // (z.B. "ge" -> "Geometry Calculator")
+                if (title.startsWith(query)) {
+                    return 100;
+                }
+                
+                // Prio 2: Der Suchbegriff ist der ANFANG eines WORTES mitten im Titel 
+                // (z.B. "calc" -> "Math Calculator")
+                if (title.includes(" " + query)) {
+                    // Wir ziehen ein winziges bisschen für die Position ab, 
+                    // aber es bleibt stark um die 90 Punkte.
+                    return 90 - (title.indexOf(" " + query) * 0.1);
+                }
+                
+                // Prio 3: Suchbegriff ist MITTEN in einem Wort enthalten 
+                // (z.B. "ge" -> "Percentage Calculator")
+                const titleIndex = title.indexOf(query);
+                if (titleIndex > 0) {
+                    // Math.max stellt sicher, dass der Titel-Score NIEMALS unter 20 fällt.
+                    // So bleibt ein Titel-Treffer immer wertvoller als ein reiner Tag-Treffer (10).
+                    return Math.max(20, 80 - titleIndex); 
+                }
+                
+                // Prio 4: Suchbegriff wurde nur in den TAGS gefunden
+                return 10;
+            };
+
+            // Absteigend sortieren (Höchster Score ganz oben)
+            return getScore(b) - getScore(a);
         });
 
         // Render first, then position: prevents calculation based on layout that is still changing.
