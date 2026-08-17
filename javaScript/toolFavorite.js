@@ -1,6 +1,5 @@
 /**
  * toolFavorite.js – Floating heart button on tool pages
- *
  * Uses window.MV (from common-login.js) for login checks and
  * favorite management, matching the homepage logic exactly.
  *
