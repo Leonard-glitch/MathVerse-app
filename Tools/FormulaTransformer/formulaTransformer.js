@@ -443,10 +443,8 @@ function extractCoefficient(node) {
             return { coeff: node.right.value * inner.coeff, base: inner.base };
         }
     }
-    if (node.type === "div" && node.right.type === "num" && node.right.value !== 0) {
-        const inner = extractCoefficient(node.left);
-        return { coeff: inner.coeff / node.right.value, base: inner.base };
-    }
+        // Division wird hier bewusst NICHT in einen Koeffizienten zerlegt
+    // (U/2 bleibt "U/2", nicht "0.5 · U") – Brüche bleiben wie eingegeben.
     return { coeff: 1, base: node };
 }
 
@@ -592,7 +590,8 @@ function simplify(node) {
                 return simplify({ type: left.type, left: { type: "div", left: left.left, right }, right: { type: "div", left: left.right, right } });
             }
 
-            if (left.type === "num" && right.type === "num" && right.value !== 0) return numNode(left.value / right.value);
+                        // Brüche bleiben wie eingegeben (keine Auto-Dezimalfaltung) –
+            // der Formel-Umformer formt nur um, er rechnet nicht.
             if (left.type === "num" && left.value === 0 && right.type !== "num") return numNode(0);
             if (right.type === "num" && right.value === 1) return left;
             return { type: "div", left, right };
@@ -868,11 +867,9 @@ function peelOnce(node, other, varName) {
                 // number (genuine ± case, e.g. (x+1)²=9). Symbolic other side
                 // (e.g. isolating a from a²+b²=c²) takes the principal root,
                 // same convention as the sibling "sqrt" case below.
-                if (isEven && otherVal !== null) {
-                    return {
-                        ambiguous: `The target variable is raised to an even power (${isSquare ? "square" : `exponent ${opnd(node.exp)}`}). This usually leads to two possible solutions (positive and negative solution branches) – this case distinction is currently not supported.`
-                    };
-                }
+                                // Formel-Umformer formt nur um: nimmt immer die Hauptwurzel
+                // statt bei ± zu blockieren (das bleibt dem Gleichungslöser
+                // vorbehalten, der bei konkreten Zahlenwerten weiter blockt).
 
                 return {
                     opLabel: isSquare ? `√` : `${opnd(node.exp)}√`,
