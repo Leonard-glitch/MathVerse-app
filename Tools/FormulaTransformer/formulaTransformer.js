@@ -730,7 +730,7 @@ function renderExpr(node) {
 
         case "mul": {
             const wrap = (n) => (n.type === "add" || n.type === "sub" || n.type === "neg") ? `(${renderExpr(n)})` : renderExpr(n);
-            return `${wrap(node.left)} · ${wrap(wrap(node.right))}`;
+            return `${wrap(node.left)} · ${wrap(node.right)}`;
         }
 
         case "div":
