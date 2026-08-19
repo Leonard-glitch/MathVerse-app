@@ -3,18 +3,20 @@
    ========================================================================== */
 
 (function () {
+  const MAX_CHAR_LENGTH = 1000;
+  const API_ENDPOINT = "/api/feedback";
 
   const modalHTML = `
-    <div id="feedbackModal" class="modal">
+    <div id="feedbackModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle" style="display: none;">
       <div class="modal-content">
-        <span class="close-btn">&times;</span>
+        <button type="button" class="close-btn" aria-label="Close feedback modal">&times;</button>
 
         <div id="feedbackFormContainer">
-          <h2 class="feedback-header">Send feedback</h2>
+          <h2 id="feedbackTitle" class="feedback-header">Send feedback</h2>
           
           <form id="feedbackForm" novalidate>
             <label for="feedbackCategory" class="feedback-label">Category</label>
-            <select id="feedbackCategory" class="feedback-select" required>
+            <select id="feedbackCategory" class="feedback-select" required aria-required="true">
               <option value="" disabled selected hidden>Select a category...</option>
               <option value="Design">Design / UI</option>
               <option value="Tool missing">Suggest a new math tool</option>
@@ -23,16 +25,25 @@
             </select>
 
             <label for="feedbackText" class="feedback-label">Your message</label>
-            <textarea id="feedbackText" class="feedback-textarea" rows="4" required placeholder="Write your feedback here..."></textarea>
+            <textarea 
+              id="feedbackText" 
+              class="feedback-textarea" 
+              rows="4" 
+              maxlength="${MAX_CHAR_LENGTH}" 
+              required 
+              aria-required="true"
+              placeholder="Write your feedback here..."
+            ></textarea>
 
-            <!-- Verwende deine globale Fehler-Klasse -->
-            <div id="feedbackError" class="errorMessagestyle"></div>
+            <div id="feedbackError" class="errorMessagestyle" role="alert" aria-live="polite" style="display: none;"></div>
 
-            <button type="submit" class="feedback-submit-btn">Send</button>
+            <button type="submit" id="feedbackSubmitBtn" class="feedback-submit-btn">
+              <span class="btn-text">Send</span>
+            </button>
           </form>
         </div>
 
-        <div id="feedbackSuccessMessage" class="success-container" style="display: none;">
+        <div id="feedbackSuccessMessage" class="success-container" style="display: none;" aria-live="polite">
           <div class="success-icon">&#10004;</div>
           <h3 class="success-header">Sent!</h3>
           <p class="success-text">Thank you, your feedback helps us improve Globomath even further.</p>
@@ -43,87 +54,173 @@
 
   document.body.insertAdjacentHTML("beforeend", modalHTML);
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const modal         = document.getElementById("feedbackModal");
-    const openBtn       = document.getElementById("openFeedbackBtn");
-    const closeBtn      = modal.querySelector(".close-btn");
-    const form          = document.getElementById("feedbackForm");
+  const initFeedbackModal = () => {
+    const modal = document.getElementById("feedbackModal");
+    const openBtn = document.getElementById("openFeedbackBtn");
+    const closeBtn = modal?.querySelector(".close-btn");
+    const form = document.getElementById("feedbackForm");
     const formContainer = document.getElementById("feedbackFormContainer");
-    const successMsg    = document.getElementById("feedbackSuccessMessage");
-    
+    const successMsg = document.getElementById("feedbackSuccessMessage");
+
     const categoryInput = document.getElementById("feedbackCategory");
-    const textInput     = document.getElementById("feedbackText");
-    const errorBox      = document.getElementById("feedbackError");
+    const textInput = document.getElementById("feedbackText");
+    const submitBtn = document.getElementById("feedbackSubmitBtn");
+    const errorBox = document.getElementById("feedbackError");
 
-    if (!openBtn) return;
+    if (!modal || !form) return;
 
-    // Hilfsfunktion zum Verstecken von Fehlern
+    let isSubmitting = false;
+
+    const showError = (message) => {
+      if (!errorBox) return;
+      errorBox.textContent = message;
+      errorBox.style.display = "block";
+    };
+
     const hideError = () => {
+      if (!errorBox) return;
       errorBox.style.display = "none";
       errorBox.textContent = "";
     };
 
-    openBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      modal.style.display = "block";
-    });
-
-    closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
+    const resetModalState = () => {
+      form.reset();
       hideError();
-    });
+      formContainer.style.display = "block";
+      successMsg.style.display = "none";
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        const btnText = submitBtn.querySelector(".btn-text");
+        if (btnText) btnText.textContent = "Send";
+      }
+      isSubmitting = false;
+    };
+
+    const openModal = () => {
+      modal.style.display = "block";
+      hideError();
+      categoryInput?.focus();
+    };
+
+    const closeModal = () => {
+      modal.style.display = "none";
+      if (successMsg.style.display === "flex") {
+        resetModalState();
+      } else {
+        hideError();
+      }
+    };
+
+    if (openBtn) {
+      openBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        openModal();
+      });
+    }
+
+    closeBtn?.addEventListener("click", closeModal);
 
     window.addEventListener("click", (e) => {
       if (e.target === modal) {
-        modal.style.display = "none";
-        hideError();
+        closeModal();
       }
     });
 
-    form.addEventListener("submit", (e) => {
+    // Tastatur-Accessibility: ESC schließt das Modal
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.style.display === "block") {
+        closeModal();
+      }
+    });
+
+    categoryInput?.addEventListener("change", hideError);
+    textInput?.addEventListener("input", hideError);
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      if (isSubmitting) return;
+
+      const category = categoryInput ? categoryInput.value.trim() : "";
+      const rawMessage = textInput ? textInput.value : "";
+      const trimmedMessage = rawMessage.trim();
+
       // Validierung
-      if (!categoryInput.value) {
-        errorBox.textContent = "Please select a category.";
-        errorBox.style.display = "block";
+      if (!category) {
+        showError("Please select a category.");
+        categoryInput?.focus();
         return;
       }
 
-      if (!textInput.value.trim()) {
-        errorBox.textContent = "Please write a message.";
-        errorBox.style.display = "block";
+      if (!trimmedMessage) {
+        showError("Please write a message.");
+        textInput?.focus();
         return;
       }
 
-      // Bei Erfolg Fehler ausblenden
+      if (trimmedMessage.length > MAX_CHAR_LENGTH) {
+        showError(`Message is too long (max ${MAX_CHAR_LENGTH} characters).`);
+        textInput?.focus();
+        return;
+      }
+
       hideError();
+      isSubmitting = true;
 
-      const category = categoryInput.value;
-      const message  = textInput.value;
-      const page     = window.location.pathname;
+      // Loading-Zustand setzen
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        const btnText = submitBtn.querySelector(".btn-text");
+        if (btnText) btnText.textContent = "Sending...";
+      }
 
-      console.log("--- NEW FEEDBACK ---");
-      console.log("Category:", category);
-      console.log("Message:", message);
-      console.log("Page:", page);
+      // Anonyme Feedback-Daten
+      const payload = {
+        category: category,
+        message: trimmedMessage,
+        page: window.location.pathname
+      };
 
-      formContainer.style.display = "none";
-      successMsg.style.display    = "flex";
+      try {
+        const response = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
 
-      setTimeout(() => {
-        modal.style.display = "none";
+        if (!response.ok) {
+          throw new Error(`Server returned status ${response.status}`);
+        }
+
+        // Erfolgsfall
+        formContainer.style.display = "none";
+        successMsg.style.display = "flex";
+
         setTimeout(() => {
-          form.reset();
-          formContainer.style.display = "block";
-          successMsg.style.display    = "none";
-        }, 300);
-      }, 2500);
+          closeModal();
+          setTimeout(() => {
+            resetModalState();
+          }, 300);
+        }, 2500);
+
+      } catch (err) {
+        // Fehlerfall: Der Text bleibt im Feld erhalten
+        showError("Failed to send feedback. Please check your connection and try again.");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          const btnText = submitBtn.querySelector(".btn-text");
+          if (btnText) btnText.textContent = "Send";
+        }
+        isSubmitting = false;
+      }
     });
+  };
 
-    // Fehler automatisch ausblenden, wenn der User mit der Eingabe beginnt
-    categoryInput.addEventListener("change", hideError);
-    textInput.addEventListener("input", hideError);
-  });
-
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFeedbackModal);
+  } else {
+    initFeedbackModal();
+  }
 })();
