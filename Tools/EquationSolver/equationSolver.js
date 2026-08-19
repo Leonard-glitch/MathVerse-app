@@ -138,6 +138,46 @@ const GREEK_LETTERS = {
 
 // Tokenizer
 
+function readBraceOrBareArgument(latex, i, contextLabel) {
+    const n = latex.length;
+    while (i < n && /\s/.test(latex[i])) i++;
+
+    if (latex[i] === "{") {
+        let depth = 0;
+        const start = i;
+        for (let k = i; k < n; k++) {
+            if (latex[k] === "{") depth++;
+            else if (latex[k] === "}") {
+                depth--;
+                if (depth === 0) {
+                    const end = k + 1;
+                    const inner = latex.slice(start + 1, end - 1);
+                    const innerTokens = tokenize(inner).slice(0, -1);
+                    return { tokens: [{ type: "LBRACE" }, ...innerTokens, { type: "RBRACE" }], nextIndex: end };
+                }
+            }
+        }
+        throw new FormulaError("A curly brace was not closed properly.");
+    }
+
+    if (latex[i] === "\\") {
+        let j = i + 1;
+        while (j < n && /[a-zA-Z]/.test(latex[j])) j++;
+        const innerTokens = tokenize(latex.slice(i, j)).slice(0, -1);
+        if (innerTokens.length !== 1) {
+            throw new FormulaError(`After "${contextLabel}" without curly braces, a single digit, letter, or "\\pi" is expected.`);
+        }
+        return { tokens: [{ type: "LBRACE" }, ...innerTokens, { type: "RBRACE" }], nextIndex: j };
+    }
+
+    if (/[0-9a-zA-Z]/.test(latex[i])) {
+        const innerTokens = tokenize(latex[i]).slice(0, -1);
+        return { tokens: [{ type: "LBRACE" }, ...innerTokens, { type: "RBRACE" }], nextIndex: i + 1 };
+    }
+
+    throw new FormulaError(`"${contextLabel}" is incomplete.`);
+}
+
 function tokenize(latex) {
     const tokens = [];
     let i = 0;
@@ -158,8 +198,33 @@ function tokenize(latex) {
                 case "left": case "right": continue; // transparent
                 case "cdot": case "times": tokens.push({ type: "MUL" }); continue;
                 case "div": tokens.push({ type: "DIV" }); continue;
-                case "frac": tokens.push({ type: "FRAC" }); continue;
-                case "sqrt": tokens.push({ type: "SQRT" }); continue;
+                                case "frac": {
+                    const numArg = readBraceOrBareArgument(latex, i, "\\frac");
+                    const denArg = readBraceOrBareArgument(latex, numArg.nextIndex, "\\frac");
+                    tokens.push({ type: "FRAC" }, ...numArg.tokens, ...denArg.tokens);
+                    i = denArg.nextIndex;
+                    continue;
+                }
+                case "sqrt": {
+                    let cursor = i;
+                    while (cursor < n && /\s/.test(latex[cursor])) cursor++;
+                    const indexTokens = [];
+                    if (latex[cursor] === "[") {
+                        let depth = 0, bracketEnd = -1;
+                        for (let k = cursor; k < n; k++) {
+                            if (latex[k] === "[") depth++;
+                            else if (latex[k] === "]") { depth--; if (depth === 0) { bracketEnd = k + 1; break; } }
+                        }
+                        if (bracketEnd === -1) throw new FormulaError("The root index was not closed.");
+                        const innerIndex = latex.slice(cursor + 1, bracketEnd - 1);
+                        indexTokens.push({ type: "LBRACKET" }, ...tokenize(innerIndex).slice(0, -1), { type: "RBRACKET" });
+                        cursor = bracketEnd;
+                    }
+                    const arg = readBraceOrBareArgument(latex, cursor, "\\sqrt");
+                    tokens.push({ type: "SQRT" }, ...indexTokens, ...arg.tokens);
+                    i = arg.nextIndex;
+                    continue;
+                }
                 case "pi": tokens.push({ type: "CONST", name: "pi" }); continue;
                 case "sin": case "cos": case "tan":
                 case "ln": case "exp":
@@ -335,11 +400,8 @@ function parseEquation(tokens) {
                 advance();
                 return { type: "const", name: t.name };
 
-            case "LETTER": {
+                        case "LETTER": {
                 advance();
-                if (t.value === "e" && peek().type !== "UNDERSCORE") {
-                    return { type: "const", name: "e" };
-                }
                 let name = t.value;
                 if (peek().type === "UNDERSCORE") {
                     advance();
