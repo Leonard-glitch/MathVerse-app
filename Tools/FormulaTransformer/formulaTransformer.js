@@ -1087,6 +1087,12 @@ function isolate(eq, varName) {
         const targetNode = varOnLeft ? curLeft : curRight;
         const otherNode = varOnLeft ? curRight : curLeft;
 
+        // Safety net: peelOnce assumes that the variable is located ONLY
+        // in targetNode. Multiple occurrences within a single side
+        // (e.g., "x*x" or "x + 1/x"), which combineAddSub could not
+        // combine, would otherwise lead to incorrect results.
+        if (countVarOccurrences(targetNode, varName) !== 1) return null;
+
         const result = peelOnce(targetNode, otherNode, varName);
         if (!result) return null;
         if (result.domainError) return { error: result.domainError };
