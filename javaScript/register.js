@@ -56,6 +56,7 @@ function showMsg(el, msg) {
 function hideMsg(el) {
     if (!el) return;
     el.style.display = 'none';
+    el.textContent = ''; // <-- Diese Zeile fixt deinen Fehler!
 }
 
 function showSuccessMsg(el, msg) {
@@ -71,8 +72,8 @@ function showSuccessMsg(el, msg) {
 // VALIDATION FUNCTIONS
 // ===========================================================================
 /**
- * @param {boolean} silent – true = nur Klassen setzen, keine Fehlertext-Änderungen
- * @returns {boolean} – true wenn valide
+ * @param {boolean} silent – true = set classes only, no error text changes
+ * @returns {boolean} – true if valid
  */
 function validateUsername(silent = false) {
     const val = usernameInput.value.trim();
@@ -246,9 +247,9 @@ passwordConfInput.addEventListener('input', () => {
     if (passwordConfInput.classList.contains('is-error')) {
         passwordConfInput.classList.remove('is-error', 'shake');
     }
-    if (formError.textContent.includes('überein')) hideMsg(formError);
+    if (formError.textContent.includes('match')) hideMsg(formError);
 
-    // Echtzeit-Match
+    // Real-time match
     const pw  = passwordInput.value;
     const pwc = passwordConfInput.value;
     if (pw && pwc && pw === pwc && pw.length >= MIN_PW_LENGTH) {
@@ -259,7 +260,7 @@ passwordConfInput.addEventListener('input', () => {
 });
 
 privacyCheckbox.addEventListener('change', () => {
-    if (privacyCheckbox.checked && formError.textContent.includes('Datenschutz')) {
+    if (privacyCheckbox.checked && formError.textContent.includes('privacy')) {
         hideMsg(formError);
     }
 });
@@ -276,91 +277,88 @@ form.addEventListener('submit', (e) => {
     let valid = true;
     let firstErrorInput = null;
 
-    // 1. Benutzername
+    // 1. Username
     const uname = usernameInput.value.trim();
     if (!uname) {
         setError(usernameInput);
-        showMsg(usernameError, 'Bitte gib einen Benutzernamen ein.');
+        showMsg(usernameError, 'Please enter a username.');
         valid = false;
         firstErrorInput = firstErrorInput || usernameInput;
     } else if (!USERNAME_REGEX.test(uname)) {
         setError(usernameInput);
-        showMsg(usernameError, 'Nur Buchstaben, Zahlen, _, - und . erlaubt (3–20 Zeichen).');
+        showMsg(usernameError, 'Only letters, numbers, _, - and . are allowed (3–20 characters).');
         valid = false;
         firstErrorInput = firstErrorInput || usernameInput;
     } else if (TAKEN_NAMES.includes(uname.toLowerCase()) || window.MV.isUsernameTaken(uname)) {
         setError(usernameInput);
-        showMsg(usernameError, `„${uname}" ist bereits vergeben.`);
+        showMsg(usernameError, `“${uname}” is already taken.`);
         valid = false;
         firstErrorInput = firstErrorInput || usernameInput;
     } else {
         setValid(usernameInput);
     }
-    
-    
 
-    // 2. E-Mail
+    // 2. Email
     if (!emailInput.value.trim() || !emailInput.checkValidity()) {
         setError(emailInput);
-        showMsg(emailError, 'Bitte gib eine gültige E-Mail-Adresse ein.');
+        showMsg(emailError, 'Please enter a valid email address.');
         valid = false;
         firstErrorInput = firstErrorInput || emailInput;
     } else if (window.MV.isEmailTaken(emailInput.value.trim())) {
         setError(emailInput);
-        showMsg(emailError, 'Für diese E-Mail-Adresse existiert bereits ein Konto.');
+        showMsg(emailError, 'An account already exists for this email address.');
         valid = false;
         firstErrorInput = firstErrorInput || emailInput;
     } else {
         setValid(emailInput);
     }
 
-
-    // 3. Passwort
+    // 3. Password
     if (!passwordInput.value) {
         setError(passwordInput);
-        if (!formError.textContent) showMsg(formError, 'Bitte gib ein Passwort ein.');
+        if (!formError.textContent) showMsg(formError, 'Please enter a password.');
         valid = false;
         firstErrorInput = firstErrorInput || passwordInput;
     } else if (passwordInput.value.length < MIN_PW_LENGTH) {
         setError(passwordInput);
-        showMsg(formError, `Das Passwort muss mindestens ${MIN_PW_LENGTH} Zeichen lang sein.`);
+        showMsg(formError, `The password must be at least ${MIN_PW_LENGTH} characters long.`);
         valid = false;
         firstErrorInput = firstErrorInput || passwordInput;
     } else {
         setValid(passwordInput);
     }
 
-    // 4. Passwort-Bestätigung
+    // 4. Password Confirmation
     if (!passwordConfInput.value) {
         setError(passwordConfInput);
-        if (!formError.textContent) showMsg(formError, 'Bitte bestätige dein Passwort.');
+        if (!formError.textContent) showMsg(formError, 'Please confirm your password.');
         valid = false;
         firstErrorInput = firstErrorInput || passwordConfInput;
     } else if (passwordInput.value !== passwordConfInput.value) {
         setError(passwordConfInput);
         setError(passwordInput);
-        showMsg(formError, 'Die Passwörter stimmen nicht überein.');
+        showMsg(formError, 'The passwords do not match.');
         valid = false;
         firstErrorInput = firstErrorInput || passwordConfInput;
     } else if (passwordInput.value.length >= MIN_PW_LENGTH) {
         setValid(passwordConfInput);
     }
 
-    // 5. Datenschutz-Checkbox
+    // 5. Privacy Checkbox
     if (!privacyCheckbox.checked) {
-        if (!formError.textContent) showMsg(formError, 'Du musst die Datenschutzerklärung akzeptieren.');
+        if (!formError.textContent) showMsg(formError, 'You must accept the privacy policy.');
         valid = false;
     }
 
-    // AUSWERTUNG
+    // EVALUATION
     if (!valid) {
-        // Scroll zum ersten Fehler-Feld, falls etwas nicht passt
+        // Scroll to first error field if something is invalid
         if (firstErrorInput) {
             firstErrorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
             firstErrorInput.focus();
         }
     } else {
-        // WENN ALLES PASST: User in "allUsers" registrieren und einloggen
+        // IF EVERYTHING IS VALID: Register and log in user
         window.MV.registerUser({
             username: uname,
             email: emailInput.value.trim(),
@@ -381,15 +379,17 @@ form.addEventListener('submit', (e) => {
         });
         window.MV.clearGuestToolHistoryStore();
 
-        // ... (dein restlicher Code davor, wo Login/Register gecheckt wird)
-
         let baseUrl = window.MV_BASE || ''; 
         let returnUrl = sessionStorage.getItem('mv-return-url') || (baseUrl + '/index.html');
         sessionStorage.removeItem('mv-return-url');
 
-        // SICHERHEITS-CHECK: Verhindert den Redirect-Loop
-        // Sucht nach "login" oder "register" im Link. Falls gefunden -> ab zur Startseite!
-        if (returnUrl.includes('login') || returnUrl.includes('register')) {
+        // SECURITY CHECK: Prevents redirect loops for ALL auth pages
+        if (
+            returnUrl.includes('login') || 
+            returnUrl.includes('register') || 
+            returnUrl.includes('forgot-password') || 
+            returnUrl.includes('reset-password')
+        ) {
             returnUrl = baseUrl + '/index.html';
         }
 

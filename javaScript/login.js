@@ -127,9 +127,13 @@ form.addEventListener('submit', (e) => {
         let returnUrl = sessionStorage.getItem('mv-return-url') || (baseUrl + '/index.html');
         sessionStorage.removeItem('mv-return-url');
 
-        // SICHERHEITS-CHECK: Verhindert den Redirect-Loop
-        // Sucht nach "login" oder "register" im Link. Falls gefunden -> ab zur Startseite!
-        if (returnUrl.includes('login') || returnUrl.includes('register')) {
+        // SICHERHEITS-CHECK: Verhindert den Redirect-Loop für ALLE Auth-Seiten
+        if (
+            returnUrl.includes('login') || 
+            returnUrl.includes('register') || 
+            returnUrl.includes('forgot-password') || 
+            returnUrl.includes('reset-password')
+        ) {
             returnUrl = baseUrl + '/index.html';
         }
 
