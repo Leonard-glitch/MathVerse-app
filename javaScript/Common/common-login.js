@@ -1045,7 +1045,12 @@ async function resetPasswordWithToken(token, newPassword) {
     initNavBurger();
 
     const _mvPath = window.location.pathname;
-    if (!_mvPath.endsWith('/login.html') && !_mvPath.endsWith('/register.html')) {
+    if (
+        !_mvPath.includes('login') && 
+        !_mvPath.includes('register') && 
+        !_mvPath.includes('forgot-password') && 
+        !_mvPath.includes('reset-password')
+    ) {
         sessionStorage.setItem('mv-return-url', window.location.href);
     }
 
@@ -1085,7 +1090,13 @@ async function resetPasswordWithToken(token, newPassword) {
             return;
         }
 
-        if ((path.endsWith('login.html') || path.endsWith('register.html')) && isLoggedIn()) {
+        // NEU: Prüft auf alle 4 Gäste-Seiten
+        const isAuthPage = path.includes('login') || 
+                        path.includes('register') || 
+                        path.includes('forgot-password') || 
+                        path.includes('reset-password');
+
+        if (isAuthPage && isLoggedIn()) {
             const returnUrl = sessionStorage.getItem('mv-return-url') || (window.MV_BASE + '/index.html');
             sessionStorage.removeItem('mv-return-url');
             window.location.replace(returnUrl);
