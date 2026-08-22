@@ -271,9 +271,15 @@ window.MV_BASE = ((document.currentScript || {}).src || '')
     }
 
     function getPinnedGroups() {
-        const u = getCurrentUser();
-        return (isLoggedIn() && u) ? (u.pinnedGroups || []) : [];
+    const u = getCurrentUser();
+    if (window.MV.isLoggedIn() && u) {
+        // Prüfen, ob der User das Array schon initialisiert hat.
+        // Wenn nicht (undefined), gib standardmäßig die Favoriten zurück.
+        return u.pinnedGroups !== undefined ? u.pinnedGroups : ["favoritenGroupStar"];
     }
+    // Für nicht eingeloggte Gäste immer die Favoriten als angepinnt zurückgeben
+    return ["favoritenGroupStar"];
+}
     function setPinnedGroups(arr) {
         if (!isLoggedIn()) return;
         updateCurrentUser({ pinnedGroups: arr });

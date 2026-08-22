@@ -13,9 +13,6 @@ function initMathVerse() {
     groups.forEach(group => createGroupDOM(group, `${group.id}GroupStar`));
     createGroupDOM({ id: "allTools", title: "All Tools" }, "allToolsGroupStar");
 
-    const favStar = document.querySelector('[data-id="favoritenGroupStar"] .star');
-    if (favStar) favStar.className = "fa fa-star star active";
-
     buildAndDistributeCards();
     sortGroupsByPins();
     initSearch();
@@ -37,11 +34,11 @@ function createGroupDOM(group, groupDataId) {
 
     const starIcon = document.createElement("i");
     const pinnedGroups = window.MV.getPinnedGroups();
-    if (pinnedGroups.includes(groupDataId) || groupDataId === "favoritenGroupStar") {
-        starIcon.className = "fa fa-star star active";
-    } else {
-        starIcon.className = "fa fa-star-o star";
-    }
+    if (pinnedGroups.includes(groupDataId)) {
+    starIcon.className = "fa fa-star star active";
+} else {
+    starIcon.className = "fa fa-star-o star";
+}
     starIcon.addEventListener("click", (e) => handleGroupStarClick(e, groupDataId));
 
     const header = document.createElement("h2");
@@ -254,8 +251,6 @@ function handleGroupStarClick(event, groupId) {
         return;
     }
 
-    if (groupId === "favoritenGroupStar") return;
-
     const star      = event.currentTarget;
     const wasActive = star.classList.contains("active");
     let pinnedGroups = window.MV.getPinnedGroups();
@@ -280,9 +275,6 @@ function sortGroupsByPins() {
     allGroups.sort((a, b) => {
         const idA = a.dataset.id;
         const idB = b.dataset.id;
-
-        if (idA === "favoritenGroupStar") return -1;
-        if (idB === "favoritenGroupStar") return 1;
 
         const isPinnedA = pinnedGroups.includes(idA);
         const isPinnedB = pinnedGroups.includes(idB);

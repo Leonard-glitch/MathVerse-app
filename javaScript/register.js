@@ -364,7 +364,7 @@ form.addEventListener('submit', (e) => {
             email: emailInput.value.trim(),
             password: passwordInput.value,
             favoriten: [],
-            pinnedGroups: [],
+            pinnedGroups: ["favoritenGroupStar"], 
             containerOrders: {},
             theme: 'violet',
             fontsize: 20,
