@@ -696,7 +696,7 @@ window.MV_BASE = ((document.currentScript || {}).src || '')
                 <p class="mv-modalText" id="mvLoginPromptText">Please log in to use this feature.</p>
                 <div class="mv-modalActions">
                     <button class="mv-modalBtnSecondary" id="mvLoginPromptCancel">Cancel</button>
-                    <a class="mv-modalBtnPrimary" href="${window.MV_BASE}/html/login.html">Sign in</a>
+                    <a class="mv-modalBtnPrimary" href="${window.MV_BASE}/html/login.html">Log in</a>
                 </div>
             </div>
         `;
