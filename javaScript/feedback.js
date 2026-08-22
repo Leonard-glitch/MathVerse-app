@@ -3,8 +3,8 @@
    ========================================================================== */
 
 (function () {
-  const MAX_CHAR_LENGTH = 1000;
-  const API_ENDPOINT = "/api/feedback";
+  const MAX_CHAR_LENGTH = 500;
+  const API_ENDPOINT = "https://globomath-feedback-worker.schuhleonard.workers.dev";
 
   const modalHTML = `
     <div id="feedbackModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle" style="display: none;">
